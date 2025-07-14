@@ -104,7 +104,7 @@ PEDAGOGICAL_MOVES: Dict[str, Dict[str, str]] = {
 
 def start_node(state: AgentState) -> AgentState:
     prompt = (
-        f"You are an educational agent helping a learner understand '{concept_pkg.title}'.\n"
+        f"You are an educational agent helping a learner understand '{concept_pkg.title}'. The learner is a student of class 7.\n"
         "Greet the learner and ask if they are ready to begin."
     )
     resp = llm_with_history(state, prompt)
