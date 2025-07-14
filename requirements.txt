@@ -12,8 +12,6 @@ Pygments
 SQLAlchemy
 Werkzeug
 absl-py
-agent
-agents
 aiohappyeyeballs
 aiohttp
 aiosignal
