@@ -318,7 +318,7 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
         explain_prompt = (
             f"Student's answer: {state['last_user_msg']}\n"
             "Provide the correct answer to the transfer question, explain why it is correct in 2–3 sentences, "
-            "and then proceed to a real-life application."
+            "and then say we are proceeding to see a real-life application."
         )
         resp = llm_with_history(state, explain_prompt)
         state["agent_output"] = resp.content
