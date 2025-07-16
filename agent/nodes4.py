@@ -69,7 +69,7 @@ PEDAGOGICAL_MOVES: Dict[str, Dict[str, str]] = {
     "APK": {
         "goal": "Activate prior knowledge; pose a hook linking the concept to everyday intuition.",
         "constraints": "Do not reveal definitions or answers; question must be common-sense answerable."
-    },
+    },  
     "CI": {
         "goal": "Provide a concise definition (≤30 words); ask learner to restate it.",
         "constraints": "Keep definition crisp; hint why it matters in ≤1 phrase."
@@ -104,7 +104,7 @@ PEDAGOGICAL_MOVES: Dict[str, Dict[str, str]] = {
 
 def start_node(state: AgentState) -> AgentState:
     prompt = (
-        f"You are an educational agent helping a learner understand '{concept_pkg.title}'. The learner is a student of class 7.\n"
+        f"You are an educational agent helping a learner understand '{concept_pkg.title}'. The learner is a student of class 7. Remember that you are interacting directly with the learner.\n"
         "Greet the learner and ask if they are ready to begin."
     )
     resp = llm_with_history(state, prompt)
@@ -135,7 +135,7 @@ Pedagogical context:
 {context}
 
 Student reply: "{state['last_user_msg']}"
-Task: Evaluate whether the student identified the concept correctly. Respond ONLY with JSON matching the schema above.
+Task: Evaluate whether the student identified the concept correctly. Respond ONLY with JSON matching the schema above. If not, help the student to do so.
 """
     raw = llm_with_history(state, decision_prompt).content
     try:
@@ -171,7 +171,7 @@ Pedagogical context:
 {context}
 
 Student restatement: "{state['last_user_msg']}"
-Task: Determine if the restatement is accurate. Respond ONLY with JSON matching the schema above.
+Task: Determine if the restatement is accurate. Respond ONLY with JSON matching the schema above. If not, help the student to do so.
 """
     raw = llm_with_history(state, decision_prompt).content
     try:
@@ -231,6 +231,7 @@ def mh_node(state: AgentState) -> AgentState:
     return state
 
 def ar_node(state: AgentState) -> AgentState:
+    # First pass: generate the quiz
     if not state.get("_asked_ar", False):
         state["_asked_ar"] = True
         prompt = (
@@ -240,14 +241,14 @@ def ar_node(state: AgentState) -> AgentState:
         state["agent_output"] = resp.content
         return state
 
+    # Second pass: grade & either explain or advance
     instructions = ar_parser.get_format_instructions()
     context = json.dumps(PEDAGOGICAL_MOVES["AR"], indent=2)
     decision_prompt = f"""{instructions}
 
 Current node: AR (Application & Retrieval)
 Possible next_state values (handled by agent code):
-- "CI": when the quiz score is less than 0.5.
-- "TC": when the quiz score is 0.5 or greater.
+- "TC": always move forward after feedback/explanation
 
 Pedagogical context:
 {context}
@@ -262,17 +263,23 @@ Task: Grade this answer on a scale from 0 to 1. Respond ONLY with JSON matching 
     except Exception:
         score, feedback = 0.0, raw
 
-    state["retrieval_score"] = score
     if score < 0.5:
-        state["agent_output"]  = feedback
-        state["current_state"] = "CI"
-        state["_asked_ci"]     = False
+        # Student struggled: give correct answer + explanation, then introduce transfer
+        explain_prompt = (
+            f"Student's answer: {state['last_user_msg']}\n"
+            "Provide the correct answer to the quiz question, explain why it is correct in 2–3 sentences, "
+            "and then say, Nice work! Time for a transfer question."
+        )
+        resp = llm_with_history(state, explain_prompt)
+        state["agent_output"] = resp.content
     else:
-        state["agent_output"]  = feedback + "\nNice work! Time for a transfer question."
-        state["current_state"] = "TC"
+        state["agent_output"] = feedback + "\nNice work! Time for a transfer question."
+
+    state["current_state"] = "TC"
     return state
 
 def tc_node(state: AgentState) -> AgentState:
+    # First pass: generate the transfer question
     if not state.get("_asked_tc", False):
         state["_asked_tc"] = True
         prompt = (
@@ -282,14 +289,14 @@ def tc_node(state: AgentState) -> AgentState:
         state["agent_output"] = resp.content
         return state
 
+    # Second pass: evaluate & either affirm or explain
     instructions = tc_parser.get_format_instructions()
     context = json.dumps(PEDAGOGICAL_MOVES["TC"], indent=2)
     decision_prompt = f"""{instructions}
 
 Current node: TC (Transfer & Critical Thinking)
 Possible next_state values (handled by agent code):
-- "RLC": when correct=true.
-- "CI": when correct=false.
+- "RLC": always move forward after feedback/explanation
 
 Pedagogical context:
 {context}
@@ -304,14 +311,19 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
     except Exception:
         correct, feedback = False, raw
 
-    state["transfer_success"] = correct
     if correct:
-        state["agent_output"]  = feedback + "\nExcellent application! You've mastered this concept."
-        state["current_state"] = "RLC"
+        state["agent_output"] = feedback + "\nExcellent application! You've mastered this concept."
     else:
-        state["agent_output"]   = feedback + "\nThat’s not quite right—let’s revisit the definition."
-        state["current_state"]  = "CI"
-        state["_asked_ci"]      = False
+        # Student struggled: give correct transfer answer + explanation
+        explain_prompt = (
+            f"Student's answer: {state['last_user_msg']}\n"
+            "Provide the correct answer to the transfer question, explain why it is correct in 2–3 sentences, "
+            "and then proceed to a real-life application."
+        )
+        resp = llm_with_history(state, explain_prompt)
+        state["agent_output"] = resp.content
+
+    state["current_state"] = "RLC"
     return state
 
 def rlc_node(state: AgentState) -> AgentState:
