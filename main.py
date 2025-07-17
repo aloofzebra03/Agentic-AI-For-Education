@@ -1,4 +1,6 @@
 # main.py
+
+import json
 from pprint import pprint
 from agent.nodes4 import (
     start_node, apk_node, ci_node, ge_node,
@@ -8,14 +10,14 @@ from agent.nodes4 import (
 
 def main():
     state: AgentState = {
-        "current_state":       "START",
-        "last_user_msg":       "",
-        "history":             [],    # now holds dicts with 'role' & 'content'
-        "definition_echoed":   False,
-        "misconception_detected": False,
-        "retrieval_score":     0.0,
-        "transfer_success":    False,
-        "session_summary":     {},
+        "current_state":           "START",
+        "last_user_msg":           "",
+        "history":                 [],
+        "definition_echoed":       False,
+        "misconception_detected":  False,
+        "retrieval_score":         0.0,
+        "transfer_success":        False,
+        "session_summary":         {},
     }
 
     node_map = {
@@ -31,31 +33,47 @@ def main():
     }
 
     while True:
-        fn = node_map[state["current_state"]]
-        state = fn(state)
-        print("\nAgent:", state["agent_output"])
+        # remember which node we're in
+        node_name = state["current_state"]
+        fn = node_map[node_name]
 
-        # append assistant’s turn
+        state = fn(state)
+        print(f"\nAgent [{node_name}]:", state["agent_output"])
+
+        # record assistant turn with node tag
         state["history"].append({
             "role":    "assistant",
+            "node":    node_name,
             "content": state["agent_output"]
         })
 
+        # if END, generate full summary and break
         if state["current_state"] == "END":
+            state = end_node(state)  # repopulate session_summary
+            print(f"\nAgent [END]:", state["agent_output"])
+            state["history"].append({
+                "role":    "assistant",
+                "node":    "END",
+                "content": state["agent_output"]
+            })
             break
 
-        # read learner’s reply
+        # otherwise prompt user
         user_msg = input("You: ")
         state["last_user_msg"] = user_msg
-
-        # append user’s turn
         state["history"].append({
             "role":    "user",
             "content": user_msg
         })
 
+    # console output
     print("\nSession Summary:")
     pprint(state["session_summary"])
+
+    # write out JSON
+    with open("session_summary.json", "w") as f:
+        json.dump(state["session_summary"], f, indent=2)
+    print("\n Session summary exported to session_summary.json")
 
 
 if __name__ == "__main__":

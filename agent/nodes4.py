@@ -343,15 +343,23 @@ def rlc_node(state: AgentState) -> AgentState:
     return state
 
 def end_node(state: AgentState) -> AgentState:
-    recap = (
-        f"Quick recap:\n"
-        f"• Definition of '{concept_pkg.title}'.\n"
-        f"• Quiz score: {state.get('retrieval_score')}\n"
-        f"• Transfer success: {state.get('transfer_success')}"
-    )
-    state["agent_output"]     = recap
+    # build debug-rich summary
     state["session_summary"] = {
-        "quiz_score":       state.get("retrieval_score"),
-        "transfer_success": state.get("transfer_success")
+        "quiz_score":             state.get("retrieval_score"),
+        "transfer_success":       state.get("transfer_success"),
+        "definition_echoed":      state.get("definition_echoed"),
+        "misconception_detected": state.get("misconception_detected"),
+        "last_user_msg":          state.get("last_user_msg"),
+        "history":                state.get("history"),
     }
+
+    # final output
+    state["agent_output"] = (
+        "Great work today! Here’s your session summary:\n"
+        f"- Quiz score: {state['session_summary']['quiz_score']}\n"
+        f"- Transfer success: {state['session_summary']['transfer_success']}\n"
+        f"- Definition echoed: {state['session_summary']['definition_echoed']}\n"
+        f"- Misconception detected: {state['session_summary']['misconception_detected']}\n"
+        f"- Last user message: {state['session_summary']['last_user_msg']}"
+    )
     return state
