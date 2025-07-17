@@ -5,8 +5,11 @@ import json
 
 load_dotenv()
 
-from agent.nodes4 import start_node, apk_node, ci_node, ge_node, \
-                         mh_node, ar_node, tc_node, rlc_node, end_node, AgentState
+from agent.nodes4 import (
+    start_node, apk_node, ci_node, ge_node,
+    mh_node, ar_node, tc_node, rlc_node, end_node,
+    AgentState
+)
 
 st.set_page_config(page_title="Interactive Tutor", page_icon="🤖")
 
@@ -36,14 +39,14 @@ if "state" not in st.session_state:
     })
     st.session_state.messages = []
 
-    # immediately invoke start_node for the intro
-    initial_state = start_node(st.session_state.state)
-    intro = initial_state["agent_output"]
-    st.session_state.state = initial_state
+    # kick off the intro
+    init = start_node(st.session_state.state)
+    intro = init["agent_output"]
+    st.session_state.state = init
     st.session_state.messages.append(("assistant", intro))
     st.session_state.state["history"].append({
-        "role": "assistant",
-        "node": "START",
+        "role":    "assistant",
+        "node":    "START",
         "content": intro
     })
 
@@ -55,7 +58,7 @@ for role, msg in st.session_state.messages:
 
 # ── handle user input ───────────────────────────────────────────────────────
 if user_msg := st.chat_input("Your turn…"):
-    # record user
+    # record user turn
     st.session_state.messages.append(("user", user_msg))
     with st.chat_message("user"):
         st.write(user_msg)
@@ -65,12 +68,12 @@ if user_msg := st.chat_input("Your turn…"):
         "content": user_msg
     })
 
-    # get bot reply
+    # call the next node
     fn = NODE_MAP[st.session_state.state["current_state"]]
     new_state = fn(st.session_state.state)
     reply = new_state["agent_output"]
 
-    # record assistant
+    # record assistant turn
     st.session_state.state = new_state
     st.session_state.messages.append(("assistant", reply))
     st.session_state.state["history"].append({
@@ -81,17 +84,25 @@ if user_msg := st.chat_input("Your turn…"):
     with st.chat_message("assistant"):
         st.write(reply)
 
-    # if session ended, show summary + download
+    # ── if we've hit END, *then* run end_node and dump JSON ──────────────
     if new_state["current_state"] == "END":
+        # populate session_summary
+        final_state = end_node(st.session_state.state)
+        st.session_state.state = final_state
+
+        # show final agent message (optional)
+        with st.chat_message("assistant"):
+            st.write(final_state["agent_output"])
+
         st.markdown("---")
         st.subheader("Session Summary")
-        st.json(new_state["session_summary"])
+        st.json(final_state["session_summary"])
 
-        # prepare JSON for download
-        summary_json = json.dumps(new_state["session_summary"], indent=2)
+        # make download button
+        summary_json = json.dumps(final_state["session_summary"], indent=2)
         st.download_button(
             label="📥 Download Session Summary",
             data=summary_json,
             file_name="session_summary.json",
-            mime="application/json"
+            mime="application/json",
         )
