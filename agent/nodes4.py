@@ -106,7 +106,7 @@ def start_node(state: AgentState) -> AgentState:
     prompt = (
         f"You are an educational agent helping a learner understand '{concept_pkg.title}'. The learner is a student of class 7. Remember that you are interacting directly with the learner.\n"
         "Greet the learner and ask if they are ready to begin."
-        "Also Remember that the student is of Kannada origin and understands olny kannada.So speak to the student in kannada.The script has to be kannada and not english.\n"
+        # "Also Remember that the student is of Kannada origin and understands olny kannada.So speak to the student in kannada.The script has to be kannada and not english.\n"
     )
     resp = llm_with_history(state, prompt)
     state["agent_output"]  = resp.content
