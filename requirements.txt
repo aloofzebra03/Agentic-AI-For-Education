@@ -269,3 +269,4 @@ yarg
 yarl
 zipp
 zstandard
+onnx-asr[cpu,hub]
