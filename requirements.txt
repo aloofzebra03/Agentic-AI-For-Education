@@ -18,7 +18,7 @@ aiosignal
 altair
 annotated-types
 anthropic
-audio_recorder_streamlit
+audio-recorder-streamlit>=0.0.9
 anyio
 asgiref
 asttokens
