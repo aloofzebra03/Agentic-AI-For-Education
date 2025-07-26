@@ -44,10 +44,14 @@ def load_asr_model():
 asr_model = load_asr_model()
 
 def convert_to_mono_wav(input_path, output_path):
-    sr, data = wavfile.read(input_path)
-    if len(data.shape) == 2:
-        data = np.mean(data, axis=1).astype(data.dtype)
-    wavfile.write(output_path, sr, data)
+    try:
+        sr, data = wavfile.read(input_path)
+        if len(data.shape) == 2:
+            data = np.mean(data, axis=1).astype(data.dtype)
+        wavfile.write(output_path, sr, data)
+    except Exception as e:
+        st.error(f"Error converting WAV to mono: {e}")
+        raise
 
 def transcribe_recorded_audio_bytes(audio_bytes):
     tmp_path = f"temp_recorded_{time.time()}.wav"
@@ -76,8 +80,9 @@ def play_text_as_audio_autoplay(text, audio_placeholder_container):
 
         audio_id = f"audio_player_{int(time.time() * 1000)}"
         audio_html = f"""
-        <audio id="{audio_id}" controls autoplay style="width: 100%; margin-top: 5px;">
+        <audio id="{audio_id}" controls autoplay data-testid="st-audio-player">
             <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
+            Your browser does not support the audio element.
         </audio>
         """
         audio_placeholder_container.markdown(audio_html, unsafe_allow_html=True)
@@ -92,71 +97,66 @@ NODE_MAP = {
     "MH": mh_node, "AR": ar_node, "TC": tc_node, "RLC": rlc_node, "END": end_node,
 }
 
-# ── Session State Initialization ───────────────────────────────────────────
-if "state" not in st.session_state:
-    st.session_state.state = AgentState({
-        "current_state": "START", "last_user_msg": "", "history": [],
-        "definition_echoed": False, "misconception_detected": False,
-        "retrieval_score": 0.0, "transfer_success": False, "session_summary": {},
-    })
-    st.session_state.messages = []
-    st.session_state.audio_recorder_key_counter = 0
-    st.session_state.processing_audio = False # New flag for two-phase render
-
-    init_state = start_node(st.session_state.state)
-    intro_message = init_state.get("agent_output", "Hello! Let's begin.")
-    st.session_state.state = init_state
-    st.session_state.messages.append(("assistant", intro_message))
-    st.session_state.state["history"].append({
-        "role": "assistant", "node": "START", "content": intro_message
-    })
-
-# ── PHASE 2: Process the request after the "Silence" render has occurred ──
-if st.session_state.processing_audio:
-    with st.spinner("Thinking..."):
-        # This code now runs on the second rerun, while the user sees a silent page
-        current_node_key = st.session_state.state["current_state"]
-        node_function = NODE_MAP.get(current_node_key, end_node)
-        
-        # Perform slow agent and TTS generation
-        new_state = node_function(st.session_state.state)
-        agent_reply = new_state.get("agent_output", "I'm not sure how to respond.")
-
-        # Update state and history
-        st.session_state.state = new_state
-        st.session_state.messages.append(("assistant", agent_reply))
-        st.session_state.state["history"].append({
-            "role": "assistant",
-            "node": new_state["current_state"],
-            "content": agent_reply
+# ── SOLUTION PART 1: Restore the Welcome Screen for initial user gesture ──
+if "first_interaction_done" not in st.session_state:
+    st.title("🧑‍🎓 Interactive Tutor")
+    st.info("Welcome! To enable voice communication, please click the button below to start the session.")
+    if st.button("🚀 Start Learning", type="primary"):
+        st.session_state.first_interaction_done = True
+        # Initialize the session state AFTER the first click
+        st.session_state.state = AgentState({
+            "current_state": "START", "last_user_msg": "", "history": [],
+            "definition_echoed": False, "misconception_detected": False,
+            "retrieval_score": 0.0, "transfer_success": False, "session_summary": {},
         })
+        st.session_state.messages = []
+        st.session_state.audio_recorder_key_counter = 0
 
-        # CRUCIAL: Reset the flag and trigger the final "Reveal" render
-        st.session_state.processing_audio = False
+        # Get the first message from the agent
+        init_state = start_node(st.session_state.state)
+        intro_message = init_state.get("agent_output", "Hello! Let's begin.")
+        st.session_state.state = init_state
+        st.session_state.messages.append(("assistant", intro_message))
+        st.session_state.state["history"].append({
+            "role": "assistant", "node": "START", "content": intro_message
+        })
         st.rerun()
+    st.stop()
 
-# ── Main Page Rendering Logic ───────────────────────────────────────────────
+# ── Main Application Logic ───────────────────────────────────────────────
+
+# SOLUTION PART 2: Aggressive JavaScript to win the race condition
+# This script runs on every rerun, repeatedly pausing any audio to prevent replays.
+st.markdown("""
+<script>
+    const audios = document.querySelectorAll('audio');
+    audios.forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
+    });
+</script>
+""", unsafe_allow_html=True)
+
+
 st.title("🧑‍🎓 Interactive Tutor")
 
 # Display chat history
 for i, (role, msg) in enumerate(st.session_state.messages):
     with st.chat_message(role):
         st.write(msg)
-        # Only render audio for the last message AND if we are NOT in the processing phase
-        if role == "assistant" and not st.session_state.processing_audio and (i == len(st.session_state.messages) - 1):
+        # Render audio ONLY for the most recent assistant message
+        if role == "assistant" and (i == len(st.session_state.messages) - 1):
             audio_container = st.empty()
             play_text_as_audio_autoplay(msg, audio_container)
 
-# ── User Input Logic ───────────────────────────────────────────────────────
+# User Input Logic
 if st.session_state.state["current_state"] != "END":
     user_msg = None
-
     recorded_audio_bytes = audio_recorder(
         text="Click the mic to speak",
         key=f"audio_recorder_{st.session_state.audio_recorder_key_counter}",
         icon_size="2x",
     )
-
     if recorded_audio_bytes:
         with st.spinner("Transcribing..."):
             user_msg = transcribe_recorded_audio_bytes(recorded_audio_bytes)
@@ -166,29 +166,33 @@ if st.session_state.state["current_state"] != "END":
     if text_input:
         user_msg = text_input
 
-    # ── PHASE 1: Acknowledge input and trigger the "Silence" render ───────
     if user_msg:
         st.session_state.audio_recorder_key_counter += 1
-        
-        # Add user message to history immediately
         st.session_state.messages.append(("user", user_msg))
         st.session_state.state["last_user_msg"] = user_msg
         st.session_state.state["history"].append({"role": "user", "content": user_msg})
 
-        # CRUCIAL: Set the flag and trigger the "Silence" rerun.
-        # This will redraw the page without the old audio player before we do any slow work.
-        st.session_state.processing_audio = True
+        with st.spinner("Thinking..."):
+            current_node_key = st.session_state.state["current_state"]
+            node_function = NODE_MAP.get(current_node_key, end_node)
+            new_state = node_function(st.session_state.state)
+            agent_reply = new_state.get("agent_output", "I'm not sure how to respond.")
+            st.session_state.state = new_state
+            st.session_state.messages.append(("assistant", agent_reply))
+            st.session_state.state["history"].append({
+                "role": "assistant",
+                "node": new_state["current_state"],
+                "content": agent_reply
+            })
         st.rerun()
 
-# ── Session End Summary ────────────────────────────────────────────────────
-if st.session_state.state["current_state"] == "END" and not st.session_state.processing_audio:
+# Session End Summary
+if st.session_state.state["current_state"] == "END":
     st.markdown("---")
     st.success("🎉 Session Complete!")
     st.subheader("Session Summary")
-    
-    summary_data = st.session_state.state.get("session_summary", {"message": "No summary was generated."})
+    summary_data = st.session_state.state.get("session_summary", {"message": "No summary."})
     st.json(summary_data)
-
     if summary_data:
         summary_json = json.dumps(summary_data, indent=2)
         st.download_button(
