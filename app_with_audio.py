@@ -35,7 +35,6 @@ except ImportError:
     start_node, apk_node, ci_node, ge_node, mh_node, ar_node, tc_node, rlc_node, end_node = (placeholder_node,) * 9
     class AgentState(dict): pass
 
-
 # ── ASR & TTS Functions ──────────────────────────────────────────────────
 @st.cache_resource
 def load_asr_model():
@@ -51,22 +50,24 @@ def convert_to_mono_wav(input_path, output_path):
         wavfile.write(output_path, sr, data)
     except Exception as e:
         st.error(f"Error converting WAV to mono: {e}")
-        raise
 
 def transcribe_recorded_audio_bytes(audio_bytes):
     tmp_path = f"temp_recorded_{time.time()}.wav"
     mono_wav_path = f"temp_mono_{time.time()}.wav"
     try:
-        with open(tmp_path, 'wb') as f:
-            f.write(audio_bytes)
+        with open(tmp_path, 'wb') as f: f.write(audio_bytes)
         convert_to_mono_wav(tmp_path, mono_wav_path)
         return asr_model.recognize(mono_wav_path)
     finally:
         if os.path.exists(tmp_path): os.remove(tmp_path)
         if os.path.exists(mono_wav_path): os.remove(mono_wav_path)
 
-def play_text_as_audio_autoplay(text, audio_placeholder_container):
+def play_text_as_audio(text, container):
+    """
+    This function is now only called for the latest message, so it always includes autoplay.
+    """
     if not text or not text.strip(): return
+    
     try:
         tts = gTTS(text=text, lang='en', slow=False)
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
@@ -78,14 +79,13 @@ def play_text_as_audio_autoplay(text, audio_placeholder_container):
         audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
         os.remove(temp_audio_file_path)
 
-        audio_id = f"audio_player_{int(time.time() * 1000)}"
         audio_html = f"""
-        <audio id="{audio_id}" controls autoplay data-testid="st-audio-player">
+        <audio controls autoplay style="width: 100%; margin-top: 5px;">
             <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
             Your browser does not support the audio element.
         </audio>
         """
-        audio_placeholder_container.markdown(audio_html, unsafe_allow_html=True)
+        container.markdown(audio_html, unsafe_allow_html=True)
     except Exception as e:
         st.error(f"TTS Error: {e}")
 
@@ -97,46 +97,28 @@ NODE_MAP = {
     "MH": mh_node, "AR": ar_node, "TC": tc_node, "RLC": rlc_node, "END": end_node,
 }
 
-# ── SOLUTION PART 1: Restore the Welcome Screen for initial user gesture ──
-if "first_interaction_done" not in st.session_state:
+# ── Welcome Screen & Session State Initialization ───────────────────────
+if "session_started" not in st.session_state:
     st.title("🧑‍🎓 Interactive Tutor")
-    st.info("Welcome! To enable voice communication, please click the button below to start the session.")
+    st.info("Welcome! Please click the 'Start Learning' button to begin the session.")
     if st.button("🚀 Start Learning", type="primary"):
-        st.session_state.first_interaction_done = True
-        # Initialize the session state AFTER the first click
+        st.session_state.session_started = True
         st.session_state.state = AgentState({
-            "current_state": "START", "last_user_msg": "", "history": [],
-            "definition_echoed": False, "misconception_detected": False,
-            "retrieval_score": 0.0, "transfer_success": False, "session_summary": {},
+            "current_state": "START", "last_user_msg": "", "history": [], "session_summary": {},
         })
         st.session_state.messages = []
         st.session_state.audio_recorder_key_counter = 0
 
-        # Get the first message from the agent
+        # This runs only once after the first click
         init_state = start_node(st.session_state.state)
         intro_message = init_state.get("agent_output", "Hello! Let's begin.")
         st.session_state.state = init_state
         st.session_state.messages.append(("assistant", intro_message))
-        st.session_state.state["history"].append({
-            "role": "assistant", "node": "START", "content": intro_message
-        })
+        st.session_state.state["history"].append({"role": "assistant", "node": "START", "content": intro_message})
         st.rerun()
     st.stop()
 
 # ── Main Application Logic ───────────────────────────────────────────────
-
-# SOLUTION PART 2: Aggressive JavaScript to win the race condition
-# This script runs on every rerun, repeatedly pausing any audio to prevent replays.
-st.markdown("""
-<script>
-    const audios = document.querySelectorAll('audio');
-    audios.forEach(audio => {
-        audio.pause();
-        audio.currentTime = 0;
-    });
-</script>
-""", unsafe_allow_html=True)
-
 
 st.title("🧑‍🎓 Interactive Tutor")
 
@@ -144,10 +126,10 @@ st.title("🧑‍🎓 Interactive Tutor")
 for i, (role, msg) in enumerate(st.session_state.messages):
     with st.chat_message(role):
         st.write(msg)
-        # Render audio ONLY for the most recent assistant message
+        # **THE CRITICAL FIX**: Only render an audio player for the single, most recent assistant message.
         if role == "assistant" and (i == len(st.session_state.messages) - 1):
-            audio_container = st.empty()
-            play_text_as_audio_autoplay(msg, audio_container)
+            audio_container = st.container()
+            play_text_as_audio(msg, audio_container)
 
 # User Input Logic
 if st.session_state.state["current_state"] != "END":
@@ -160,7 +142,6 @@ if st.session_state.state["current_state"] != "END":
     if recorded_audio_bytes:
         with st.spinner("Transcribing..."):
             user_msg = transcribe_recorded_audio_bytes(recorded_audio_bytes)
-            st.info(f"You said: {user_msg}")
 
     text_input = st.chat_input("Or type your response here...")
     if text_input:
