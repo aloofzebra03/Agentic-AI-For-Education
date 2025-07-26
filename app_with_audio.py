@@ -15,7 +15,6 @@ from audio_recorder_streamlit import audio_recorder
 from gtts import gTTS
 
 # This is a placeholder for your agent logic.
-# The app will run with placeholder logic if agent/nodes4.py is not found.
 try:
     from agent.nodes4 import (
         start_node, apk_node, ci_node, ge_node,
@@ -23,108 +22,67 @@ try:
         AgentState
     )
 except ImportError:
-    st.error("Could not import agent nodes. Please ensure 'agent/nodes4.py' is in the correct path. Running with placeholder logic.")
-    # Create dummy functions and state to allow the app to run
+    st.error("Could not import agent nodes. Running with placeholder logic.")
     def placeholder_node(state):
         next_states = {"START": "APK", "END": "END"}
         current_node = state["current_state"]
         state["current_state"] = next_states.get(current_node, "END")
-        state["agent_output"] = f"This is a placeholder response from the '{current_node}' node. You said: '{state['last_user_msg']}'"
+        state["agent_output"] = f"Placeholder response from '{current_node}'. You said: '{state['last_user_msg']}'"
         if state["current_state"] == "END":
-            state["agent_output"] = "This is the end of the placeholder session."
-            state["session_summary"] = {"summary": "This is a placeholder summary from the placeholder agent."}
+            state["agent_output"] = "End of placeholder session."
+            state["session_summary"] = {"summary": "This is a placeholder summary."}
         return state
     start_node, apk_node, ci_node, ge_node, mh_node, ar_node, tc_node, rlc_node, end_node = (placeholder_node,) * 9
     class AgentState(dict): pass
 
 
-# ── Load ASR model ─────────────────────────────────────────────────────────
+# ── ASR & TTS Functions ──────────────────────────────────────────────────
 @st.cache_resource
 def load_asr_model():
-    """Caches the ASR model to avoid reloading on each script run."""
     return onnx_asr.load_model("nemo-parakeet-tdt-0.6b-v2")
 
 asr_model = load_asr_model()
 
 def convert_to_mono_wav(input_path, output_path):
-    """Converts a stereo WAV to mono."""
-    try:
-        sr, data = wavfile.read(input_path)
-        if len(data.shape) == 2:
-            data = np.mean(data, axis=1).astype(data.dtype)
-        wavfile.write(output_path, sr, data)
-    except Exception as e:
-        st.error(f"Error converting WAV to mono: {e}")
-        raise
+    sr, data = wavfile.read(input_path)
+    if len(data.shape) == 2:
+        data = np.mean(data, axis=1).astype(data.dtype)
+    wavfile.write(output_path, sr, data)
 
 def transcribe_recorded_audio_bytes(audio_bytes):
-    """Transcribes recorded audio bytes from audio_recorder."""
     tmp_path = f"temp_recorded_{time.time()}.wav"
-    with open(tmp_path, 'wb') as f:
-        f.write(audio_bytes)
-
     mono_wav_path = f"temp_mono_{time.time()}.wav"
-    transcript = None
     try:
+        with open(tmp_path, 'wb') as f:
+            f.write(audio_bytes)
         convert_to_mono_wav(tmp_path, mono_wav_path)
-        transcript = asr_model.recognize(mono_wav_path)
+        return asr_model.recognize(mono_wav_path)
     finally:
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
-        if os.path.exists(mono_wav_path):
-            os.remove(mono_wav_path)
-    return transcript
+        if os.path.exists(tmp_path): os.remove(tmp_path)
+        if os.path.exists(mono_wav_path): os.remove(mono_wav_path)
 
-# ── Text-to-Speech Function (Corrected Version) ──────────────────────────
-def play_text_as_audio_autoplay(text, audio_placeholder_container, autoplay=False):
-    """
-    Converts text to speech and creates an HTML5 audio player.
-    Autoplays ONLY if the flag is True and browser permission is granted.
-    """
-    if not text or not text.strip():
-        return
-
+def play_text_as_audio_autoplay(text, audio_placeholder_container):
+    if not text or not text.strip(): return
     try:
         tts = gTTS(text=text, lang='en', slow=False)
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
             tts.write_to_fp(tmp)
             temp_audio_file_path = tmp.name
-
+        
         with open(temp_audio_file_path, "rb") as audio_file:
             audio_bytes = audio_file.read()
-
         audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
         os.remove(temp_audio_file_path)
 
-        autoplay_attribute = "autoplay" if autoplay else ""
-        audio_id = f"audio_player_{int(time.time() * 1000)}_{hash(text)}"
-
+        audio_id = f"audio_player_{int(time.time() * 1000)}"
         audio_html = f"""
-        <audio id="{audio_id}" controls {autoplay_attribute} style="width: 100%; margin-top: 5px;">
+        <audio id="{audio_id}" controls autoplay style="width: 100%; margin-top: 5px;">
             <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
-            Your browser does not support the audio element.
         </audio>
-        <script>
-            (function() {{
-                var audio = document.getElementById("{audio_id}");
-                var hasPermission = sessionStorage.getItem('audioAutoplayEnabled') === 'true';
-                var shouldAutoplay = {str(autoplay).lower()};
-
-                if (audio && shouldAutoplay && hasPermission) {{
-                    var playPromise = audio.play();
-                    if (playPromise !== undefined) {{
-                        playPromise.catch(error => {{
-                            console.error("Autoplay was prevented: ", error);
-                        }});
-                    }}
-                }}
-            }})();
-        </script>
         """
         audio_placeholder_container.markdown(audio_html, unsafe_allow_html=True)
-
     except Exception as e:
-        st.error(f"TTS Error: Could not generate audio. {e}")
+        st.error(f"TTS Error: {e}")
 
 # ── Streamlit Page Configuration ───────────────────────────────────────────
 st.set_page_config(page_title="Interactive Tutor", page_icon="🤖")
@@ -134,20 +92,7 @@ NODE_MAP = {
     "MH": mh_node, "AR": ar_node, "TC": tc_node, "RLC": rlc_node, "END": end_node,
 }
 
-# ── Initial Interaction / Welcome Screen ───────────────────────────────────
-if "first_interaction_done" not in st.session_state:
-    st.title("🧑‍🎓 Interactive Tutor")
-    st.info("Welcome! To enable voice communication, please click the button below to start the session.")
-
-    if st.button("🚀 Start Learning", type="primary"):
-        st.session_state.first_interaction_done = True
-        st.rerun()
-
-    st.stop()
-
-# ── Main Application Logic ───────────────────────────────────────────────
-
-# Initialize session state for the agent if not already done
+# ── Session State Initialization ───────────────────────────────────────────
 if "state" not in st.session_state:
     st.session_state.state = AgentState({
         "current_state": "START", "last_user_msg": "", "history": [],
@@ -156,75 +101,53 @@ if "state" not in st.session_state:
     })
     st.session_state.messages = []
     st.session_state.audio_recorder_key_counter = 0
+    st.session_state.processing_audio = False # New flag for two-phase render
 
-    with st.spinner("Initializing tutor..."):
-        init_state = start_node(st.session_state.state)
-        intro_message = init_state.get("agent_output", "Hello! Let's begin.")
-        st.session_state.state = init_state
-        st.session_state.messages.append(("assistant", intro_message))
+    init_state = start_node(st.session_state.state)
+    intro_message = init_state.get("agent_output", "Hello! Let's begin.")
+    st.session_state.state = init_state
+    st.session_state.messages.append(("assistant", intro_message))
+    st.session_state.state["history"].append({
+        "role": "assistant", "node": "START", "content": intro_message
+    })
+
+# ── PHASE 2: Process the request after the "Silence" render has occurred ──
+if st.session_state.processing_audio:
+    with st.spinner("Thinking..."):
+        # This code now runs on the second rerun, while the user sees a silent page
+        current_node_key = st.session_state.state["current_state"]
+        node_function = NODE_MAP.get(current_node_key, end_node)
+        
+        # Perform slow agent and TTS generation
+        new_state = node_function(st.session_state.state)
+        agent_reply = new_state.get("agent_output", "I'm not sure how to respond.")
+
+        # Update state and history
+        st.session_state.state = new_state
+        st.session_state.messages.append(("assistant", agent_reply))
         st.session_state.state["history"].append({
-            "role": "assistant", "node": "START", "content": intro_message
+            "role": "assistant",
+            "node": new_state["current_state"],
+            "content": agent_reply
         })
 
+        # CRUCIAL: Reset the flag and trigger the final "Reveal" render
+        st.session_state.processing_audio = False
+        st.rerun()
+
+# ── Main Page Rendering Logic ───────────────────────────────────────────────
 st.title("🧑‍🎓 Interactive Tutor")
 
-# --- DEFINITIVE FIX FOR TIMING ISSUE ---
-# On ANY rerun, immediately send a command to pause all audio.
-# This runs before the slow gTTS call, preventing the old audio from playing.
-st.markdown("<script>document.querySelectorAll('audio').forEach(a => a.pause());</script>", unsafe_allow_html=True)
-# --- END OF FIX ---
-
-
-# Global autoplay enabler button
-st.markdown("""
-<div style="background: #e8f4fd; padding: 10px; border-radius: 8px; margin-bottom: 1rem;">
-    <span>🔊 <b>Audio Control:</b></span>
-    <button onclick="enableGlobalAutoplay()" id="global-autoplay-btn"
-            style="background: #28a745; color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer;">
-        🔓 Enable Auto-Audio
-    </button>
-    <span id="autoplay-status" style="font-size: 12px; color: #666; margin-left: 10px;">Click to allow automatic audio playback.</span>
-</div>
-<script>
-    function enableGlobalAutoplay() {
-        var btn = document.getElementById('global-autoplay-btn');
-        var status = document.getElementById('autoplay-status');
-        var silentAudio = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAVFYAAFRWAAABAAgAZGF0YQAAAAA='); // Short silent audio
-        
-        silentAudio.play().then(() => {
-            sessionStorage.setItem('audioAutoplayEnabled', 'true');
-            btn.innerHTML = '✅ Auto-Audio Enabled';
-            btn.disabled = true;
-            btn.style.background = '#6c757d';
-            status.innerHTML = 'All new responses will now play automatically!';
-            status.style.color = '#28a745';
-        }).catch(error => {
-            btn.innerHTML = '❌ Permission Denied';
-            btn.style.background = '#dc3545';
-            status.innerHTML = 'Browser blocked autoplay. Please check site settings.';
-            status.style.color = '#dc3545';
-        });
-    }
-    if (sessionStorage.getItem('audioAutoplayEnabled') === 'true') {
-        enableGlobalAutoplay();
-    }
-</script>
-""", unsafe_allow_html=True)
-
-# Display chat history (with corrected audio player logic)
+# Display chat history
 for i, (role, msg) in enumerate(st.session_state.messages):
     with st.chat_message(role):
         st.write(msg)
-        # ONLY create an audio player for the MOST RECENT assistant message.
-        if role == "assistant" and (i == len(st.session_state.messages) - 1):
+        # Only render audio for the last message AND if we are NOT in the processing phase
+        if role == "assistant" and not st.session_state.processing_audio and (i == len(st.session_state.messages) - 1):
             audio_container = st.empty()
-            play_text_as_audio_autoplay(
-                text=msg,
-                audio_placeholder_container=audio_container,
-                autoplay=True
-            )
+            play_text_as_audio_autoplay(msg, audio_container)
 
-# ── User Input Logic ──────────────────────────────────────────────────────
+# ── User Input Logic ───────────────────────────────────────────────────────
 if st.session_state.state["current_state"] != "END":
     user_msg = None
 
@@ -235,42 +158,30 @@ if st.session_state.state["current_state"] != "END":
     )
 
     if recorded_audio_bytes:
-        with st.spinner("Transcribing your audio..."):
-            try:
-                user_msg = transcribe_recorded_audio_bytes(recorded_audio_bytes)
-                st.info(f"You said: {user_msg}")
-            except Exception as e:
-                st.error(f"Audio transcription failed: {e}")
+        with st.spinner("Transcribing..."):
+            user_msg = transcribe_recorded_audio_bytes(recorded_audio_bytes)
+            st.info(f"You said: {user_msg}")
 
     text_input = st.chat_input("Or type your response here...")
     if text_input:
         user_msg = text_input
 
+    # ── PHASE 1: Acknowledge input and trigger the "Silence" render ───────
     if user_msg:
         st.session_state.audio_recorder_key_counter += 1
-
+        
+        # Add user message to history immediately
         st.session_state.messages.append(("user", user_msg))
         st.session_state.state["last_user_msg"] = user_msg
         st.session_state.state["history"].append({"role": "user", "content": user_msg})
 
-        with st.spinner("Thinking..."):
-            current_node_key = st.session_state.state["current_state"]
-            node_function = NODE_MAP.get(current_node_key, end_node)
-            new_state = node_function(st.session_state.state)
-            agent_reply = new_state.get("agent_output", "I'm not sure how to respond to that.")
-
-            st.session_state.state = new_state
-            st.session_state.messages.append(("assistant", agent_reply))
-            st.session_state.state["history"].append({
-                "role": "assistant",
-                "node": new_state["current_state"],
-                "content": agent_reply
-            })
-
+        # CRUCIAL: Set the flag and trigger the "Silence" rerun.
+        # This will redraw the page without the old audio player before we do any slow work.
+        st.session_state.processing_audio = True
         st.rerun()
 
 # ── Session End Summary ────────────────────────────────────────────────────
-if st.session_state.state["current_state"] == "END":
+if st.session_state.state["current_state"] == "END" and not st.session_state.processing_audio:
     st.markdown("---")
     st.success("🎉 Session Complete!")
     st.subheader("Session Summary")
