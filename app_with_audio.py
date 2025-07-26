@@ -168,6 +168,13 @@ if "state" not in st.session_state:
 
 st.title("🧑‍🎓 Interactive Tutor")
 
+# --- DEFINITIVE FIX FOR TIMING ISSUE ---
+# On ANY rerun, immediately send a command to pause all audio.
+# This runs before the slow gTTS call, preventing the old audio from playing.
+st.markdown("<script>document.querySelectorAll('audio').forEach(a => a.pause());</script>", unsafe_allow_html=True)
+# --- END OF FIX ---
+
+
 # Global autoplay enabler button
 st.markdown("""
 <div style="background: #e8f4fd; padding: 10px; border-radius: 8px; margin-bottom: 1rem;">
@@ -240,9 +247,6 @@ if st.session_state.state["current_state"] != "END":
         user_msg = text_input
 
     if user_msg:
-        # **FIX FOR TIMING ISSUE**: Immediately pause any currently playing audio.
-        st.markdown("<script>document.querySelectorAll('audio').forEach(a => a.pause());</script>", unsafe_allow_html=True)
-        
         st.session_state.audio_recorder_key_counter += 1
 
         st.session_state.messages.append(("user", user_msg))
