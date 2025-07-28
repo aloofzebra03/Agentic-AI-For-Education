@@ -9,6 +9,7 @@ PyPika
 PySocks
 PyYAML
 Pygments
+pydub
 SQLAlchemy
 Werkzeug
 absl-py
