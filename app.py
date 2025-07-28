@@ -169,37 +169,16 @@ for i, (role, msg) in enumerate(st.session_state.messages):
 # Handle user input at the bottom of the page
 if st.session_state.state["current_state"] != "END":
     user_msg = None
-    # Center the recorder and the future indicator
-    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    # ** THE FIX **: Use the component's built-in parameters. No more JavaScript hacks.
+    col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
         recorded_audio_bytes = audio_recorder(
             text="Click the mic to speak",
-            key=f"audio_recorder_{st.session_state.audio_recorder_key_counter}",
-            icon_size="3x"
+            recording_text="🔴 Recording...",
+            icon_size="3x",
+            key=f"audio_recorder_{st.session_state.audio_recorder_key_counter}"
         )
-        # Add the recording indicator UI and script right after the recorder
-        st.markdown('''
-            <div id="rec-indicator" style="text-align: center; color: #ff4b4b; font-weight: bold; margin-top: -20px;"></div>
-            <script>
-                // This script uses a MutationObserver to watch for changes in the recorder button.
-                const recorderButton = document.querySelector('.st-emotion-cache-1litb6p button');
-                const indicator = document.getElementById('rec-indicator');
-
-                if (recorderButton && indicator) {
-                    const observer = new MutationObserver(mutations => {
-                        mutations.forEach(mutation => {
-                            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                                // The component adds a class containing 'red' when recording
-                                const isRecording = recorderButton.classList.value.includes('red');
-                                indicator.textContent = isRecording ? '🔴 Recording...' : '';
-                            }
-                        });
-                    });
-
-                    observer.observe(recorderButton, { attributes: true });
-                }
-            </script>
-        ''', unsafe_allow_html=True)
 
     if recorded_audio_bytes:
         with st.spinner("Transcribing..."):
