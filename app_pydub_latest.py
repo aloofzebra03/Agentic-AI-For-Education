@@ -7,8 +7,8 @@ import numpy as np
 import tempfile
 import base64
 import time
-import soundfile as sf
-from pedalboard import Pedalboard, Resample
+from pydub import AudioSegment
+from pydub.effects import speedup
 
 # Import the audio_recorder component
 from audio_recorder_streamlit import audio_recorder
@@ -67,54 +67,52 @@ def transcribe_recorded_audio_bytes(audio_bytes):
 
 def play_text_as_audio(text, container):
     """
-    Generates audio with gTTS and speeds it up using pedalboard, saving as WAV.
+    This robust version generates the audio, speeds it up on the server,
+    and then sends the modified file to the browser.
     """
     if not text or not text.strip():
         return
-    
     try:
-        # 1. gTTS generates the initial MP3 audio
+        # 1. gTTS generates the audio at normal speed
         tts = gTTS(text=text, lang='en', slow=False)
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
             tts.save(fp.name)
             normal_speed_path = fp.name
 
-        # 2. Load the audio file
-        audio, sample_rate = sf.read(normal_speed_path)
+        # 2. pydub loads the audio file
+        audio = AudioSegment.from_mp3(normal_speed_path)
 
-        # 3. Create a pedalboard to resample (speed up) the audio
-        board = Pedalboard([
-            Resample(target_sample_rate=int(sample_rate * 1.25))
-        ])
+        # 3. pydub speeds up the audio (1.25x) and saves it
+        fast_audio = speedup(audio, playback_speed=1.25)
         
-        # 4. Process the audio
-        fast_audio = board(audio, sample_rate)
-        
-        # 5. Export the fast audio to a temporary WAV file
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as fp: # Use .wav suffix
-            sf.write(fp.name, fast_audio, int(sample_rate * 1.25), format='WAV') # Specify WAV format
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
+            fast_audio.export(fp.name, format="mp3")
             fast_speed_path = fp.name
 
-        # 6. Read bytes and encode for Streamlit
+        # 4. Read the bytes of the new, faster audio file
         with open(fast_speed_path, "rb") as audio_file:
             audio_bytes = audio_file.read()
         
         audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
         
-        # 7. Clean up temporary files
+        # 5. Clean up the temporary files
         os.remove(normal_speed_path)
         os.remove(fast_speed_path)
 
-        # 8. Display in Streamlit using the correct audio type
+        # 6. Send the modified audio to the browser (no JS hacks needed)
         audio_html = f"""
         <audio controls autoplay style="width: 100%; margin-top: 5px;">
-            <source src="data:audio/wav;base64,{audio_base64}" type="audio/wav">
+            <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
+            Your browser does not support the audio element.
         </audio>
-        """ # Changed type to audio/wav
+        """
         container.markdown(audio_html, unsafe_allow_html=True)
-
     except Exception as e:
-        st.error(f"An error occurred in audio processing: {e}")
+        # Add more specific error for ffmpeg
+        if isinstance(e, FileNotFoundError):
+             st.error("ffmpeg not found. Please ensure ffmpeg is installed and in your system's PATH.")
+        else:
+            st.error(f"An error occurred in audio processing: {e}")
 
 # ── Streamlit Page Configuration & State Initialization ──────────────────
 st.set_page_config(page_title="Interactive Tutor", page_icon="🤖")
