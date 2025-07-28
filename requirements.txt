@@ -9,8 +9,7 @@ PyPika
 PySocks
 PyYAML
 Pygments
-pyaudioop
-pydub
+pedalboard
 SQLAlchemy
 Werkzeug
 absl-py
