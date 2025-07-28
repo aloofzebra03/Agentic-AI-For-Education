@@ -64,23 +64,54 @@ def transcribe_recorded_audio_bytes(audio_bytes):
         if os.path.exists(mono_wav_path): os.remove(mono_wav_path)
 
 def play_text_as_audio(text, container):
-    if not text or not text.strip(): return
+    """
+    This robust version generates the audio, speeds it up on the server,
+    and then sends the modified file to the browser.
+    """
+    if not text or not text.strip():
+        return
     try:
+        # 1. gTTS generates the audio at normal speed
         tts = gTTS(text=text, lang='en', slow=False)
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
-            tts.write_to_fp(tmp)
-            temp_audio_file_path = tmp.name
-        
-        with open(temp_audio_file_path, "rb") as audio_file:
-            audio_bytes = audio_file.read()
-        audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
-        os.remove(temp_audio_file_path)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
+            tts.save(fp.name)
+            normal_speed_path = fp.name
 
-        audio_html = f'<audio controls autoplay style="width: 100%; margin-top: 5px;"><source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3"></audio>'
+        # 2. pydub loads the audio file
+        audio = AudioSegment.from_mp3(normal_speed_path)
+
+        # 3. pydub speeds up the audio (1.25x) and saves it
+        fast_audio = speedup(audio, playback_speed=1.25)
+        
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
+            fast_audio.export(fp.name, format="mp3")
+            fast_speed_path = fp.name
+
+        # 4. Read the bytes of the new, faster audio file
+        with open(fast_speed_path, "rb") as audio_file:
+            audio_bytes = audio_file.read()
+        
+        audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
+        
+        # 5. Clean up the temporary files
+        os.remove(normal_speed_path)
+        os.remove(fast_speed_path)
+
+        # 6. Send the modified audio to the browser (no JS hacks needed)
+        audio_html = f"""
+        <audio controls autoplay style="width: 100%; margin-top: 5px;">
+            <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
+            Your browser does not support the audio element.
+        </audio>
+        """
         container.markdown(audio_html, unsafe_allow_html=True)
     except Exception as e:
-        st.error(f"TTS Error: {e}")
-
+        # Add more specific error for ffmpeg
+        if isinstance(e, FileNotFoundError):
+             st.error("ffmpeg not found. Please ensure ffmpeg is installed and in your system's PATH.")
+        else:
+            st.error(f"An error occurred in audio processing: {e}")
+            
 # ── Streamlit Page Configuration & State Initialization ──────────────────
 st.set_page_config(page_title="Interactive Tutor", page_icon="🤖")
 
