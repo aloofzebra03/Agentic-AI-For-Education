@@ -9,6 +9,7 @@ PyPika
 PySocks
 PyYAML
 Pygments
+pyaudioop
 pydub
 SQLAlchemy
 Werkzeug
