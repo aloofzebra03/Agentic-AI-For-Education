@@ -9,6 +9,7 @@ PyPika
 PySocks
 PyYAML
 Pygments
+soundfile
 pedalboard
 SQLAlchemy
 Werkzeug
