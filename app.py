@@ -7,17 +7,14 @@ import numpy as np
 import tempfile
 import base64
 import time
+from pydub import AudioSegment
+from pydub.effects import speedup
 
 # Import the audio_recorder component
 from audio_recorder_streamlit import audio_recorder
 
 # Import gTTS for text-to-speech
 from gtts import gTTS
-
-# Add the required imports for pydub
-from pydub import AudioSegment
-from pydub.effects import speedup
-
 
 # This is a placeholder for your agent logic.
 try:
@@ -29,7 +26,7 @@ try:
 except ImportError:
     st.error("Could not import agent nodes. Running with placeholder logic.")
     def placeholder_node(state):
-        time.sleep(1) # Simulate a slow LLM call
+        time.sleep(3) # Simulate a slow LLM call
         next_states = {"START": "APK", "END": "END"}
         current_node = state["current_state"]
         state["current_state"] = next_states.get(current_node, "END")
@@ -102,7 +99,7 @@ def play_text_as_audio(text, container):
         os.remove(normal_speed_path)
         os.remove(fast_speed_path)
 
-        # 6. Send the modified audio to the browser
+        # 6. Send the modified audio to the browser (no JS hacks needed)
         audio_html = f"""
         <audio controls autoplay style="width: 100%; margin-top: 5px;">
             <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
@@ -111,11 +108,11 @@ def play_text_as_audio(text, container):
         """
         container.markdown(audio_html, unsafe_allow_html=True)
     except Exception as e:
-        if "ffmpeg" in str(e).lower() or isinstance(e, FileNotFoundError):
-             st.error("ffmpeg not found. Please ensure ffmpeg is installed on your system and accessible in your PATH.")
+        # Add more specific error for ffmpeg
+        if isinstance(e, FileNotFoundError):
+             st.error("ffmpeg not found. Please ensure ffmpeg is installed and in your system's PATH.")
         else:
             st.error(f"An error occurred in audio processing: {e}")
-
 
 # ── Streamlit Page Configuration & State Initialization ──────────────────
 st.set_page_config(page_title="Interactive Tutor", page_icon="🤖")
@@ -169,17 +166,9 @@ for i, (role, msg) in enumerate(st.session_state.messages):
 # Handle user input at the bottom of the page
 if st.session_state.state["current_state"] != "END":
     user_msg = None
-    
-    # ** THE FIX **: Use the component's built-in parameters. No more JavaScript hacks.
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col2:
-        recorded_audio_bytes = audio_recorder(
-            text="Click the mic to speak",
-            recording_text="🔴 Recording...",
-            icon_size="3x",
-            key=f"audio_recorder_{st.session_state.audio_recorder_key_counter}"
-        )
-
+    recorded_audio_bytes = audio_recorder(text="Click the mic to speak",
+                                          key=f"audio_recorder_{st.session_state.audio_recorder_key_counter}",
+                                          icon_size="2x")
     if recorded_audio_bytes:
         with st.spinner("Transcribing..."):
             user_msg = transcribe_recorded_audio_bytes(recorded_audio_bytes)
