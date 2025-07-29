@@ -273,3 +273,4 @@ yarl
 zipp
 zstandard
 onnx-asr[cpu,hub]
+pysqlite3-binary>=0.0.6
