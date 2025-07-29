@@ -9,12 +9,15 @@ import base64
 import time
 import soundfile as sf
 from pedalboard import Pedalboard, Resample
+import sys,pysqlite3
 
 # Import the audio_recorder component
 from audio_recorder_streamlit import audio_recorder
 
 # Import gTTS for text-to-speech
 from gtts import gTTS
+
+sys.modules["sqlite3"] = pysqlite3
 
 # This is a placeholder for your agent logic.
 try:
