@@ -135,6 +135,8 @@ Possible next_state values:
 Pedagogical context:
 {context}
 
+If the student's reply indicates they don't know or they are stuck after two attempts, provide the correct identification and move on to the next state.
+
 Student reply: "{state['last_user_msg']}"
 Task: Evaluate whether the student identified the concept correctly. Respond ONLY with JSON matching the schema above. If not, help the student to do so.
 """
@@ -171,6 +173,8 @@ Possible next_state values:
 Pedagogical context:
 {context}
 
+If the student's restatement indicates they don't know or they are stuck after two attempts, provide the correct definition and move on.
+
 Student restatement: "{state['last_user_msg']}"
 Task: Determine if the restatement is accurate. Respond ONLY with JSON matching the schema above. If not, help the student to do so.
 """
@@ -205,6 +209,8 @@ Possible next_state values:
 
 Pedagogical context:
 {context}
+
+If the student's response indicates they don't know or are stuck after two attempts, provide the correct explanation in a concise manner and move on to the next state.
 
 Student response: "{state['last_user_msg']}"
 Task: Detect misconception or correct reasoning. RESPOND ONLY WITH JSON matching the schema above.
