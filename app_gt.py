@@ -171,9 +171,9 @@ for i, (role, msg) in enumerate(st.session_state.messages):
 # Handle user input at the bottom of the page
 if st.session_state.state["current_state"] != "END":
     user_msg = None
-    recorded_audio_bytes = audio_recorder(text="Click the mic to speak",
+    recorded_audio_bytes = audio_recorder(text="Click the mic to speak, click again to stop",
                                           key=f"audio_recorder_{st.session_state.audio_recorder_key_counter}",
-                                          icon_size="2x")
+                                          icon_size="2x", pause_threshold=20.0)
     if recorded_audio_bytes:
         with st.spinner("Transcribing..."):
             user_msg = transcribe_recorded_audio_bytes(recorded_audio_bytes)
