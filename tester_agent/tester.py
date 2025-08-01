@@ -8,8 +8,7 @@ class TesterAgent:
         self.persona = persona
         self.llm = ChatGoogleGenerativeAI(
             model="gemini-2.0-flash",
-            # api_key=os.getenv("GOOGLE_API_KEY"),
-            api_key='AIzaSyBQwzJ2LniqqvhULi3vOL1Zy9nRaEPzYhw',
+            api_key=os.getenv("GOOGLE_API_KEY"),
             temperature=0.7,
         )
         # Initialize history with the persona's description as a system prompt
