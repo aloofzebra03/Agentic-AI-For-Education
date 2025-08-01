@@ -6,7 +6,7 @@ from typing import Literal, Optional, Dict
 from pydantic import BaseModel
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.output_parsers import PydanticOutputParser
-from agent.config import concept_pkg
+from educational_agent.config import concept_pkg
 import dotenv
 
 dotenv.load_dotenv(dotenv_path=".env", override=True)

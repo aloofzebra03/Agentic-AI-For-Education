@@ -2,7 +2,7 @@
 
 import json
 from pprint import pprint
-from agent.nodes4 import (
+from educational_agent.nodes import (
     start_node, apk_node, ci_node, ge_node,
     mh_node, ar_node, tc_node, rlc_node,
     end_node, AgentState

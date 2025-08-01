@@ -6,7 +6,7 @@ from typing import Literal, Optional, Dict
 from pydantic import BaseModel
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.output_parsers import PydanticOutputParser
-from agent.config_rag import concept_pkg
+from educational_agent.config_rag import concept_pkg
 from Creating_Section_Text.retriever import retrieve_docs
 from Filtering_GT.filter_utils import filter_relevant_section
 from Creating_Section_Text.schema import NextSectionChoice  # Use real schema for section_name

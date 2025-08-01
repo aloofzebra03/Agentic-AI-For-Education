@@ -1,0 +1,167 @@
+{
+  "quiz_score": 0.0,
+  "transfer_success": false,
+  "definition_echoed": false,
+  "misconception_detected": false,
+  "last_user_msg": "So, my phone has tiny wiggling rocks inside? That's...weird.",
+  "history": [
+    {
+      "role": "user",
+      "content": "Oscillatory... motion? Like, things going back and forth? I think I'm already lost."
+    },
+    {
+      "role": "assistant",
+      "node": "APK",
+      "content": "Think about a swing set at a playground. What makes it move back and forth, and what eventually makes it stop?"
+    },
+    {
+      "role": "user",
+      "content": "Uhm... someone pushes it? And it stops because... friction? I guess?"
+    },
+    {
+      "role": "assistant",
+      "node": "APK",
+      "content": "You're on the right track! A push gets it started, and friction slows it down. But what kind of motion is the swing doing *while* it's swinging back and forth?"
+    },
+    {
+      "role": "user",
+      "content": "Is that the oscillatory part? I don't get what's so special about back and forth."
+    },
+    {
+      "role": "assistant",
+      "node": "APK",
+      "content": "The 'back and forth' *is* the oscillatory part! Oscillatory motion is just a fancy way of saying something moves back and forth repeatedly. Think of other things that do that... like a pendulum in a clock, or even your chest when you breathe."
+    },
+    {
+      "role": "user",
+      "content": "So, breathing is...oscillatory? Like, it's physics now? I thought it was just...breathing."
+    },
+    {
+      "role": "assistant",
+      "node": "CI",
+      "content": "Oscillatory motion is repetitive movement back and forth around a central point, like a swing or a pendulum.\n\nCan you restate that in your own words?"
+    },
+    {
+      "role": "user",
+      "content": "So...it's like, anything that wiggles a lot? But not just wiggling, like...regular wiggling? I'm still not sure what makes it special enough to have a name."
+    },
+    {
+      "role": "assistant",
+      "node": "CI",
+      "content": "You're getting closer! The key is the 'regular' part. It's about repeating the same motion back and forth around a central point. Think of a bouncing spring - it goes up and down, up and down. Can you try restating the definition now?"
+    },
+    {
+      "role": "user",
+      "content": "Okay, so it's not just *any* wiggling, it's wiggling that's like...predictable wiggling? Like a metronome? Is that oscillatory?"
+    },
+    {
+      "role": "assistant",
+      "node": "CI",
+      "content": "Yes, a metronome is a great example of oscillatory motion! It's that predictable, repetitive back-and-forth movement around a central point. Now, can you put the definition of oscillatory motion in your own words?"
+    },
+    {
+      "role": "user",
+      "content": "Okay...so, like, things that go back and forth the same way every time? Is that it?"
+    },
+    {
+      "role": "assistant",
+      "node": "CI",
+      "content": "That's very close! To be even more precise, it's motion that repeats around a central point or equilibrium. For example, a swing moves back and forth around its resting point."
+    },
+    {
+      "role": "user",
+      "content": "Equili...what now? So it needs a middle? Like, it has to go back and forth around a specific spot?"
+    },
+    {
+      "role": "assistant",
+      "node": "CI",
+      "content": "Yes, exactly! It goes back and forth around a specific spot, which we call the equilibrium point. It's the resting position when nothing is making it move."
+    },
+    {
+      "role": "user",
+      "content": "Okay, so the swing isn't oscillating when I'm holding it still, right? Because it's just... there."
+    },
+    {
+      "role": "assistant",
+      "node": "GE",
+      "content": "How does the energy of an oscillating system (like a pendulum or a spring) change as it moves through its cycle of motion?"
+    },
+    {
+      "role": "user",
+      "content": "Energy? Like... batteries? I don't see any batteries on a swing!"
+    },
+    {
+      "role": "assistant",
+      "node": "GE",
+      "content": "You're right, there are no batteries! But energy isn't just about batteries. Think about when the swing is at the very top of its arc versus when it's at the very bottom. What's different about it in those two places?"
+    },
+    {
+      "role": "user",
+      "content": "Uhm... it's higher at the top? So...more high-up-ness energy? Is that a thing?"
+    },
+    {
+      "role": "assistant",
+      "node": "MH",
+      "content": "Good thinking! Actually, The swing has potential energy at the top of its arc (like stored energy) and kinetic energy (energy of motion) at the bottom. It's constantly converting between these two forms of energy as it swings."
+    },
+    {
+      "role": "user",
+      "content": "Potential...kinetic... it's like it can't make up its mind what kind of energy it wants to be?"
+    },
+    {
+      "role": "assistant",
+      "node": "AR",
+      "content": "Okay, here's a multiple-choice question for you:\n\n**Which of the following is the best example of oscillatory motion?**\n\na) A car driving down a straight highway.\nb) A ball rolling to a stop on a flat surface.\nc) A pendulum swinging back and forth.\nd) A rocket launching into space.\n\nWhat's your answer?"
+    },
+    {
+      "role": "user",
+      "content": "Uhm... they all move, right? But... back and forth... that's the key, right? So... c) A pendulum swinging back and forth? I think?"
+    },
+    {
+      "role": "assistant",
+      "node": "AR",
+      "content": "Correct! A pendulum swinging back and forth is a great example of oscillatory motion. It repeats its movement around a central point.\nNice work! Time for a transfer question."
+    },
+    {
+      "role": "user",
+      "content": "Okay, but why aren't the others? The car goes forward...and back if it's stuck in traffic?"
+    },
+    {
+      "role": "assistant",
+      "node": "TC",
+      "content": "Okay, here's a \"what if\" scenario:\n\nImagine you're designing a new type of earthquake-resistant building. Earthquakes cause the ground to shake back and forth.\n\n**What if you could design a part of the building that uses oscillatory motion to *absorb* some of the earthquake's energy? How might that work?**"
+    },
+    {
+      "role": "user",
+      "content": "So, like, a giant swing inside the building that moves *instead* of the building?"
+    },
+    {
+      "role": "assistant",
+      "node": "TC",
+      "content": "That's a great idea! You're describing a tuned mass damper, which is exactly what engineers use. The swing (or mass) oscillates to counteract the building's movement.\nExcellent application! You've mastered this concept."
+    },
+    {
+      "role": "user",
+      "content": "Wait, so buildings have giant swings inside them now? That sounds terrifying!"
+    },
+    {
+      "role": "assistant",
+      "node": "RLC",
+      "content": "Many modern smartphones use tiny quartz crystals that vibrate at a very precise frequency to keep accurate time. This is a form of oscillatory motion! Have you ever noticed how your phone always seems to have the correct time, even if you haven't connected to the internet in a while? That's thanks to these tiny, oscillating crystals. Have you ever thought about how your phone keeps time?"
+    },
+    {
+      "role": "user",
+      "content": "So, my phone has tiny wiggling rocks inside? That's...weird."
+    },
+    {
+      "role": "assistant",
+      "node": "RLC",
+      "content": "Great! As a quick creative task, try drawing or explaining this idea to a friend and share what you notice."
+    },
+    {
+      "role": "assistant",
+      "node": "END",
+      "content": "Great work today! Here\u2019s your session summary:\n- Quiz score: 0.0\n- Transfer success: False\n- Definition echoed: False\n- Misconception detected: False\n- Last user message: So, my phone has tiny wiggling rocks inside? That's...weird."
+    }
+  ]
+}
