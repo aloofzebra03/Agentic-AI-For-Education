@@ -137,7 +137,7 @@ if "session_started" not in st.session_state:
 NODE_MAP = {"START": start_node, "APK": apk_node, "CI": ci_node, "GE": ge_node, "MH": mh_node, "AR": ar_node, "TC": tc_node, "RLC": rlc_node, "END": end_node}
 
 # ── Step 2: Process a request if the flag is set ───────────────────────────
-if st.session_state.get("processing_request"):
+if st.session_state.get("processing_request") or (st.session_state.state.get("current_state") == "END" and "session_summary" not in st.session_state.state):
     st.session_state.processing_request = False # Unset flag to prevent re-running
 
     # Use a spinner during the potentially slow LLM call
