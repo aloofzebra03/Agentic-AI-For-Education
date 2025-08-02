@@ -28,5 +28,5 @@ class ConceptPkg(BaseModel):
 
 # Now we only need the concept title;
 # all prompts (hook, definition, mechanism, etc.) are generated dynamically.
-concept_pkg = ConceptPkg(title="Sundial")
+concept_pkg = ConceptPkg(title="Simple Pendulum")
 
