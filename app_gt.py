@@ -19,6 +19,9 @@ from gtts import gTTS
 
 sys.modules["sqlite3"] = pysqlite3
 
+PROJECT_ROOT = r"/mount/src/Personalized_Education/Agentic-AI-For-Education/"
+sys.path.insert(0, PROJECT_ROOT)
+
 # This is a placeholder for your agent logic.
 try:
     from educational_agent.nodes4_rag import (
