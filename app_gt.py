@@ -9,7 +9,8 @@ import base64
 import time
 import soundfile as sf
 from pedalboard import Pedalboard, Resample
-import sys,pysqlite3
+import sys
+# import pysqlite3
 
 # Import the audio_recorder component
 from audio_recorder_streamlit import audio_recorder
@@ -17,7 +18,7 @@ from audio_recorder_streamlit import audio_recorder
 # Import gTTS for text-to-speech
 from gtts import gTTS
 
-sys.modules["sqlite3"] = pysqlite3
+# sys.modules["sqlite3"] = pysqlite3
 
 PROJECT_ROOT = r"/mount/src/Personalized_Education/Agentic-AI-For-Education/"
 sys.path.insert(0, PROJECT_ROOT)
@@ -47,7 +48,8 @@ except ImportError:
 # ── ASR & TTS Functions ──────────────────────────────────────────────────
 @st.cache_resource
 def load_asr_model():
-    return onnx_asr.load_model("nemo-parakeet-tdt-0.6b-v2")
+    # return onnx_asr.load_model("nemo-parakeet-tdt-0.6b-v2")
+    return onnx_asr.load_model(model = "nemo-parakeet-tdt-0.6b-v2", path = "parakeet-tdt-0.6b-v2-onnx")
 
 asr_model = load_asr_model()
 
