@@ -1,26 +1,20 @@
-# educational_agent/graph.py
 from typing import TypedDict, List, Dict, Any, Optional
 from langgraph.graph import StateGraph, END, START
 from langgraph.checkpoint.sqlite import SqliteSaver
 
-# --- import your node functions exactly as they are ---
 from educational_agent.nodes4_rag import (
     start_node, apk_node, ci_node, ge_node,
     mh_node, ar_node, tc_node, rlc_node, end_node,
     AgentState as _AgentStateDict  # if you defined one; we’ll define our own TypedDict anyway
 )
 
-# ----- Define a typed state for nicer diffs in Studio -----
 class AgentState(TypedDict, total=False):
-    # Routing
     current_state: str
 
-    # IO
     last_user_msg: str
     agent_output: str
     history: List[Dict[str, str]]
 
-    # First-pass flags
     _asked_apk: bool
     _asked_ci: bool
     _asked_ge: bool
@@ -29,17 +23,14 @@ class AgentState(TypedDict, total=False):
     _asked_tc: bool
     _asked_rlc: bool
 
-    # Pedagogy / metrics
     definition_echoed: bool
     misconception_detected: bool
     retrieval_score: float
     transfer_success: bool
     last_correction: Optional[str]
 
-    # Summary
     session_summary: Dict[str, Any]
 
-# ---- Wrap your functions (LangGraph merges returned dicts) ----
 def _START(state: AgentState) -> AgentState: return start_node(state) or state
 def _APK(state: AgentState) -> AgentState:   return apk_node(state) or state
 def _CI(state: AgentState) -> AgentState:    return ci_node(state) or state
@@ -63,7 +54,6 @@ g.add_node("TC",    _TC)
 g.add_node("RLC",   _RLC)
 g.add_node("END",   _END)
 
-# Router: decide next hop from state["current_state"]
 def _route(state: AgentState) -> str:
     return state.get("current_state", "APK")
 
