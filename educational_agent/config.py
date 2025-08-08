@@ -28,5 +28,5 @@ class ConceptPkg(BaseModel):
 
 # Now we only need the concept title;
 # all prompts (hook, definition, mechanism, etc.) are generated dynamically.
-concept_pkg = ConceptPkg(title="Oscillatory Motion")
+concept_pkg = ConceptPkg(title="educational_agent/nodes4_rag.py")
 
