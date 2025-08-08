@@ -10,15 +10,23 @@ from educational_agent.nodes import (
 
 def main():
     state: AgentState = {
-        "current_state":           "START",
-        "last_user_msg":           "",
-        "history":                 [],
-        "definition_echoed":       False,
-        "misconception_detected":  False,
-        "retrieval_score":         0.0,
-        "transfer_success":        False,
-        "session_summary":         {},
-    }
+    "current_state": "START",
+    "last_user_msg": "",
+    "history": [],
+    "definition_echoed": False,
+    "misconception_detected": False,
+    "retrieval_score": 0.0,
+    "transfer_success": False,
+    "session_summary": {},
+    "_asked_apk": False,
+    "_asked_ci": False,
+    "_asked_ge": False,
+    "_asked_mh": False,
+    "_asked_ar": False,
+    "_asked_tc": False,
+    "_asked_rlc": False,
+}
+
 
     node_map = {
         "START": start_node,

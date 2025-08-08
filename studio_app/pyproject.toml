@@ -1,0 +1,17 @@
+[project]
+name = "agentic-ai-for-education"
+version = "0.0.1"
+requires-python = ">=3.12"
+dependencies = [
+    "langgraph",
+    "langgraph-cli",
+    "langchain",
+    # add your other libs here (streamlit, onnxruntime, etc.)
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["educational_agent", "studio_app"]

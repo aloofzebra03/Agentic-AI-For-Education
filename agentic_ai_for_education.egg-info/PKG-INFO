@@ -1,0 +1,20 @@
+Metadata-Version: 2.4
+Name: agentic-ai-for-education
+Version: 0.0.1
+Summary: Educational agent with LangGraph, RAG, and Streamlit UI
+Requires-Python: >=3.10
+Requires-Dist: langgraph>=0.2.30
+Requires-Dist: langgraph-cli>=0.2.30
+Requires-Dist: langchain>=0.2.7
+Requires-Dist: langchain-google-genai>=2.0.0
+Requires-Dist: python-dotenv>=1.0.1
+Requires-Dist: langsmith>=0.1.85
+Provides-Extra: ui
+Requires-Dist: streamlit>=1.36.0; extra == "ui"
+Requires-Dist: scipy>=1.11.0; extra == "ui"
+Requires-Dist: numpy>=1.24.0; extra == "ui"
+Requires-Dist: soundfile>=0.12.1; extra == "ui"
+Requires-Dist: pedalboard>=0.9.12; extra == "ui"
+Requires-Dist: gTTS>=2.5.0; extra == "ui"
+Requires-Dist: audio-recorder-streamlit>=0.0.8; extra == "ui"
+Requires-Dist: pysqlite3-binary>=0.5.2.post3; extra == "ui"
