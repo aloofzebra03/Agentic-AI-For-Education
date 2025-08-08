@@ -48,8 +48,8 @@ except ImportError:
 # ── ASR & TTS Functions ──────────────────────────────────────────────────
 @st.cache_resource
 def load_asr_model():
-    # return onnx_asr.load_model("nemo-parakeet-tdt-0.6b-v2")
-    return onnx_asr.load_model(model = "nemo-parakeet-tdt-0.6b-v2", path = "parakeet-tdt-0.6b-v2-onnx")
+    return onnx_asr.load_model("nemo-parakeet-tdt-0.6b-v2")
+    # return onnx_asr.load_model(model = "nemo-parakeet-tdt-0.6b-v2", path = "parakeet-tdt-0.6b-v2-onnx")
 
 asr_model = load_asr_model()
 
