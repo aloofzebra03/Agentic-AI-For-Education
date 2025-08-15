@@ -11,7 +11,7 @@ from Creating_Section_Text.retriever import retrieve_docs
 from Filtering_GT.filter_utils import filter_relevant_section
 from Creating_Section_Text.schema import NextSectionChoice  # Use real schema for section_name
 import dotenv
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage, AIMessage,SystemMessage
 
 
 dotenv.load_dotenv(dotenv_path=".env", override=True)
@@ -29,13 +29,20 @@ def get_llm():
     )
 
 def llm_with_history(state: AgentState, system_content: str):
-    prior = state.setdefault("history", []).copy()
-    messages = []
-    for msg in prior:
-        role = "human" if msg["role"] == "user" else "assistant"
-        messages.append((role, msg["content"]))
-    messages.append(("human", system_content))
-    return get_llm().invoke(messages)
+     # Build request: system instruction first, then entire past conversation
+    sys_msg = SystemMessage(content=system_content)
+    conversation = state.get("messages", [])
+    
+    request_msgs = [sys_msg] + conversation
+    
+    resp = get_llm().invoke(request_msgs)
+    # response = llm.invoke(prompt, config={"callbacks": get_callbacks()})
+
+    
+    # Append model reply to persistent conversation
+    state["messages"].append(AIMessage(content=resp.content))
+    return resp
+
 
 def get_ground_truth(concept: str, section_name: str) -> str:
     """
