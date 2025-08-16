@@ -1,5 +1,5 @@
 import os
-from Creating_Section_Text import config
+from educational_agent.Creating_Section_Text import config
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 import streamlit as st
 

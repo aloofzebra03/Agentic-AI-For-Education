@@ -1,5 +1,5 @@
-from Filtering_GT.model_loader    import get_filter_llm
-from Filtering_GT.prompt_builder  import build_filter_prompt
+from educational_agent.Filtering_GT.model_loader    import get_filter_llm
+from educational_agent.Filtering_GT.prompt_builder  import build_filter_prompt
 
 def filter_relevant_section(ongoing_concept: str,
                             section_name,

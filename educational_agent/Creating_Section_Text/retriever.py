@@ -1,6 +1,6 @@
 
-from Creating_Section_Text.vectorstore import load_vectorstore
-from Creating_Section_Text.schema import NextSectionChoice
+from educational_agent.Creating_Section_Text.vectorstore import load_vectorstore
+from educational_agent.Creating_Section_Text.schema import NextSectionChoice
 
 def build_query_text(ongoing_concept: str, section_name: str) -> str:
     return (

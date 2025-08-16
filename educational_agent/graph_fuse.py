@@ -1,3 +1,5 @@
+from langchain_core.runnables import RunnableConfig
+import uuid
 from typing import TypedDict, List, Dict, Any, Optional, Annotated
 import os
 import dotenv
@@ -9,6 +11,7 @@ from langchain_core.messages import AnyMessage, HumanMessage, AIMessage
 
 from langfuse import get_client
 from langfuse.langchain import CallbackHandler
+
 
 from educational_agent.nodes4_rag_studio import (
     start_node, apk_node, ci_node, ge_node,
@@ -49,7 +52,7 @@ class AgentState(TypedDict, total=False):
 # -----------------------------------------------------------------------------
 # 4. Initialize state and wrap helper
 # -----------------------------------------------------------------------------
-def _INIT(state: AgentState) -> AgentState:
+def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
     state.setdefault("messages", [])
     state.setdefault("history", [])
     state.setdefault("last_user_msg", "")
@@ -126,3 +129,4 @@ compiled = g.compile(
     interrupt_after=["START","APK","CI","GE","AR","TC","RLC"]
 )
 graph = compiled.with_config({"callbacks": [langfuse_handler]})
+

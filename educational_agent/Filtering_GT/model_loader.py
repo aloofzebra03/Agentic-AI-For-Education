@@ -1,5 +1,5 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
-from Filtering_GT.config         import MODEL_NAME, GOOGLE_API_KEY
+from educational_agent.Filtering_GT.config         import MODEL_NAME, GOOGLE_API_KEY
 
 def get_filter_llm():
     """

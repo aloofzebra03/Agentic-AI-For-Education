@@ -4,9 +4,9 @@ import os
 from pathlib import Path
 
 from langchain_chroma import Chroma
-from Creating_Section_Text.embedder       import get_embedder
-from Creating_Section_Text.pdf_loader     import load_documents
-from Creating_Section_Text import config
+from educational_agent.Creating_Section_Text.embedder       import get_embedder
+from educational_agent.Creating_Section_Text.pdf_loader     import load_documents
+from educational_agent.Creating_Section_Text import config
 
 DB_DIR  = Path(config.CHROMA_PERSIST_DIR)
 DB_FILE = DB_DIR / "chroma.sqlite3"   # the primary SQLite file Chroma uses

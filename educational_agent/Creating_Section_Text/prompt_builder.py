@@ -1,6 +1,6 @@
 # prompt_builder.py
 
-from Creating_Section_Text.schema import NextSectionChoice
+from educational_agent.Creating_Section_Text.schema import NextSectionChoice
 
 _PROMPT = """
 You are an AI tutor. Given this NextSectionChoice schema:

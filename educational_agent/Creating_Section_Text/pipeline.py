@@ -1,11 +1,11 @@
 # pipeline.py
 
-from Creating_Section_Text.model_loader    import get_llm
-from Creating_Section_Text.retriever      import retrieve_docs
-from Creating_Section_Text.prompt_builder import build_prompt
-from Creating_Section_Text.schema         import NextSectionChoice
-from Creating_Section_Text.vectorstore import build_vectorstore
-from Filtering_GT.filter_utils            import filter_relevant_section
+from educational_agent.Creating_Section_Text.model_loader    import get_llm
+from educational_agent.Creating_Section_Text.retriever      import retrieve_docs
+from educational_agent.Creating_Section_Text.prompt_builder import build_prompt
+from educational_agent.Creating_Section_Text.schema         import NextSectionChoice
+from educational_agent.Creating_Section_Text.vectorstore import build_vectorstore
+from educational_agent.Filtering_GT.filter_utils            import filter_relevant_section
 import time
 
 def run_one(ongoing_concept: str, section_params: NextSectionChoice):

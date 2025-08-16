@@ -115,3 +115,4 @@ g.add_edge("END", END)
 checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")
 
 graph = g.compile(checkpointer=checkpointer,interrupt_after=["START","APK","CI","GE","AR","TC","RLC"])
+

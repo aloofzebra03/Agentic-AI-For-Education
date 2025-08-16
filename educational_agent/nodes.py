@@ -1,5 +1,3 @@
-# agent/nodes2.py
-
 import os
 import json
 from typing import Literal, Optional, Dict
