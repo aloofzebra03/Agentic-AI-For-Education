@@ -16,7 +16,7 @@ HF_API_KEY          = os.getenv("HF_API_KEY", "")
 HF_EMBEDDING_MODEL = 'sentence-transformers/all-MiniLM-L6-v2'
 
 # Chroma
-CHROMA_PERSIST_DIR = "Creating_section_text/chroma_db"
+CHROMA_PERSIST_DIR = "educational_agent/Creating_Section_Text/chroma_db"
 
 # PDF to ingest
 PDF_PATH = r"Creating_Section_Text/data/Chapter8.pdf"

@@ -20,20 +20,22 @@ def run_test():
     persona = personas[persona_idx]
 
     # 2. Initialize Agents
-    educational_agent = EducationalAgent()
+    educational_agent = EducationalAgent(persona_name=persona.name)
     tester_agent = TesterAgent(persona)
 
     # 3. Start Conversation
     agent_msg = educational_agent.start()
-    print(f"Educational xAgent: {agent_msg}")
+    print(f"Educational Agent: {agent_msg}")
 
     # 4. Run Conversation Loop
-    while educational_agent.state["current_state"] != "END":
+    while educational_agent.current_state() != "END":
+
         user_msg = tester_agent.respond(agent_msg)
         print(f"Tester Agent ({persona.name}): {user_msg}")
         time.sleep(5)
         agent_msg = educational_agent.post(user_msg)
         print(f"Educational Agent: {agent_msg}")
+        print("#########" + educational_agent.current_state())
 
     # Save and print the session summary after the loop
     session_summary = educational_agent.state.get("session_summary", {})

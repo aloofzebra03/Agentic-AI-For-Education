@@ -1,20 +1,16 @@
 import os
 from educational_agent.Creating_Section_Text import config
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-import streamlit as st
 
-# make absolutely sure your key is set before any gRPC code loads:
-# os.environ["GOOGLE_API_KEY"]     = config.GOOGLE_API_KEY
+from dotenv import load_dotenv
 
-# os.environ["GOOGLE_API_USE_REST"] = "true"
-# os.environ["GRPC_DNS_RESOLVER"] = "native"
-
+load_dotenv(dotenv_path=".env", override=True)
 
 def get_embedder():
     print("Building Gemini embedder...")
     embeddings = GoogleGenerativeAIEmbeddings(
-        model="models/embedding-001",  # <- NO "models/" prefix
-        google_api_key=st.secrets['GOOGLE_API_KEY'] # <- explicit auth
+        model="models/embedding-001",  
+        # google_api_key=st.secrets['GOOGLE_API_KEY'] 
     )
     # sanity check
     vec = embeddings.embed_query("hello, world!")

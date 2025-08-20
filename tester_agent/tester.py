@@ -2,6 +2,7 @@ import os
 import json
 from langchain_google_genai import ChatGoogleGenerativeAI
 from tester_agent.personas import Persona
+from langchain_core.messages import HumanMessage, AIMessage,SystemMessage
 
 class TesterAgent:
     def __init__(self, persona: Persona):
@@ -13,21 +14,14 @@ class TesterAgent:
         )
         # Initialize history with the persona's description as a system prompt
         self.history = [
-            {"role": "system", "content": f"You are a student with the persona of a '{self.persona.name}'. Your characteristics are: {self.persona.description}. You must consistently act according to this persona."}
+            SystemMessage(content=f"You are a student with the persona of a '{self.persona.name}'. Your characteristics are: {self.persona.description}. You must consistently act according to this persona.")
         ]
 
     def respond(self, agent_msg: str) -> str:
-        """
-        Generates a response to the educational agent's message based on the persona
-        and the full conversation history.
-        """
         # Add the educational agent's latest message to the history
-        self.history.append({"role": "assistant", "content": agent_msg})
+        self.history.append(AIMessage(content=agent_msg))
 
-        # Format the history for the prompt
-        # We can pass the structured history directly to some models,
-        # but for clarity in a text-based prompt, we format it.
-        formatted_history = "\n".join([f"{msg['role'].title()}: {msg['content']}" for msg in self.history])
+        formatted_history = self.history
 
         prompt = f"""
 {formatted_history}
@@ -42,6 +36,6 @@ User: """
         user_response = response.content.strip()
 
         # Add your own response to the history
-        self.history.append({"role": "user", "content": user_response})
+        self.history.append(HumanMessage(content=user_response))
 
         return user_response

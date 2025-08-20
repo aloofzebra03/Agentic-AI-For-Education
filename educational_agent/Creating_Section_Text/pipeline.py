@@ -21,6 +21,7 @@ def run_one(ongoing_concept: str, section_params: NextSectionChoice):
     prompt = build_prompt(ongoing_concept, section_params, filtered_text)
     llm    = get_llm()
     out    = llm.invoke(prompt)
+    #out now contains the next section that will be displayed to the student
     print(out.content)
     return out.content
 

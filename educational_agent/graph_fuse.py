@@ -11,6 +11,7 @@ from langchain_core.messages import AnyMessage, HumanMessage, AIMessage
 
 from langfuse import get_client
 from langfuse.langchain import CallbackHandler
+from langgraph.checkpoint.memory import InMemorySaver
 
 
 from educational_agent.nodes4_rag_studio import (
@@ -20,7 +21,7 @@ from educational_agent.nodes4_rag_studio import (
 
 dotenv.load_dotenv(dotenv_path=".env", override=True)
 
-langfuse = get_client()  # reads PUBLIC/SECRET keys and optional HOST from env
+langfuse = get_client()  
 if not langfuse.auth_check():
     raise RuntimeError("Langfuse auth failed – check your .env keys")
 
@@ -69,9 +70,9 @@ def _wrap(fn):
                 state["last_user_msg"] = text
                 state.setdefault("history", []).append({"role":"user","content":text})
         # Run the node
-        st = fn(state) or state
+        st = fn(state)
         # Log assistant output
-        out = (st.get("agent_output") or "").strip()
+        out = st.get("agent_output")
         if out:
             st.setdefault("history", []).append({
                 "role": "assistant",
@@ -108,14 +109,14 @@ g.add_node("RLC", _RLC)
 g.add_node("END", _END)
 
 def _route(state: AgentState) -> str:
-    return state.get("current_state", "APK")
+    return state.get("current_state", "CI")
 
 g.add_edge(START, "INIT")
 g.add_edge("INIT", "START")
 g.add_edge("START", "APK")
 g.add_conditional_edges("APK", _route, {"APK": "APK", "CI": "CI"})
-g.add_conditional_edges("CI",  _route, {"CI": "CI",  "GE": "GE"})
-g.add_conditional_edges("GE",  _route, {"MH": "MH",  "AR": "AR","GE": "GE"})
+g.add_conditional_edges("CI",  _route, {"CI": "CI", "GE": "GE"})
+g.add_conditional_edges("GE",  _route, {"MH": "MH", "AR": "AR","GE": "GE"})
 g.add_edge("MH", "AR")
 g.add_edge("AR", "TC")
 g.add_edge("TC", "RLC")
@@ -123,10 +124,15 @@ g.add_edge("RLC", "END")
 g.add_edge("END", END)
 
 checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")
+CHECKPOINTER = InMemorySaver()
 
-compiled = g.compile(
-    checkpointer=checkpointer,
-    interrupt_after=["START","APK","CI","GE","AR","TC","RLC"]
-)
-graph = compiled.with_config({"callbacks": [langfuse_handler]})
 
+def build_graph():
+    compiled = g.compile(
+        # checkpointer=checkpointer,
+        checkpointer=CHECKPOINTER,
+        interrupt_after=["START", "APK", "CI", "GE", "AR", "TC", "RLC"],
+    )
+    return compiled
+
+graph = build_graph()

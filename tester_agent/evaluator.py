@@ -23,7 +23,7 @@ Your task is to analyze the following conversation between an educational agent 
 
 **Conversation History:**
 {json.dumps(history, indent=2)}
-
+    
 **Evaluation Metrics:**
 - **Adaptability:** How well did the agent adapt to the student's persona? (1-5)
 - **Pedagogical Flow:** Did the conversation follow a logical and effective teaching structure? (1-5)

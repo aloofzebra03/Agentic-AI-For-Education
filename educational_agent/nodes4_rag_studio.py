@@ -38,7 +38,6 @@ def llm_with_history(state: AgentState, system_content: str):
     resp = get_llm().invoke(request_msgs)
     # response = llm.invoke(prompt, config={"callbacks": get_callbacks()})
 
-    
     # Append model reply to persistent conversation
     state["messages"].append(AIMessage(content=resp.content))
     return resp
@@ -66,7 +65,8 @@ def get_ground_truth(concept: str, section_name: str) -> str:
         combined = [f"# Page: {d.metadata['page_label']}\n{d.page_content}" for d in docs]
         full_doc = "\n---\n".join(combined)
         return filter_relevant_section(concept, section_name, full_doc)
-    except Exception:
+    except Exception as e:
+        print(f"Error retrieving ground truth for {concept} - {section_name}: {e}")
         return ""
 
 # ─── Pydantic response models ─────────────────────────────────────────────────
@@ -145,6 +145,7 @@ def start_node(state: AgentState) -> AgentState:
         "Greet the learner and ask if they are ready to begin."
         # "Also Remember that the student is of Kannada origin and understands olny kannada.So speak to the student in kannada.The script has to be kannada and not english.\n"
     )
+    print("IN START NODE")
     resp = llm_with_history(state, prompt)
     state["agent_output"]  = resp.content
     state["current_state"] = "APK"
@@ -184,6 +185,7 @@ Task: Evaluate whether the student identified the concept correctly. Respond ONL
     try:
         parsed: ApkResponse = apk_parser.parse(raw)
         state["agent_output"]  = parsed.feedback
+        # state["agent_output"] = prompt
         state["current_state"] = parsed.next_state
     except Exception:
         state["agent_output"]  = "Oops, I got confused. Let's try defining it.\n" + raw
@@ -191,6 +193,7 @@ Task: Evaluate whether the student identified the concept correctly. Respond ONL
     return state
 
 def ci_node(state: AgentState) -> AgentState:
+    print("REACHED HERE")
     if not state.get("_asked_ci", False):
         state["_asked_ci"] = True
         # Include ground truth for Explanation (with analogies)
