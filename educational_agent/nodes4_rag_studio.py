@@ -193,7 +193,7 @@ Task: Evaluate whether the student identified the concept correctly. Respond ONL
     return state
 
 def ci_node(state: AgentState) -> AgentState:
-    print("REACHED HERE")
+    # print("REACHED HERE")
     if not state.get("_asked_ci", False):
         state["_asked_ci"] = True
         # Include ground truth for Explanation (with analogies)
@@ -303,7 +303,7 @@ def ar_node(state: AgentState) -> AgentState:
     # Second pass: grade & either explain or advance
     instructions = ar_parser.get_format_instructions()
     context = json.dumps(PEDAGOGICAL_MOVES["AR"], indent=2)
-    decision_prompt = f"""{instructions}
+    decision_prompt = f"""
 
 Current node: AR (Application & Retrieval)
 Possible next_state values (handled by agent code):
@@ -313,13 +313,14 @@ Pedagogical context:
 {context}
 
 Student answer: "{state['last_user_msg']}"
-Task: Grade this answer on a scale from 0 to 1. Respond ONLY with JSON matching the schema above.
+Task: Grade this answer on a scale from 0 to 1. Respond ONLY with JSON matching the schema above.{instructions}
 """
     raw = llm_with_history(state, decision_prompt).content
     try:
         parsed: ArResponse = ar_parser.parse(raw)
         score, feedback = parsed.score, parsed.feedback
-    except Exception:
+    except Exception as e:
+        print(e)
         score, feedback = 0.0, raw
 
     if score < 0.5:

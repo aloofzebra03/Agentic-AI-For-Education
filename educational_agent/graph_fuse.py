@@ -13,6 +13,7 @@ from langfuse import get_client
 from langfuse.langchain import CallbackHandler
 from langgraph.checkpoint.memory import InMemorySaver
 
+import operator
 
 from educational_agent.nodes4_rag_studio import (
     start_node, apk_node, ci_node, ge_node,
@@ -35,7 +36,7 @@ class AgentState(TypedDict, total=False):
     current_state: str
     last_user_msg: str
     agent_output: str
-    history: List[Dict[str, Any]]
+    history: Annotated[List[Dict[str, Any]],operator.add]
     _asked_apk: bool
     _asked_ci: bool
     _asked_ge: bool
@@ -62,23 +63,26 @@ def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
 
 def _wrap(fn):
     def inner(state: AgentState) -> AgentState:
-        # Capture latest user input
+        # 1. Capture latest user input
         msgs = state.get("messages", [])
         if msgs and isinstance(msgs[-1], HumanMessage):
             text = msgs[-1].content or ""
             if text and text != state.get("last_user_msg"):
                 state["last_user_msg"] = text
-                state.setdefault("history", []).append({"role":"user","content":text})
-        # Run the node
+
         st = fn(state)
-        # Log assistant output
+
+        updates = {}
         out = st.get("agent_output")
         if out:
-            st.setdefault("history", []).append({
+            updates["history"] = [{
                 "role": "assistant",
                 "content": out,
-                "node": st.get("current_state")
-            })
+                "node": st.get("current_state"),
+            }]
+
+        if updates:
+            return {**st, **updates}
         return st
     return inner
 

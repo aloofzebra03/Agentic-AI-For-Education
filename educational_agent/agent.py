@@ -7,6 +7,8 @@ from typing import Optional, Dict, Any
 from langchain_core.messages import HumanMessage
 from langfuse.langchain import CallbackHandler as LangfuseCallbackHandler
 
+from langgraph.types import Command
+
 # Import the graph factory that returns a compiled graph WITHOUT callbacks baked in
 from educational_agent.graph_fuse import build_graph
 
@@ -78,9 +80,18 @@ class EducationalAgent:
     def post(self, user_text: str) -> str:
         final_text = ""
         last_state: Dict[str, Any] = {}
+        
+        cmd = Command(
+            resume=True,
+            update={
+                "messages": [HumanMessage(content=user_text)],
+                # "last_user_msg": user_text,
+                "history": [{"role": "user", "content": user_text}]
+            },
+        )
+
         events = self.graph.stream(
-            {"messages": [HumanMessage(content=user_text)],
-             "history": self.state.get("history", [])},
+            cmd,
             stream_mode="values",
             config={"configurable": {"thread_id": self.thread_id}},
         )

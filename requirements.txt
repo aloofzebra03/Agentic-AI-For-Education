@@ -1,3 +1,5 @@
+-e .
+
 Brotli
 Deprecated
 GitPython
@@ -259,7 +261,7 @@ tzdata
 uritemplate
 urllib3
 uvicorn
-watchdog
+watchdog == 4.0.0
 watchfiles
 wcwidth
 webencodings

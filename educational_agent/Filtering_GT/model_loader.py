@@ -9,6 +9,6 @@ def get_filter_llm():
         model=MODEL_NAME,
         api_key=GOOGLE_API_KEY,
         temperature=0.0,            # deterministic extraction
-        max_new_tokens=1024,        # enough to return a section
+        max_tokens=1024,        # enough to return a section
         transport="rest"
     )

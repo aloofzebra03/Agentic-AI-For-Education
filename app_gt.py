@@ -10,7 +10,7 @@ import time
 import soundfile as sf
 from pedalboard import Pedalboard, Resample
 import sys
-import pysqlite3
+# import pysqlite3
 
 # Import the audio_recorder component
 from audio_recorder_streamlit import audio_recorder
@@ -18,10 +18,10 @@ from audio_recorder_streamlit import audio_recorder
 # Import gTTS for text-to-speech
 from gtts import gTTS
 
-sys.modules["sqlite3"] = pysqlite3
+# sys.modules["sqlite3"] = pysqlite3
 
-PROJECT_ROOT = r"/mount/src/Personalized_Education/Agentic-AI-For-Education/"
-sys.path.insert(0, PROJECT_ROOT)
+# PROJECT_ROOT = r"/mount/src/Personalized_Education/Agentic-AI-For-Education/"
+# sys.path.insert(0, PROJECT_ROOT)
 
 # This is a placeholder for your agent logic.
 try:
