@@ -2,7 +2,6 @@
 from pydantic import BaseModel
 from typing import List
 
-
 import streamlit as st
 
 GOOGLE_API_KEY = st.secrets.get("GOOGLE_API_KEY")

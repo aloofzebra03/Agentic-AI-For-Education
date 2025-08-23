@@ -2,6 +2,7 @@
 
 import os
 import json
+from turtle import st
 from typing import Literal, Optional, Dict
 from pydantic import BaseModel
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -14,11 +15,12 @@ import dotenv
 from langchain_core.messages import HumanMessage, AIMessage
 
 # dotenv.load_dotenv(dotenv_path=".env", override=True)
-dotenv.load_dotenv()
+# dotenv.load_dotenv()
+api_key = st.secrets.get("GOOGLE_API_KEY")
 AgentState = dict
 
 def get_llm():
-    api_key = os.getenv("GOOGLE_API_KEY")
+    api_key = st.secrets.get("GOOGLE_API_KEY")
     if not api_key:
         raise RuntimeError("Please set GOOGLE_API_KEY")
     return ChatGoogleGenerativeAI(
