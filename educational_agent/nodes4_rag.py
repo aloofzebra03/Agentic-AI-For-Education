@@ -14,7 +14,7 @@ import dotenv
 from langchain_core.messages import HumanMessage, AIMessage
 
 # dotenv.load_dotenv(dotenv_path=".env", override=True)
-dotenv.load_dotenv(override=True)
+dotenv.load_dotenv()
 AgentState = dict
 
 def get_llm():
