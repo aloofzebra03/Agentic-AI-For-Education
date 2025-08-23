@@ -30,21 +30,10 @@ try:
         mh_node, ar_node, tc_node, rlc_node, end_node,
         AgentState
     )
-except ImportError:
-    st.error("Could not import agent nodes. Running with placeholder logic.")
-    def placeholder_node(state):
-        time.sleep(3) # Simulate a slow LLM call
-        next_states = {"START": "APK", "END": "END"}
-        current_node = state["current_state"]
-        state["current_state"] = next_states.get(current_node, "END")
-        state["agent_output"] = f"Placeholder response from '{current_node}'. You said: '{state['last_user_msg']}'"
-        if state["current_state"] == "END":
-            state["agent_output"] = "End of placeholder session."
-            state["session_summary"] = {"summary": "This is a placeholder summary."}
-        return state
-    start_node, apk_node, ci_node, ge_node, mh_node, ar_node, tc_node, rlc_node, end_node = (placeholder_node,) * 9
-    class AgentState(dict): pass
-
+except ImportError as e:
+    st.error(f"Could not import agent nodes: {e}")
+    st.stop()
+    
 # ── ASR & TTS Functions ──────────────────────────────────────────────────
 @st.cache_resource
 def load_asr_model():
