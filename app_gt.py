@@ -49,7 +49,7 @@ except ImportError:
 @st.cache_resource
 def load_asr_model():
     print("BOOT: about to init ASR...", flush=True)
-    model = onnx_asr.load_model("nemo-parakeet-tdt-0.6b-v2")
+    # model = onnx_asr.load_model("nemo-parakeet-tdt-0.6b-v2")
     print("BOOT: ASR ready", flush=True)
     return model
     # return onnx_asr.load_model(model = "nemo-parakeet-tdt-0.6b-v2", path = "parakeet-tdt-0.6b-v2-onnx")
