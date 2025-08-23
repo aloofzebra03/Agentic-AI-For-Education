@@ -30,7 +30,7 @@ def get_llm():
 
 def llm_with_history(state: AgentState, system_content: str):
      # Build request: system instruction first, then entire past conversation
-    sys_msg = SystemMessage(content=system_content + " Remember you are speaking directly with the Student.")
+    sys_msg = SystemMessage(content=system_content)
     conversation = state.get("messages", [])
 
     request_msgs = [sys_msg] + conversation
