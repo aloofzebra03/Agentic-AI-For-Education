@@ -2,7 +2,6 @@
 
 import os
 import json
-from turtle import st
 from typing import Literal, Optional, Dict
 from pydantic import BaseModel
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -13,6 +12,8 @@ from educational_agent.Filtering_GT.filter_utils import filter_relevant_section
 from educational_agent.Creating_Section_Text.schema import NextSectionChoice  # Use real schema for section_name
 import dotenv
 from langchain_core.messages import HumanMessage, AIMessage
+
+import streamlit as st
 
 # dotenv.load_dotenv(dotenv_path=".env", override=True)
 # dotenv.load_dotenv()
