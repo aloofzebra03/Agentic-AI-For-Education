@@ -13,9 +13,8 @@ from educational_agent.Creating_Section_Text.schema import NextSectionChoice  # 
 import dotenv
 from langchain_core.messages import HumanMessage, AIMessage
 
-
-dotenv.load_dotenv(dotenv_path=".env", override=True)
-
+# dotenv.load_dotenv(dotenv_path=".env", override=True)
+dotenv.load_dotenv(override=True)
 AgentState = dict
 
 def get_llm():
