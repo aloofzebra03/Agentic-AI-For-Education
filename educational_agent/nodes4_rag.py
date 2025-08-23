@@ -16,8 +16,8 @@ from langchain_core.messages import HumanMessage, AIMessage
 import streamlit as st
 
 # dotenv.load_dotenv(dotenv_path=".env", override=True)
-# dotenv.load_dotenv()
-api_key = st.secrets.get("GOOGLE_API_KEY")
+dotenv.load_dotenv()
+# api_key = st.secrets.get("GOOGLE_API_KEY")
 AgentState = dict
 
 def get_llm():

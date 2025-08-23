@@ -30,11 +30,11 @@ def get_llm():
 
 def llm_with_history(state: AgentState, system_content: str):
      # Build request: system instruction first, then entire past conversation
-    sys_msg = SystemMessage(content=system_content)
+    sys_msg = SystemMessage(content=system_content + " Remember you are speaking directly with the Student.")
     conversation = state.get("messages", [])
-    
+
     request_msgs = [sys_msg] + conversation
-    
+
     resp = get_llm().invoke(request_msgs)
     # response = llm.invoke(prompt, config={"callbacks": get_callbacks()})
 
@@ -303,7 +303,7 @@ def ar_node(state: AgentState) -> AgentState:
     # Second pass: grade & either explain or advance
     instructions = ar_parser.get_format_instructions()
     context = json.dumps(PEDAGOGICAL_MOVES["AR"], indent=2)
-    decision_prompt = f"""
+    decision_prompt = f"""{instructions}
 
 Current node: AR (Application & Retrieval)
 Possible next_state values (handled by agent code):
@@ -313,7 +313,7 @@ Pedagogical context:
 {context}
 
 Student answer: "{state['last_user_msg']}"
-Task: Grade this answer on a scale from 0 to 1. Respond ONLY with JSON matching the schema above.{instructions}
+Task: Grade this answer on a scale from 0 to 1. Respond ONLY with JSON matching the schema above.DO NOT start with any additional text.Direct reply in requested format so I can parse directly.
 """
     raw = llm_with_history(state, decision_prompt).content
     try:
