@@ -3,6 +3,8 @@
 import os
 import json
 from typing import Literal, Optional, Dict
+import re
+
 from pydantic import BaseModel
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.output_parsers import PydanticOutputParser
@@ -17,6 +19,53 @@ from langchain_core.messages import HumanMessage, AIMessage,SystemMessage
 dotenv.load_dotenv(dotenv_path=".env", override=True)
 
 AgentState = dict
+
+def extract_json_block(text: str) -> str:
+    s = text.strip()
+
+    # 1) Try to find a fenced code block containing JSON (language tag optional)
+    m = re.search(r"```(?:json)?\s*({.*?})\s*```", s, flags=re.DOTALL | re.IGNORECASE)
+    if m:
+        return m.group(1).strip()
+
+    # 2) Try to find the first balanced JSON object in the text
+    start = s.find("{")
+    if start != -1:
+        depth = 0
+        in_str = False
+        esc = False
+        for i, ch in enumerate(s[start:], start=start):
+            if in_str:
+                if esc:
+                    esc = False
+                elif ch == "\\":
+                    esc = True
+                elif ch == '"':
+                    in_str = False
+            else:
+                if ch == '"':
+                    in_str = True
+                elif ch == "{":
+                    depth += 1
+                elif ch == "}":
+                    depth -= 1
+                    if depth == 0:
+                        return s[start:i+1].strip()
+
+    # 3) Nothing found — return original (let parser raise)
+    return s
+
+
+# def extract_json_block(text: str) -> str:
+#     """```
+#     If text starts with ```json and ends with ```, extract the JSON block.
+#     Otherwise, return text unchanged.
+#     """
+#     pattern = r"^```json\s*(.*?)\s*```$"
+#     match = re.match(pattern, text.strip(), re.DOTALL)
+#     if match:
+#         return match.group(1).strip()
+#     return text
 
 def get_llm():
     api_key = os.getenv("GOOGLE_API_KEY")
@@ -182,10 +231,10 @@ Student reply: "{state['last_user_msg']}"
 Task: Evaluate whether the student identified the concept correctly. Respond ONLY with JSON matching the schema above. If not, help the student to do so.
 """
     raw = llm_with_history(state, decision_prompt).content
+    json_text = extract_json_block(raw)
     try:
-        parsed: ApkResponse = apk_parser.parse(raw)
+        parsed: ApkResponse = apk_parser.parse(json_text)
         state["agent_output"]  = parsed.feedback
-        # state["agent_output"] = prompt
         state["current_state"] = parsed.next_state
     except Exception:
         state["agent_output"]  = "Oops, I got confused. Let's try defining it.\n" + raw
@@ -225,8 +274,9 @@ Student restatement: "{state['last_user_msg']}"
 Task: Determine if the restatement is accurate. Respond ONLY with JSON matching the schema above. If not, help the student to do so.
 """
     raw = llm_with_history(state, decision_prompt).content
+    json_text = extract_json_block(raw)
     try:
-        parsed: CiResponse = ci_parser.parse(raw)
+        parsed: CiResponse = ci_parser.parse(json_text)
         state["agent_output"]  = parsed.feedback
         state["current_state"] = parsed.next_state
     except Exception:
@@ -265,8 +315,9 @@ Student response: "{state['last_user_msg']}"
 Task: Detect misconception or correct reasoning. RESPOND ONLY WITH JSON matching the schema above.
 """
     raw = llm_with_history(state, decision_prompt).content
+    json_text = extract_json_block(raw)
     try:
-        parsed: GeResponse = ge_parser.parse(raw)
+        parsed: GeResponse = ge_parser.parse(json_text)
         if parsed.next_state == "MH":
             state["last_correction"] = parsed.correction or "Let me clarify that for you."
         state["agent_output"]  = parsed.feedback
@@ -316,8 +367,9 @@ Student answer: "{state['last_user_msg']}"
 Task: Grade this answer on a scale from 0 to 1. Respond ONLY with JSON matching the schema above.DO NOT start with any additional text.Direct reply in requested format so I can parse directly.
 """
     raw = llm_with_history(state, decision_prompt).content
+    json_text = extract_json_block(raw)
     try:
-        parsed: ArResponse = ar_parser.parse(raw)
+        parsed: ArResponse = ar_parser.parse(json_text)
         score, feedback = parsed.score, parsed.feedback
     except Exception as e:
         print(e)
@@ -368,8 +420,9 @@ Student answer: "{state['last_user_msg']}"
 Task: Evaluate whether the application is correct. Respond ONLY with JSON matching the schema above.
 """
     raw = llm_with_history(state, decision_prompt).content
+    json_text = extract_json_block(raw)
     try:
-        parsed: TcResponse = tc_parser.parse(raw)
+        parsed: TcResponse = tc_parser.parse(json_text)
         correct, feedback = parsed.correct, parsed.feedback
     except Exception:
         correct, feedback = False, raw
