@@ -60,27 +60,17 @@ class EducationalAgent:
     def start(self) -> str:
         final_text = ""
         last_state: Dict[str, Any] = {}
-        # events = self.graph.stream(
-        #     {"messages": [HumanMessage(content="__start__")],
-        #      "history": self.state.get("history", [])},  # seed for Gemini
-        #     stream_mode="values",
-        #     config={"configurable": {"thread_id": self.thread_id}},
-        # )
-        # for state in events:
-        #     if isinstance(state, dict):
-        #         last_state = state
-        #         if state.get("agent_output"):
-        #             final_text = state["agent_output"]
-        
-        result = self.graph.invoke(
+        events = self.graph.stream(
             {"messages": [HumanMessage(content="__start__")],
              "history": self.state.get("history", [])},  # seed for Gemini
+            stream_mode="values",
             config={"configurable": {"thread_id": self.thread_id}},
         )
-        if isinstance(result, dict):
-            last_state = result
-            if result.get("agent_output"):
-                final_text = result["agent_output"]
+        for state in events:
+            if isinstance(state, dict):
+                last_state = state
+                if state.get("agent_output"):
+                    final_text = state["agent_output"]
 
         if last_state:
             self.state = last_state
@@ -100,39 +90,23 @@ class EducationalAgent:
             },
         )
 
-        # events = self.graph.stream(
-        #     cmd,
-        #     stream_mode="values",
-        #     config={"configurable": {"thread_id": self.thread_id}},
-        # )
-        # for state in events:
-        #     if isinstance(state, dict):
-        #         last_state = state
-        #         if state.get("agent_output"):
-        #             final_text = state["agent_output"]
-        #         else:
-        #             try:
-        #                 msgs = state.get("messages") or []
-        #                 if msgs and getattr(msgs[-1], "type", None) == "ai":
-        #                     final_text = getattr(msgs[-1], "content", final_text) or final_text
-        #             except Exception:
-        #                 pass
-
-        result = self.graph.invoke(
+        events = self.graph.stream(
             cmd,
+            stream_mode="values",
             config={"configurable": {"thread_id": self.thread_id}},
         )
-        if isinstance(result, dict):
-            last_state = result
-            if result.get("agent_output"):
-                final_text = result["agent_output"]
-            else:
-                try:
-                    msgs = result.get("messages") or []
-                    if msgs and getattr(msgs[-1], "type", None) == "ai":
-                        final_text = getattr(msgs[-1], "content", final_text) or final_text
-                except Exception:
-                    pass
+        for state in events:
+            if isinstance(state, dict):
+                last_state = state
+                if state.get("agent_output"):
+                    final_text = state["agent_output"]
+                else:
+                    try:
+                        msgs = state.get("messages") or []
+                        if msgs and getattr(msgs[-1], "type", None) == "ai":
+                            final_text = getattr(msgs[-1], "content", final_text) or final_text
+                    except Exception:
+                        pass
 
         # <-- persist full state
         if last_state:

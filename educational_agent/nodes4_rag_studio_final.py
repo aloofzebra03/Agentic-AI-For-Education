@@ -24,22 +24,10 @@ AgentState = dict
 def extract_json_block(text: str) -> str:
     s = text.strip()
 
-    # 🔍 JSON EXTRACTION INPUT 🔍
-    print("=" * 60)
-    print("🔧 JSON EXTRACTION - INPUT TEXT")
-    print("=" * 60)
-    print(f"📄 INPUT_LENGTH: {len(s)} characters")
-    print(f"📄 INPUT_PREVIEW: {s[:200]}...")
-    print("=" * 60)
-
     # 1) Try to find a fenced code block containing JSON (language tag optional)
     m = re.search(r"```(?:json)?\s*({.*?})\s*```", s, flags=re.DOTALL | re.IGNORECASE)
     if m:
-        result = m.group(1).strip()
-        print("🎯 JSON EXTRACTED - METHOD: Fenced code block")
-        print(f"📦 EXTRACTED_JSON: {result}")
-        print("=" * 60)
-        return result
+        return m.group(1).strip()
 
     # 2) Try to find the first balanced JSON object in the text
     start = s.find("{")
@@ -63,16 +51,9 @@ def extract_json_block(text: str) -> str:
                 elif ch == "}":
                     depth -= 1
                     if depth == 0:
-                        result = s[start:i+1].strip()
-                        print("🎯 JSON EXTRACTED - METHOD: Balanced braces")
-                        print(f"📦 EXTRACTED_JSON: {result}")
-                        print("=" * 60)
-                        return result
+                        return s[start:i+1].strip()
 
     # 3) Nothing found — return original (let parser raise)
-    print("⚠️ JSON EXTRACTION - METHOD: No JSON found, returning original")
-    print(f"📦 RETURNED_TEXT: {s}")
-    print("=" * 60)
     return s
 
 
@@ -87,25 +68,10 @@ def get_llm():
     )
 
 def llm_with_history(state: AgentState, final_prompt: str):
-    # 🔍 LLM INVOCATION - INPUT 🔍
-    print("=" * 70)
-    print("🤖 LLM INVOCATION - STARTED")
-    print("=" * 70)
-    print(f"📝 PROMPT_LENGTH: {len(final_prompt)} characters")
-    print(f"📝 PROMPT_PREVIEW: {final_prompt[:200]}...")
-    print("=" * 70)
-    
     # Send the final prompt directly as a human message
     request_msgs = [HumanMessage(content=final_prompt)]
     
     resp = get_llm().invoke(request_msgs)
-    
-    # 🔍 LLM INVOCATION - OUTPUT 🔍
-    print("🤖 LLM INVOCATION - COMPLETED")
-    print(f"📤 RESPONSE_LENGTH: {len(resp.content)} characters")
-    print(f"📤 RESPONSE_PREVIEW: {resp.content[:200]}...")
-    print(f"📊 RESPONSE_TYPE: {type(resp).__name__}")
-    print("=" * 70)
     
     # Append model reply to persistent conversation
     state["messages"].append(AIMessage(content=resp.content))
@@ -128,6 +94,13 @@ def build_prompt_from_template(system_prompt: str, state: AgentState,
                              include_last_message: bool = False, 
                              include_instructions: bool = False,
                              parser=None) -> str:
+    """
+    Build a prompt using LangChain's PromptTemplate with conditional keys:
+    - system_prompt: The main system instructions
+    - history: Conversation history (always included if available)
+    - last_user_message: Last user message (included if include_last_message=True)
+    - instructions: Format instructions (included if include_instructions=True and parser provided)
+    """
     
     # Build the template string based on what we need
     template_parts = ["{system_prompt}"]
@@ -173,15 +146,10 @@ def build_prompt_from_template(system_prompt: str, state: AgentState,
 
 
 def get_ground_truth(concept: str, section_name: str) -> str:
+    """
+    Fetch relevant sections from vector store and filter by section name.
+    """
     try:
-        # 🔍 GROUND TRUTH RETRIEVAL - INPUT 🔍
-        print("=" * 70)
-        print("📚 GROUND TRUTH RETRIEVAL - STARTED")
-        print("=" * 70)
-        print(f"🎯 CONCEPT: {concept}")
-        print(f"📋 SECTION_NAME: {section_name}")
-        print("=" * 70)
-        
         # Build a minimal NextSectionChoice object; other fields are dummy since retriever only uses section_name
         params = NextSectionChoice(
             section_name=section_name,
@@ -198,20 +166,10 @@ def get_ground_truth(concept: str, section_name: str) -> str:
         docs = retrieve_docs(concept, params)
         combined = [f"# Page: {d.metadata['page_label']}\n{d.page_content}" for d in docs]
         full_doc = "\n---\n".join(combined)
-        result = filter_relevant_section(concept, section_name, full_doc)
-        
-        # 🔍 GROUND TRUTH RETRIEVAL - OUTPUT 🔍
-        print("📚 GROUND TRUTH RETRIEVAL - COMPLETED")
-        print(f"📄 DOC_COUNT: {len(docs)} documents")
-        print(f"📏 FULL_DOC_LENGTH: {len(full_doc)} characters")
-        print(f"📏 FILTERED_LENGTH: {len(result)} characters")
-        print(f"📄 RESULT_PREVIEW: {result[:300]}...")
-        print("=" * 70)
-        
-        return result
+        return filter_relevant_section(concept, section_name, full_doc)
     except Exception as e:
         print(f"Error retrieving ground truth for {concept} - {section_name}: {e}")
-        raise
+        return ""
 
 # ─── Pydantic response models ─────────────────────────────────────────────────
 
@@ -302,17 +260,6 @@ def start_node(state: AgentState) -> AgentState:
     resp = llm_with_history(state, final_prompt)
     # Apply JSON extraction in case LLM wraps response in markdown
     content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-    
-    # 🔍 START NODE - CONTENT PROCESSING 🔍
-    print("=" * 80)
-    print("🎯 START NODE - CONTENT OUTPUT 🎯")
-    print("=" * 80)
-    print(f"📄 CONTENT: {content}")
-    print(f"📏 CONTENT_LENGTH: {len(content)} characters")
-    print(f"📊 CONTENT_TYPE: {type(content).__name__}")
-    print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
-    print("=" * 80)
-    
     state["agent_output"]  = content
     state["current_state"] = "APK"
     return state
@@ -367,23 +314,13 @@ Task: Evaluate whether the student identified the concept correctly. Respond ONL
     json_text = extract_json_block(raw)
     try:
         parsed: ApkResponse = apk_parser.parse(json_text)
-        
-        # 🔍 APK PARSING OUTPUT - MAIN CONTENT 🔍
-        print("=" * 80)
-        print("🎯 APK NODE - PARSED OUTPUT CONTENTS 🎯")
-        print("=" * 80)
-        print(f"📝 FEEDBACK: {parsed.feedback}")
-        print(f"🚀 NEXT_STATE: {parsed.next_state}")
-        print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
-        print("=" * 80)
-        
         state["agent_output"]  = parsed.feedback
         state["current_state"] = parsed.next_state
     except Exception as e:
-        print(f"Error parsing APK response: {e}")
-        print(f"Raw response: {raw}")
-        print(f"Extracted JSON text: {json_text}")
-        raise
+        # print(e)
+        # quit()
+        state["agent_output"]  = "Oops, I got confused. Let's try defining it.\n" + extract_json_block(raw)
+        state["current_state"] = "CI"
     return state
 
 def ci_node(state: AgentState) -> AgentState:
@@ -438,23 +375,11 @@ Task: Determine if the restatement is accurate. Respond ONLY with JSON matching 
     json_text = extract_json_block(raw)
     try:
         parsed: CiResponse = ci_parser.parse(json_text)
-        
-        # 🔍 CI PARSING OUTPUT - MAIN CONTENT 🔍
-        print("=" * 80)
-        print("🎯 CI NODE - PARSED OUTPUT CONTENTS 🎯")
-        print("=" * 80)
-        print(f"📝 FEEDBACK: {parsed.feedback}")
-        print(f"🚀 NEXT_STATE: {parsed.next_state}")
-        print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
-        print("=" * 80)
-        
         state["agent_output"]  = parsed.feedback
         state["current_state"] = parsed.next_state
-    except Exception as e:
-        print(f"Error parsing CI response: {e}")
-        print(f"Raw response: {raw}")
-        print(f"Extracted JSON text: {json_text}")
-        raise
+    except Exception:
+        state["agent_output"]  = "Hmm, let's move on.\n" + extract_json_block(raw)
+        state["current_state"] = "GE"
     return state
 
 def ge_node(state: AgentState) -> AgentState:
@@ -507,26 +432,13 @@ Task: Detect misconception or correct reasoning. RESPOND ONLY WITH JSON matching
     json_text = extract_json_block(raw)
     try:
         parsed: GeResponse = ge_parser.parse(json_text)
-        
-        # 🔍 GE PARSING OUTPUT - MAIN CONTENT 🔍
-        print("=" * 80)
-        print("🎯 GE NODE - PARSED OUTPUT CONTENTS 🎯")
-        print("=" * 80)
-        print(f"📝 FEEDBACK: {parsed.feedback}")
-        print(f"🚀 NEXT_STATE: {parsed.next_state}")
-        print(f"🔧 CORRECTION: {parsed.correction}")
-        print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
-        print("=" * 80)
-        
         if parsed.next_state == "MH":
             state["last_correction"] = parsed.correction or "Let me clarify that for you."
         state["agent_output"]  = parsed.feedback
         state["current_state"] = parsed.next_state
-    except Exception as e:
-        print(f"Error parsing GE response: {e}")
-        print(f"Raw response: {raw}")
-        print(f"Extracted JSON text: {json_text}")
-        raise
+    except Exception:
+        state["agent_output"]  = "Sorry, I couldn't interpret that—let's move on."
+        state["current_state"] = "AR"
     return state
 
 def mh_node(state: AgentState) -> AgentState:
@@ -589,23 +501,10 @@ Task: Grade this answer on a scale from 0 to 1. Respond ONLY with JSON matching 
     try:
         print("#############JSON TEXT HERE",json_text)
         parsed: ArResponse = ar_parser.parse(json_text)
-        
-        # 🔍 AR PARSING OUTPUT - MAIN CONTENT 🔍
-        print("=" * 80)
-        print("🎯 AR NODE - PARSED OUTPUT CONTENTS 🎯")
-        print("=" * 80)
-        print(f"📝 FEEDBACK: {parsed.feedback}")
-        print(f"📊 SCORE: {parsed.score}")
-        print(f"🎯 SCORE_TYPE: {type(parsed.score).__name__}")
-        print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
-        print("=" * 80)
-        
         score, feedback = parsed.score, parsed.feedback
     except Exception as e:
-        print(f"Error parsing AR response: {e}")
-        print(f"Raw response: {raw}")
-        print(f"Extracted JSON text: {json_text}")
-        raise
+        print(e)
+        score, feedback = 0.0, extract_json_block(raw)
 
     if score < 0.5:
         # Student struggled: give correct answer + explanation, then introduce transfer
@@ -681,23 +580,9 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
     json_text = extract_json_block(raw)
     try:
         parsed: TcResponse = tc_parser.parse(json_text)
-        
-        # 🔍 TC PARSING OUTPUT - MAIN CONTENT 🔍
-        print("=" * 80)
-        print("🎯 TC NODE - PARSED OUTPUT CONTENTS 🎯")
-        print("=" * 80)
-        print(f"📝 FEEDBACK: {parsed.feedback}")
-        print(f"✅ CORRECT: {parsed.correct}")
-        print(f"🎯 CORRECT_TYPE: {type(parsed.correct).__name__}")
-        print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
-        print("=" * 80)
-        
         correct, feedback = parsed.correct, parsed.feedback
-    except Exception as e:
-        print(f"Error parsing TC response: {e}")
-        print(f"Raw response: {raw}")
-        print(f"Extracted JSON text: {json_text}")
-        raise
+    except Exception:
+        correct, feedback = False, extract_json_block(raw)
 
     if correct:
         state["agent_output"] = feedback + "\nExcellent application! You've mastered this concept."

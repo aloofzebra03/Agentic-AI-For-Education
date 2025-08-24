@@ -8,7 +8,6 @@ import re
 from pydantic import BaseModel
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.output_parsers import PydanticOutputParser
-from langchain_core.prompts import PromptTemplate
 from educational_agent.config_rag import concept_pkg
 from educational_agent.Creating_Section_Text.retriever import retrieve_docs
 from educational_agent.Filtering_GT.filter_utils import filter_relevant_section
@@ -24,22 +23,10 @@ AgentState = dict
 def extract_json_block(text: str) -> str:
     s = text.strip()
 
-    # 🔍 JSON EXTRACTION INPUT 🔍
-    print("=" * 60)
-    print("🔧 JSON EXTRACTION - INPUT TEXT")
-    print("=" * 60)
-    print(f"📄 INPUT_LENGTH: {len(s)} characters")
-    print(f"📄 INPUT_PREVIEW: {s[:200]}...")
-    print("=" * 60)
-
     # 1) Try to find a fenced code block containing JSON (language tag optional)
     m = re.search(r"```(?:json)?\s*({.*?})\s*```", s, flags=re.DOTALL | re.IGNORECASE)
     if m:
-        result = m.group(1).strip()
-        print("🎯 JSON EXTRACTED - METHOD: Fenced code block")
-        print(f"📦 EXTRACTED_JSON: {result}")
-        print("=" * 60)
-        return result
+        return m.group(1).strip()
 
     # 2) Try to find the first balanced JSON object in the text
     start = s.find("{")
@@ -63,18 +50,22 @@ def extract_json_block(text: str) -> str:
                 elif ch == "}":
                     depth -= 1
                     if depth == 0:
-                        result = s[start:i+1].strip()
-                        print("🎯 JSON EXTRACTED - METHOD: Balanced braces")
-                        print(f"📦 EXTRACTED_JSON: {result}")
-                        print("=" * 60)
-                        return result
+                        return s[start:i+1].strip()
 
     # 3) Nothing found — return original (let parser raise)
-    print("⚠️ JSON EXTRACTION - METHOD: No JSON found, returning original")
-    print(f"📦 RETURNED_TEXT: {s}")
-    print("=" * 60)
     return s
 
+
+# def extract_json_block(text: str) -> str:
+#     """```
+#     If text starts with ```json and ends with ```, extract the JSON block.
+#     Otherwise, return text unchanged.
+#     """
+#     pattern = r"^```json\s*(.*?)\s*```$"
+#     match = re.match(pattern, text.strip(), re.DOTALL)
+#     if match:
+#         return match.group(1).strip()
+#     return text
 
 def get_llm():
     api_key = os.getenv("GOOGLE_API_KEY")
@@ -86,102 +77,26 @@ def get_llm():
         temperature=0.5,
     )
 
-def llm_with_history(state: AgentState, final_prompt: str):
-    # 🔍 LLM INVOCATION - INPUT 🔍
-    print("=" * 70)
-    print("🤖 LLM INVOCATION - STARTED")
-    print("=" * 70)
-    print(f"📝 PROMPT_LENGTH: {len(final_prompt)} characters")
-    print(f"📝 PROMPT_PREVIEW: {final_prompt[:200]}...")
-    print("=" * 70)
-    
-    # Send the final prompt directly as a human message
-    request_msgs = [HumanMessage(content=final_prompt)]
-    
+def llm_with_history(state: AgentState, system_content: str):
+     # Build request: system instruction first, then entire past conversation
+    sys_msg = SystemMessage(content=system_content)
+    conversation = state.get("messages", [])
+
+    request_msgs = [sys_msg] + conversation
+
     resp = get_llm().invoke(request_msgs)
-    
-    # 🔍 LLM INVOCATION - OUTPUT 🔍
-    print("🤖 LLM INVOCATION - COMPLETED")
-    print(f"📤 RESPONSE_LENGTH: {len(resp.content)} characters")
-    print(f"📤 RESPONSE_PREVIEW: {resp.content[:200]}...")
-    print(f"📊 RESPONSE_TYPE: {type(resp).__name__}")
-    print("=" * 70)
-    
+    # response = llm.invoke(prompt, config={"callbacks": get_callbacks()})
+
     # Append model reply to persistent conversation
     state["messages"].append(AIMessage(content=resp.content))
     return resp
 
-def build_conversation_history(state: AgentState) -> str:
-    """Build conversation history as text from the messages."""
-    conversation = state.get("messages", [])
-    history_text = ""
-    
-    for msg in conversation:
-        if isinstance(msg, HumanMessage):
-            history_text += f"Student: {msg.content}\n"
-        elif isinstance(msg, AIMessage):
-            history_text += f"Agent: {msg.content}\n"
-    
-    return history_text.strip()
-
-def build_prompt_from_template(system_prompt: str, state: AgentState, 
-                             include_last_message: bool = False, 
-                             include_instructions: bool = False,
-                             parser=None) -> str:
-    
-    # Build the template string based on what we need
-    template_parts = ["{system_prompt}"]
-    template_vars = ["system_prompt"]
-    
-    # Add history if available
-    history = build_conversation_history(state)
-    if history:
-        template_parts.append("\n\nConversation History:\n{history}")
-        template_vars.append("history")
-    
-    # Add last user message if requested
-    if include_last_message and state.get("last_user_msg"):
-        template_parts.append("\n\nStudent's Latest Response: {last_user_message}")
-        template_vars.append("last_user_message")
-    
-    # Add instructions at the end if requested
-    if include_instructions and parser:
-        template_parts.append("\n\n{instructions}")
-        template_vars.append("instructions")
-    
-    # Create the template
-    template_string = "".join(template_parts)
-    prompt_template = PromptTemplate(
-        input_variables=template_vars,
-        template=template_string
-    )
-    
-    # Prepare the values
-    template_values = {"system_prompt": system_prompt}
-    
-    if history:
-        template_values["history"] = history
-    
-    if include_last_message and state.get("last_user_msg"):
-        template_values["last_user_message"] = state["last_user_msg"]
-    
-    if include_instructions and parser:
-        template_values["instructions"] = parser.get_format_instructions()
-    
-    # Format the prompt
-    return prompt_template.format(**template_values)
-
 
 def get_ground_truth(concept: str, section_name: str) -> str:
+    """
+    Fetch relevant sections from vector store and filter by section name.
+    """
     try:
-        # 🔍 GROUND TRUTH RETRIEVAL - INPUT 🔍
-        print("=" * 70)
-        print("📚 GROUND TRUTH RETRIEVAL - STARTED")
-        print("=" * 70)
-        print(f"🎯 CONCEPT: {concept}")
-        print(f"📋 SECTION_NAME: {section_name}")
-        print("=" * 70)
-        
         # Build a minimal NextSectionChoice object; other fields are dummy since retriever only uses section_name
         params = NextSectionChoice(
             section_name=section_name,
@@ -198,20 +113,10 @@ def get_ground_truth(concept: str, section_name: str) -> str:
         docs = retrieve_docs(concept, params)
         combined = [f"# Page: {d.metadata['page_label']}\n{d.page_content}" for d in docs]
         full_doc = "\n---\n".join(combined)
-        result = filter_relevant_section(concept, section_name, full_doc)
-        
-        # 🔍 GROUND TRUTH RETRIEVAL - OUTPUT 🔍
-        print("📚 GROUND TRUTH RETRIEVAL - COMPLETED")
-        print(f"📄 DOC_COUNT: {len(docs)} documents")
-        print(f"📏 FULL_DOC_LENGTH: {len(full_doc)} characters")
-        print(f"📏 FILTERED_LENGTH: {len(result)} characters")
-        print(f"📄 RESULT_PREVIEW: {result[:300]}...")
-        print("=" * 70)
-        
-        return result
+        return filter_relevant_section(concept, section_name, full_doc)
     except Exception as e:
         print(f"Error retrieving ground truth for {concept} - {section_name}: {e}")
-        raise
+        return ""
 
 # ─── Pydantic response models ─────────────────────────────────────────────────
 
@@ -284,35 +189,15 @@ PEDAGOGICAL_MOVES: Dict[str, Dict[str, str]] = {
 # ─── Node definitions ───────────────────────────────────────────────────────────
 
 def start_node(state: AgentState) -> AgentState:
-    system_prompt = (
+    prompt = (
         f"You are an educational agent helping a learner understand '{concept_pkg.title}'. The learner is a student of class 7. Remember that you are interacting directly with the learner.\n"
         "Greet the learner and ask if they are ready to begin."
         # "Also Remember that the student is of Kannada origin and understands olny kannada.So speak to the student in kannada.The script has to be kannada and not english.\n"
     )
-    
-    # Build final prompt using template
-    final_prompt = build_prompt_from_template(
-        system_prompt=system_prompt,
-        state=state,
-        include_last_message=False,
-        include_instructions=False
-    )
-    
     print("IN START NODE")
-    resp = llm_with_history(state, final_prompt)
+    resp = llm_with_history(state, prompt)
     # Apply JSON extraction in case LLM wraps response in markdown
     content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-    
-    # 🔍 START NODE - CONTENT PROCESSING 🔍
-    print("=" * 80)
-    print("🎯 START NODE - CONTENT OUTPUT 🎯")
-    print("=" * 80)
-    print(f"📄 CONTENT: {content}")
-    print(f"📏 CONTENT_LENGTH: {len(content)} characters")
-    print(f"📊 CONTENT_TYPE: {type(content).__name__}")
-    print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
-    print("=" * 80)
-    
     state["agent_output"]  = content
     state["current_state"] = "APK"
     return state
@@ -322,27 +207,21 @@ def apk_node(state: AgentState) -> AgentState:
         state["_asked_apk"] = True
         # Include ground truth for Concept Definition
         gt = get_ground_truth(concept_pkg.title, "Concept Definition")
-        system_prompt = (
+        prompt = (
             f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
             f"Ground truth (Concept Definition):\n{gt}\nGenerate one hook question that activates prior knowledge for '{concept_pkg.title}'.",
         )
-        
-        # Build final prompt using template
-        final_prompt = build_prompt_from_template(
-            system_prompt=system_prompt,
-            state=state,
-            include_last_message=False,
-            include_instructions=False
-        )
-            
-        resp = llm_with_history(state, final_prompt)
+        resp = llm_with_history(state, prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         state["agent_output"] = content
         return state
 
+    instructions = apk_parser.get_format_instructions()
     context = json.dumps(PEDAGOGICAL_MOVES["APK"], indent=2)
-    system_prompt = f"""Current node: APK (Activate Prior Knowledge)
+    decision_prompt = f"""{instructions}
+
+Current node: APK (Activate Prior Knowledge)
 Possible next_state values:
 - "CI": when the student's reply shows they correctly identified '{concept_pkg.title}'.
 - "APK": when the student's reply does not clearly identify '{concept_pkg.title}'.
@@ -352,38 +231,18 @@ Pedagogical context:
 
 If the student's reply indicates they don't know or they are stuck after two attempts, provide the correct identification and move on to the next state.
 
-Task: Evaluate whether the student identified the concept correctly. Respond ONLY with JSON matching the schema above. If not, help the student to do so."""
-
-    # Build final prompt using template with instructions at the end
-    final_prompt = build_prompt_from_template(
-        system_prompt=system_prompt,
-        state=state,
-        include_last_message=True,
-        include_instructions=True,
-        parser=apk_parser
-    )
-    
-    raw = llm_with_history(state, final_prompt).content
+Student reply: "{state['last_user_msg']}"
+Task: Evaluate whether the student identified the concept correctly. Respond ONLY with JSON matching the schema above. If not, help the student to do so.
+"""
+    raw = llm_with_history(state, decision_prompt).content
     json_text = extract_json_block(raw)
     try:
         parsed: ApkResponse = apk_parser.parse(json_text)
-        
-        # 🔍 APK PARSING OUTPUT - MAIN CONTENT 🔍
-        print("=" * 80)
-        print("🎯 APK NODE - PARSED OUTPUT CONTENTS 🎯")
-        print("=" * 80)
-        print(f"📝 FEEDBACK: {parsed.feedback}")
-        print(f"🚀 NEXT_STATE: {parsed.next_state}")
-        print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
-        print("=" * 80)
-        
         state["agent_output"]  = parsed.feedback
         state["current_state"] = parsed.next_state
-    except Exception as e:
-        print(f"Error parsing APK response: {e}")
-        print(f"Raw response: {raw}")
-        print(f"Extracted JSON text: {json_text}")
-        raise
+    except Exception:
+        state["agent_output"]  = "Oops, I got confused. Let's try defining it.\n" + extract_json_block(raw)
+        state["current_state"] = "CI"
     return state
 
 def ci_node(state: AgentState) -> AgentState:
@@ -392,28 +251,22 @@ def ci_node(state: AgentState) -> AgentState:
         state["_asked_ci"] = True
         # Include ground truth for Explanation (with analogies)
         gt = get_ground_truth(concept_pkg.title, "Explanation (with analogies)")
-        system_prompt = (
+        prompt = (
             f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
             f"Ground truth (Explanation):\n{gt}\nProvide a concise definition (≤30 words) of '{concept_pkg.title}', "
             "then ask the learner to restate it."
         )
-        
-        # Build final prompt using template
-        final_prompt = build_prompt_from_template(
-            system_prompt=system_prompt,
-            state=state,
-            include_last_message=False,
-            include_instructions=False
-        )
-            
-        resp = llm_with_history(state, final_prompt)
+        resp = llm_with_history(state, prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         state["agent_output"] = content
         return state
 
+    instructions = ci_parser.get_format_instructions()
     context = json.dumps(PEDAGOGICAL_MOVES["CI"], indent=2)
-    system_prompt = f"""Current node: CI (Concept Introduction)
+    decision_prompt = f"""{instructions}
+
+Current node: CI (Concept Introduction)
 Possible next_state values:
 - "GE": when the student's paraphrase accurately captures the definition.
 - "CI": when the paraphrase is inaccurate or incomplete.
@@ -423,38 +276,18 @@ Pedagogical context:
 
 If the student's restatement indicates they don't know or they are stuck after two attempts, provide the correct definition and move on.
 
-Task: Determine if the restatement is accurate. Respond ONLY with JSON matching the schema above. If not, help the student to do so."""
-
-    # Build final prompt using template with instructions at the end
-    final_prompt = build_prompt_from_template(
-        system_prompt=system_prompt,
-        state=state,
-        include_last_message=True,
-        include_instructions=True,
-        parser=ci_parser
-    )
-    
-    raw = llm_with_history(state, final_prompt).content
+Student restatement: "{state['last_user_msg']}"
+Task: Determine if the restatement is accurate. Respond ONLY with JSON matching the schema above. If not, help the student to do so.
+"""
+    raw = llm_with_history(state, decision_prompt).content
     json_text = extract_json_block(raw)
     try:
         parsed: CiResponse = ci_parser.parse(json_text)
-        
-        # 🔍 CI PARSING OUTPUT - MAIN CONTENT 🔍
-        print("=" * 80)
-        print("🎯 CI NODE - PARSED OUTPUT CONTENTS 🎯")
-        print("=" * 80)
-        print(f"📝 FEEDBACK: {parsed.feedback}")
-        print(f"🚀 NEXT_STATE: {parsed.next_state}")
-        print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
-        print("=" * 80)
-        
         state["agent_output"]  = parsed.feedback
         state["current_state"] = parsed.next_state
-    except Exception as e:
-        print(f"Error parsing CI response: {e}")
-        print(f"Raw response: {raw}")
-        print(f"Extracted JSON text: {json_text}")
-        raise
+    except Exception:
+        state["agent_output"]  = "Hmm, let's move on.\n" + extract_json_block(raw)
+        state["current_state"] = "GE"
     return state
 
 def ge_node(state: AgentState) -> AgentState:
@@ -462,71 +295,44 @@ def ge_node(state: AgentState) -> AgentState:
         state["_asked_ge"] = True
         # Include ground truth for Details (facts, sub-concepts)
         gt = get_ground_truth(concept_pkg.title, "Details (facts, sub-concepts)")
-        system_prompt = (
+        prompt = (
             f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
             f"Ground truth (Details):\n{gt}\nGenerate one 'why' or 'how' question to explore the mechanism of '{concept_pkg.title}'.",
         )
-        
-        # Build final prompt using template
-        final_prompt = build_prompt_from_template(
-            system_prompt=system_prompt,
-            state=state,
-            include_last_message=False,
-            include_instructions=False
-        )
-            
-        resp = llm_with_history(state, final_prompt)
+        resp = llm_with_history(state, prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         state["agent_output"] = content
         return state
 
+    instructions = ge_parser.get_format_instructions()
     context = json.dumps(PEDAGOGICAL_MOVES["GE"], indent=2)
-    system_prompt = f"""Current node: GE (Guided Exploration)
+    decision_prompt = f"""{instructions}
+
+Current node: GE (Guided Exploration)
 Possible next_state values:
 - "MH": if you detect a misconception in the student's reasoning (must include a non-empty "correction" ≤2 sentences).
-- "AR": if the reasoning is correct or there's no misconception.
+- "AR": if the reasoning is correct or there’s no misconception.
 
 Pedagogical context:
 {context}
 
 If the student's response indicates they don't know or are stuck after two attempts, provide the correct explanation in a concise manner and move on to the next state.
 
-Task: Detect misconception or correct reasoning. RESPOND ONLY WITH JSON matching the schema above."""
-
-    # Build final prompt using template with instructions at the end
-    final_prompt = build_prompt_from_template(
-        system_prompt=system_prompt,
-        state=state,
-        include_last_message=True,
-        include_instructions=True,
-        parser=ge_parser
-    )
-    
-    raw = llm_with_history(state, final_prompt).content
+Student response: "{state['last_user_msg']}"
+Task: Detect misconception or correct reasoning. RESPOND ONLY WITH JSON matching the schema above.
+"""
+    raw = llm_with_history(state, decision_prompt).content
     json_text = extract_json_block(raw)
     try:
         parsed: GeResponse = ge_parser.parse(json_text)
-        
-        # 🔍 GE PARSING OUTPUT - MAIN CONTENT 🔍
-        print("=" * 80)
-        print("🎯 GE NODE - PARSED OUTPUT CONTENTS 🎯")
-        print("=" * 80)
-        print(f"📝 FEEDBACK: {parsed.feedback}")
-        print(f"🚀 NEXT_STATE: {parsed.next_state}")
-        print(f"🔧 CORRECTION: {parsed.correction}")
-        print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
-        print("=" * 80)
-        
         if parsed.next_state == "MH":
             state["last_correction"] = parsed.correction or "Let me clarify that for you."
         state["agent_output"]  = parsed.feedback
         state["current_state"] = parsed.next_state
-    except Exception as e:
-        print(f"Error parsing GE response: {e}")
-        print(f"Raw response: {raw}")
-        print(f"Extracted JSON text: {json_text}")
-        raise
+    except Exception:
+        state["agent_output"]  = "Sorry, I couldn’t interpret that—let’s move on."
+        state["current_state"] = "AR"
     return state
 
 def mh_node(state: AgentState) -> AgentState:
@@ -545,84 +351,49 @@ def ar_node(state: AgentState) -> AgentState:
         state["_asked_ar"] = True
         # Include ground truth for MCQs
         gt = get_ground_truth(concept_pkg.title, "MCQs")
-        system_prompt = (
+        prompt = (
             f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
             f"Ground truth (MCQs):\n{gt}\nGenerate a short quiz question (T/F, MCQ, or short answer) on '{concept_pkg.title}' and prompt the learner."
         )
-        
-        # Build final prompt using template
-        final_prompt = build_prompt_from_template(
-            system_prompt=system_prompt,
-            state=state,
-            include_last_message=False,
-            include_instructions=False
-        )
-            
-        resp = llm_with_history(state, final_prompt)
+        resp = llm_with_history(state, prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         state["agent_output"] = content
         return state
 
     # Second pass: grade & either explain or advance
+    instructions = ar_parser.get_format_instructions()
     context = json.dumps(PEDAGOGICAL_MOVES["AR"], indent=2)
-    system_prompt = f"""Current node: AR (Application & Retrieval)
+    decision_prompt = f"""{instructions}
+
+Current node: AR (Application & Retrieval)
 Possible next_state values (handled by agent code):
 - "TC": always move forward after feedback/explanation
 
 Pedagogical context:
 {context}
 
-Task: Grade this answer on a scale from 0 to 1. Respond ONLY with JSON matching the schema above.DO NOT start with any additional text.Direct reply in requested format so I can parse directly."""
-
-    # Build final prompt using template with instructions at the end
-    final_prompt = build_prompt_from_template(
-        system_prompt=system_prompt,
-        state=state,
-        include_last_message=True,
-        include_instructions=True,
-        parser=ar_parser
-    )
-    
-    raw = llm_with_history(state, final_prompt).content
+Student answer: "{state['last_user_msg']}"
+Task: Grade this answer on a scale from 0 to 1. Respond ONLY with JSON matching the schema above.DO NOT start with any additional text.Direct reply in requested format so I can parse directly.
+"""
+    raw = llm_with_history(state, decision_prompt).content
     json_text = extract_json_block(raw)
     try:
         print("#############JSON TEXT HERE",json_text)
         parsed: ArResponse = ar_parser.parse(json_text)
-        
-        # 🔍 AR PARSING OUTPUT - MAIN CONTENT 🔍
-        print("=" * 80)
-        print("🎯 AR NODE - PARSED OUTPUT CONTENTS 🎯")
-        print("=" * 80)
-        print(f"📝 FEEDBACK: {parsed.feedback}")
-        print(f"📊 SCORE: {parsed.score}")
-        print(f"🎯 SCORE_TYPE: {type(parsed.score).__name__}")
-        print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
-        print("=" * 80)
-        
         score, feedback = parsed.score, parsed.feedback
     except Exception as e:
-        print(f"Error parsing AR response: {e}")
-        print(f"Raw response: {raw}")
-        print(f"Extracted JSON text: {json_text}")
-        raise
+        print(e)
+        score, feedback = 0.0, extract_json_block(raw)
 
     if score < 0.5:
         # Student struggled: give correct answer + explanation, then introduce transfer
-        explain_system_prompt = (
+        explain_prompt = (
+            f"Student's answer: {state['last_user_msg']}\n"
             "Provide the correct answer to the quiz question, explain why it is correct in 2–3 sentences, "
             "and then say, Nice work! Time for a transfer question."
         )
-        
-        # Build final prompt using template
-        explain_final_prompt = build_prompt_from_template(
-            system_prompt=explain_system_prompt,
-            state=state,
-            include_last_message=True,
-            include_instructions=False
-        )
-            
-        resp = llm_with_history(state, explain_final_prompt)
+        resp = llm_with_history(state, explain_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         state["agent_output"] = content
@@ -638,85 +409,49 @@ def tc_node(state: AgentState) -> AgentState:
         state["_asked_tc"] = True
         # Include ground truth for What-if Scenarios
         gt = get_ground_truth(concept_pkg.title, "What-if Scenarios")
-        system_prompt = (
+        prompt = (
             f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
             f"Ground truth (What-if Scenarios):\n{gt}\nGenerate a 'what-if' or transfer question to apply '{concept_pkg.title}' in a new context."
         )
-        
-        # Build final prompt using template
-        final_prompt = build_prompt_from_template(
-            system_prompt=system_prompt,
-            state=state,
-            include_last_message=False,
-            include_instructions=False
-        )
-            
-        resp = llm_with_history(state, final_prompt)
+        resp = llm_with_history(state, prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         state["agent_output"] = content
         return state
 
     # Second pass: evaluate & either affirm or explain
+    instructions = tc_parser.get_format_instructions()
     context = json.dumps(PEDAGOGICAL_MOVES["TC"], indent=2)
-    system_prompt = f"""Current node: TC (Transfer & Critical Thinking)
+    decision_prompt = f"""{instructions}
+
+Current node: TC (Transfer & Critical Thinking)
 Possible next_state values (handled by agent code):
 - "RLC": always move forward after feedback/explanation
 
 Pedagogical context:
 {context}
 
-Task: Evaluate whether the application is correct. Respond ONLY with JSON matching the schema above."""
-
-    # Build final prompt using template with instructions at the end
-    final_prompt = build_prompt_from_template(
-        system_prompt=system_prompt,
-        state=state,
-        include_last_message=True,
-        include_instructions=True,
-        parser=tc_parser
-    )
-    
-    raw = llm_with_history(state, final_prompt).content
+Student answer: "{state['last_user_msg']}"
+Task: Evaluate whether the application is correct. Respond ONLY with JSON matching the schema above.
+"""
+    raw = llm_with_history(state, decision_prompt).content
     json_text = extract_json_block(raw)
     try:
         parsed: TcResponse = tc_parser.parse(json_text)
-        
-        # 🔍 TC PARSING OUTPUT - MAIN CONTENT 🔍
-        print("=" * 80)
-        print("🎯 TC NODE - PARSED OUTPUT CONTENTS 🎯")
-        print("=" * 80)
-        print(f"📝 FEEDBACK: {parsed.feedback}")
-        print(f"✅ CORRECT: {parsed.correct}")
-        print(f"🎯 CORRECT_TYPE: {type(parsed.correct).__name__}")
-        print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
-        print("=" * 80)
-        
         correct, feedback = parsed.correct, parsed.feedback
-    except Exception as e:
-        print(f"Error parsing TC response: {e}")
-        print(f"Raw response: {raw}")
-        print(f"Extracted JSON text: {json_text}")
-        raise
+    except Exception:
+        correct, feedback = False, extract_json_block(raw)
 
     if correct:
         state["agent_output"] = feedback + "\nExcellent application! You've mastered this concept."
     else:
         # Student struggled: give correct transfer answer + explanation
-        explain_system_prompt = (
+        explain_prompt = (
+            f"Student's answer: {state['last_user_msg']}\n"
             "Provide the correct answer to the transfer question, explain why it is correct in 2–3 sentences, "
             "and then say we are proceeding to see a real-life application."
         )
-        
-        # Build final prompt using template
-        explain_final_prompt = build_prompt_from_template(
-            system_prompt=explain_system_prompt,
-            state=state,
-            include_last_message=True,
-            include_instructions=False
-        )
-            
-        resp = llm_with_history(state, explain_final_prompt)
+        resp = llm_with_history(state, explain_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         state["agent_output"] = content
@@ -729,20 +464,11 @@ def rlc_node(state: AgentState) -> AgentState:
         state["_asked_rlc"] = True
         # Include ground truth for Real-Life Application
         gt = get_ground_truth(concept_pkg.title, "Real-Life Application")
-        system_prompt = (
+        prompt = (
             f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
             f"Ground truth (Real-Life Application):\n{gt}\nProvide a real-life application for '{concept_pkg.title}', then ask if the learner has seen or used it themselves."
         )
-        
-        # Build final prompt using template
-        final_prompt = build_prompt_from_template(
-            system_prompt=system_prompt,
-            state=state,
-            include_last_message=False,
-            include_instructions=False
-        )
-            
-        resp = llm_with_history(state, final_prompt)
+        resp = llm_with_history(state, prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         state["agent_output"] = content
@@ -767,7 +493,7 @@ def end_node(state: AgentState) -> AgentState:
 
     # final output
     state["agent_output"] = (
-        "Great work today! Here's your session summary:\n"
+        "Great work today! Here’s your session summary:\n"
         f"- Quiz score: {state['session_summary']['quiz_score']}\n"
         f"- Transfer success: {state['session_summary']['transfer_success']}\n"
         f"- Definition echoed: {state['session_summary']['definition_echoed']}\n"
