@@ -338,6 +338,16 @@ def apk_node(state: AgentState) -> AgentState:
         resp = llm_with_history(state, final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+        
+        # 🔍 APK NODE - FIRST PASS CONTENT 🔍
+        print("=" * 80)
+        print("🎯 APK NODE - FIRST PASS CONTENT OUTPUT 🎯")
+        print("=" * 80)
+        print(f"📄 CONTENT: {content}")
+        print(f"📏 CONTENT_LENGTH: {len(content)} characters")
+        print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
+        print("=" * 80)
+        
         state["agent_output"] = content
         return state
 
@@ -409,6 +419,16 @@ def ci_node(state: AgentState) -> AgentState:
         resp = llm_with_history(state, final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+        
+        # 🔍 CI NODE - FIRST PASS CONTENT 🔍
+        print("=" * 80)
+        print("🎯 CI NODE - FIRST PASS CONTENT OUTPUT 🎯")
+        print("=" * 80)
+        print(f"📄 CONTENT: {content}")
+        print(f"📏 CONTENT_LENGTH: {len(content)} characters")
+        print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
+        print("=" * 80)
+        
         state["agent_output"] = content
         return state
 
@@ -478,6 +498,16 @@ def ge_node(state: AgentState) -> AgentState:
         resp = llm_with_history(state, final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+        
+        # 🔍 GE NODE - FIRST PASS CONTENT 🔍
+        print("=" * 80)
+        print("🎯 GE NODE - FIRST PASS CONTENT OUTPUT 🎯")
+        print("=" * 80)
+        print(f"📄 CONTENT: {content}")
+        print(f"📏 CONTENT_LENGTH: {len(content)} characters")
+        print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
+        print("=" * 80)
+        
         state["agent_output"] = content
         return state
 
@@ -561,6 +591,16 @@ def ar_node(state: AgentState) -> AgentState:
         resp = llm_with_history(state, final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+        
+        # 🔍 AR NODE - FIRST PASS CONTENT 🔍
+        print("=" * 80)
+        print("🎯 AR NODE - FIRST PASS CONTENT OUTPUT 🎯")
+        print("=" * 80)
+        print(f"📄 CONTENT: {content}")
+        print(f"📏 CONTENT_LENGTH: {len(content)} characters")
+        print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
+        print("=" * 80)
+        
         state["agent_output"] = content
         return state
 
@@ -625,6 +665,16 @@ Task: Grade this answer on a scale from 0 to 1. Respond ONLY with JSON matching 
         resp = llm_with_history(state, explain_final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+        
+        # 🔍 AR NODE - EXPLANATION CONTENT 🔍
+        print("=" * 80)
+        print("🎯 AR NODE - EXPLANATION CONTENT OUTPUT 🎯")
+        print("=" * 80)
+        print(f"📄 CONTENT: {content}")
+        print(f"📏 CONTENT_LENGTH: {len(content)} characters")
+        print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
+        print("=" * 80)
+        
         state["agent_output"] = content
     else:
         state["agent_output"] = feedback + "\nNice work! Time for a transfer question."
@@ -654,6 +704,16 @@ def tc_node(state: AgentState) -> AgentState:
         resp = llm_with_history(state, final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+        
+        # 🔍 TC NODE - FIRST PASS CONTENT 🔍
+        print("=" * 80)
+        print("🎯 TC NODE - FIRST PASS CONTENT OUTPUT 🎯")
+        print("=" * 80)
+        print(f"📄 CONTENT: {content}")
+        print(f"📏 CONTENT_LENGTH: {len(content)} characters")
+        print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
+        print("=" * 80)
+        
         state["agent_output"] = content
         return state
 
@@ -719,6 +779,16 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
         resp = llm_with_history(state, explain_final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+        
+        # 🔍 TC NODE - EXPLANATION CONTENT 🔍
+        print("=" * 80)
+        print("🎯 TC NODE - EXPLANATION CONTENT OUTPUT 🎯")
+        print("=" * 80)
+        print(f"📄 CONTENT: {content}")
+        print(f"📏 CONTENT_LENGTH: {len(content)} characters")
+        print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
+        print("=" * 80)
+        
         state["agent_output"] = content
 
     state["current_state"] = "RLC"
@@ -745,6 +815,16 @@ def rlc_node(state: AgentState) -> AgentState:
         resp = llm_with_history(state, final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+        
+        # 🔍 RLC NODE - FIRST PASS CONTENT 🔍
+        print("=" * 80)
+        print("🎯 RLC NODE - FIRST PASS CONTENT OUTPUT 🎯")
+        print("=" * 80)
+        print(f"📄 CONTENT: {content}")
+        print(f"📏 CONTENT_LENGTH: {len(content)} characters")
+        print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
+        print("=" * 80)
+        
         state["agent_output"] = content
         return state
 
@@ -764,6 +844,18 @@ def end_node(state: AgentState) -> AgentState:
         "last_user_msg":          state.get("last_user_msg"),
         "history":                state.get("history"),
     }
+
+    # 🔍 END NODE - SESSION SUMMARY 🔍
+    print("=" * 80)
+    print("🎯 END NODE - SESSION SUMMARY CONTENTS 🎯")
+    print("=" * 80)
+    print(f"📊 QUIZ_SCORE: {state['session_summary']['quiz_score']}")
+    print(f"🎯 TRANSFER_SUCCESS: {state['session_summary']['transfer_success']}")
+    print(f"📝 DEFINITION_ECHOED: {state['session_summary']['definition_echoed']}")
+    print(f"🔍 MISCONCEPTION_DETECTED: {state['session_summary']['misconception_detected']}")
+    print(f"💬 LAST_USER_MSG: {state['session_summary']['last_user_msg']}")
+    print(f"📚 HISTORY_LENGTH: {len(str(state['session_summary']['history'])) if state['session_summary']['history'] else 0} characters")
+    print("=" * 80)
 
     # final output
     state["agent_output"] = (
