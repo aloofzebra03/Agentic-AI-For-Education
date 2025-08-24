@@ -124,7 +124,7 @@ g.add_conditional_edges("GE",  _route, {"MH": "MH", "AR": "AR","GE": "GE"})
 g.add_edge("MH", "AR")
 g.add_conditional_edges("AR", _route, {"AR": "AR","TC": "TC"})
 g.add_conditional_edges("TC", _route, {"TC": "TC","RLC": "RLC"})
-g.add_edge("RLC", "END")
+g.add_conditional_edges("RLC", _route, {"RLC": "RLC","END": "END"})
 g.add_edge("END", END)
 
 checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")
