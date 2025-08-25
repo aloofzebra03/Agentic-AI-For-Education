@@ -43,8 +43,9 @@ def run_test():
     print("\nSession Summary:")
     pprint(session_summary)
 
-    # Save the session summary to a persona-specific file
-    summary_filename = f"session_summary_{persona.name.lower().replace(' ', '_')}.json"
+    # Save the session summary using the Langfuse session ID
+    session_id = educational_agent.session_id
+    summary_filename = f"session_summary_{session_id}.json"
     os.makedirs("reports", exist_ok=True)
     summary_path = os.path.join("reports", summary_filename)
     with open(summary_path, "w") as f:
@@ -70,7 +71,9 @@ def run_test():
         "evaluation": json.loads(clean_str),
         "history": educational_agent.state["history"],
     }
-    report_path = f"reports/evaluation_{persona.name.lower().replace(' ', '_')}.json"
+    # Use the Langfuse session ID for the evaluation report filename
+    session_id = educational_agent.session_id
+    report_path = f"reports/evaluation_{session_id}.json"
     os.makedirs("reports", exist_ok=True)
     with open(report_path, "w") as f:
         json.dump(report, f, indent=2)
