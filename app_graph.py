@@ -22,6 +22,13 @@ from gtts import gTTS
 
 # sys.modules["sqlite3"] = pysqlite3
 
+import asyncio
+try:
+    asyncio.get_running_loop()
+except RuntimeError:
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
 # Load environment variables
 load_dotenv(dotenv_path=".env", override=True)
 
