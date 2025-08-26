@@ -227,7 +227,6 @@ python-dateutil
 python-dotenv
 pytz
 pyu2f
-pywin32
 pyzmq
 referencing
 regex
@@ -288,7 +287,7 @@ unicodedata2
 uritemplate
 urllib3
 uvicorn
-watchdog
+watchdog == 4.0.0
 watchfiles
 wcwidth
 webencodings
@@ -301,3 +300,7 @@ yarg
 yarl
 zipp
 zstandard
+
+pysqlite3-binary>=0.0.6
+onnx-asr[cpu,hub]
+
