@@ -6,11 +6,11 @@ import dotenv
 
 from langgraph.graph import StateGraph, END, START
 from langgraph.graph.message import add_messages
-from langgraph.checkpoint.sqlite import SqliteSaver
+# from langgraph.checkpoint.sqlite import SqliteSaver
 from langchain_core.messages import AnyMessage, HumanMessage, AIMessage
 
-from langfuse import get_client
-from langfuse.langchain import CallbackHandler
+# from langfuse import get_client
+# from langfuse.langchain import CallbackHandler
 from langgraph.checkpoint.memory import InMemorySaver
 
 import operator
@@ -22,11 +22,11 @@ from educational_agent.nodes4_rag_studio import (
 
 dotenv.load_dotenv(dotenv_path=".env", override=True)
 
-langfuse = get_client()  
-if not langfuse.auth_check():
-    raise RuntimeError("Langfuse auth failed – check your .env keys")
+# langfuse = get_client()  
+# if not langfuse.auth_check():
+#     raise RuntimeError("Langfuse auth failed – check your .env keys")
 
-langfuse_handler = CallbackHandler()
+# langfuse_handler = CallbackHandler()
 
 # -----------------------------------------------------------------------------
 # 3. Define AgentState TypedDict
@@ -127,7 +127,7 @@ g.add_conditional_edges("TC", _route, {"TC": "TC","RLC": "RLC"})
 g.add_conditional_edges("RLC", _route, {"RLC": "RLC","END": "END"})
 g.add_edge("END", END)
 
-checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")
+# checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")
 CHECKPOINTER = InMemorySaver()
 
 

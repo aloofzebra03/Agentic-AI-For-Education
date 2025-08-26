@@ -10,7 +10,7 @@ import time
 import soundfile as sf
 from pedalboard import Pedalboard, Resample
 import sys
-import pysqlite3
+# import pysqlite3
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -20,7 +20,7 @@ from audio_recorder_streamlit import audio_recorder
 # Import gTTS for text-to-speech
 from gtts import gTTS
 
-sys.modules["sqlite3"] = pysqlite3
+# sys.modules["sqlite3"] = pysqlite3
 
 # Load environment variables
 load_dotenv(dotenv_path=".env", override=True)
