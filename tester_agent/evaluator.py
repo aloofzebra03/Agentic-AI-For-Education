@@ -6,6 +6,16 @@ from tester_agent.session_metrics import compute_and_upload_session_metrics
 from typing import Optional, Dict, Any
 
 class Evaluator:
+    """
+    Educational Quality Evaluator - Focuses on pedagogical effectiveness and qualitative assessment.
+    
+    This evaluator complements the quantitative session metrics by providing:
+    - Educational quality assessment (pedagogical flow, scaffolding, etc.)
+    - Qualitative feedback for educational improvement
+    - Technical issue identification
+    
+    Note: For quantitative metrics (engagement, clarity scores, etc.), use session_metrics.py
+    """
     def __init__(self):
         self.llm = ChatGoogleGenerativeAI(
             model="gemini-2.0-flash",
@@ -15,10 +25,11 @@ class Evaluator:
 
     def evaluate(self, persona: Persona, history: list) -> str:
         """
-        Evaluates the conversation and provides feedback.
+        Evaluates the educational quality and pedagogical effectiveness of the conversation.
+        Focuses on qualitative assessment complementary to quantitative session metrics.
         """
         prompt = f"""
-You are an expert in evaluating educational conversations.
+You are an expert in evaluating educational conversations for pedagogical effectiveness.
 Your task is to analyze the following conversation between an educational agent and a student with the persona of a "{persona.name}".
 
 **Persona Description:** {persona.description}
@@ -26,19 +37,20 @@ Your task is to analyze the following conversation between an educational agent 
 **Conversation History:**
 {json.dumps(history, indent=2)}
     
-**Evaluation Metrics:**
-- **Adaptability:** How well did the agent adapt to the student's persona? (1-5)
-- **Pedagogical Flow:** Did the conversation follow a logical and effective teaching structure? (1-5)
-- **Clarity & Conciseness:** Were the agent's explanations easy to understand? (1-5)
-- **Error Handling:** How did the agent handle unexpected or incorrect student inputs? (1-5)
+**Educational Quality Metrics:**
+- **Pedagogical Flow:** Did the conversation follow a logical and effective teaching structure? Did it progress from simple to complex concepts appropriately? (1-5)
+- **Learning Objective Achievement:** How well did the agent help the student achieve the learning objectives? Were concepts properly introduced and reinforced? (1-5)
+- **Scaffolding Effectiveness:** Did the agent provide appropriate support and gradually reduce guidance as the student progressed? (1-5)
+- **Misconception Handling:** How effectively did the agent identify and address student misconceptions? (1-5)
 
-**Feedback:**
-- **Strengths:** What did the agent do well?
-- **Areas for Improvement:** What could the agent do better?
-- **Bugs/Issues:** Were there any bugs or issues with the agent's responses?
+**Qualitative Feedback:**
+- **Pedagogical Strengths:** What educational strategies did the agent use effectively?
+- **Areas for Educational Improvement:** What pedagogical approaches could be enhanced?
+- **Technical Issues:** Were there any bugs, technical problems, or system errors?
+- **Persona Alignment:** How well did the agent adapt its teaching style to this specific persona?
 
 **Output Format:**
-Please provide your evaluation in JSON format.Give me the json object directly WITHOUT any additional text like ```json in the beginning etc.
+Please provide your evaluation in JSON format. Give me the json object directly WITHOUT any additional text like ```json in the beginning etc.
 I want to run the function json.loads on your output directly.
 
 """
@@ -52,17 +64,21 @@ I want to run the function json.loads on your output directly.
                             session_state: Dict[str, Any],
                             upload_metrics: bool = True) -> Dict[str, Any]:
         """
-        Evaluates the conversation and optionally computes/uploads session metrics.
+        Provides comprehensive assessment combining educational quality evaluation 
+        with quantitative session metrics.
         
         Args:
             persona: Student persona used in the conversation
             history: Conversation history
             session_id: Unique session identifier
             session_state: Final agent state
-            upload_metrics: Whether to compute and upload metrics to Langfuse
+            upload_metrics: Whether to compute and upload quantitative metrics to Langfuse
             
         Returns:
-            Dictionary containing evaluation and optionally metrics
+            Dictionary containing:
+            - Educational quality evaluation (pedagogical effectiveness)
+            - Quantitative session metrics (engagement, performance, etc.)
+            - Persona and history data
         """
         # Get regular evaluation
         evaluation_str = self.evaluate(persona, history)
@@ -77,11 +93,11 @@ I want to run the function json.loads on your output directly.
         
         result = {
             "persona": persona.model_dump(),
-            "evaluation": json.loads(clean_str),
+            "educational_evaluation": json.loads(clean_str),  # Pedagogical quality assessment
             "history": history,
         }
         
-        # Optionally compute and upload metrics
+        # Optionally compute and upload quantitative session metrics
         if upload_metrics:
             try:
                 session_metrics = compute_and_upload_session_metrics(
@@ -90,10 +106,10 @@ I want to run the function json.loads on your output directly.
                     session_state=session_state,
                     persona_name=persona.name
                 )
-                result["session_metrics"] = session_metrics.model_dump()
-                print(f"✅ Session metrics computed and uploaded for session: {session_id}")
+                result["session_metrics"] = session_metrics.model_dump()  # Quantitative analytics
+                print(f"✅ Educational evaluation and session metrics completed for: {session_id}")
             except Exception as e:
-                print(f"❌ Failed to compute/upload metrics: {e}")
+                print(f"❌ Failed to compute/upload session metrics: {e}")
                 result["metrics_error"] = str(e)
         
         return result

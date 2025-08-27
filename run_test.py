@@ -77,10 +77,10 @@ def run_test():
         print("⚠️ Continuing without metrics...")
         session_metrics = None
 
-    # 6. Evaluate Conversation
+    # 6. Evaluate Educational Quality (Pedagogical Assessment)
     evaluator = Evaluator()
     evaluation = evaluator.evaluate(persona, educational_agent.state["history"])
-    print("\n--- Evaluation ---")
+    print("\n--- Educational Quality Evaluation ---")
     print(evaluation)
 
     clean_str = evaluation.strip()
@@ -90,14 +90,14 @@ def run_test():
         clean_str = clean_str[:-3]
     clean_str = clean_str.strip()
 
-    # 6. Save Report
+    # 7. Save Comprehensive Report
     report = {
         "persona": persona.model_dump(),
-        "evaluation": json.loads(clean_str),
+        "educational_evaluation": json.loads(clean_str),  # Pedagogical quality assessment
         "history": educational_agent.state["history"],
     }
     
-    # Include metrics in the report if available
+    # Include quantitative metrics in the report if available
     if session_metrics:
         report["session_metrics"] = session_metrics.model_dump()
     # Use the Langfuse session ID for the evaluation report filename

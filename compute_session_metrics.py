@@ -53,8 +53,12 @@ def extract_history_and_state(data: Dict[str, Any]) -> tuple[List[Dict], Dict[st
         # Raw history list
         return data, {}
     
+    elif "educational_evaluation" in data and "history" in data:
+        # Updated evaluation report format (post-refactor)
+        return data["history"], {}
+    
     elif "evaluation" in data and "history" in data:
-        # Evaluation report format
+        # Legacy evaluation report format (pre-refactor)
         return data["history"], {}
     
     else:
@@ -62,7 +66,8 @@ def extract_history_and_state(data: Dict[str, Any]) -> tuple[List[Dict], Dict[st
         print("   - {'history': [...], 'session_state': {...}}")
         print("   - {'history': [...]}")
         print("   - [...]  (raw history list)")
-        print("   - {'evaluation': {...}, 'history': [...]}  (evaluation report)")
+        print("   - {'educational_evaluation': {...}, 'history': [...]}  (updated evaluation report)")
+        print("   - {'evaluation': {...}, 'history': [...]}  (legacy evaluation report)")
         raise RuntimeError("Could not extract history from data - unsupported format")
 
 
