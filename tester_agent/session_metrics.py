@@ -168,7 +168,6 @@ You are an expert educational analyst. Analyze this educational conversation and
         return "\n".join(formatted_lines)
     
     def _extract_quiz_score(self, history: List[Dict], state: Dict) -> float:
-        """Extract quiz score from session state or default to 0"""
         
         # Check if quiz score is stored in the agent state (from AR node)
         quiz_score = state.get("quiz_score")
