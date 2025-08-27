@@ -18,6 +18,8 @@ class LLMAnalyzedMetrics(BaseModel):
     user_interest_rating: float = Field(description="Score 1-5 based on enthusiasm, questions asked, and voluntary engagement", ge=1, le=5)
     user_engagement_rating: float = Field(description="Score 1-5 based on response quality, participation, and willingness to explore", ge=1, le=5)
     enjoyment_probability: float = Field(description="Probability 0-1 that the user enjoyed and benefited from the session", ge=0, le=1)
+    error_handling_count: int = Field(description="Count of times the agent had to clarify, correct, or re-explain something", ge=0)
+    adaptability: bool = Field(description="Whether the agent adapted its teaching approach based on user responses")
 
 
 class SessionMetrics(BaseModel):
@@ -36,7 +38,6 @@ class SessionMetrics(BaseModel):
     quiz_score: float = Field(description="Score from formative assessments (0-100)", ge=0, le=100)
     error_handling_count: int = Field(description="Count of corrections/re-prompts", ge=0)
     adaptability: bool = Field(description="Whether flow was adjusted dynamically to user performance")
-    # average_response_time: float = Field(description="Average seconds taken per interaction", ge=0)
     
     # Session metadata
     session_id: str = Field(description="Unique session identifier")
@@ -79,9 +80,6 @@ class MetricsComputer:
         
         # Compute simple metrics that don't need LLM
         quiz_score = self._extract_quiz_score(history, session_state)
-        error_handling_count = self._count_error_handling(history)
-        adaptability = self._check_adaptability(session_state)
-        # avg_response_time = self._estimate_avg_response_time(history)
         
         return SessionMetrics(
             # LLM-analyzed metrics
@@ -92,12 +90,11 @@ class MetricsComputer:
             user_interest_rating=llm_metrics.user_interest_rating,
             user_engagement_rating=llm_metrics.user_engagement_rating,
             enjoyment_probability=llm_metrics.enjoyment_probability,
+            error_handling_count=llm_metrics.error_handling_count,
+            adaptability=llm_metrics.adaptability,
             
             # Computed metrics
             quiz_score=quiz_score,
-            error_handling_count=error_handling_count,
-            adaptability=adaptability,
-            # average_response_time=avg_response_time,
             
             # Session metadata
             session_id=session_id,
@@ -138,6 +135,16 @@ You are an expert educational analyst. Analyze this educational conversation and
    - Willingness to participate
    - Active involvement
 6. **Enjoyment Probability**: Estimate 0-1 likelihood that user enjoyed and benefited from the session
+7. **Error Handling Count**: Count how many times the agent had to:
+   - Clarify or re-explain something
+   - Correct a misunderstanding
+   - Provide additional help when user struggled
+   - Rephrase or simplify explanations
+8. **Adaptability**: Determine if the agent adapted its teaching approach based on user responses:
+   - Did it adjust difficulty level?
+   - Did it provide more examples when user struggled?
+   - Did it change explanations based on user feedback?
+   - Did it modify the teaching flow based on user performance?
 
 {self.llm_parser.get_format_instructions()}
 """
@@ -175,60 +182,6 @@ You are an expert educational analyst. Analyze this educational conversation and
         # If no quiz score found in state, default to 0
         return 0.0
     
-    def _count_error_handling(self, history: List[Dict]) -> int:
-        """Count corrections and re-prompts in the conversation"""
-        error_count = 0
-        
-        for interaction in history:
-            if interaction.get("role") == "assistant":
-                content = str(interaction.get("content", "")).lower()
-                error_indicators = [
-                    "let me clarify", "correction", "actually", "i mean", "sorry", 
-                    "let me rephrase", "to be more precise", "what i meant was",
-                    "let me explain that better", "clarification"
-                ]
-                if any(indicator in content for indicator in error_indicators):
-                    error_count += 1
-        
-        return error_count
-    
-    def _check_adaptability(self, state: Dict) -> bool:
-        """Check if the agent adapted its flow based on user performance"""
-        # Look for adaptation indicators in the state
-        adaptation_indicators = [
-            "_asked_mh",  # Moved to more help
-            "misconception_detected",
-            "last_correction",
-            "retrieval_score",
-            "transfer_success"
-        ]
-        
-        for indicator in adaptation_indicators:
-            if state.get(indicator):
-                return True
-        
-        return False
-    
-    def _estimate_avg_response_time(self, history: List[Dict]) -> float:
-        """Estimate average response time based on response complexity"""
-        user_responses = [h for h in history if h.get("role") == "user"]
-        
-        if len(user_responses) == 0:
-            return 30.0
-        
-        total_estimated_time = 0
-        for response in user_responses:
-            content = str(response.get("content", ""))
-            # Estimate time based on response length and complexity
-            base_time = 15  # Base 15 seconds
-            length_factor = len(content) * 0.1  # 0.1 second per character
-            word_count = len(content.split())
-            complexity_factor = word_count * 0.5  # 0.5 second per word
-            
-            estimated_time = base_time + length_factor + complexity_factor
-            total_estimated_time += min(estimated_time, 120)  # Cap at 2 minutes
-        
-        return total_estimated_time / len(user_responses)
     def upload_to_langfuse(self, metrics: SessionMetrics) -> bool:
         """Upload computed metrics to Langfuse as session-level metrics"""
         try:
