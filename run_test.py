@@ -55,19 +55,27 @@ def run_test():
 
     # 5. Compute and Upload Session Metrics to Langfuse
     print("\n📊 Computing session metrics...")
-    session_metrics = compute_and_upload_session_metrics(
-        session_id=session_id,
-        history=educational_agent.state["history"],
-        session_state=educational_agent.state,
-        persona_name=persona.name
-    )
+    try:
+        session_metrics = compute_and_upload_session_metrics(
+            session_id=session_id,
+            history=educational_agent.state["history"],
+            session_state=educational_agent.state,
+            persona_name=persona.name
+        )
 
-    # Save metrics locally as well
-    metrics_filename = f"session_metrics_{session_id}.json"
-    metrics_path = os.path.join("reports", metrics_filename)
-    with open(metrics_path, "w") as f:
-        json.dump(session_metrics.model_dump(), f, indent=2)
-    print(f"📋 Session metrics saved to {metrics_path}")
+        # Save metrics locally as well
+        metrics_filename = f"session_metrics_{session_id}.json"
+        metrics_path = os.path.join("reports", metrics_filename)
+        with open(metrics_path, "w") as f:
+            json.dump(session_metrics.model_dump(), f, indent=2)
+        print(f"📋 Session metrics saved to {metrics_path}")
+    
+    except Exception as e:
+        print(f"❌ Error: Failed to compute session metrics: {e}")
+        import traceback
+        traceback.print_exc()
+        print("⚠️ Continuing without metrics...")
+        session_metrics = None
 
     # 6. Evaluate Conversation
     evaluator = Evaluator()
@@ -87,8 +95,11 @@ def run_test():
         "persona": persona.model_dump(),
         "evaluation": json.loads(clean_str),
         "history": educational_agent.state["history"],
-        "session_metrics": session_metrics.model_dump(),  # Include metrics in the report
     }
+    
+    # Include metrics in the report if available
+    if session_metrics:
+        report["session_metrics"] = session_metrics.model_dump()
     # Use the Langfuse session ID for the evaluation report filename
     session_id = educational_agent.session_id
     report_path = f"reports/evaluation_{session_id}.json"

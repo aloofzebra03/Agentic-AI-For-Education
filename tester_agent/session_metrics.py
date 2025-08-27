@@ -147,16 +147,8 @@ You are an expert educational analyst. Analyze this educational conversation and
             response = self.llm.invoke(prompt)
             return self.llm_parser.parse(response.content)
         except Exception as e:
-            print(f"Warning: LLM analysis failed, using fallback values: {e}")
-            # Fallback values if LLM fails
-            return LLMAnalyzedMetrics(
-                concepts_covered=["simple pendulum", "oscillation"],
-                clarity_conciseness_score=3.0,
-                user_type="Medium",
-                user_interest_rating=3.0,
-                user_engagement_rating=3.0,
-                enjoyment_probability=0.6
-            )
+            print(f"❌ Error: LLM analysis failed: {e}")
+            raise RuntimeError(f"Failed to analyze conversation with LLM: {e}") from e
     
     def _format_conversation_for_analysis(self, history: List[Dict[str, Any]]) -> str:
         """Format conversation history for LLM analysis"""
@@ -258,7 +250,6 @@ You are an expert educational analyst. Analyze this educational conversation and
             total_estimated_time += min(estimated_time, 120)  # Cap at 2 minutes
         
         return total_estimated_time / len(user_responses)
-    
     def upload_to_langfuse(self, metrics: SessionMetrics) -> bool:
         """Upload computed metrics to Langfuse as session-level metrics"""
         try:
@@ -293,8 +284,8 @@ You are an expert educational analyst. Analyze this educational conversation and
             return True
             
         except Exception as e:
-            print(f"❌ Failed to upload metrics to Langfuse: {e}")
-            return False
+            print(f"❌ Error: Failed to upload metrics to Langfuse: {e}")
+            raise RuntimeError(f"Failed to upload metrics to Langfuse: {e}") from e
 
 
 def compute_and_upload_session_metrics(session_id: str, 
@@ -312,19 +303,26 @@ def compute_and_upload_session_metrics(session_id: str,
     
     Returns:
         SessionMetrics object with all computed metrics
+        
+    Raises:
+        RuntimeError: If metrics computation or upload fails
     """
-    computer = MetricsComputer()
-    metrics = computer.compute_metrics(session_id, history, session_state, persona_name)
-    
-    # Upload to Langfuse
-    upload_success = computer.upload_to_langfuse(metrics)
-    
-    if upload_success:
+    try:
+        computer = MetricsComputer()
+        metrics = computer.compute_metrics(session_id, history, session_state, persona_name)
+        
+        # Upload to Langfuse
+        computer.upload_to_langfuse(metrics)
+        
         print(f"📊 Session metrics computed and uploaded successfully!")
         print(f"   - Concepts covered: {metrics.num_concepts_covered}")
         print(f"   - User type: {metrics.user_type}")
         print(f"   - Quiz score: {metrics.quiz_score:.1f}%")
         print(f"   - Engagement rating: {metrics.user_engagement_rating:.1f}/5")
         print(f"   - Enjoyment probability: {metrics.enjoyment_probability:.2f}")
+        
+        return metrics
     
-    return metrics
+    except Exception as e:
+        print(f"❌ Error: Session metrics computation failed: {e}")
+        raise RuntimeError(f"Session metrics computation failed: {e}") from e

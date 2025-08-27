@@ -319,6 +319,7 @@ if "agent" in st.session_state and st.session_state.agent.current_state() == "EN
                 st.success("✅ Session metrics computed and uploaded to Langfuse!")
             except Exception as e:
                 st.error(f"❌ Failed to compute metrics: {e}")
+                st.session_state.session_metrics_computed = True  # Mark as attempted to avoid retry
     
     # Display computed metrics
     if "session_metrics" in st.session_state:

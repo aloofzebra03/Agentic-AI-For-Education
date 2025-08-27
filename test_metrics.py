@@ -61,6 +61,7 @@ def test_metrics_with_existing_reports():
         print(f"❌ Test failed: {e}")
         import traceback
         traceback.print_exc()
+        raise RuntimeError(f"Metrics test failed: {e}") from e
 
 
 def test_langfuse_upload():

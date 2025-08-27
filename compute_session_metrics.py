@@ -13,6 +13,9 @@ Or use programmatically:
 import argparse
 import json
 import sys
+import argparse
+import json
+import sys
 from pathlib import Path
 from typing import Dict, Any, List
 
@@ -30,8 +33,8 @@ def load_session_data(file_path: str) -> Dict[str, Any]:
             data = json.load(f)
         return data
     except Exception as e:
-        print(f"❌ Error loading session data from {file_path}: {e}")
-        sys.exit(1)
+        print(f"❌ Error: Failed to load session data from {file_path}: {e}")
+        raise RuntimeError(f"Failed to load session data: {e}") from e
 
 
 def extract_history_and_state(data: Dict[str, Any]) -> tuple[List[Dict], Dict[str, Any]]:
@@ -55,12 +58,12 @@ def extract_history_and_state(data: Dict[str, Any]) -> tuple[List[Dict], Dict[st
         return data["history"], {}
     
     else:
-        print("❌ Could not extract history from data. Expected formats:")
+        print("❌ Error: Could not extract history from data. Expected formats:")
         print("   - {'history': [...], 'session_state': {...}}")
         print("   - {'history': [...]}")
         print("   - [...]  (raw history list)")
         print("   - {'evaluation': {...}, 'history': [...]}  (evaluation report)")
-        sys.exit(1)
+        raise RuntimeError("Could not extract history from data - unsupported format")
 
 
 def compute_metrics_from_file(file_path: str, 
@@ -105,20 +108,25 @@ def compute_metrics_from_file(file_path: str,
     print(f"💬 History length: {len(history)} interactions")
     
     # Compute metrics
-    if upload:
-        metrics = compute_and_upload_session_metrics(
-            session_id=session_id,
-            history=history,
-            session_state=session_state,
-            persona_name=persona_name
-        )
-    else:
-        from tester_agent.session_metrics import MetricsComputer
-        computer = MetricsComputer()
-        metrics = computer.compute_metrics(session_id, history, session_state, persona_name)
-        print("📊 Metrics computed (not uploaded)")
+    try:
+        if upload:
+            metrics = compute_and_upload_session_metrics(
+                session_id=session_id,
+                history=history,
+                session_state=session_state,
+                persona_name=persona_name
+            )
+        else:
+            from tester_agent.session_metrics import MetricsComputer
+            computer = MetricsComputer()
+            metrics = computer.compute_metrics(session_id, history, session_state, persona_name)
+            print("📊 Metrics computed (not uploaded)")
+        
+        return metrics
     
-    return metrics
+    except Exception as e:
+        print(f"❌ Error: Failed to compute metrics: {e}")
+        raise RuntimeError(f"Failed to compute metrics: {e}") from e
 
 
 def main():
@@ -189,7 +197,9 @@ def main():
         print("\n✅ Metrics computation completed successfully!")
         
     except Exception as e:
-        print(f"❌ Error computing metrics: {e}")
+        print(f"❌ Error: Metrics computation failed: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 
