@@ -42,7 +42,6 @@ class SessionMetrics(BaseModel):
     # Session metadata
     session_id: str = Field(description="Unique session identifier")
     total_interactions: int = Field(description="Total number of user-agent exchanges", ge=0)
-    session_duration: float = Field(description="Total session duration in minutes", ge=0)
     persona_name: Optional[str] = Field(description="User persona if known")
 
 
@@ -71,9 +70,7 @@ class MetricsComputer:
         user_interactions = [h for h in history if h.get("role") == "user"]
         agent_interactions = [h for h in history if h.get("role") == "assistant"]
         total_interactions = len(user_interactions)
-        
-        # Calculate session duration (estimate based on interaction count)
-        session_duration = total_interactions * 2.5  # Rough estimate: 2.5 min per interaction
+    
         
         # Get LLM-analyzed metrics in one call
         llm_metrics = self._analyze_conversation_with_llm(history, persona_name)
@@ -99,7 +96,6 @@ class MetricsComputer:
             # Session metadata
             session_id=session_id,
             total_interactions=total_interactions,
-            session_duration=session_duration,
             persona_name=persona_name
         )
     
