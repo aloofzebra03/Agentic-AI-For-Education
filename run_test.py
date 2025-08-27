@@ -7,6 +7,7 @@ from educational_agent.agent import EducationalAgent
 from tester_agent.tester import TesterAgent
 from tester_agent.evaluator import Evaluator
 from tester_agent.personas import personas
+from tester_agent.session_metrics import compute_and_upload_session_metrics
 from dotenv import load_dotenv
 
 load_dotenv(dotenv_path = r"C:\Users\aryan\Desktop\Personalized_Education\Agentic-AI-For-Education\tester_agent\.env", override=True)
@@ -52,7 +53,23 @@ def run_test():
         json.dump(session_summary, f, indent=2)
     print(f"\nSession summary exported to {summary_path}")
 
-    # 5. Evaluate Conversation
+    # 5. Compute and Upload Session Metrics to Langfuse
+    print("\n📊 Computing session metrics...")
+    session_metrics = compute_and_upload_session_metrics(
+        session_id=session_id,
+        history=educational_agent.state["history"],
+        session_state=educational_agent.state,
+        persona_name=persona.name
+    )
+
+    # Save metrics locally as well
+    metrics_filename = f"session_metrics_{session_id}.json"
+    metrics_path = os.path.join("reports", metrics_filename)
+    with open(metrics_path, "w") as f:
+        json.dump(session_metrics.model_dump(), f, indent=2)
+    print(f"📋 Session metrics saved to {metrics_path}")
+
+    # 6. Evaluate Conversation
     evaluator = Evaluator()
     evaluation = evaluator.evaluate(persona, educational_agent.state["history"])
     print("\n--- Evaluation ---")
@@ -70,6 +87,7 @@ def run_test():
         "persona": persona.model_dump(),
         "evaluation": json.loads(clean_str),
         "history": educational_agent.state["history"],
+        "session_metrics": session_metrics.model_dump(),  # Include metrics in the report
     }
     # Use the Langfuse session ID for the evaluation report filename
     session_id = educational_agent.session_id

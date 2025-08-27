@@ -36,6 +36,7 @@ load_dotenv(dotenv_path=".env", override=True)
 try:
     from educational_agent.agent import EducationalAgent
     from educational_agent.config_rag import concept_pkg
+    from tester_agent.session_metrics import compute_and_upload_session_metrics
 except ImportError as e:
     st.error(f"Could not import EducationalAgent: {e}")
     st.stop()
@@ -302,6 +303,48 @@ if "agent" in st.session_state and st.session_state.agent.current_state() == "EN
         session_info = st.session_state.agent.session_info()
         st.subheader("🔍 Langfuse Session Details")
         st.code(f"Session ID: {session_info['session_id']}\nThread ID: {session_info['thread_id']}")
+    
+    # Compute and upload session metrics
+    if "session_metrics_computed" not in st.session_state:
+        with st.spinner("📊 Computing session metrics..."):
+            try:
+                session_metrics = compute_and_upload_session_metrics(
+                    session_id=st.session_state.agent.session_id,
+                    history=st.session_state.agent.state.get("history", []),
+                    session_state=st.session_state.agent.state,
+                    persona_name="interactive-user"
+                )
+                st.session_state.session_metrics = session_metrics
+                st.session_state.session_metrics_computed = True
+                st.success("✅ Session metrics computed and uploaded to Langfuse!")
+            except Exception as e:
+                st.error(f"❌ Failed to compute metrics: {e}")
+    
+    # Display computed metrics
+    if "session_metrics" in st.session_state:
+        st.subheader("📊 Session Metrics")
+        metrics = st.session_state.session_metrics
+        
+        # Key metrics in columns
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Quiz Score", f"{metrics.quiz_score:.1f}%")
+            st.metric("User Type", metrics.user_type)
+        with col2:
+            st.metric("Engagement Rating", f"{metrics.user_engagement_rating:.1f}/5")
+            st.metric("Interest Rating", f"{metrics.user_interest_rating:.1f}/5")
+        with col3:
+            st.metric("Concepts Covered", metrics.num_concepts_covered)
+            st.metric("Enjoyment Probability", f"{metrics.enjoyment_probability:.0%}")
+        
+        # Download metrics
+        metrics_json = metrics.model_dump_json(indent=2)
+        st.download_button(
+            label="📊 Download Session Metrics",
+            data=metrics_json,
+            file_name=f"session_metrics_{st.session_state.session_id}.json",
+            mime="application/json"
+        )
     
     # Option to start a new session
     if st.button("🔄 Start New Session", type="primary"):

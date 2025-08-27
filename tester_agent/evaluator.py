@@ -2,6 +2,8 @@ import os
 import json
 from langchain_google_genai import ChatGoogleGenerativeAI
 from tester_agent.personas import Persona
+from tester_agent.session_metrics import compute_and_upload_session_metrics
+from typing import Optional, Dict, Any
 
 class Evaluator:
     def __init__(self):
@@ -42,3 +44,56 @@ I want to run the function json.loads on your output directly.
 """
         response = self.llm.invoke(prompt)
         return response.content
+    
+    def evaluate_with_metrics(self, 
+                            persona: Persona, 
+                            history: list, 
+                            session_id: str,
+                            session_state: Dict[str, Any],
+                            upload_metrics: bool = True) -> Dict[str, Any]:
+        """
+        Evaluates the conversation and optionally computes/uploads session metrics.
+        
+        Args:
+            persona: Student persona used in the conversation
+            history: Conversation history
+            session_id: Unique session identifier
+            session_state: Final agent state
+            upload_metrics: Whether to compute and upload metrics to Langfuse
+            
+        Returns:
+            Dictionary containing evaluation and optionally metrics
+        """
+        # Get regular evaluation
+        evaluation_str = self.evaluate(persona, history)
+        
+        # Parse evaluation
+        clean_str = evaluation_str.strip()
+        if clean_str.startswith("```json"):
+            clean_str = clean_str[7:]
+        if clean_str.endswith("```"):
+            clean_str = clean_str[:-3]
+        clean_str = clean_str.strip()
+        
+        result = {
+            "persona": persona.model_dump(),
+            "evaluation": json.loads(clean_str),
+            "history": history,
+        }
+        
+        # Optionally compute and upload metrics
+        if upload_metrics:
+            try:
+                session_metrics = compute_and_upload_session_metrics(
+                    session_id=session_id,
+                    history=history,
+                    session_state=session_state,
+                    persona_name=persona.name
+                )
+                result["session_metrics"] = session_metrics.model_dump()
+                print(f"✅ Session metrics computed and uploaded for session: {session_id}")
+            except Exception as e:
+                print(f"❌ Failed to compute/upload metrics: {e}")
+                result["metrics_error"] = str(e)
+        
+        return result
