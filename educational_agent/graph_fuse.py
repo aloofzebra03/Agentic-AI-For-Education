@@ -49,6 +49,7 @@ class AgentState(TypedDict, total=False):
     retrieval_score: float
     transfer_success: bool
     last_correction: Optional[str]
+    quiz_score: float
     session_summary: Dict[str, Any]
 
 # -----------------------------------------------------------------------------

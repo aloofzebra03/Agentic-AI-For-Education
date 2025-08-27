@@ -641,6 +641,9 @@ Task: Grade this answer on a scale from 0 to 1. Respond ONLY with JSON matching 
         print("=" * 80)
         
         score, feedback = parsed.score, parsed.feedback
+        
+        # Store the quiz score in the state for metrics
+        state["quiz_score"] = score * 100  # Convert 0-1 score to 0-100 percentage
     except Exception as e:
         print(f"Error parsing AR response: {e}")
         print(f"Raw response: {raw}")

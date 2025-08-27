@@ -11,9 +11,8 @@ from langfuse import Langfuse
 
 # Pydantic model for LLM-analyzed metrics
 class LLMAnalyzedMetrics(BaseModel):
-    """Metrics that require LLM analysis from conversation history"""
-    
-    concepts_covered: List[str] = Field(description="List of educational concepts taught during the session (e.g., 'simple pendulum', 'oscillation', 'period')")
+
+    concepts_covered: List[str] = Field(description="List of educational concepts taught during the session")
     clarity_conciseness_score: float = Field(description="Score 1-5 for how clear and concise the agent's explanations were", ge=1, le=5)
     user_type: Literal["Dull", "Medium", "High"] = Field(description="Learner classification based on comprehension speed and curiosity")
     user_interest_rating: float = Field(description="Score 1-5 based on enthusiasm, questions asked, and voluntary engagement", ge=1, le=5)
@@ -37,7 +36,7 @@ class SessionMetrics(BaseModel):
     quiz_score: float = Field(description="Score from formative assessments (0-100)", ge=0, le=100)
     error_handling_count: int = Field(description="Count of corrections/re-prompts", ge=0)
     adaptability: bool = Field(description="Whether flow was adjusted dynamically to user performance")
-    average_response_time: float = Field(description="Average seconds taken per interaction", ge=0)
+    # average_response_time: float = Field(description="Average seconds taken per interaction", ge=0)
     
     # Session metadata
     session_id: str = Field(description="Unique session identifier")
@@ -82,7 +81,7 @@ class MetricsComputer:
         quiz_score = self._extract_quiz_score(history, session_state)
         error_handling_count = self._count_error_handling(history)
         adaptability = self._check_adaptability(session_state)
-        avg_response_time = self._estimate_avg_response_time(history)
+        # avg_response_time = self._estimate_avg_response_time(history)
         
         return SessionMetrics(
             # LLM-analyzed metrics
@@ -98,7 +97,7 @@ class MetricsComputer:
             quiz_score=quiz_score,
             error_handling_count=error_handling_count,
             adaptability=adaptability,
-            average_response_time=avg_response_time,
+            # average_response_time=avg_response_time,
             
             # Session metadata
             session_id=session_id,
@@ -147,7 +146,7 @@ You are an expert educational analyst. Analyze this educational conversation and
             response = self.llm.invoke(prompt)
             return self.llm_parser.parse(response.content)
         except Exception as e:
-            print(f"❌ Error: LLM analysis failed: {e}")
+            print(f" Error: LLM analysis failed: {e}")
             raise RuntimeError(f"Failed to analyze conversation with LLM: {e}") from e
     
     def _format_conversation_for_analysis(self, history: List[Dict[str, Any]]) -> str:
@@ -166,35 +165,15 @@ You are an expert educational analyst. Analyze this educational conversation and
         return "\n".join(formatted_lines)
     
     def _extract_quiz_score(self, history: List[Dict], state: Dict) -> float:
-        """Extract quiz score from conversation or session state"""
+        """Extract quiz score from session state or default to 0"""
         
-        # First check if quiz results are stored in session state
-        if state.get("quiz_results"):
-            quiz_data = state["quiz_results"]
-            if isinstance(quiz_data, dict):
-                correct = quiz_data.get("correct", 0)
-                total = quiz_data.get("total", 0)
-                if total > 0:
-                    return (correct / total) * 100
+        # Check if quiz score is stored in the agent state (from AR node)
+        quiz_score = state.get("quiz_score")
+        if quiz_score is not None:
+            return float(quiz_score)
         
-        # Look for quiz-related interactions in conversation
-        correct_answers = 0
-        total_questions = 0
-        
-        for interaction in history:
-            if interaction.get("role") == "assistant":
-                content = str(interaction.get("content", "")).lower()
-                if any(word in content for word in ["correct", "right", "well done", "excellent", "good job"]):
-                    correct_answers += 1
-                    total_questions += 1
-                elif any(word in content for word in ["incorrect", "wrong", "not quite", "try again", "not right"]):
-                    total_questions += 1
-        
-        if total_questions > 0:
-            return (correct_answers / total_questions) * 100
-        
-        # Default score if no quiz interactions found
-        return 75.0
+        # If no quiz score found in state, default to 0
+        return 0.0
     
     def _count_error_handling(self, history: List[Dict]) -> int:
         """Count corrections and re-prompts in the conversation"""
