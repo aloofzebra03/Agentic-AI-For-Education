@@ -106,6 +106,7 @@ importlib_metadata
 ipykernel
 ipython
 ipython_pygments_lexers
+imageio-ffmpeg
 jedi
 jiter
 joblib
