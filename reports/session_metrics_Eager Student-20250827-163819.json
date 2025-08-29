@@ -1,0 +1,23 @@
+{
+  "concepts_covered": [
+    "Simple Pendulum",
+    "Period",
+    "Gravity",
+    "Length of String",
+    "Mass of Bob",
+    "Acceleration due to gravity",
+    "Seismograph"
+  ],
+  "num_concepts_covered": 7,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "High",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.9,
+  "quiz_score": 0.0,
+  "error_handling_count": 2,
+  "adaptability": true,
+  "session_id": "Eager Student-20250827-163819",
+  "total_interactions": 14,
+  "persona_name": "Eager Student"
+}

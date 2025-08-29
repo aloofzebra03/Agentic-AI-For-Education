@@ -1,0 +1,24 @@
+{
+  "concepts_covered": [
+    "Simple Pendulum",
+    "Gravity",
+    "Inertia",
+    "Potential Energy",
+    "Kinetic Energy",
+    "Period",
+    "Gravitational Acceleration",
+    "Seismographs"
+  ],
+  "num_concepts_covered": 8,
+  "clarity_conciseness_score": 5.0,
+  "user_type": "High",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.95,
+  "quiz_score": 100.0,
+  "error_handling_count": 1,
+  "adaptability": true,
+  "session_id": "Eager Student-20250827-201659",
+  "total_interactions": 14,
+  "persona_name": "Eager Student"
+}

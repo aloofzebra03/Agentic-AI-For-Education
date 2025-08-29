@@ -1,0 +1,24 @@
+{
+  "concepts_covered": [
+    "Simple Pendulum",
+    "Pivot",
+    "Gravity",
+    "Tension",
+    "Restoring Force",
+    "Period",
+    "Gravitational Acceleration",
+    "Application of Pendulums (Seismographs)"
+  ],
+  "num_concepts_covered": 8,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "Dull",
+  "user_interest_rating": 2.0,
+  "user_engagement_rating": 3.0,
+  "enjoyment_probability": 0.6,
+  "quiz_score": 70.0,
+  "error_handling_count": 6,
+  "adaptability": true,
+  "session_id": "Confused Student-20250828-104254",
+  "total_interactions": 16,
+  "persona_name": "Confused Student"
+}

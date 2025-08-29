@@ -44,6 +44,8 @@ class AgentState(TypedDict, total=False):
     _asked_ar: bool
     _asked_tc: bool
     _asked_rlc: bool
+    _ci_tries: int
+    _rlc_tries: int
     definition_echoed: bool
     misconception_detected: bool
     retrieval_score: float

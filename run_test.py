@@ -36,7 +36,7 @@ def run_test():
         time.sleep(5)
         agent_msg = educational_agent.post(user_msg)
         print(f"Educational Agent: {agent_msg}")
-        print("#########" + educational_agent.current_state())
+        # print("#########" + educational_agent.current_state())
 
     # Save and print the session summary after the loop
     session_summary = educational_agent.state.get("session_summary", {})

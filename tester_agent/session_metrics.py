@@ -6,7 +6,7 @@ from typing import List, Dict, Any, Optional, Literal
 from pydantic import BaseModel, Field
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.output_parsers import PydanticOutputParser
-from langfuse import Langfuse
+from langfuse import get_client
 
 
 # Pydantic model for LLM-analyzed metrics
@@ -44,6 +44,20 @@ class SessionMetrics(BaseModel):
     total_interactions: int = Field(description="Total number of user-agent exchanges", ge=0)
     persona_name: Optional[str] = Field(description="User persona if known")
 
+# --- Score Configs (enforce schema; replace with your real config IDs) ---
+SCORE_CONFIGS = {
+    "num_concepts_covered": "cmeuwebal024tad082cqip658",
+    "clarity_conciseness_score": "cmeuwfcmx024wad08mrqcs430",
+    "user_type": "cmeuwh5r300bsad0752kaermc",
+    "user_interest_rating": "cmeuwicno0001ad06awfm3nro",
+    "user_engagement_rating": "cmeuwj89z003aad07q7c1xiqe",
+    "enjoyment_probability": "cmeuwjt270005ad0644xa4tvo",
+    "quiz_score": "cmeuwkn070008ad066edbbqjj",
+    "error_handling_count": "cmeuwl304000bad06tj4938z0",
+    "adaptability": "cmeuwluud003ead079uzva6oi",
+    "total_interactions": "cmeuwm85f00niad07mzbi97sn",
+}
+
 
 class MetricsComputer:
     """Computes session metrics from conversation history and state"""
@@ -54,7 +68,7 @@ class MetricsComputer:
             api_key=os.getenv("GOOGLE_API_KEY"),
             temperature=0.2,
         )
-        self.langfuse = Langfuse()
+        self.langfuse = get_client()
         self.llm_parser = PydanticOutputParser(pydantic_object=LLMAnalyzedMetrics)
     
     def compute_metrics(self, 
@@ -100,7 +114,6 @@ class MetricsComputer:
         )
     
     def _analyze_conversation_with_llm(self, history: List[Dict[str, Any]], persona_name: Optional[str] = None) -> LLMAnalyzedMetrics:
-        """Use LLM to analyze conversation and extract all subjective metrics in one call"""
         
         # Format conversation for LLM analysis
         conversation_text = self._format_conversation_for_analysis(history)
@@ -168,57 +181,78 @@ You are an expert educational analyst. Analyze this educational conversation and
         return "\n".join(formatted_lines)
     
     def _extract_quiz_score(self, history: List[Dict], state: Dict) -> float:
-        
-        # Check if quiz score is stored in the agent state (from AR node)
         quiz_score = state.get("quiz_score")
         if quiz_score is not None:
             return float(quiz_score)
         
-        # If no quiz score found in state, default to 0
         return 0.0
     
     def upload_to_langfuse(self, metrics: SessionMetrics) -> bool:
-        """Upload computed metrics to Langfuse as session-level metrics"""
+        """
+        Post-hoc: attach all metrics as scores to the Langfuse SESSION (no new trace).
+        Enforces Score Configs by passing config_id per score.
+        """
         try:
-            # Convert metrics to dictionary for Langfuse
-            metrics_dict = metrics.model_dump()
-            
-            # Upload as session metadata
-            self.langfuse.trace(
-                id=metrics.session_id,
-                metadata={
-                    "session_metrics": metrics_dict,
-                    "computed_at": datetime.now().isoformat()
+            md = metrics.model_dump()
+
+            def _put(name: str, value, data_type: str, comment: Optional[str] = None):
+                payload = {
+                    "name": name,
+                    "session_id": metrics.session_id,      # <-- SESSION target
+                    "config_id": SCORE_CONFIGS.get(name), # <-- enforce config
+                    "data_type": data_type,               # explicit is fine
                 }
+                if data_type == "CATEGORICAL":
+                    payload["value"] = str(value)
+                elif data_type in ("NUMERIC", "BOOLEAN"):
+                    payload["value"] = float(value)
+                if comment:
+                    payload["comment"] = comment
+                self.langfuse.create_score(**payload)
+
+            # concepts -> count (validated by "num_concepts_covered" config)
+            _put(
+                "num_concepts_covered",
+                len(md.get("concepts_covered", []) or []),
+                "NUMERIC",
+                comment=str(md.get("concepts_covered", [])),
             )
-            
-            # Also log as individual scores for easier querying
-            for metric_name, metric_value in metrics_dict.items():
-                if metric_name not in ["session_id", "concepts_covered", "persona_name"]:  # Skip non-numeric or complex fields
-                    try:
-                        if isinstance(metric_value, (int, float, bool)):
-                            self.langfuse.score(
-                                name=metric_name,
-                                value=float(metric_value),
-                                trace_id=metrics.session_id,
-                                comment=f"Session-level metric: {metric_name}"
-                            )
-                    except (ValueError, TypeError):
-                        # Skip problematic metrics
-                        pass
-            
-            print(f"✅ Successfully uploaded metrics to Langfuse for session: {metrics.session_id}")
+
+            # numeric scores
+            for name in [
+                "clarity_conciseness_score",
+                "user_interest_rating",
+                "user_engagement_rating",
+                "enjoyment_probability",
+                "quiz_score",
+                "error_handling_count",
+                "total_interactions",
+            ]:
+                val = md.get(name)
+                if isinstance(val, (int, float)):
+                    _put(name, float(val), "NUMERIC")
+
+            # boolean
+            _put("adaptability", 1.0 if md.get("adaptability") else 0.0, "BOOLEAN")
+
+            # categorical
+            if md.get("user_type"):
+                _put("user_type", str(md["user_type"]), "CATEGORICAL")
+
+            # flush for short-lived scripts
+            self.langfuse.flush()
+
+            print(f"✅ Uploaded session-level scores (enforced by Score Configs) for session: {metrics.session_id}")
             return True
-            
+
         except Exception as e:
             print(f"❌ Error: Failed to upload metrics to Langfuse: {e}")
             raise RuntimeError(f"Failed to upload metrics to Langfuse: {e}") from e
 
-
 def compute_and_upload_session_metrics(session_id: str, 
-                                     history: List[Dict[str, Any]], 
-                                     session_state: Dict[str, Any],
-                                     persona_name: Optional[str] = None) -> SessionMetrics:
+                                    history: List[Dict[str, Any]], 
+                                    session_state: Dict[str, Any],
+                                    persona_name: Optional[str] = None) -> SessionMetrics:
     """
     Convenience function to compute and upload session metrics
     

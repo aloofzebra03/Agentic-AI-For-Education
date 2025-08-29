@@ -236,6 +236,10 @@ class TcResponse(BaseModel):
     correct: bool
     feedback: str
 
+class RlcResponse(BaseModel):
+    feedback: str
+    next_state: Literal["RLC", "END"]
+
 # ─── Parsers ───────────────────────────────────────────────────────────────────
 
 apk_parser = PydanticOutputParser(pydantic_object=ApkResponse)
@@ -243,6 +247,7 @@ ci_parser  = PydanticOutputParser(pydantic_object=CiResponse)
 ge_parser  = PydanticOutputParser(pydantic_object=GeResponse)
 ar_parser  = PydanticOutputParser(pydantic_object=ArResponse)
 tc_parser  = PydanticOutputParser(pydantic_object=TcResponse)
+rlc_parser = PydanticOutputParser(pydantic_object=RlcResponse)
 
 # ─── Pedagogical‐move context ───────────────────────────────────────────────────
 
@@ -400,6 +405,7 @@ def ci_node(state: AgentState) -> AgentState:
     # print("REACHED HERE")
     if not state.get("_asked_ci", False):
         state["_asked_ci"] = True
+        state["_ci_tries"] = 0  # Initialize attempt counter
         # Include ground truth for Explanation (with analogies)
         gt = get_ground_truth(concept_pkg.title, "Explanation (with analogies)")
         system_prompt = (
@@ -432,6 +438,43 @@ def ci_node(state: AgentState) -> AgentState:
         state["agent_output"] = content
         return state
 
+    # Increment attempt counter
+    state["_ci_tries"] = state.get("_ci_tries", 0) + 1
+    
+    # Check if we've reached 2 attempts - if so, provide definition and move on
+    if state["_ci_tries"] >= 2:
+        # gt = get_ground_truth(concept_pkg.title, "Explanation (with analogies)")
+        system_prompt = (
+            f"The student has struggled with restating the definition. Provide the correct definition of '{concept_pkg.title}' "
+            f"clearly and encourage them that it's okay to struggle with new concepts. "
+            "Then say 'Now let's explore this concept deeper with a question.'"
+        )
+        
+        # Build final prompt using template
+        final_prompt = build_prompt_from_template(
+            system_prompt=system_prompt,
+            state=state,
+            include_last_message=False,
+            include_instructions=False
+        )
+            
+        resp = llm_with_history(state, final_prompt)
+        # Apply JSON extraction in case LLM wraps response in markdown
+        content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+        
+        # 🔍 CI NODE - AUTO-PROGRESS CONTENT 🔍
+        print("=" * 80)
+        print("🎯 CI NODE - AUTO-PROGRESS AFTER 2 TRIES 🎯")
+        print("=" * 80)
+        print(f"📄 CONTENT: {content}")
+        print(f"📏 CONTENT_LENGTH: {len(content)} characters")
+        print(f"🔢 CI_TRIES: {state['_ci_tries']}")
+        print("=" * 80)
+        
+        state["agent_output"] = content
+        state["current_state"] = "GE"
+        return state
+
     context = json.dumps(PEDAGOGICAL_MOVES["CI"], indent=2)
     system_prompt = f"""Current node: CI (Concept Introduction)
 Possible next_state values:
@@ -441,7 +484,7 @@ Possible next_state values:
 Pedagogical context:
 {context}
 
-If the student's restatement indicates they don't know or they are stuck after two attempts, provide the correct definition and move on.
+This is attempt {state["_ci_tries"]} for the student. If they get it wrong this time, we'll provide the correct definition and move on.
 
 Task: Determine if the restatement is accurate. Respond ONLY with JSON matching the schema above. If not, help the student to do so."""
 
@@ -465,6 +508,7 @@ Task: Determine if the restatement is accurate. Respond ONLY with JSON matching 
         print("=" * 80)
         print(f"📝 FEEDBACK: {parsed.feedback}")
         print(f"🚀 NEXT_STATE: {parsed.next_state}")
+        print(f"🔢 CI_TRIES: {state['_ci_tries']}")
         print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
         print("=" * 80)
         
@@ -516,6 +560,7 @@ def ge_node(state: AgentState) -> AgentState:
 Possible next_state values:
 - "MH": if you detect a misconception in the student's reasoning (must include a non-empty "correction" ≤2 sentences).
 - "AR": if the reasoning is correct or there's no misconception.
+Choose ONLY from these options
 
 Pedagogical context:
 {context}
@@ -800,6 +845,7 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
 def rlc_node(state: AgentState) -> AgentState:
     if not state.get("_asked_rlc", False):
         state["_asked_rlc"] = True
+        state["_rlc_tries"] = 0  # Initialize attempt counter
         # Include ground truth for Real-Life Application
         gt = get_ground_truth(concept_pkg.title, "Real-Life Application")
         system_prompt = (
@@ -831,10 +877,89 @@ def rlc_node(state: AgentState) -> AgentState:
         state["agent_output"] = content
         return state
 
-    state["agent_output"] = (
-        "Great! As a quick creative task, try drawing or explaining this idea to a friend and share what you notice."
+    # Increment attempt counter
+    state["_rlc_tries"] = state.get("_rlc_tries", 0) + 1
+    
+    # Check if we've reached 2 attempts - if so, answer final doubts and move to END
+    if state["_rlc_tries"] >= 2:
+        # Include ground truth for Real-Life Application to help answer any final questions
+        # gt = get_ground_truth(concept_pkg.title, "Real-Life Application")
+        system_prompt = (
+            f"The student has been discussing real-life applications of '{concept_pkg.title}' and this is their final interaction in this section. "
+            f"Answer any remaining questions or doubts they might have about the real-life application thoroughly and helpfully. "
+            "After addressing their question/doubt, conclude by saying: "
+            "'Great! As a quick creative task, try drawing or explaining this idea to a friend and share what you notice. You've learned a lot today!'"
+        )
+        
+        # Build final prompt using template
+        final_prompt = build_prompt_from_template(
+            system_prompt=system_prompt,
+            state=state,
+            include_last_message=True,
+            include_instructions=False
+        )
+            
+        resp = llm_with_history(state, final_prompt)
+        # Apply JSON extraction in case LLM wraps response in markdown
+        content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+        
+        # 🔍 RLC NODE - FINAL ANSWER AND CONCLUSION 🔍
+        print("=" * 80)
+        print("🎯 RLC NODE - FINAL ANSWER AND CONCLUSION 🎯")
+        print("=" * 80)
+        print(f"📄 CONTENT: {content}")
+        print(f"📏 CONTENT_LENGTH: {len(content)} characters")
+        print(f"🔢 RLC_TRIES: {state['_rlc_tries']}")
+        print("=" * 80)
+        
+        state["agent_output"] = content
+        state["current_state"] = "END"
+        return state
+
+    context = json.dumps(PEDAGOGICAL_MOVES["RLC"], indent=2)
+    system_prompt = f"""Current node: RLC (Real-Life Context)
+Possible next_state values:
+- "RLC": when the student is asking relevant questions about the real-life application and you want to continue the discussion.
+- "END": when the student seems satisfied or has no more questions about the real-life application.
+
+Pedagogical context:
+{context}
+
+This is attempt {state["_rlc_tries"]} for the student in the RLC node. You can stay in this node for up to 2 attempts to answer questions about the real-life application before moving to END.
+
+Task: Evaluate whether the student has more questions about the real-life application. If they're asking relevant questions, stay in RLC. If they seem satisfied or ready to move on, go to END. Respond ONLY with JSON matching the schema above."""
+
+    # Build final prompt using template with instructions at the end
+    final_prompt = build_prompt_from_template(
+        system_prompt=system_prompt,
+        state=state,
+        include_last_message=True,
+        include_instructions=True,
+        parser=rlc_parser
     )
-    state["current_state"] = "END"
+    
+    raw = llm_with_history(state, final_prompt).content
+    json_text = extract_json_block(raw)
+    try:
+        parsed: RlcResponse = rlc_parser.parse(json_text)
+        
+        # 🔍 RLC PARSING OUTPUT - MAIN CONTENT 🔍
+        print("=" * 80)
+        print("🎯 RLC NODE - PARSED OUTPUT CONTENTS 🎯")
+        print("=" * 80)
+        print(f"📝 FEEDBACK: {parsed.feedback}")
+        print(f"🚀 NEXT_STATE: {parsed.next_state}")
+        print(f"🔢 RLC_TRIES: {state['_rlc_tries']}")
+        print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
+        print("=" * 80)
+        
+        state["agent_output"]  = parsed.feedback
+        state["current_state"] = parsed.next_state
+    except Exception as e:
+        print(f"Error parsing RLC response: {e}")
+        print(f"Raw response: {raw}")
+        print(f"Extracted JSON text: {json_text}")
+        raise
     return state
 
 def end_node(state: AgentState) -> AgentState:
