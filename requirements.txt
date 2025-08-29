@@ -275,6 +275,7 @@ tokenizers
 toml
 toolz
 tornado
+torch
 tqdm
 traitlets
 transformers
