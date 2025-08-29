@@ -186,6 +186,7 @@ optree
 orjson
 ormsgpack
 overrides
+openai-whisper
 packaging
 pandas
 pandocfilters

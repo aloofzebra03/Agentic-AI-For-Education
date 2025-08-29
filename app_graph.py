@@ -29,6 +29,19 @@ except RuntimeError:
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
+import whisper
+
+class WhisperASR:
+    def __init__(self, model_name: str = "tiny"):
+        # Load tiny (~75MB). Use "base", "small", etc. if you want better accuracy.
+        self.model = whisper.load_model(model_name)
+
+    def recognize(self, audio_path: str) -> str:
+        # fp16=False is safer on CPU; set True on GPU with half precision.
+        result = self.model.transcribe(audio_path, language='en', fp16=False)
+        return result.get("text", "").strip()
+
+
 # Load environment variables
 load_dotenv(dotenv_path=".env", override=True)
 
@@ -46,9 +59,10 @@ except ImportError as e:
 def load_asr_model():
     print("BOOT: about to init ASR...", flush=True)
     # model = onnx_asr.load_model("nemo-parakeet-tdt-0.6b-v2")
+    model = WhisperASR(model_name="tiny")
     print("BOOT: ASR ready", flush=True)
-    # return model
-    return None
+    return model
+    # return None
     # return onnx_asr.load_model(model = "nemo-parakeet-tdt-0.6b-v2", path = "parakeet-tdt-0.6b-v2-onnx")
 
 asr_model = load_asr_model()
