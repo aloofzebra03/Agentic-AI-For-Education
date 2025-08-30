@@ -86,6 +86,11 @@ def get_llm():
         temperature=0.5,
     )
 
+def add_ai_message_to_conversation(state: AgentState, content: str):
+    """Add AI message to conversation after successful processing"""
+    state["messages"].append(AIMessage(content=content))
+    print(f"📝 Added AI message to conversation: {content[:50]}...")
+
 def llm_with_history(state: AgentState, final_prompt: str):
     # 🔍 LLM INVOCATION - INPUT 🔍
     print("=" * 70)
@@ -96,6 +101,7 @@ def llm_with_history(state: AgentState, final_prompt: str):
     print("=" * 70)
     
     # Send the final prompt directly as a human message
+    # Note: The final_prompt already contains conversation history via build_prompt_from_template
     request_msgs = [HumanMessage(content=final_prompt)]
     
     resp = get_llm().invoke(request_msgs)
@@ -107,17 +113,18 @@ def llm_with_history(state: AgentState, final_prompt: str):
     print(f"📊 RESPONSE_TYPE: {type(resp).__name__}")
     print("=" * 70)
     
-    # Append model reply to persistent conversation
-    state["messages"].append(AIMessage(content=resp.content))
+    # DO NOT append to messages here - let the calling node handle it after parsing
     return resp
 
 def build_conversation_history(state: AgentState) -> str:
-    """Build conversation history as text from the messages."""
+    """Build formatted conversation history from messages for prompt inclusion"""
     conversation = state.get("messages", [])
     history_text = ""
     
     for msg in conversation:
-        if isinstance(msg, HumanMessage):
+        if isinstance(msg, HumanMessage) and msg.content == "__start__":
+            continue
+        elif isinstance(msg, HumanMessage):
             history_text += f"Student: {msg.content}\n"
         elif isinstance(msg, AIMessage):
             history_text += f"Agent: {msg.content}\n"
@@ -228,6 +235,10 @@ class GeResponse(BaseModel):
     next_state: Literal["MH", "AR"]
     correction: Optional[str] = None
 
+class MhResponse(BaseModel):
+    feedback: str
+    next_state: Literal["MH", "AR"]
+
 class ArResponse(BaseModel):
     score: float
     feedback: str
@@ -245,6 +256,7 @@ class RlcResponse(BaseModel):
 apk_parser = PydanticOutputParser(pydantic_object=ApkResponse)
 ci_parser  = PydanticOutputParser(pydantic_object=CiResponse)
 ge_parser  = PydanticOutputParser(pydantic_object=GeResponse)
+mh_parser  = PydanticOutputParser(pydantic_object=MhResponse)
 ar_parser  = PydanticOutputParser(pydantic_object=ArResponse)
 tc_parser  = PydanticOutputParser(pydantic_object=TcResponse)
 rlc_parser = PydanticOutputParser(pydantic_object=RlcResponse)
@@ -308,6 +320,9 @@ def start_node(state: AgentState) -> AgentState:
     # Apply JSON extraction in case LLM wraps response in markdown
     content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
     
+    # Add AI message to conversation after successful processing
+    add_ai_message_to_conversation(state, content)
+    
     # 🔍 START NODE - CONTENT PROCESSING 🔍
     print("=" * 80)
     print("🎯 START NODE - CONTENT OUTPUT 🎯")
@@ -343,6 +358,9 @@ def apk_node(state: AgentState) -> AgentState:
         resp = llm_with_history(state, final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+        
+        # Add AI message to conversation after successful processing
+        add_ai_message_to_conversation(state, content)
         
         # 🔍 APK NODE - FIRST PASS CONTENT 🔍
         print("=" * 80)
@@ -382,6 +400,9 @@ Task: Evaluate whether the student identified the concept correctly. Respond ONL
     json_text = extract_json_block(raw)
     try:
         parsed: ApkResponse = apk_parser.parse(json_text)
+        
+        # Add AI message to conversation after successful parsing
+        add_ai_message_to_conversation(state, parsed.feedback)
         
         # 🔍 APK PARSING OUTPUT - MAIN CONTENT 🔍
         print("=" * 80)
@@ -426,6 +447,9 @@ def ci_node(state: AgentState) -> AgentState:
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
+        # Add AI message to conversation after successful processing
+        add_ai_message_to_conversation(state, content)
+        
         # 🔍 CI NODE - FIRST PASS CONTENT 🔍
         print("=" * 80)
         print("🎯 CI NODE - FIRST PASS CONTENT OUTPUT 🎯")
@@ -461,6 +485,9 @@ def ci_node(state: AgentState) -> AgentState:
         resp = llm_with_history(state, final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+        
+        # Add AI message to conversation after successful processing
+        add_ai_message_to_conversation(state, content)
         
         # 🔍 CI NODE - AUTO-PROGRESS CONTENT 🔍
         print("=" * 80)
@@ -501,6 +528,9 @@ Task: Determine if the restatement is accurate. Respond ONLY with JSON matching 
     json_text = extract_json_block(raw)
     try:
         parsed: CiResponse = ci_parser.parse(json_text)
+        
+        # Add AI message to conversation after successful parsing
+        add_ai_message_to_conversation(state, parsed.feedback)
         
         # 🔍 CI PARSING OUTPUT - MAIN CONTENT 🔍
         print("=" * 80)
@@ -543,6 +573,9 @@ def ge_node(state: AgentState) -> AgentState:
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
+        # Add AI message to conversation after successful processing
+        add_ai_message_to_conversation(state, content)
+        
         # 🔍 GE NODE - FIRST PASS CONTENT 🔍
         print("=" * 80)
         print("🎯 GE NODE - FIRST PASS CONTENT OUTPUT 🎯")
@@ -583,6 +616,9 @@ Task: Detect misconception or correct reasoning. RESPOND ONLY WITH JSON matching
     try:
         parsed: GeResponse = ge_parser.parse(json_text)
         
+        # Add AI message to conversation after successful parsing
+        add_ai_message_to_conversation(state, parsed.feedback)
+        
         # 🔍 GE PARSING OUTPUT - MAIN CONTENT 🔍
         print("=" * 80)
         print("🎯 GE NODE - PARSED OUTPUT CONTENTS 🎯")
@@ -605,13 +641,145 @@ Task: Detect misconception or correct reasoning. RESPOND ONLY WITH JSON matching
     return state
 
 def mh_node(state: AgentState) -> AgentState:
-    if state.get("current_state") == "MH" and not state.get("_asked_mh", False):
+    """Misconception Handling node - addresses student misconceptions and handles follow-up questions"""
+    
+    # First time entering MH: provide the correction from GE node
+    if not state.get("_asked_mh", False):
         state["_asked_mh"] = True
-        corr = state.get("last_correction", "Let me clarify that for you.")
-        state["agent_output"]  = f"Good thinking! Actually, {corr}"
+        state["_mh_tries"] = 0
+        
+        # Get the correction from GE node
+        correction = state.get("last_correction", "Let me clarify that for you.")
+        
+        # Provide the correction to the student
+        correction_message = f"I understand your thinking, but let me clarify: {correction}"
+        
+        # Add AI message to conversation
+        add_ai_message_to_conversation(state, correction_message)
+        
+        # 🔍 MH NODE - FIRST PASS CORRECTION 🔍
+        print("=" * 80)
+        print("🎯 MH NODE - INITIAL CORRECTION PROVIDED 🎯")
+        print("=" * 80)
+        print(f"📝 CORRECTION: {correction}")
+        print(f"💬 MESSAGE: {correction_message}")
+        print("=" * 80)
+        
+        state["agent_output"] = correction_message
+        return state
+    
+    # Handle student's response after correction
+    state["_mh_tries"] = state.get("_mh_tries", 0) + 1
+    
+    # Check if we've reached max tries - use LLM for final conclusion
+    if state["_mh_tries"] >= 2:
+        context = json.dumps(PEDAGOGICAL_MOVES["MH"], indent=2)
+        correction = state.get("last_correction", "the previous correction")
+        
+        final_system_prompt = f"""Current node: MH (Misconception Handling) - FINAL ATTEMPT
+This is the final attempt to address the student's misconception.
+
+Pedagogical context:
+{context}
+
+Original correction provided: {correction}
+
+The student has had 2 attempts to understand the misconception correction, but may still be confused.
+
+Task: Provide a FINAL, CLEAR explanation that:
+1. Acknowledges their confusion/persistence 
+2. Gives the correct concept one more time in the simplest terms
+3. Concludes the misconception handling positively
+4. Transitions to moving forward with assessment
+
+Be encouraging but definitive. This is the final clarification before moving to assessment.
+Respond ONLY with a clear, conclusive message (not JSON - just the message text)."""
+
+        # Build final prompt for concluding misconception
+        final_prompt = build_prompt_from_template(
+            system_prompt=final_system_prompt,
+            state=state,
+            include_last_message=True,
+            include_instructions=False,
+            parser=None
+        )
+        
+        final_response = llm_with_history(state, final_prompt).content.strip()
+        
+        # Add AI message to conversation
+        add_ai_message_to_conversation(state, final_response)
+        
+        # 🔍 MH NODE - MAX TRIES REACHED 🔍
+        print("=" * 80)
+        print("🎯 MH NODE - MAX TRIES REACHED, LLM CONCLUSION 🎯")
+        print("=" * 80)
+        print(f"🔢 MH_TRIES: {state['_mh_tries']}")
+        print(f"💬 LLM_FINAL_MESSAGE: {final_response}")
+        print("=" * 80)
+        
+        state["agent_output"] = final_response
         state["current_state"] = "AR"
         return state
-    state["current_state"] = "AR"
+    
+    # Normal MH processing: evaluate student's response and decide next action
+    context = json.dumps(PEDAGOGICAL_MOVES["MH"], indent=2)
+    correction = state.get("last_correction", "the previous correction")
+    
+    system_prompt = f"""Current node: MH (Misconception Handling)
+Possible next_state values:
+- "MH": if the student still has doubts, questions, or shows continued misconception (max 2 tries total).
+- "AR": if the student shows understanding or acceptance of the correction.
+
+Pedagogical context:
+{context}
+
+Previous correction provided: {correction}
+
+This is attempt {state["_mh_tries"]} of 2 for misconception handling.
+
+The student has received a correction for their misconception. Now they have responded. 
+Analyze their response:
+- If they seem to understand and accept the correction, move to AR
+- If they have more questions, doubts, or still show misconception, provide additional clarification and stay in MH
+- Be encouraging and supportive while addressing their concerns
+
+Task: Evaluate the student's response after receiving misconception correction. Respond ONLY with JSON matching the schema above."""
+
+    # Build final prompt using template with instructions
+    final_prompt = build_prompt_from_template(
+        system_prompt=system_prompt,
+        state=state,
+        include_last_message=True,
+        include_instructions=True,
+        parser=mh_parser
+    )
+    
+    raw = llm_with_history(state, final_prompt).content
+    json_text = extract_json_block(raw)
+    try:
+        parsed: MhResponse = mh_parser.parse(json_text)
+        
+        # Add AI message to conversation after successful parsing
+        add_ai_message_to_conversation(state, parsed.feedback)
+        
+        # 🔍 MH PARSING OUTPUT - MAIN CONTENT 🔍
+        print("=" * 80)
+        print("🎯 MH NODE - PARSED OUTPUT CONTENTS 🎯")
+        print("=" * 80)
+        print(f"📝 FEEDBACK: {parsed.feedback}")
+        print(f"🚀 NEXT_STATE: {parsed.next_state}")
+        print(f"🔢 MH_TRIES: {state['_mh_tries']}")
+        print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
+        print("=" * 80)
+        
+        state["agent_output"] = parsed.feedback
+        state["current_state"] = parsed.next_state
+    except Exception as e:
+        print(f"Error parsing MH response: {e}")
+        print(f"Raw response: {raw}")
+        print(f"Extracted JSON text: {json_text}")
+        raise
+    
     return state
 
 def ar_node(state: AgentState) -> AgentState:
@@ -636,7 +804,8 @@ def ar_node(state: AgentState) -> AgentState:
         resp = llm_with_history(state, final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-        
+        add_ai_message_to_conversation(state, content)
+
         # 🔍 AR NODE - FIRST PASS CONTENT 🔍
         print("=" * 80)
         print("🎯 AR NODE - FIRST PASS CONTENT OUTPUT 🎯")
@@ -713,7 +882,7 @@ Task: Grade this answer on a scale from 0 to 1. Respond ONLY with JSON matching 
         resp = llm_with_history(state, explain_final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-        
+
         # 🔍 AR NODE - EXPLANATION CONTENT 🔍
         print("=" * 80)
         print("🎯 AR NODE - EXPLANATION CONTENT OUTPUT 🎯")
@@ -726,6 +895,8 @@ Task: Grade this answer on a scale from 0 to 1. Respond ONLY with JSON matching 
         state["agent_output"] = content
     else:
         state["agent_output"] = feedback + "\nNice work! Time for a transfer question."
+
+    add_ai_message_to_conversation(state, state["agent_output"])
 
     state["current_state"] = "TC"
     return state
@@ -752,7 +923,9 @@ def tc_node(state: AgentState) -> AgentState:
         resp = llm_with_history(state, final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-        
+
+        add_ai_message_to_conversation(state, content)
+
         # 🔍 TC NODE - FIRST PASS CONTENT 🔍
         print("=" * 80)
         print("🎯 TC NODE - FIRST PASS CONTENT OUTPUT 🎯")
@@ -809,6 +982,7 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
 
     if correct:
         state["agent_output"] = feedback + "\nExcellent application! You've mastered this concept."
+        add_ai_message_to_conversation(state, state["agent_output"])
     else:
         # Student struggled: give correct transfer answer + explanation
         explain_system_prompt = (
@@ -827,7 +1001,8 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
         resp = llm_with_history(state, explain_final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-        
+        add_ai_message_to_conversation(state, content)
+
         # 🔍 TC NODE - EXPLANATION CONTENT 🔍
         print("=" * 80)
         print("🎯 TC NODE - EXPLANATION CONTENT OUTPUT 🎯")
@@ -864,7 +1039,8 @@ def rlc_node(state: AgentState) -> AgentState:
         resp = llm_with_history(state, final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-        
+        add_ai_message_to_conversation(state, content)
+
         # 🔍 RLC NODE - FIRST PASS CONTENT 🔍
         print("=" * 80)
         print("🎯 RLC NODE - FIRST PASS CONTENT OUTPUT 🎯")
@@ -902,6 +1078,8 @@ def rlc_node(state: AgentState) -> AgentState:
         resp = llm_with_history(state, final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+
+        add_ai_message_to_conversation(state, content)
         
         # 🔍 RLC NODE - FINAL ANSWER AND CONCLUSION 🔍
         print("=" * 80)
@@ -942,6 +1120,9 @@ Task: Evaluate whether the student has more questions about the real-life applic
     json_text = extract_json_block(raw)
     try:
         parsed: RlcResponse = rlc_parser.parse(json_text)
+        
+        # Add AI message to conversation after successful parsing
+        add_ai_message_to_conversation(state, parsed.feedback)
         
         # 🔍 RLC PARSING OUTPUT - MAIN CONTENT 🔍
         print("=" * 80)

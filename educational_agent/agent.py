@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, AIMessage
 from langfuse.langchain import CallbackHandler as LangfuseCallbackHandler
 
 from langgraph.types import Command
@@ -72,8 +72,7 @@ class EducationalAgent:
         #             final_text = state["agent_output"]
         
         result = self.graph.invoke(
-            {"messages": [HumanMessage(content="__start__")],
-             "history": self.state.get("history", [])},  # seed for Gemini
+            {"messages": [HumanMessage(content="__start__")]},
             config={"configurable": {"thread_id": self.thread_id}},
         )
         if isinstance(result, dict):
@@ -90,12 +89,13 @@ class EducationalAgent:
         final_text = ""
         last_state: Dict[str, Any] = {}
         
+        # Create user message
+        user_message = HumanMessage(content=user_text)
+        
         cmd = Command(
             resume=True,
             update={
-                "messages": [HumanMessage(content=user_text)],
-                # "last_user_msg": user_text,
-                "history": [{"role": "user", "content": user_text}]
+                "messages": [user_message],  # LangGraph will add this to existing messages
             },
         )
 
@@ -121,8 +121,23 @@ class EducationalAgent:
             cmd,
             config={"configurable": {"thread_id": self.thread_id}},
         )
+        
+        # Debug logging: Verify message state
         if isinstance(result, dict):
             last_state = result
+            messages = result.get("messages", [])
+            
+            print(f"🔍 AGENT DEBUG - Post-invoke state:")
+            print(f"📊 Messages count: {len(messages)}")
+            
+            # Show last few messages for verification
+            if messages:
+                print("📜 Last 3 messages:")
+                for i, msg in enumerate(messages[-3:]):
+                    msg_type = "Human" if isinstance(msg, HumanMessage) else "AI"
+                    content = (msg.content[:50] + "...") if len(msg.content) > 50 else msg.content
+                    print(f"  {len(messages)-3+i+1}. {msg_type}: {content}")
+            
             if result.get("agent_output"):
                 final_text = result["agent_output"]
             else:
@@ -141,6 +156,31 @@ class EducationalAgent:
     
     def current_state(self) -> str:
         return self.state.get("current_state", "")
+
+    def get_history_for_reports(self) -> List[Dict[str, Any]]:
+        """Convert messages to history format for reports and metrics"""
+        history = []
+        messages = self.state.get("messages", [])
+        current_node = "unknown"
+        
+        for msg in messages:
+            if isinstance(msg, HumanMessage):
+                # Skip the initial "__start__" message
+                if msg.content != "__start__":
+                    history.append({
+                        "role": "user",
+                        "content": msg.content
+                    })
+            elif isinstance(msg, AIMessage):
+                # Try to get the current node from agent state, fallback to tracking from messages
+                current_node = self.state.get("current_state", current_node)
+                history.append({
+                    "role": "assistant", 
+                    "content": msg.content,
+                    "node": current_node
+                })
+        
+        return history
 
 
     def session_info(self) -> Dict[str, str]:

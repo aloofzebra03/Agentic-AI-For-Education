@@ -322,9 +322,12 @@ if "agent" in st.session_state and st.session_state.agent.current_state() == "EN
     if "session_metrics_computed" not in st.session_state:
         with st.spinner("📊 Computing session metrics..."):
             try:
+                # Convert messages to history format for metrics
+                history_for_reports = st.session_state.agent.get_history_for_reports()
+                
                 session_metrics = compute_and_upload_session_metrics(
                     session_id=st.session_state.agent.session_id,
-                    history=st.session_state.agent.state.get("history", []),
+                    history=history_for_reports,
                     session_state=st.session_state.agent.state,
                     persona_name="interactive-user"
                 )

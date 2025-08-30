@@ -56,9 +56,12 @@ def run_test():
     # 5. Compute and Upload Session Metrics to Langfuse
     print("\n📊 Computing session metrics...")
     try:
+        # Convert messages to history format for metrics
+        history_for_reports = educational_agent.get_history_for_reports()
+        
         session_metrics = compute_and_upload_session_metrics(
             session_id=session_id,
-            history=educational_agent.state["history"],
+            history=history_for_reports,
             session_state=educational_agent.state,
             persona_name=persona.name
         )
@@ -79,7 +82,9 @@ def run_test():
 
     # 6. Evaluate Educational Quality (Pedagogical Assessment)
     evaluator = Evaluator()
-    evaluation = evaluator.evaluate(persona, educational_agent.state["history"])
+    # Convert messages to history format for evaluation
+    history_for_reports = educational_agent.get_history_for_reports()
+    evaluation = evaluator.evaluate(persona, history_for_reports)
     print("\n--- Educational Quality Evaluation ---")
     print(evaluation)
 
@@ -94,7 +99,7 @@ def run_test():
     report = {
         "persona": persona.model_dump(),
         "educational_evaluation": json.loads(clean_str),  # Pedagogical quality assessment
-        "history": educational_agent.state["history"],
+        "history": history_for_reports,  # Use the converted history
     }
     
     # Include quantitative metrics in the report if available

@@ -13,8 +13,6 @@ from langchain_core.messages import AnyMessage, HumanMessage, AIMessage
 # from langfuse.langchain import CallbackHandler
 from langgraph.checkpoint.memory import InMemorySaver
 
-import operator
-
 from educational_agent.nodes4_rag_studio import (
     start_node, apk_node, ci_node, ge_node,
     mh_node, ar_node, tc_node, rlc_node, end_node,
@@ -36,7 +34,6 @@ class AgentState(TypedDict, total=False):
     current_state: str
     last_user_msg: str
     agent_output: str
-    history: Annotated[List[Dict[str, Any]],operator.add]
     _asked_apk: bool
     _asked_ci: bool
     _asked_ge: bool
@@ -45,6 +42,7 @@ class AgentState(TypedDict, total=False):
     _asked_tc: bool
     _asked_rlc: bool
     _ci_tries: int
+    _mh_tries: int
     _rlc_tries: int
     definition_echoed: bool
     misconception_detected: bool
@@ -59,33 +57,30 @@ class AgentState(TypedDict, total=False):
 # -----------------------------------------------------------------------------
 def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
     state.setdefault("messages", [])
-    state.setdefault("history", [])
     state.setdefault("last_user_msg", "")
     state.setdefault("current_state", "START")
     return state
 
 def _wrap(fn):
     def inner(state: AgentState) -> AgentState:
+        # Debug logging: Current state before processing
+        print(f"🔧 _WRAP DEBUG - Node processing started")
+        print(f"📊 Messages count: {len(state.get('messages', []))}")
+        
         # 1. Capture latest user input
         msgs = state.get("messages", [])
         if msgs and isinstance(msgs[-1], HumanMessage):
             text = msgs[-1].content or ""
             if text and text != state.get("last_user_msg"):
                 state["last_user_msg"] = text
+                print(f"📝 Updated last_user_msg: {text[:50]}...")
 
         st = fn(state)
 
-        updates = {}
-        out = st.get("agent_output")
-        if out:
-            updates["history"] = [{
-                "role": "assistant",
-                "content": out,
-                "node": st.get("current_state"),
-            }]
+        # Debug logging: Final state after processing
+        print(f"🏁 _WRAP DEBUG - Node processing completed")
+        print(f"📊 Final messages count: {len(st.get('messages', []))}")
 
-        if updates:
-            return {**st, **updates}
         return st
     return inner
 
@@ -138,7 +133,7 @@ def build_graph():
     compiled = g.compile(
         # checkpointer=checkpointer,
         checkpointer=CHECKPOINTER,
-        interrupt_after=["START", "APK", "CI", "GE", "AR", "TC", "RLC"],
+        interrupt_after=["START", "APK", "CI", "GE","MH", "AR", "TC", "RLC"],
     )
     return compiled
 
