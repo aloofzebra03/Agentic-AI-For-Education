@@ -22,8 +22,10 @@ from gtts import gTTS
 
 sys.modules["sqlite3"] = pysqlite3
 
-st.legacy_caching.clear_cache()
-
+if st.button('Clear Resource Cache'):
+    st.cache_resource.clear()
+    st.success("Resource cache cleared!")
+    
 import asyncio
 try:
     asyncio.get_running_loop()
