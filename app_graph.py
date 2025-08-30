@@ -22,6 +22,8 @@ from gtts import gTTS
 
 sys.modules["sqlite3"] = pysqlite3
 
+st.legacy_caching.clear_cache()
+
 import asyncio
 try:
     asyncio.get_running_loop()
@@ -55,7 +57,7 @@ except ImportError as e:
     st.stop()
     
 # ── ASR & TTS Functions ──────────────────────────────────────────────────
-@st.cache_resource
+@st.cache_resource(ttl=36000)
 def load_asr_model():
     print("BOOT: about to init ASR...", flush=True)
     # model = onnx_asr.load_model("nemo-parakeet-tdt-0.6b-v2")

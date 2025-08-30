@@ -41,6 +41,7 @@ class AgentState(TypedDict, total=False):
     _asked_ar: bool
     _asked_tc: bool
     _asked_rlc: bool
+    _apk_tries: int
     _ci_tries: int
     _mh_tries: int
     _rlc_tries: int

@@ -340,6 +340,7 @@ def start_node(state: AgentState) -> AgentState:
 def apk_node(state: AgentState) -> AgentState:
     if not state.get("_asked_apk", False):
         state["_asked_apk"] = True
+        state["_apk_tries"] = 0
         # Include ground truth for Concept Definition
         gt = get_ground_truth(concept_pkg.title, "Concept Definition")
         system_prompt = (
@@ -374,6 +375,53 @@ def apk_node(state: AgentState) -> AgentState:
         state["agent_output"] = content
         return state
 
+    # Handle student's response after hook question
+    state["_apk_tries"] = state.get("_apk_tries", 0) + 1
+    
+    # Check if we've reached max tries (2) - provide answer and move to CI
+    if state["_apk_tries"] >= 2:
+        gt = get_ground_truth(concept_pkg.title, "Concept Definition")
+        final_system_prompt = f"""Current node: APK (Activate Prior Knowledge) - FINAL ATTEMPT
+This is the final attempt to help the student identify the concept.
+
+The student has had 2 attempts to identify '{concept_pkg.title}' but hasn't gotten it right.
+
+Ground truth (Concept Definition): {gt}
+
+Task: Provide the correct identification of '{concept_pkg.title}' in a supportive way that:
+1. Acknowledges their effort
+2. Gives the correct answer clearly
+3. Briefly explains why this is the concept
+4. Transitions positively to learning more about it
+
+Respond ONLY with a clear, encouraging message (not JSON - just the message text)."""
+
+        # Build final prompt for revealing the concept
+        final_prompt = build_prompt_from_template(
+            system_prompt=final_system_prompt,
+            state=state,
+            include_last_message=True,
+            include_instructions=False,
+            parser=None
+        )
+        
+        final_response = llm_with_history(state, final_prompt).content.strip()
+        
+        # Add AI message to conversation
+        add_ai_message_to_conversation(state, final_response)
+        
+        # 🔍 APK NODE - MAX TRIES REACHED 🔍
+        print("=" * 80)
+        print("🎯 APK NODE - MAX TRIES REACHED, PROVIDING ANSWER 🎯")
+        print("=" * 80)
+        print(f"🔢 APK_TRIES: {state['_apk_tries']}")
+        print(f"💬 LLM_FINAL_MESSAGE: {final_response}")
+        print("=" * 80)
+        
+        state["agent_output"] = final_response
+        state["current_state"] = "CI"
+        return state
+
     context = json.dumps(PEDAGOGICAL_MOVES["APK"], indent=2)
     system_prompt = f"""Current node: APK (Activate Prior Knowledge)
 Possible next_state values:
@@ -383,7 +431,7 @@ Possible next_state values:
 Pedagogical context:
 {context}
 
-If the student's reply indicates they don't know or they are stuck after two attempts, provide the correct identification and move on to the next state.
+This is attempt {state["_apk_tries"]} of 2 for prior knowledge activation.
 
 Task: Evaluate whether the student identified the concept correctly. Respond ONLY with JSON matching the schema above. If not, help the student to do so."""
 
