@@ -1,0 +1,25 @@
+{
+  "concepts_covered": [
+    "Simple Pendulum",
+    "Periodic Motion",
+    "Inertia",
+    "Gravity",
+    "Period (T)",
+    "Length (L)",
+    "Acceleration due to Gravity (g)",
+    "Formula for Period of a Simple Pendulum",
+    "Real-world applications of pendulums (metronome)"
+  ],
+  "num_concepts_covered": 9,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "High",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.95,
+  "quiz_score": 100.0,
+  "error_handling_count": 2,
+  "adaptability": true,
+  "session_id": "Eager Student-20250830-213649",
+  "total_interactions": 13,
+  "persona_name": "Eager Student"
+}

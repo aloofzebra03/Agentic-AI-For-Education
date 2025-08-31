@@ -1,0 +1,22 @@
+{
+  "concepts_covered": [
+    "Simple Pendulum",
+    "Gravity",
+    "Inertia",
+    "Period",
+    "Oscillation",
+    "Metronome"
+  ],
+  "num_concepts_covered": 6,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "Medium",
+  "user_interest_rating": 4.0,
+  "user_engagement_rating": 4.0,
+  "enjoyment_probability": 0.8,
+  "quiz_score": 70.0,
+  "error_handling_count": 5,
+  "adaptability": true,
+  "session_id": "Confused Student-20250830-214035",
+  "total_interactions": 15,
+  "persona_name": "Confused Student"
+}

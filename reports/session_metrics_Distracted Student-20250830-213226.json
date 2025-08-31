@@ -1,0 +1,22 @@
+{
+  "concepts_covered": [
+    "Simple Pendulum",
+    "Gravity",
+    "Period",
+    "Length of Pendulum",
+    "Relationship between Length and Period",
+    "Gravitational Acceleration"
+  ],
+  "num_concepts_covered": 6,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "Dull",
+  "user_interest_rating": 2.0,
+  "user_engagement_rating": 2.0,
+  "enjoyment_probability": 0.3,
+  "quiz_score": 100.0,
+  "error_handling_count": 8,
+  "adaptability": true,
+  "session_id": "Distracted Student-20250830-213226",
+  "total_interactions": 15,
+  "persona_name": "Distracted Student"
+}
