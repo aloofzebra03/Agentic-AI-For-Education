@@ -38,4 +38,4 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 # Ensure both your package and the studio app are importable
-include = ["educational_agent", "studio_app","tester_agent"]
+include = ["educational_agent", "studio_app","tester_agent","educational_agent_with_simulation"]
