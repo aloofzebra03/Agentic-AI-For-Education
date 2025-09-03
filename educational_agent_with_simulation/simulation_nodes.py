@@ -1,195 +1,448 @@
 # simulation_nodes.py
 
 import json
-from typing import Dict
-
+from typing import Dict, List, Literal, Optional
+from pydantic import BaseModel, Field, conlist
+from langchain.output_parsers import PydanticOutputParser
 from langchain_core.messages import HumanMessage, AIMessage
 
-# Import shared utilities and AgentState from the parent educational_agent package
+from educational_agent.config_rag import concept_pkg
 from educational_agent.shared_utils import (
     AgentState,
     add_ai_message_to_conversation,
     llm_with_history,
     build_prompt_from_template,
     extract_json_block,
-    PEDAGOGICAL_MOVES
 )
 
-# ─── Simulation Agent: States & Parsers ─────────────────────────
-
-# New simulation-specific states
-#   SIM_CC        : Concept Creator Agent (generate 3 core concepts)
-#   SIM_VARS      : Mention variables at play
-#   SIM_ACTION    : State action to be performed
-#   SIM_EXPECT    : Ask expected outcome
-#   SIM_EXECUTE   : Execute action
-#   SIM_OBSERVE   : Ask observations
-#   SIM_INSIGHT   : Mention insights
-#   SIM_NEXT      : Repeat for Concept 2 & 3 controller
-#   SIM_REFLECT   : Reflection & summary
-
-SIM_NODE_ORDER = ["SIM_VARS", "SIM_ACTION", "SIM_EXPECT",
-                  "SIM_EXECUTE", "SIM_OBSERVE", "SIM_INSIGHT"]
+# ─────────────────────────────────────────────────────────────────────
+# Simulation moves
+# ─────────────────────────────────────────────────────────────────────
 
 SIM_MOVES: Dict[str, Dict[str, str]] = {
-    "SIM_CC":     {"goal": "Propose 3 distinct, independently variable core concepts.", "constraints": "Clear, learner-friendly language."},
-    "SIM_VARS":   {"goal": "List variables; mark which are held constant.", "constraints": "Only relevant variables; concise."},
-    "SIM_ACTION": {"goal": "Describe the single, testable change.", "constraints": "Alter key variable(s) only; isolate concept."},
-    "SIM_EXPECT": {"goal": "Elicit prediction and brief why.", "constraints": "No leading hints; accept 'not sure'."},
-    "SIM_EXECUTE":{"goal": "Perform the action in the sim.", "constraints": "Show observable effects; no interpretation."},
-    "SIM_OBSERVE":{"goal": "Collect raw observations.", "constraints": "Allow multiple valid answers; no feedback yet."},
-    "SIM_INSIGHT":{"goal": "Map observation → principle; compare to prediction.", "constraints": "Reinforce why it happened."},
-    "SIM_NEXT":   {"goal": "Advance to next concept.", "constraints": "Proceed only after insights captured."},
-    "SIM_REFLECT":{"goal": "Synthesize learning across concepts.", "constraints": "Encourage metacognition; concise summary."},
+    "SIM_CC":     {"goal": "Propose 1–5 distinct, independently variable core concepts for simulation.", "constraints": "Clear, learner-friendly; testable via observable changes."},
+    "SIM_VARS":   {"goal": "List variables; mark independent/dependent/controls.", "constraints": "Only relevant variables; concise."},
+    "SIM_ACTION": {"goal": "Describe a single, testable change to perform.", "constraints": "Alter one independent variable; keep controls fixed."},
+    "SIM_EXPECT": {"goal": "Elicit the learner’s prediction and brief why.", "constraints": "No leading hints; accept 'not sure'."},
+    "SIM_EXECUTE":{"goal": "Perform/narrate the action steps.", "constraints": "Describe observable effects only; no interpretation."},
+    "SIM_OBSERVE":{"goal": "Ask for raw observations from the learner.", "constraints": "Allow multiple valid answers; don’t judge yet."},
+    "SIM_INSIGHT":{"goal": "Map observation → principle; compare with prediction.", "constraints": "Reinforce why it happened; ≤3 sentences."},
+    "SIM_REFLECT":{"goal": "Synthesize learning across the simulated concept(s).", "constraints": "Encourage metacognition; concise bullets."},
 }
 
-# ─── Simulation Agent Node Stubs (no logic, structure only) ─────────────────────
+# ─────────────────────────────────────────────────────────────────────
+# Pydantic response models + parsers (same style as main nodes)
+# ─────────────────────────────────────────────────────────────────────
+
+# SIM_CC: 1–5 concepts
+class SimConcepts(BaseModel):
+    concepts: conlist(str, min_length=1, max_length=5)
+
+sim_cc_parser = PydanticOutputParser(pydantic_object=SimConcepts)
+
+# SIM_VARS: declare variables
+class SimVariable(BaseModel):
+    name: str
+    role: Literal["independent", "dependent", "control"]
+    note: Optional[str] = None
+
+class SimVarsResponse(BaseModel):
+    variables: conlist(SimVariable, min_length=2)
+    prompt_to_learner: str
+
+sim_vars_parser = PydanticOutputParser(pydantic_object=SimVarsResponse)
+
+# SIM_ACTION
+class SimActionResponse(BaseModel):
+    action: str
+    rationale: str
+    prompt_to_learner: str
+
+sim_action_parser = PydanticOutputParser(pydantic_object=SimActionResponse)
+
+# SIM_EXPECT
+class SimExpectResponse(BaseModel):
+    question: str
+    hint: Optional[str] = None
+
+sim_expect_parser = PydanticOutputParser(pydantic_object=SimExpectResponse)
+
+# SIM_EXECUTE
+class SimExecuteResponse(BaseModel):
+    steps: conlist(str, min_length=1)
+    what_to_watch: str
+
+sim_execute_parser = PydanticOutputParser(pydantic_object=SimExecuteResponse)
+
+# SIM_OBSERVE
+class SimObserveResponse(BaseModel):
+    observation_prompt: str
+    expected_observations: List[str]
+
+sim_observe_parser = PydanticOutputParser(pydantic_object=SimObserveResponse)
+
+# SIM_INSIGHT
+class SimInsightResponse(BaseModel):
+    micro_explanation: str
+    compared_to_prediction: str
+
+sim_insight_parser = PydanticOutputParser(pydantic_object=SimInsightResponse)
+
+# SIM_REFLECT
+class SimReflectResponse(BaseModel):
+    bullets: conlist(str, min_length=2, max_length=5)
+    closing_prompt: str
+
+sim_reflect_parser = PydanticOutputParser(pydantic_object=SimReflectResponse)
+
+# ─────────────────────────────────────────────────────────────────────
+# Node implementations (each uses build_prompt_from_template directly)
+# ─────────────────────────────────────────────────────────────────────
 
 def sim_concept_creator_node(state: AgentState) -> AgentState:
-    """SIM_CC: Generates 3 core concepts for simulation-based learning."""
-    state.setdefault("sim_concepts", [])
-    state.setdefault("sim_current_idx", 0)
-    state.setdefault("sim_per_concept_data", {})
-    state.setdefault("sim_total_concepts", 3)
+    """
+    SIM_CC: Generate 1–5 independently variable, testable concepts.
+    Stores:
+      - sim_concepts: List[str]
+      - sim_total_concepts: int
+      - sim_current_idx: int
+    Handover: set current_state="GE" so graph routes to your GE node.
+    """
 
-    # Use the shared utilities to create a more sophisticated response
     context = json.dumps(SIM_MOVES["SIM_CC"], indent=2)
-    system_prompt = f"""You are an educational simulation agent. Your task is to design 3 distinct core concepts for simulation-based learning.
+    system_prompt = f"""Current node: SIM_CC (Simulation Concept Creator)
 
-Context: {context}
+Concept in focus: "{concept_pkg.title}"
 
-Generate 3 core concepts that can be explored through interactive simulation. Each concept should:
-1. Be independently variable (changing one doesn't automatically change others)
-2. Be testable through observable changes
-3. Use clear, learner-friendly language
-4. Be suitable for a class 7 student
+Context:
+{context}
 
-Present the concepts clearly and prepare to begin with Concept #1."""
+Task:
+Return JSON ONLY with 1–5 clear, independent, testable simulation concepts for a class 7 learner.
 
-    # Build final prompt using shared template utility
+Guidelines:
+- Keep each concept short (≤7 words), concrete, and experimentally manipulable.
+- They must be independently variable (changing one doesn’t implicitly change the others).
+"""
+
     final_prompt = build_prompt_from_template(
         system_prompt=system_prompt,
         state=state,
         include_last_message=False,
-        include_instructions=False
+        include_instructions=True,
+        parser=sim_cc_parser,
     )
-    
-    # Use shared LLM utility
-    resp = llm_with_history(state, final_prompt)
-    content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-    
-    # Use shared conversation utility
-    add_ai_message_to_conversation(state, content)
-    
-    state["agent_output"] = content
-    state["current_state"] = "SIM_VARS"
+    raw = llm_with_history(state, final_prompt).content
+    json_text = extract_json_block(raw)
+    parsed: SimConcepts = sim_cc_parser.parse(json_text)
+
+    # Save & speak
+    state["sim_concepts"] = parsed.concepts
+    state["sim_total_concepts"] = len(parsed.concepts)
+    state["sim_current_idx"] = 0
+
+    speak = (
+        "We’ll explore these through quick simulations:\n"
+        + "\n".join([f"{i+1}. {c}" for i, c in enumerate(parsed.concepts)])
+        + "\n\nNow let’s continue with a why/how exploration."
+    )
+    add_ai_message_to_conversation(state, speak)
+    state["agent_output"] = speak
+
+    # Handover to GE (your graph: SIM_CC → GE)
+    state["current_state"] = "GE"
     return state
 
 
 def sim_vars_node(state: AgentState) -> AgentState:
-    """SIM_VARS: Mention variables at play and identify constants."""
+    """
+    SIM_VARS: List variables (independent/dependent/control) for current concept.
+    """
     idx = state.get("sim_current_idx", 0)
-    
+    concepts = state.get("sim_concepts", [])
+    concept = concepts[idx] if concepts else f"Concept #{idx+1}"
+
     context = json.dumps(SIM_MOVES["SIM_VARS"], indent=2)
-    system_prompt = f"""You are working on Concept #{idx+1} in a simulation-based learning session.
+    system_prompt = f"""Current node: SIM_VARS (Variables Declaration)
 
-Context: {context}
+We are on Simulation Concept #{idx+1}: "{concept}"
 
-Your task: List the variables that are relevant to this concept. Clearly mark which variables will be held constant during our simulation and which ones we might change.
+Context:
+{context}
 
-Be concise and learner-friendly. Focus only on the most relevant variables for understanding the core concept."""
+Task:
+Respond with JSON ONLY: declare variables (independent/dependent/control) that matter to this concept, and a short prompt to the learner to confirm/ask questions.
+
+Keep it concise and age-appropriate.
+"""
 
     final_prompt = build_prompt_from_template(
         system_prompt=system_prompt,
         state=state,
-        include_last_message=True,  # Include student's latest response about the concept
-        include_instructions=False
+        include_last_message=True,
+        include_instructions=True,
+        parser=sim_vars_parser,
     )
-    
-    resp = llm_with_history(state, final_prompt)
-    content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-    
-    add_ai_message_to_conversation(state, content)
-    
-    state["agent_output"] = content
+    raw = llm_with_history(state, final_prompt).content
+    json_text = extract_json_block(raw)
+    parsed: SimVarsResponse = sim_vars_parser.parse(json_text)
+
+    lines = ["Here are the variables we’ll use:"]
+    for v in parsed.variables:
+        note = f" — {v.note}" if v.note else ""
+        lines.append(f"- {v.name} ({v.role}){note}")
+    lines.append(parsed.prompt_to_learner)
+    msg = "\n".join(lines)
+
+    add_ai_message_to_conversation(state, msg)
+    state["agent_output"] = msg
     state["current_state"] = "SIM_ACTION"
     return state
 
 
 def sim_action_node(state: AgentState) -> AgentState:
-    """SIM_ACTION: State action to be performed (skeleton)."""
+    """
+    SIM_ACTION: Propose one concrete action to isolate the concept.
+    """
     idx = state.get("sim_current_idx", 0)
-    placeholder = f"[SIM_ACTION] (skeleton) Concept #{idx+1}: describe single, testable change."
-    add_ai_message_to_conversation(state, placeholder)
-    state["agent_output"] = placeholder
+    concepts = state.get("sim_concepts", [])
+    concept = concepts[idx] if concepts else f"Concept #{idx+1}"
+
+    context = json.dumps(SIM_MOVES["SIM_ACTION"], indent=2)
+    system_prompt = f"""Current node: SIM_ACTION (Single Manipulation)
+
+We are on Simulation Concept #{idx+1}: "{concept}"
+
+Context:
+{context}
+
+Task:
+Return JSON ONLY describing:
+- 'action': one specific manipulation on the independent variable
+- 'rationale': why this isolates the concept
+- 'prompt_to_learner': a quick check like "Shall we try this? (yes/no)"
+"""
+
+    final_prompt = build_prompt_from_template(
+        system_prompt=system_prompt,
+        state=state,
+        include_last_message=False,
+        include_instructions=True,
+        parser=sim_action_parser,
+    )
+    raw = llm_with_history(state, final_prompt).content
+    json_text = extract_json_block(raw)
+    parsed: SimActionResponse = sim_action_parser.parse(json_text)
+
+    msg = f"{parsed.action}\n\nWhy this works: {parsed.rationale}\n{parsed.prompt_to_learner}"
+    add_ai_message_to_conversation(state, msg)
+    state["agent_output"] = msg
     state["current_state"] = "SIM_EXPECT"
     return state
 
 
 def sim_expect_node(state: AgentState) -> AgentState:
-    """SIM_EXPECT: Ask expected outcome (skeleton)."""
+    """
+    SIM_EXPECT: Ask the learner’s prediction before executing.
+    """
     idx = state.get("sim_current_idx", 0)
-    placeholder = f"[SIM_EXPECT] (skeleton) Concept #{idx+1}: prompt prediction + why."
-    add_ai_message_to_conversation(state, placeholder)
-    state["agent_output"] = placeholder
+    concepts = state.get("sim_concepts", [])
+    concept = concepts[idx] if concepts else f"Concept #{idx+1}"
+
+    context = json.dumps(SIM_MOVES["SIM_EXPECT"], indent=2)
+    system_prompt = f"""Current node: SIM_EXPECT (Prediction)
+
+We are on Simulation Concept #{idx+1}: "{concept}"
+
+Context:
+{context}
+
+Task:
+Return JSON ONLY with:
+- 'question': the prediction prompt (direct and short)
+- 'hint': optional tiny nudge (or null)
+"""
+
+    final_prompt = build_prompt_from_template(
+        system_prompt=system_prompt,
+        state=state,
+        include_last_message=False,
+        include_instructions=True,
+        parser=sim_expect_parser,
+    )
+    raw = llm_with_history(state, final_prompt).content
+    json_text = extract_json_block(raw)
+    parsed: SimExpectResponse = sim_expect_parser.parse(json_text)
+
+    hint = f"\n(Hint: {parsed.hint})" if parsed.hint else ""
+    msg = f"{parsed.question}{hint}"
+    add_ai_message_to_conversation(state, msg)
+    state["agent_output"] = msg
     state["current_state"] = "SIM_EXECUTE"
     return state
 
 
 def sim_execute_node(state: AgentState) -> AgentState:
-    """SIM_EXECUTE: Execute action (skeleton)."""
+    """
+    SIM_EXECUTE: Narrate execution steps + what to watch.
+    """
     idx = state.get("sim_current_idx", 0)
-    placeholder = f"[SIM_EXECUTE] (skeleton) Concept #{idx+1}: perform action; show observable effect."
-    add_ai_message_to_conversation(state, placeholder)
-    state["agent_output"] = placeholder
+    concepts = state.get("sim_concepts", [])
+    concept = concepts[idx] if concepts else f"Concept #{idx+1}"
+
+    context = json.dumps(SIM_MOVES["SIM_EXECUTE"], indent=2)
+    system_prompt = f"""Current node: SIM_EXECUTE (Do the thing)
+
+We are on Simulation Concept #{idx+1}: "{concept}"
+
+Context:
+{context}
+
+Task:
+Return JSON ONLY with:
+- 'steps': list of short steps the simulation would do
+- 'what_to_watch': what visible/measureable change the learner should look for
+"""
+
+    final_prompt = build_prompt_from_template(
+        system_prompt=system_prompt,
+        state=state,
+        include_last_message=False,
+        include_instructions=True,
+        parser=sim_execute_parser,
+    )
+    raw = llm_with_history(state, final_prompt).content
+    json_text = extract_json_block(raw)
+    parsed: SimExecuteResponse = sim_execute_parser.parse(json_text)
+
+    msg = "Let’s execute:\n" + "\n".join([f"{i+1}. {s}" for i, s in enumerate(parsed.steps)]) + f"\n\nWatch for: {parsed.what_to_watch}"
+    add_ai_message_to_conversation(state, msg)
+    state["agent_output"] = msg
     state["current_state"] = "SIM_OBSERVE"
     return state
 
 
 def sim_observe_node(state: AgentState) -> AgentState:
-    """SIM_OBSERVE: Ask observations (skeleton)."""
+    """
+    SIM_OBSERVE: Ask for raw observations (no judging).
+    """
     idx = state.get("sim_current_idx", 0)
-    placeholder = f"[SIM_OBSERVE] (skeleton) Concept #{idx+1}: capture raw observations."
-    add_ai_message_to_conversation(state, placeholder)
-    state["agent_output"] = placeholder
+    concepts = state.get("sim_concepts", [])
+    concept = concepts[idx] if concepts else f"Concept #{idx+1}"
+
+    context = json.dumps(SIM_MOVES["SIM_OBSERVE"], indent=2)
+    system_prompt = f"""Current node: SIM_OBSERVE (What did you notice?)
+
+We are on Simulation Concept #{idx+1}: "{concept}"
+
+Context:
+{context}
+
+Task:
+Return JSON ONLY with:
+- 'observation_prompt': a short, neutral request for what the learner saw
+- 'expected_observations': 2–5 strings (internal guide, not printed verbatim later)
+"""
+
+    final_prompt = build_prompt_from_template(
+        system_prompt=system_prompt,
+        state=state,
+        include_last_message=True,
+        include_instructions=True,
+        parser=sim_observe_parser,
+    )
+    raw = llm_with_history(state, final_prompt).content
+    json_text = extract_json_block(raw)
+    parsed: SimObserveResponse = sim_observe_parser.parse(json_text)
+
+    add_ai_message_to_conversation(state, parsed.observation_prompt)
+    state["agent_output"] = parsed.observation_prompt
+    state["sim_expected_observations"] = parsed.expected_observations
     state["current_state"] = "SIM_INSIGHT"
     return state
 
 
 def sim_insight_node(state: AgentState) -> AgentState:
-    """SIM_INSIGHT: Mention insights (skeleton)."""
+    """
+    SIM_INSIGHT: Micro-explanation + compare to prediction.
+    (Graph will route to SIM_REFLECT next.)
+    """
     idx = state.get("sim_current_idx", 0)
-    placeholder = f"[SIM_INSIGHT] (skeleton) Concept #{idx+1}: map observations to principle; compare with prediction."
-    add_ai_message_to_conversation(state, placeholder)
-    state["agent_output"] = placeholder
-    state["current_state"] = "SIM_NEXT"
-    return state
+    concepts = state.get("sim_concepts", [])
+    concept = concepts[idx] if concepts else f"Concept #{idx+1}"
 
+    context = json.dumps(SIM_MOVES["SIM_INSIGHT"], indent=2)
+    system_prompt = f"""Current node: SIM_INSIGHT (Why did that happen?)
 
-def sim_next_concept_node(state: AgentState) -> AgentState:
-    """SIM_NEXT: Controller to move across concepts (skeleton)."""
-    total = state.get("sim_total_concepts", 3)
-    idx = state.get("sim_current_idx", 0)
+We are on Simulation Concept #{idx+1}: "{concept}"
 
-    if idx + 1 < total:
-        state["sim_current_idx"] = idx + 1
-        placeholder = f"[SIM_NEXT] (skeleton) Proceeding to Concept #{state['sim_current_idx']+1}."
-        add_ai_message_to_conversation(state, placeholder)
-        state["agent_output"] = placeholder
-        state["current_state"] = "SIM_VARS"
-        return state
+Context:
+{context}
 
-    placeholder = "[SIM_NEXT] (skeleton) All concepts done. Moving to Reflection."
-    add_ai_message_to_conversation(state, placeholder)
-    state["agent_output"] = placeholder
+Task:
+Return JSON ONLY with:
+- 'micro_explanation': ≤3 sentences connecting observation → principle
+- 'compared_to_prediction': 1 sentence linking to the learner’s prediction (agree or differ)
+"""
+
+    final_prompt = build_prompt_from_template(
+        system_prompt=system_prompt,
+        state=state,
+        include_last_message=True,
+        include_instructions=True,
+        parser=sim_insight_parser,
+    )
+    raw = llm_with_history(state, final_prompt).content
+    json_text = extract_json_block(raw)
+    parsed: SimInsightResponse = sim_insight_parser.parse(json_text)
+
+    msg = f"{parsed.micro_explanation}\n{parsed.compared_to_prediction}"
+    add_ai_message_to_conversation(state, msg)
+    state["agent_output"] = msg
+
+    # Next hop per your graph: SIM_REFLECT
     state["current_state"] = "SIM_REFLECT"
     return state
 
 
 def sim_reflection_node(state: AgentState) -> AgentState:
-    """SIM_REFLECT: Reflection & summary (skeleton)."""
-    placeholder = "[SIM_REFLECT] (skeleton) Reflection & summary across concepts."
-    add_ai_message_to_conversation(state, placeholder)
-    state["agent_output"] = placeholder
-    state["current_state"] = "END"
+    """
+    SIM_REFLECT: Short synthesis across sim concept(s).
+    Handover: set current_state="GE" (your graph edge already routes SIM_REFLECT → GE).
+    """
+    concept_list = state.get("sim_concepts", [])
+    list_str = "\n".join([f"- {c}" for c in concept_list]) if concept_list else "- (unavailable)"
+
+    context = json.dumps(SIM_MOVES["SIM_REFLECT"], indent=2)
+    system_prompt = f"""Current node: SIM_REFLECT (Synthesis)
+
+We covered:
+{list_str}
+
+Context:
+{context}
+
+Task:
+Return JSON ONLY with:
+- 'bullets': 2–5 concise takeaways across the simulation concept(s)
+- 'closing_prompt': a short reflective question to the learner
+"""
+
+    final_prompt = build_prompt_from_template(
+        system_prompt=system_prompt,
+        state=state,
+        include_last_message=False,
+        include_instructions=True,
+        parser=sim_reflect_parser,
+    )
+    raw = llm_with_history(state, final_prompt).content
+    json_text = extract_json_block(raw)
+    parsed: SimReflectResponse = sim_reflect_parser.parse(json_text)
+
+    msg = "Quick recap:\n" + "\n".join([f"• {b}" for b in parsed.bullets]) + f"\n\n{parsed.closing_prompt}"
+    add_ai_message_to_conversation(state, msg)
+    state["agent_output"] = msg
+
+    # Handover back to GE (your graph: SIM_REFLECT → GE)
+    state["current_state"] = "GE"
     return state

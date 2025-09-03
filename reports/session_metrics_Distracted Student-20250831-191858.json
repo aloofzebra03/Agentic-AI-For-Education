@@ -1,0 +1,21 @@
+{
+  "concepts_covered": [
+    "Simple pendulum",
+    "Gravity",
+    "Oscillation",
+    "Period (of a pendulum)",
+    "Relationship between string length and period"
+  ],
+  "num_concepts_covered": 5,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "Dull",
+  "user_interest_rating": 2.0,
+  "user_engagement_rating": 2.0,
+  "enjoyment_probability": 0.4,
+  "quiz_score": 80.0,
+  "error_handling_count": 8,
+  "adaptability": true,
+  "session_id": "Distracted Student-20250831-191858",
+  "total_interactions": 15,
+  "persona_name": "Distracted Student"
+}

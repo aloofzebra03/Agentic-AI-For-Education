@@ -53,6 +53,9 @@ class AgentState(TypedDict, total=False):
     _mh_tries: int
     _rlc_tries: int
     definition_echoed: bool
+    sim_concepts: List[str]
+    sim_total_concepts: int
+    sim_current_idx: int
     misconception_detected: bool
     retrieval_score: float
     transfer_success: bool
@@ -67,6 +70,9 @@ def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
     state.setdefault("messages", [])
     state.setdefault("last_user_msg", "")
     state.setdefault("current_state", "START")
+    state.setdefault("sim_concepts", [])
+    state.setdefault("sim_total_concepts", 0)
+    state.setdefault("sim_current_idx", 0)
     return state
 
 def _wrap(fn):
@@ -96,7 +102,7 @@ def _TC(s):    return _wrap(tc_node)(s)
 def _RLC(s):   return _wrap(rlc_node)(s)
 def _END(s):   return _wrap(end_node)(s)
 
-# ▶ NEW: Node wrappers (simulation)
+# NEW: Node wrappers (simulation)
 def _SIM_CC(s):       return _wrap(sim_concept_creator_node)(s)
 def _SIM_VARS(s):     return _wrap(sim_vars_node)(s)
 def _SIM_ACTION(s):   return _wrap(sim_action_node)(s)
@@ -104,7 +110,7 @@ def _SIM_EXPECT(s):   return _wrap(sim_expect_node)(s)
 def _SIM_EXECUTE(s):  return _wrap(sim_execute_node)(s)
 def _SIM_OBSERVE(s):  return _wrap(sim_observe_node)(s)
 def _SIM_INSIGHT(s):  return _wrap(sim_insight_node)(s)
-def _SIM_NEXT(s):     return _wrap(sim_next_concept_node)(s)
+# def _SIM_NEXT(s):     return _wrap(sim_next_concept_node)(s)
 def _SIM_REFLECT(s):  return _wrap(sim_reflection_node)(s)
 
 # -----------------------------------------------------------------------------
@@ -130,7 +136,7 @@ g.add_node("SIM_EXPECT", _SIM_EXPECT)
 g.add_node("SIM_EXECUTE", _SIM_EXECUTE)
 g.add_node("SIM_OBSERVE", _SIM_OBSERVE)
 g.add_node("SIM_INSIGHT", _SIM_INSIGHT)
-g.add_node("SIM_NEXT", _SIM_NEXT)
+# g.add_node("SIM_NEXT", _SIM_NEXT)
 g.add_node("SIM_REFLECT", _SIM_REFLECT)
 
 def _route(state: AgentState) -> str:
@@ -139,32 +145,31 @@ def _route(state: AgentState) -> str:
 g.add_edge(START, "INIT")
 g.add_edge("INIT", "START")
 
-# ⬇️ Changed: route from START conditionally to APK or SIM_CC (default still APK if your start node sets it)
-# g.add_conditional_edges("START", _route, {"APK": "APK", "SIM_CC": "SIM_CC"})
 g.add_edge("START","APK")
 # Core flow
-g.add_conditional_edges("APK", _route, {"APK": "APK", "CI": "CI","SIM_CC":"SIM_CC"})
-g.add_conditional_edges("CI",  _route, {"CI": "CI", "GE": "GE"})
-g.add_conditional_edges("GE",  _route, {"MH": "MH", "AR": "AR","GE": "GE"})
+g.add_conditional_edges("APK", _route, {"APK": "APK", "CI": "CI"})
+g.add_conditional_edges("CI",  _route, {"CI": "CI","SIM_CC":"SIM_CC"})
+g.add_conditional_edges("GE",  _route, {"MH": "MH", "AR": "AR","GE": "GE","SIM_VARS": "SIM_VARS"})
 g.add_edge("MH", "AR")
 g.add_conditional_edges("AR", _route, {"AR": "AR","TC": "TC"})
 g.add_conditional_edges("TC", _route, {"TC": "TC","RLC": "RLC"})
 g.add_conditional_edges("RLC", _route, {"RLC": "RLC","END": "END"})
 g.add_edge("END", END)
 
-# ▶ NEW: Simulation flow edges
-g.add_edge("SIM_CC", "SIM_VARS")
+#  NEW: Simulation flow edges
+g.add_conditional_edges("SIM_CC", _route, {"GE": "GE"})
+# g.add_edge("SIM_CC", "SIM_VARS")
 g.add_edge("SIM_VARS", "SIM_ACTION")
 g.add_edge("SIM_ACTION", "SIM_EXPECT")
 g.add_edge("SIM_EXPECT", "SIM_EXECUTE")
 g.add_edge("SIM_EXECUTE", "SIM_OBSERVE")
 g.add_edge("SIM_OBSERVE", "SIM_INSIGHT")
-g.add_edge("SIM_INSIGHT", "SIM_NEXT")
-g.add_conditional_edges("SIM_NEXT", _route, {
-    "SIM_VARS": "SIM_VARS",        # next concept loop
-    "SIM_REFLECT": "SIM_REFLECT"   # finish concepts
-})
-g.add_edge("SIM_REFLECT", "END")   # handoff to your existing END
+g.add_edge("SIM_INSIGHT", "SIM_REFLECT")
+# g.add_conditional_edges("SIM_NEXT", _route, {
+#     "SIM_VARS": "SIM_VARS",        # next concept loop
+#     "SIM_REFLECT": "SIM_REFLECT"   # finish concepts
+# })
+g.add_edge("SIM_REFLECT", "GE")   # handoff to your existing GE
 
 checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")
 # CHECKPOINTER = InMemorySaver()
@@ -178,7 +183,7 @@ def build_graph():
             # ▶ NEW: pause points for simulation path
             "SIM_CC", "SIM_VARS", "SIM_ACTION", "SIM_EXPECT",
             "SIM_EXECUTE", "SIM_OBSERVE", "SIM_INSIGHT",
-            "SIM_NEXT", "SIM_REFLECT",
+            "SIM_REFLECT",
         ],
     )
     return compiled
