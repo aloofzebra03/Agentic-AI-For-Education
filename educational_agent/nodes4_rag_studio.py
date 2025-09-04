@@ -12,6 +12,7 @@ from educational_agent.shared_utils import (
     extract_json_block,
     get_llm,
     add_ai_message_to_conversation,
+    add_system_message_to_conversation,
     llm_with_history,
     build_conversation_history,
     build_prompt_from_template,
@@ -119,8 +120,8 @@ def start_node(state: AgentState) -> AgentState:
     # Apply JSON extraction in case LLM wraps response in markdown
     content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
     
-    # Add AI message to conversation after successful processing
-    add_ai_message_to_conversation(state, content)
+    # Add System message to conversation after successful processing (for start node)
+    add_system_message_to_conversation(state, content)
     
     # 🔍 START NODE - CONTENT PROCESSING 🔍
     print("=" * 80)

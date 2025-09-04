@@ -10,7 +10,7 @@ import re
 from typing import Dict, Optional, Any
 import dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_core.prompts import PromptTemplate
 from educational_agent.config_rag import concept_pkg
 from educational_agent.Creating_Section_Text.retriever import retrieve_docs
@@ -96,6 +96,12 @@ def add_ai_message_to_conversation(state: AgentState, content: str):
     print(f"📝 Added AI message to conversation: {content[:50]}...")
 
 
+def add_system_message_to_conversation(state: AgentState, content: str):
+    """Add System message to conversation after successful processing."""
+    state["messages"].append(SystemMessage(content=content))
+    print(f"📝 Added System message to conversation: {content[:50]}...")
+
+
 def llm_with_history(state: AgentState, final_prompt: str):
     """Invoke LLM with history context and return response."""
     # 🔍 LLM INVOCATION - INPUT 🔍
@@ -135,6 +141,8 @@ def build_conversation_history(state: AgentState) -> str:
             history_text += f"Student: {msg.content}\n"
         elif isinstance(msg, AIMessage):
             history_text += f"Agent: {msg.content}\n"
+        elif isinstance(msg, SystemMessage):
+            history_text += f"System: {msg.content}\n"
     
     return history_text.strip()
 
