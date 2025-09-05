@@ -164,7 +164,7 @@ def initialize_agent():
     """Initialize the Educational Agent with Langfuse session tracking"""
     session_id = generate_session_id()
     agent = EducationalAgent(
-        session_label="streamlit-session",
+        session_label="streamlit-simulation-session",
         user_id="streamlit-user",
         persona_name="interactive-user"
     )
