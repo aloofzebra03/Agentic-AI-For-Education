@@ -1,7 +1,7 @@
 import json
 from typing import Literal, Optional, Dict
 
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 from langchain.output_parsers import PydanticOutputParser
 from educational_agent.config_rag import concept_pkg
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
@@ -62,28 +62,64 @@ class ApkResponse(BaseModel):
     next_state: Literal["CI", "APK"]
 
 class CiResponse(BaseModel):
-    feedback: str
+    feedback: str = Field(
+        ...,
+        description=(
+            "This feedback is directly injected into the conversation, so it must continue naturally from the previous messages. "
+            "You will be given the conversation history in the prompt; ensure your feedback maintains continuity and feels like a direct response to the student."
+        )
+    )
     next_state: Literal["GE", "CI"]
 
 class GeResponse(BaseModel):
-    feedback: str
+    feedback: str = Field(
+            ...,
+            description=(
+                "This feedback is directly injected into the conversation, so it must continue naturally from the previous messages. "
+                "You will be given the conversation history in the prompt; ensure your feedback maintains continuity and feels like a direct response to the student."
+            )
+        )
     next_state: Literal["MH", "AR"]
     correction: Optional[str] = None
 
 class MhResponse(BaseModel):
-    feedback: str
+    feedback: str = Field(
+        ...,
+        description=(
+            "This feedback is directly injected into the conversation, so it must continue naturally from the previous messages. "
+            "You will be given the conversation history in the prompt; ensure your feedback maintains continuity and feels like a direct response to the student."
+        )
+    )
     next_state: Literal["MH", "AR"]
 
 class ArResponse(BaseModel):
     score: float
-    feedback: str
+    feedback: str = Field(
+        ...,
+        description=(
+            "This feedback is directly injected into the conversation, so it must continue naturally from the previous messages. "
+            "You will be given the conversation history in the prompt; ensure your feedback maintains continuity and feels like a direct response to the student."
+        )
+    )
 
 class TcResponse(BaseModel):
     correct: bool
-    feedback: str
+    feedback: str = Field(
+        ...,
+        description=(
+            "This feedback is directly injected into the conversation, so it must continue naturally from the previous messages. "
+            "You will be given the conversation history in the prompt; ensure your feedback maintains continuity and feels like a direct response to the student."
+        )
+    )
 
 class RlcResponse(BaseModel):
-    feedback: str
+    feedback: str = Field(
+        ...,
+        description=(
+            "This feedback is directly injected into the conversation, so it must continue naturally from the previous messages. "
+            "You will be given the conversation history in the prompt; ensure your feedback maintains continuity and feels like a direct response to the student."
+        )
+    )
     next_state: Literal["RLC", "END"]
 
 # ─── Parsers ───────────────────────────────────────────────────────────────────
@@ -115,7 +151,7 @@ def start_node(state: AgentState) -> AgentState:
         include_instructions=False
     )
     
-    print("IN START NODE")
+    # print("IN START NODE")
     resp = llm_with_history(state, final_prompt)
     # Apply JSON extraction in case LLM wraps response in markdown
     content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
