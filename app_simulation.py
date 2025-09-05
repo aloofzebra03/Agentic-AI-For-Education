@@ -171,7 +171,7 @@ def initialize_agent():
     return agent, session_id
 
 if "session_started" not in st.session_state:
-    st.title("🧑‍🎓 Interactive Educational Agent")
+    st.title("🧑‍🎓 Interactive Simulation Educational Agent")
     st.info(f"Welcome! Ready to learn about **{concept_pkg.title}**? Click 'Start Learning' to begin your personalized learning session.")
     
     if st.button("🚀 Start Learning", type="primary"):
