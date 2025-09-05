@@ -169,8 +169,8 @@ g.add_edge("SIM_OBSERVE", "SIM_INSIGHT")
 g.add_edge("SIM_INSIGHT", "SIM_REFLECT")
 g.add_edge("SIM_REFLECT", "AR")   # After simulation, go to AR to ask question about the concept
 
-# checkpointer = InMemorySaver()
-checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")
+checkpointer = InMemorySaver()
+# checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")
 
 def build_graph():
     compiled = g.compile(

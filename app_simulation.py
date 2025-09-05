@@ -10,7 +10,7 @@ import time
 import soundfile as sf
 from pedalboard import Pedalboard, Resample
 import sys
-import pysqlite3
+# import pysqlite3
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -20,7 +20,7 @@ from audio_recorder_streamlit import audio_recorder
 # Import gTTS for text-to-speech
 from gtts import gTTS
 
-sys.modules["sqlite3"] = pysqlite3
+# sys.modules["sqlite3"] = pysqlite3
 
 if st.button('Clear Resource Cache'):
     st.cache_resource.clear()
@@ -219,11 +219,12 @@ if st.session_state.get("processing_request"):
             st.error(f"An error occurred: {e}")
             agent_reply = "I encountered an error. Please try again."
             st.session_state.messages.append(("assistant", agent_reply))
+            st.stop()
     
     st.rerun()
 
 # ── Main Application Logic & UI Display ──────────────────────────────────
-st.title("🧑‍🎓 Interactive Educational Agent")
+st.title("🧑‍🎓 Interactive Simulation Educational Agent")
 
 # Display session info in sidebar
 with st.sidebar:
