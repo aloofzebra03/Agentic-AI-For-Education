@@ -15,6 +15,63 @@ from educational_agent.shared_utils import (
 )
 
 # ─────────────────────────────────────────────────────────────────────
+# Simulation configuration helpers
+# ─────────────────────────────────────────────────────────────────────
+
+def create_simulation_config(variables: List, concept: str, action_config: Dict) -> Dict:
+    """
+    Create simulation configuration based on variables and action.
+    Maps physics concepts to pendulum parameters.
+    """
+    # Default parameters
+    base_params = {"length": 1.0, "gravity": 9.8, "amplitude": 30}
+    
+    # Extract independent variable that's being changed
+    independent_var = None
+    for var in variables:
+        if var.role == "independent":
+            independent_var = var.name.lower()
+            break
+    
+    if not independent_var:
+        raise ValueError(f"No independent variable found for concept: {concept}")
+    
+    # Map concept variables to simulation parameters
+    if "length" in independent_var or "length" in concept.lower():
+        return {
+            "concept": concept,
+            "parameter_name": "length",
+            "before_params": {**base_params, "length": 1.0},
+            "after_params": {**base_params, "length": 2.0},
+            "action_description": "increasing the pendulum length from 1.0m to 2.0m",
+            "timing": {"before_duration": 3, "transition_duration": 2, "after_duration": 3},
+            "agent_message": "Watch how the period changes as I increase the length..."
+        }
+    elif "gravity" in independent_var or "gravity" in concept.lower():
+        return {
+            "concept": concept,
+            "parameter_name": "gravity",
+            "before_params": {**base_params, "gravity": 9.8},
+            "after_params": {**base_params, "gravity": 1.6},  # Moon gravity
+            "action_description": "changing gravity from Earth (9.8 m/s²) to Moon (1.6 m/s²)",
+            "timing": {"before_duration": 3, "transition_duration": 2, "after_duration": 3},
+            "agent_message": "Watch how the period changes with reduced gravity..."
+        }
+    elif "amplitude" in independent_var or "angle" in independent_var:
+        return {
+            "concept": concept,
+            "parameter_name": "amplitude",
+            "before_params": {**base_params, "amplitude": 15},
+            "after_params": {**base_params, "amplitude": 60},
+            "action_description": "increasing the starting angle from 15° to 60°",
+            "timing": {"before_duration": 3, "transition_duration": 1, "after_duration": 3},
+            "agent_message": "Watch how the period changes with larger swing angles..."
+        }
+    else:
+        raise ValueError(f"Unknown parameter for simulation: {independent_var}")
+
+
+# ─────────────────────────────────────────────────────────────────────
 # Simulation moves
 # ─────────────────────────────────────────────────────────────────────
 
@@ -188,6 +245,9 @@ Keep it concise and age-appropriate.
     lines.append(parsed.prompt_to_learner)
     msg = "\n".join(lines)
 
+    # Store variables for later use in simulation
+    state["sim_variables"] = parsed.variables
+
     add_ai_message_to_conversation(state, msg)
     state["agent_output"] = msg
     state["current_state"] = "SIM_ACTION"
@@ -229,6 +289,14 @@ Return JSON ONLY describing:
     parsed: SimActionResponse = sim_action_parser.parse(json_text)
 
     msg = f"{parsed.action}\n\nWhy this works: {parsed.rationale}\n{parsed.prompt_to_learner}"
+    
+    # Store action configuration for simulation
+    state["sim_action_config"] = {
+        "action": parsed.action,
+        "rationale": parsed.rationale,
+        "prompt": parsed.prompt_to_learner
+    }
+    
     add_ai_message_to_conversation(state, msg)
     state["agent_output"] = msg
     state["current_state"] = "SIM_EXPECT"
@@ -278,12 +346,38 @@ Return JSON ONLY with:
 
 def sim_execute_node(state: AgentState) -> AgentState:
     """
-    SIM_EXECUTE: Execute the simulation action.
+    SIM_EXECUTE: Execute the simulation action with visual demonstration.
+    Creates simulation config and sets flags for Streamlit to display the pendulum simulation.
     """
-    msg = "[SIM_EXECUTE] (skeleton) Let's execute the action steps; watch for observable effects. We are only testing and this feature is not available yet."
-    add_ai_message_to_conversation(state, msg)
-    state["agent_output"] = msg
-    state["current_state"] = "SIM_OBSERVE"
+    try:
+        # Get stored data from previous nodes
+        variables = state.get("sim_variables", [])
+        action_config = state.get("sim_action_config", {})
+        idx = state.get("sim_current_idx", 0)
+        concepts = state.get("sim_concepts", [])
+        current_concept = concepts[idx] if idx < len(concepts) else "Unknown concept"
+        
+        # Create simulation configuration
+        simulation_config = create_simulation_config(variables, current_concept, action_config)
+        
+        # Set flags for Streamlit to display simulation
+        state["show_simulation"] = True
+        state["simulation_config"] = simulation_config
+        
+        # Agent message
+        msg = f"Perfect! Let me demonstrate this concept with a simulation. {simulation_config['agent_message']}"
+        add_ai_message_to_conversation(state, msg)
+        state["agent_output"] = msg
+        state["current_state"] = "SIM_OBSERVE"
+        
+    except Exception as e:
+        # Error handling: stop simulation and provide fallback
+        error_msg = f"I encountered an issue setting up the simulation for this concept. Let me explain it differently: {str(e)}"
+        add_ai_message_to_conversation(state, error_msg)
+        state["agent_output"] = error_msg
+        state["show_simulation"] = False
+        state["current_state"] = "SIM_OBSERVE"
+    
     return state
 
 

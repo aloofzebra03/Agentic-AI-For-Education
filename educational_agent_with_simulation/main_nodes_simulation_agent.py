@@ -67,12 +67,12 @@ class CiResponse(BaseModel):
 
 class GeResponse(BaseModel):
     feedback: str
-    next_state: Literal["MH", "AR","SIM_VARS", "GE"]
+    next_state: Literal["MH", "AR", "GE"]
     correction: Optional[str] = None
 
 class MhResponse(BaseModel):
     feedback: str
-    next_state: Literal["MH", "GE"]
+    next_state: Literal["MH", "AR"]
 
 class ArResponse(BaseModel):
     score: float
@@ -473,7 +473,6 @@ Current status:
 Possible next_state values:
 - "MH": if you detect a misconception in the student's reasoning (must include a non-empty "correction" ≤2 sentences).
 - "AR": if the reasoning is correct and we should test this concept.
-- "SIM_VARS": if the learner remains unconvinced or confused and would benefit from a simulation for this concept.
 - "GE": if you need to ask another question about the same concept.
 
 Choose ONLY from these options
@@ -483,7 +482,7 @@ Pedagogical context:
 
 If the student's response indicates they don't know or are stuck after two attempts, provide the correct explanation in a concise manner and move on to the next state.
 
-Task: Detect misconception, correct reasoning, or need for simulation. RESPOND ONLY WITH JSON matching the schema above."""
+Task: Detect misconception, correct reasoning, or need for further exploration. RESPOND ONLY WITH JSON matching the schema above."""
 
     # Build final prompt using template with instructions at the end
     final_prompt = build_prompt_from_template(
@@ -605,7 +604,7 @@ Respond ONLY with a clear, conclusive message (not JSON - just the message text)
         print("=" * 80)
         
         state["agent_output"] = final_response
-        state["current_state"] = "GE"
+        state["current_state"] = "SIM_VARS"  # After max tries, show simulation to help convince student
         return state
     
     # Normal MH processing: evaluate student's response and decide next action
@@ -615,7 +614,7 @@ Respond ONLY with a clear, conclusive message (not JSON - just the message text)
     system_prompt = f"""Current node: MH (Misconception Handling)
 Possible next_state values:
 - "MH": if the student still has doubts, questions, or shows continued misconception (max 2 tries total).
-- "GE": if the student shows understanding or acceptance of the correction.
+- "AR": if the student shows understanding and acceptance of the correction.
 
 Pedagogical context:
 {context}
@@ -626,8 +625,8 @@ This is attempt {state["_mh_tries"]} of 2 for misconception handling.
 
 The student has received a correction for their misconception. Now they have responded. 
 Analyze their response:
-- If they seem to understand and accept the correction, go back to GE for further exploration
-- If they have more questions, doubts, or still show misconception, provide additional clarification and stay in MH
+- If they seem to understand and accept the correction, move to AR for assessment
+- If they still have questions, doubts, or show misconception, provide additional clarification and stay in MH
 - Be encouraging and supportive while addressing their concerns
 
 Task: Evaluate the student's response after receiving misconception correction. Respond ONLY with JSON matching the schema above."""

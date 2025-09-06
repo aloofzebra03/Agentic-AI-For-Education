@@ -63,6 +63,11 @@ class AgentState(TypedDict, total=False):
     last_correction: Optional[str]
     quiz_score: float
     session_summary: Dict[str, Any]
+    # NEW: Simulation-related state fields
+    sim_variables: List[Any]
+    sim_action_config: Dict[str, Any]
+    show_simulation: bool
+    simulation_config: Dict[str, Any]
 
 # -----------------------------------------------------------------------------
 # // 4. Initialize state and wrap helper
@@ -76,6 +81,11 @@ def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
     state.setdefault("sim_current_idx", 0)
     state.setdefault("concepts_completed", False)
     state.setdefault("in_simulation", False)
+    # NEW: Initialize simulation state
+    state.setdefault("sim_variables", [])
+    state.setdefault("sim_action_config", {})
+    state.setdefault("show_simulation", False)
+    state.setdefault("simulation_config", {})
     return state
 
 def _wrap(fn):
@@ -152,8 +162,8 @@ g.add_edge("START","APK")
 # Core flow
 g.add_conditional_edges("APK", _route, {"APK": "APK", "CI": "CI"})
 g.add_conditional_edges("CI",  _route, {"CI": "CI","SIM_CC":"SIM_CC"})
-g.add_conditional_edges("GE",  _route, {"MH": "MH", "AR": "AR","GE": "GE","SIM_VARS": "SIM_VARS"})
-g.add_conditional_edges("MH", _route,{"AR": "AR","GE": "GE"})
+g.add_conditional_edges("GE",  _route, {"MH": "MH", "AR": "AR","GE": "GE"})
+g.add_conditional_edges("MH", _route,{"SIM_VARS": "SIM_VARS", "AR": "AR"})
 g.add_conditional_edges("AR", _route, {"AR": "AR","TC": "TC", "GE": "GE"})
 g.add_conditional_edges("TC", _route, {"TC": "TC","RLC": "RLC"})
 g.add_conditional_edges("RLC", _route, {"RLC": "RLC","END": "END"})
@@ -174,7 +184,7 @@ checkpointer = InMemorySaver()
 
 def build_graph():
     compiled = g.compile(
-        checkpointer=checkpointer,
+        # checkpointer=checkpointer,
         # checkpointer=CHECKPOINTER,
         interrupt_after=[
             "START", "APK", "CI", "GE","MH", "AR", "TC", "RLC",
