@@ -184,7 +184,7 @@ checkpointer = InMemorySaver()
 
 def build_graph():
     compiled = g.compile(
-        # checkpointer=checkpointer,
+        checkpointer=checkpointer,
         # checkpointer=CHECKPOINTER,
         interrupt_after=[
             "START", "APK", "CI", "GE","MH", "AR", "TC", "RLC",
