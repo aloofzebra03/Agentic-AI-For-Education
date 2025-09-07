@@ -213,7 +213,7 @@ def main():
                 "before_params": {"length": 1.0, "gravity": 9.8, "amplitude": 30},
                 "after_params": {"length": 2.0, "gravity": 9.8, "amplitude": 30},
                 "action_description": "increasing the pendulum length from 1.0m to 2.0m",
-                "timing": {"before_duration": 8, "transition_duration": 3, "after_duration": 8},
+                "timing": {"before_duration": 8, "transition_duration": 0, "after_duration": 8},
                 "agent_message": "Watch how the period changes as I increase the length..."
             }
             
