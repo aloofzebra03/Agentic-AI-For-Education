@@ -67,8 +67,31 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "timing": {"before_duration": 3, "transition_duration": 1, "after_duration": 3},
             "agent_message": "Watch how the period changes with larger swing angles..."
         }
+    elif "mass" in independent_var or "bob" in independent_var:
+        # For pendulum physics, mass doesn't affect the period, but we can demonstrate this
+        return {
+            "concept": concept,
+            "parameter_name": "mass_demo",
+            "before_params": {**base_params, "amplitude": 30},
+            "after_params": {**base_params, "amplitude": 30},  # Same parameters to show no change
+            "action_description": "comparing pendulums with different bob masses (but same period)",
+            "timing": {"before_duration": 4, "transition_duration": 1, "after_duration": 4},
+            "agent_message": "Watch carefully - does changing the bob mass affect the period? This is surprising!"
+        }
+    elif "frequency" in independent_var or "period" in independent_var:
+        # Demonstrate period/frequency by changing length
+        return {
+            "concept": concept,
+            "parameter_name": "length",
+            "before_params": {**base_params, "length": 0.5},
+            "after_params": {**base_params, "length": 2.0},
+            "action_description": "changing length to show how period and frequency are related",
+            "timing": {"before_duration": 3, "transition_duration": 2, "after_duration": 3},
+            "agent_message": "Watch how changing length affects both period and frequency..."
+        }
     else:
-        raise ValueError(f"Unknown parameter for simulation: {independent_var}")
+        # Default fallback - use length variation as a general demonstration
+        raise ValueError(f"Unrecognized independent variable '{independent_var}' for concept: {concept}")
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -190,7 +213,7 @@ Guidelines:
     # Save & speak
     state["sim_concepts"] = parsed.concepts
     state["sim_total_concepts"] = len(parsed.concepts)
-    state["sim_current_idx"] = 0
+    state["sim_current_idx"] = 0 # We start with the first concept
 
     speak = (
         "We'll explore these concepts one by one:\n"
@@ -503,6 +526,7 @@ Return JSON ONLY with:
     state["agent_output"] = msg
 
     # Handover to AR to ask a question about this concept
+    # AR will handle concept progression and move to next concept via GE
     state["current_state"] = "AR"
     state["_asked_ar"] = False  # Reset AR flag for this concept
     return state

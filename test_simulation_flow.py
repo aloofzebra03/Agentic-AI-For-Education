@@ -216,8 +216,18 @@ def main():
             # Display simulation concepts if available
             if state.get("sim_concepts"):
                 st.write("**Simulation Concepts:**")
+                current_idx = state.get("sim_current_idx", 0)
+                total_concepts = len(state["sim_concepts"])
+                
                 for i, concept in enumerate(state["sim_concepts"]):
-                    st.write(f"  {i+1}. {concept}")
+                    if i == current_idx:
+                        st.write(f"  ➡️ **{i+1}. {concept}** (Current)")
+                    elif i < current_idx:
+                        st.write(f"  ✅ {i+1}. {concept} (Completed)")
+                    else:
+                        st.write(f"  ⏳ {i+1}. {concept} (Pending)")
+                
+                st.write(f"**Progress: {current_idx + 1}/{total_concepts} concepts**")
             
             # Display simulation variables if available
             if state.get("sim_variables"):
@@ -234,7 +244,23 @@ def main():
         
         # Check if we should display simulation
         if st.session_state.simulation_state.get("show_simulation", False):
-            display_simulation_if_needed(st.session_state.simulation_state)
+            # Create a custom display function for test environment
+            simulation_config = st.session_state.simulation_state.get("simulation_config")
+            if simulation_config:
+                try:
+                    from app_simulation import create_pendulum_simulation_html
+                    import streamlit.components.v1 as components
+                    
+                    # Create and display the simulation
+                    simulation_html = create_pendulum_simulation_html(simulation_config)
+                    components.html(simulation_html, height=450)
+                    
+                    st.info("🔬 **Simulation running above** - Watch the pendulum carefully and notice what changes!")
+                    
+                except Exception as e:
+                    st.error(f"Error displaying simulation: {e}")
+            else:
+                st.warning("🔍 Simulation config not found - SIM_EXECUTE may have failed")
         else:
             st.info("🔍 Simulation will appear here when SIM_EXECUTE node sets show_simulation=True")
         

@@ -224,8 +224,18 @@ def main():
             # Concepts and variables
             if state.get("sim_concepts"):
                 st.write("**📝 Simulation Concepts:**")
+                current_idx = state.get("sim_current_idx", 0)
+                total_concepts = len(state["sim_concepts"])
+                
                 for i, concept in enumerate(state["sim_concepts"]):
-                    st.write(f"  {i+1}. {concept}")
+                    if i == current_idx:
+                        st.write(f"  ➡️ **{i+1}. {concept}** (Current)")
+                    elif i < current_idx:
+                        st.write(f"  ✅ {i+1}. {concept} (Completed)")
+                    else:
+                        st.write(f"  ⏳ {i+1}. {concept} (Pending)")
+                
+                st.write(f"**Progress: {current_idx + 1}/{total_concepts} concepts**")
             
             if state.get("sim_variables"):
                 st.write("**🔧 Simulation Variables:**")
@@ -254,7 +264,18 @@ def main():
         if st.session_state.test_state.get("show_simulation", False):
             st.success("🎉 Simulation is ready to display!")
             try:
-                display_simulation_if_needed(st.session_state.test_state)
+                simulation_config = st.session_state.test_state.get("simulation_config")
+                if simulation_config:
+                    from app_simulation import create_pendulum_simulation_html
+                    import streamlit.components.v1 as components
+                    
+                    # Create and display the simulation
+                    simulation_html = create_pendulum_simulation_html(simulation_config)
+                    components.html(simulation_html, height=450)
+                    
+                    st.info("🔬 **Simulation running above** - Watch the pendulum carefully!")
+                else:
+                    st.error("Simulation config not found!")
             except Exception as e:
                 st.error(f"Error displaying simulation: {str(e)}")
         else:
