@@ -46,4 +46,8 @@ personas = [
             "I have to go to the bathroom.",
         ],
     ),
+    Persona(
+        name="Dull Student",
+        description=""
+    )
 ]
