@@ -44,7 +44,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "before_params": {**base_params, "length": 1.0},
             "after_params": {**base_params, "length": 2.0},
             "action_description": "increasing the pendulum length from 1.0m to 2.0m",
-            "timing": {"before_duration": 3, "transition_duration": 2, "after_duration": 3},
+            "timing": {"before_duration": 8, "transition_duration": 3, "after_duration": 8},
             "agent_message": "Watch how the period changes as I increase the length..."
         }
     elif "gravity" in independent_var or "gravity" in concept.lower():
@@ -54,7 +54,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "before_params": {**base_params, "gravity": 9.8},
             "after_params": {**base_params, "gravity": 1.6},  # Moon gravity
             "action_description": "changing gravity from Earth (9.8 m/s²) to Moon (1.6 m/s²)",
-            "timing": {"before_duration": 3, "transition_duration": 2, "after_duration": 3},
+            "timing": {"before_duration": 8, "transition_duration": 3, "after_duration": 8},
             "agent_message": "Watch how the period changes with reduced gravity..."
         }
     elif "amplitude" in independent_var or "angle" in independent_var:
@@ -64,7 +64,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "before_params": {**base_params, "amplitude": 15},
             "after_params": {**base_params, "amplitude": 60},
             "action_description": "increasing the starting angle from 15° to 60°",
-            "timing": {"before_duration": 3, "transition_duration": 1, "after_duration": 3},
+            "timing": {"before_duration": 6, "transition_duration": 2, "after_duration": 6},
             "agent_message": "Watch how the period changes with larger swing angles..."
         }
     elif "mass" in independent_var or "bob" in independent_var:
@@ -75,7 +75,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "before_params": {**base_params, "amplitude": 30},
             "after_params": {**base_params, "amplitude": 30},  # Same parameters to show no change
             "action_description": "comparing pendulums with different bob masses (but same period)",
-            "timing": {"before_duration": 4, "transition_duration": 1, "after_duration": 4},
+            "timing": {"before_duration": 10, "transition_duration": 2, "after_duration": 10},
             "agent_message": "Watch carefully - does changing the bob mass affect the period? This is surprising!"
         }
     elif "frequency" in independent_var or "period" in independent_var:
@@ -86,7 +86,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "before_params": {**base_params, "length": 0.5},
             "after_params": {**base_params, "length": 2.0},
             "action_description": "changing length to show how period and frequency are related",
-            "timing": {"before_duration": 3, "transition_duration": 2, "after_duration": 3},
+            "timing": {"before_duration": 7, "transition_duration": 3, "after_duration": 7},
             "agent_message": "Watch how changing length affects both period and frequency..."
         }
     else:
