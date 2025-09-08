@@ -52,10 +52,10 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "concept": concept,
             "parameter_name": "gravity",
             "before_params": {**base_params, "gravity": 9.8},
-            "after_params": {**base_params, "gravity": 1.6},  # Moon gravity
-            "action_description": "changing gravity from Earth (9.8 m/s²) to Moon (1.6 m/s²)",
+            "after_params": {**base_params, "gravity": 50.0},  # High gravity demonstration
+            "action_description": "changing gravity from Earth (9.8 m/s²) to high gravity (50 m/s²)",
             "timing": {"before_duration": 8, "transition_duration": 3, "after_duration": 8},
-            "agent_message": "Watch how the period changes with reduced gravity..."
+            "agent_message": "Watch how the period changes with increased gravity..."
         }
     elif "amplitude" in independent_var or "angle" in independent_var:
         return {

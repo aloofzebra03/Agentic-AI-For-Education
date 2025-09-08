@@ -23,40 +23,85 @@ except ImportError as e:
     st.error(f"Import error: {e}")
     IMPORTS_SUCCESS = False
 
-def create_hardcoded_state() -> Dict[str, Any]:
-    """Create hardcoded state for testing SIM_EXECUTE node with length parameter"""
+def create_hardcoded_state(test_concept: str = "gravity") -> Dict[str, Any]:
+    """Create hardcoded state for testing SIM_EXECUTE node with different physics concepts"""
     
-    # Simulate a SimVariable object for length
+    # Simulate a SimVariable object
     class MockSimVariable:
         def __init__(self, name, role, note=None):
             self.name = name
             self.role = role
             self.note = note
     
+    # Define different test scenarios
+    test_configs = {
+        "gravity": {
+            "concept": "pendulum gravity effect on period",
+            "last_user_msg": "I don't understand pendulum gravity effect",
+            "variables": [
+                MockSimVariable("gravity", "independent", "What we will change"),
+                MockSimVariable("period", "dependent", "What we will observe"),
+                MockSimVariable("pendulum length", "control", "Kept constant at 1m"),
+                MockSimVariable("amplitude", "control", "Kept constant at 30°")
+            ],
+            "action": "change pendulum gravity to see period effect"
+        },
+        "length": {
+            "concept": "pendulum length effect on period", 
+            "last_user_msg": "I don't understand pendulum length effect",
+            "variables": [
+                MockSimVariable("pendulum length", "independent", "What we will change"),
+                MockSimVariable("period", "dependent", "What we will observe"),
+                MockSimVariable("gravity", "control", "Kept constant at 9.8 m/s²"),
+                MockSimVariable("amplitude", "control", "Kept constant at 30°")
+            ],
+            "action": "change pendulum length to see period effect"
+        },
+        "amplitude": {
+            "concept": "amplitude effect on period",
+            "last_user_msg": "I don't understand amplitude effect", 
+            "variables": [
+                MockSimVariable("amplitude", "independent", "What we will change"),
+                MockSimVariable("period", "dependent", "What we will observe"),
+                MockSimVariable("pendulum length", "control", "Kept constant at 1m"),
+                MockSimVariable("gravity", "control", "Kept constant at 9.8 m/s²")
+            ],
+            "action": "change starting amplitude to see period effect"
+        },
+        "mass": {
+            "concept": "mass independence in pendulum motion",
+            "last_user_msg": "I don't understand why mass doesn't affect period",
+            "variables": [
+                MockSimVariable("bob mass", "independent", "What we will change"),
+                MockSimVariable("period", "dependent", "What we will observe"),
+                MockSimVariable("pendulum length", "control", "Kept constant at 1m"),
+                MockSimVariable("gravity", "control", "Kept constant at 9.8 m/s²")
+            ],
+            "action": "change bob mass to show period independence"
+        }
+    }
+    
+    config = test_configs.get(test_concept, test_configs["gravity"])
+    
     return {
         # Basic state
         "messages": [],
         "current_state": "SIM_EXECUTE",
-        "last_user_msg": "I don't understand pendulum length effect",
+        "last_user_msg": config["last_user_msg"],
         "agent_output": "",
         
         # Simulation concepts (from SIM_CC)
-        "sim_concepts": ["pendulum length effect on period"],
+        "sim_concepts": [config["concept"]],
         "sim_total_concepts": 1,
         "sim_current_idx": 0,
+
+        # Variables (from SIM_VARS) - dynamically set based on test_concept
+        "sim_variables": config["variables"],
         
-        # Variables (from SIM_VARS) - focusing on length
-        "sim_variables": [
-            MockSimVariable("pendulum length", "independent", "What we will change"),
-            MockSimVariable("period", "dependent", "What we will observe"),
-            MockSimVariable("gravity", "control", "Kept constant at 9.8 m/s²"),
-            MockSimVariable("amplitude", "control", "Kept constant at 30°")
-        ],
-        
-        # Action config (from SIM_ACTION)
+        # Action config (from SIM_ACTION) - simplified
         "sim_action_config": {
-            "action": "increase pendulum length from 1.0m to 2.0m",
-            "rationale": "this isolates the length effect on period",
+            "action": config["action"],
+            "rationale": f"this isolates the {test_concept} effect on period",
             "prompt": "Shall we try this demonstration?"
         },
         
@@ -65,6 +110,9 @@ def create_hardcoded_state() -> Dict[str, Any]:
         "simulation_config": {},
         "in_simulation": True,
         "misconception_detected": True,
+        
+        # Execute config - will be populated by create_simulation_config() in main simulation
+        "sim_execute_config": None,
         
         # Other required state
         "_asked_mh": True,
@@ -136,10 +184,28 @@ def main():
         st.error("❌ Could not import required modules. Please check your environment.")
         return
     
+    # Concept selection
+    st.subheader("🔬 Select Physics Concept to Test")
+    test_concept = st.selectbox(
+        "Choose which physics concept to test:",
+        options=["gravity", "length", "amplitude", "mass"],
+        index=0,  # Default to gravity
+        help="Each concept tests different pendulum parameters"
+    )
+    
+    # Show what this concept tests
+    concept_info = {
+        "gravity": "🌍 Tests how gravity affects pendulum period (9.8 → 50.0 m/s²)",
+        "length": "📏 Tests how length affects pendulum period (1.0 → 2.0 m)", 
+        "amplitude": "📐 Tests how amplitude affects pendulum period (30° → 60°)",
+        "mass": "⚖️ Tests mass independence in pendulum motion (1.0 → 5.0 kg)"
+    }
+    st.info(concept_info[test_concept])
+    
     # Initialize test state
     if st.button("🔧 Initialize Hardcoded State"):
-        st.session_state.test_state = create_hardcoded_state()
-        st.success("✅ Hardcoded state initialized!")
+        st.session_state.test_state = create_hardcoded_state(test_concept)
+        st.success(f"✅ Hardcoded state initialized for {test_concept} concept!")
         st.json(st.session_state.test_state)
     
     if hasattr(st.session_state, 'test_state'):
@@ -202,25 +268,6 @@ def main():
             test_html_rendering(simulation_config)
         else:
             st.info("🔍 Execute SIM_EXECUTE node first to trigger simulation rendering")
-        
-        # Manual HTML test
-        st.subheader("🔬 Manual HTML Test")
-        if st.button("🧪 Test HTML with Manual Config"):
-            # Create a simple manual config for testing
-            manual_config = {
-                "concept": "pendulum length effect",
-                "parameter_name": "length", 
-                "before_params": {"length": 1.0, "gravity": 9.8, "amplitude": 30},
-                "after_params": {"length": 2.0, "gravity": 9.8, "amplitude": 30},
-                "action_description": "increasing the pendulum length from 1.0m to 2.0m",
-                "timing": {"before_duration": 8, "transition_duration": 0, "after_duration": 8},
-                "agent_message": "Watch how the period changes as I increase the length..."
-            }
-            
-            st.write("**Manual Config:**")
-            st.json(manual_config)
-            
-            test_html_rendering(manual_config)
     
     else:
         st.info("👆 Click 'Initialize Hardcoded State' to begin testing")

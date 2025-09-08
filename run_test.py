@@ -3,7 +3,7 @@ import json
 import time
 from pprint import pprint
 
-from educational_agent.agent import EducationalAgent
+from educational_agent_with_simulation.agent import EducationalAgent
 from tester_agent.tester import TesterAgent
 from tester_agent.evaluator import Evaluator
 from tester_agent.personas import personas

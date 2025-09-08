@@ -48,6 +48,15 @@ personas = [
     ),
     Persona(
         name="Dull Student",
-        description=""
+        description="A student that is not very bright.",
+        sample_phrases=[
+            "I don't get it.",
+            "Can you explain that again?",
+            "I'm not sure I understand.",
+            "This is too hard for me.",
+            "I think I need more help.",
+            "I'm just not good at this.",
+            "Why is this important?"
+        ]
     )
 ]
