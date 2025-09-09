@@ -383,9 +383,10 @@ def sim_execute_node(state: AgentState) -> AgentState:
         # Create simulation configuration
         simulation_config = create_simulation_config(variables, current_concept, action_config)
         
-        # Set flags for Streamlit to display simulation
+        # Set flags for Streamlit to display simulation - but mark that it's active
         state["show_simulation"] = True
         state["simulation_config"] = simulation_config
+        state["simulation_active"] = True  # New flag to track simulation lifecycle
         
         # Agent message
         msg = f"Perfect! Let me demonstrate this concept with a simulation. {simulation_config['agent_message']}"
@@ -399,6 +400,7 @@ def sim_execute_node(state: AgentState) -> AgentState:
         add_ai_message_to_conversation(state, error_msg)
         state["agent_output"] = error_msg
         state["show_simulation"] = False
+        state["simulation_active"] = False
         state["current_state"] = "SIM_OBSERVE"
     
     return state
@@ -525,6 +527,11 @@ Return JSON ONLY with:
     add_ai_message_to_conversation(state, msg)
     state["agent_output"] = msg
 
+    # IMPORTANT: Reset simulation flags since simulation cycle is complete
+    state["show_simulation"] = False
+    state["simulation_active"] = False
+    state["simulation_config"] = {}
+    
     # Handover to AR to ask a question about this concept
     # AR will handle concept progression and move to next concept via GE
     state["current_state"] = "AR"

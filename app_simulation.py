@@ -351,9 +351,11 @@ def create_pendulum_simulation_html(config):
 def display_simulation_if_needed():
     """
     Check if simulation should be displayed and render it.
+    Only displays if simulation is active and hasn't been shown for this cycle.
     """
     if (hasattr(st.session_state, 'agent') and 
-        st.session_state.agent.state.get("show_simulation")):
+        st.session_state.agent.state.get("show_simulation") and
+        st.session_state.agent.state.get("simulation_active", False)):
         
         simulation_config = st.session_state.agent.state.get("simulation_config")
         
@@ -366,11 +368,15 @@ def display_simulation_if_needed():
                 # Add a brief pause instruction
                 st.info("🔬 **Simulation running above** - Watch the pendulum carefully and notice what changes!")
                 
+                # Mark simulation as displayed but keep it available for this cycle
+                # We don't reset show_simulation here - let the nodes manage the lifecycle
+                
             except Exception as e:
                 st.error(f"Error displaying simulation: {e}")
-                
-        # Clear the simulation flag after displaying
-        st.session_state.agent.state["show_simulation"] = False
+                # Clear flags on error
+                st.session_state.agent.state["show_simulation"] = False
+                st.session_state.agent.state["simulation_active"] = False
+                st.stop()
 
 # ── Streamlit Page Configuration & State Initialization ──────────────────
 st.set_page_config(page_title="Interactive Educational Agent", page_icon="🤖")

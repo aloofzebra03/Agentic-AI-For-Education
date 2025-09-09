@@ -8,6 +8,7 @@ from tester_agent.tester import TesterAgent
 from tester_agent.evaluator import Evaluator
 from tester_agent.personas import personas
 from tester_agent.session_metrics import compute_and_upload_session_metrics
+from tester_agent.simulation_descriptor import format_simulation_context_for_tester
 from dotenv import load_dotenv
 
 load_dotenv(dotenv_path = r"C:\Users\aryan\Desktop\Personalized_Education\Agentic-AI-For-Education\tester_agent\.env", override=True)
@@ -31,7 +32,31 @@ def run_test():
     # 4. Run Conversation Loop
     while educational_agent.current_state() != "END":
 
-        user_msg = tester_agent.respond(agent_msg)
+        # Check if there's a simulation to describe before getting tester response
+        agent_state = educational_agent.state
+        simulation_config = agent_state.get("simulation_config", {})
+        
+        if simulation_config:
+            # There's a simulation - get description and display it
+            simulation_description = format_simulation_context_for_tester(agent_state)
+            
+            print("\n" + "="*80)
+            print("🔬 SIMULATION DESCRIPTION FOR TESTER AGENT")
+            print("="*80)
+            print(simulation_description)
+            print("="*80 + "\n")
+                        
+            # Get tester response with simulation context
+            if hasattr(tester_agent, 'respond_with_simulation_context'):
+                user_msg = tester_agent.respond_with_simulation_context(agent_msg, simulation_description)
+            else:
+                # Fallback: add context to agent message for older tester agent versions
+                enhanced_agent_msg = f"{agent_msg}\n\n[SIMULATION CONTEXT: {simulation_description[:200]}...]"
+                user_msg = tester_agent.respond(enhanced_agent_msg)
+        else:
+            # No simulation - normal response
+            user_msg = tester_agent.respond(agent_msg)
+        
         print(f"Tester Agent ({persona.name}): {user_msg}")
         time.sleep(5)
         agent_msg = educational_agent.post(user_msg)

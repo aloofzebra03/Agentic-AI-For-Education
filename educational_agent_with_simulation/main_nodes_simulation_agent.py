@@ -411,6 +411,7 @@ def ge_node(state: AgentState) -> AgentState:
     
     if not state.get("_asked_ge", False):
         state["_asked_ge"] = True
+        state["_ge_tries"] = 0  # Initialize tries counter
         
         # Check if we have concepts to explore
         if concepts and current_idx < len(concepts):
@@ -424,13 +425,8 @@ def ge_node(state: AgentState) -> AgentState:
                 f"Generate one 'why' or 'how' question to explore the mechanism of this specific concept within '{concept_pkg.title}'."
             )
         else:
-            # No concepts yet, ask general question
-            gt = get_ground_truth(concept_pkg.title, "Details (facts, sub-concepts)")
-            system_prompt = (
-                f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
-                f"Ground truth (Details):\n{gt}\nGenerate one 'why' or 'how' question to explore the mechanism of '{concept_pkg.title}'."
-            )
-        
+            raise IndexError("No concepts available for exploration.")
+
         # Build final prompt using template
         final_prompt = build_prompt_from_template(
             system_prompt=system_prompt,
@@ -460,6 +456,47 @@ def ge_node(state: AgentState) -> AgentState:
         state["agent_output"] = content
         return state
 
+    # Handle tries for GE node - increment counter
+    state["_ge_tries"] = state.get("_ge_tries", 0) + 1
+    
+    # Check if we've reached max tries (1) - transition smoothly to MH
+    if state["_ge_tries"] >= 1:
+        # Let LLM generate a natural transition to MH with gentle correction
+        current_idx = state.get("sim_current_idx", 0)
+        concepts = state.get("sim_concepts", [])
+        
+        if concepts and current_idx < len(concepts):
+            current_concept = concepts[current_idx]
+            gt_context = get_ground_truth(concept_pkg.title, "Details (facts, sub-concepts)")
+            transition_prompt = f"""The student has tried once to explore concept '{current_concept}' within '{concept_pkg.title}'. 
+            
+Based on their response, provide a gentle clarification or correction to help them understand better. Use this ground truth as reference: {gt_context[:200]}...
+
+Keep your response conversational and supportive. Address any confusion while guiding them toward the correct understanding."""
+        else:
+            gt_context = get_ground_truth(concept_pkg.title, "Details (facts, sub-concepts)")
+            transition_prompt = f"""The student has tried once to explore '{concept_pkg.title}'. 
+            
+Based on their response, provide a gentle clarification or correction to help them understand better. Use this ground truth as reference: {gt_context[:200]}...
+
+Keep your response conversational and supportive. Address any confusion while guiding them toward the correct understanding."""
+        
+        final_prompt = build_prompt_from_template(
+            system_prompt=transition_prompt,
+            state=state,
+            include_last_message=True,
+            include_instructions=False
+        )
+        
+        resp = llm_with_history(state, final_prompt)
+        content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+        
+        add_ai_message_to_conversation(state, content)
+        state["agent_output"] = content
+        state["last_correction"] = content  # Store for MH node
+        state["current_state"] = "MH"  # Transition to MH for proper misconception handling
+        return state
+
     context = json.dumps(PEDAGOGICAL_MOVES["GE"], indent=2)
     current_idx = state.get("sim_current_idx", 0)
     concepts = state.get("sim_concepts", [])
@@ -479,8 +516,6 @@ Choose ONLY from these options
 
 Pedagogical context:
 {context}
-
-If the student's response indicates they don't know or are stuck after two attempts, provide the correct explanation in a concise manner and move on to the next state.
 
 Task: Detect misconception, correct reasoning, or need for further exploration. RESPOND ONLY WITH JSON matching the schema above."""
 
@@ -518,7 +553,8 @@ Task: Detect misconception, correct reasoning, or need for further exploration. 
             state["in_simulation"] = True
         
         state["agent_output"] = parsed.feedback
-        state["current_state"] = parsed.next_state
+        # state["current_state"] = parsed.next_state
+        state["current_state"] = 'MH'
     except Exception as e:
         print(f"Error parsing GE response: {e}")
         print(f"Raw response: {raw}")
@@ -659,7 +695,8 @@ Task: Evaluate the student's response after receiving misconception correction. 
         print("=" * 80)
         
         state["agent_output"] = parsed.feedback
-        state["current_state"] = parsed.next_state
+        # state["current_state"] = parsed.next_state
+        state["current_state"] = "SIM_VARS"
     except Exception as e:
         print(f"Error parsing MH response: {e}")
         print(f"Raw response: {raw}")
@@ -944,6 +981,12 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
     return state
 
 def rlc_node(state: AgentState) -> AgentState:
+    # Ensure simulation flags are properly reset when entering RLC
+    if state.get("simulation_active", False):
+        state["show_simulation"] = False
+        state["simulation_active"] = False
+        state["simulation_config"] = {}
+    
     if not state.get("_asked_rlc", False):
         state["_asked_rlc"] = True
         state["_rlc_tries"] = 0  # Initialize attempt counter

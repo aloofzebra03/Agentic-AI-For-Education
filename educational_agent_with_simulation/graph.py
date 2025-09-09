@@ -49,6 +49,7 @@ class AgentState(TypedDict, total=False):
     _asked_rlc: bool
     _apk_tries: int
     _ci_tries: int
+    _ge_tries: int
     _mh_tries: int
     _rlc_tries: int
     definition_echoed: bool
@@ -68,6 +69,7 @@ class AgentState(TypedDict, total=False):
     sim_action_config: Dict[str, Any]
     show_simulation: bool
     simulation_config: Dict[str, Any]
+    simulation_active: bool
 
 # -----------------------------------------------------------------------------
 # // 4. Initialize state and wrap helper
@@ -86,6 +88,7 @@ def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
     state.setdefault("sim_action_config", {})
     state.setdefault("show_simulation", False)
     state.setdefault("simulation_config", {})
+    state.setdefault("simulation_active", False)
     return state
 
 def _wrap(fn):
@@ -162,8 +165,10 @@ g.add_edge("START","APK")
 # Core flow
 g.add_conditional_edges("APK", _route, {"APK": "APK", "CI": "CI"})
 g.add_conditional_edges("CI",  _route, {"CI": "CI","SIM_CC":"SIM_CC"})
-g.add_conditional_edges("GE",  _route, {"MH": "MH", "AR": "AR","GE": "GE"})
-g.add_conditional_edges("MH", _route,{"MH": "MH", "SIM_VARS": "SIM_VARS", "AR": "AR"})
+# g.add_conditional_edges("GE",  _route, {"MH": "MH", "AR": "AR","GE": "GE"})
+g.add_conditional_edges("GE",  _route, {"MH": "MH", "GE": "GE"})
+# g.add_conditional_edges("MH", _route,{"MH": "MH", "SIM_VARS": "SIM_VARS", "AR": "AR"})
+g.add_conditional_edges("MH", _route,{"MH": "MH", "SIM_VARS": "SIM_VARS"})
 g.add_conditional_edges("AR", _route, {"AR": "AR","TC": "TC", "GE": "GE"})
 g.add_conditional_edges("TC", _route, {"TC": "TC","RLC": "RLC"})
 g.add_conditional_edges("RLC", _route, {"RLC": "RLC","END": "END"})
