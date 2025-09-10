@@ -1,7 +1,7 @@
 # simulation_nodes.py
 import json
 from typing import Dict, List, Literal, Optional
-from pydantic import BaseModel, Field, conlist
+from pydantic import BaseModel, Field
 from langchain.output_parsers import PydanticOutputParser
 from langchain_core.messages import HumanMessage, AIMessage
 
@@ -45,7 +45,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "after_params": {**base_params, "length": 2.0},
             "action_description": "increasing the pendulum length from 1.0m to 2.0m",
             "timing": {"before_duration": 8, "transition_duration": 3, "after_duration": 8},
-            "agent_message": "Watch how the period changes as I increase the length..."
+            "agent_message": "Watch how the period changes as I increase the length for you..."
         }
     elif "gravity" in independent_var or "gravity" in concept.lower():
         return {
@@ -55,7 +55,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "after_params": {**base_params, "gravity": 50.0},  # High gravity demonstration
             "action_description": "changing gravity from Earth (9.8 m/s²) to high gravity (50 m/s²)",
             "timing": {"before_duration": 8, "transition_duration": 3, "after_duration": 8},
-            "agent_message": "Watch how the period changes with increased gravity..."
+            "agent_message": "Watch carefully as I change the gravity for you to see how the period changes..."
         }
     elif "amplitude" in independent_var or "angle" in independent_var:
         return {
@@ -65,7 +65,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "after_params": {**base_params, "amplitude": 60},
             "action_description": "increasing the starting angle from 15° to 60°",
             "timing": {"before_duration": 6, "transition_duration": 2, "after_duration": 6},
-            "agent_message": "Watch how the period changes with larger swing angles..."
+            "agent_message": "Watch closely as I increase the swing angle for you to see how the period changes..."
         }
     elif "mass" in independent_var or "bob" in independent_var:
         # For pendulum physics, mass doesn't affect the period, but we can demonstrate this
@@ -76,7 +76,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "after_params": {**base_params, "amplitude": 30},  # Same parameters to show no change
             "action_description": "comparing pendulums with different bob masses (but same period)",
             "timing": {"before_duration": 10, "transition_duration": 2, "after_duration": 10},
-            "agent_message": "Watch carefully - does changing the bob mass affect the period? This is surprising!"
+            "agent_message": "Watch this carefully! I'll show you how changing the bob mass affects the period - this might surprise you!"
         }
     elif "frequency" in independent_var or "period" in independent_var:
         # Demonstrate period/frequency by changing length
@@ -87,7 +87,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "after_params": {**base_params, "length": 2.0},
             "action_description": "changing length to show how period and frequency are related",
             "timing": {"before_duration": 7, "transition_duration": 3, "after_duration": 7},
-            "agent_message": "Watch how changing length affects both period and frequency..."
+            "agent_message": "I'll show you how changing length affects both period and frequency - watch this demonstration..."
         }
     else:
         # Default fallback - use length variation as a general demonstration
@@ -115,7 +115,7 @@ SIM_MOVES: Dict[str, Dict[str, str]] = {
 
 # SIM_CC: 1–5 concepts
 class SimConcepts(BaseModel):
-    concepts: conlist(str, min_length=1, max_length=5)
+    concepts: List[str] = Field(description="List of clear, testable concepts that can be demonstrated to the student", min_items=1, max_items=5)
 
 
 # SIM_VARS: declare variables
@@ -125,39 +125,39 @@ class SimVariable(BaseModel):
     note: Optional[str] = None
 
 class SimVarsResponse(BaseModel):
-    variables: conlist(SimVariable, min_length=2)
-    prompt_to_learner: str
+    variables: List[SimVariable] = Field(description="List of variables for the simulation", min_items=2)
+    prompt_to_learner: str = Field(description="Direct question or statement to the student. Use 'you' and address them personally. Avoid third-person references like 'the student'.")
 
 # SIM_ACTION
 class SimActionResponse(BaseModel):
-    action: str
-    rationale: str
-    prompt_to_learner: str
+    action: str = Field(description="Describe the action in clear terms that can be communicated directly to the student. Build on the variables just discussed.")
+    rationale: str = Field(description="Explain to the student why this action will help them understand the concept. Reference the variables they just learned about.")
+    prompt_to_learner: str = Field(description="Direct question to the student asking for their consent or engagement. Use 'you' and speak directly to them.")
 
 # SIM_EXPECT
 class SimExpectResponse(BaseModel):
-    question: str
-    hint: Optional[str] = None
+    question: str = Field(description="Direct question asking the student for their prediction about the proposed action. Use 'you' and 'your' - speak directly to the student.")
+    hint: Optional[str] = Field(default=None, description="Optional gentle hint for the student, phrased as if speaking directly to them")
 
 # SIM_EXECUTE
 class SimExecuteResponse(BaseModel):
-    steps: conlist(str, min_length=1)
-    what_to_watch: str
+    steps: List[str] = Field(description="List of steps describing what you are doing for the student to observe", min_items=1)
+    what_to_watch: str = Field(description="Tell the student directly what they should focus on watching during the simulation")
 
 # SIM_OBSERVE
 class SimObserveResponse(BaseModel):
-    observation_prompt: str
-    expected_observations: List[str]
+    observation_prompt: str = Field(description="Direct question asking the student what they observed. Use 'you' and speak directly to them.")
+    expected_observations: List[str] = Field(description="Internal list of what the student might observe - not shown verbatim to student")
 
 # SIM_INSIGHT
 class SimInsightResponse(BaseModel):
-    micro_explanation: str
-    compared_to_prediction: str
+    micro_explanation: str = Field(description="Explain to the student why they observed what they did. Speak directly to them using 'you' and 'your'.")
+    compared_to_prediction: str = Field(description="Connect directly with the student about their prediction using 'you' and 'your prediction'.")
 
 # SIM_REFLECT
 class SimReflectResponse(BaseModel):
-    bullets: conlist(str, min_length=2, max_length=5)
-    closing_prompt: str
+    bullets: List[str] = Field(description="Key takeaways phrased as if speaking directly to the student", min_items=2, max_items=5)
+    closing_prompt: str = Field(description="Reflective question for the student using direct address with 'you' and 'your'.")
 
 sim_cc_parser = PydanticOutputParser(pydantic_object=SimConcepts)
 sim_vars_parser = PydanticOutputParser(pydantic_object=SimVarsResponse)
@@ -185,6 +185,8 @@ def sim_concept_creator_node(state: AgentState) -> AgentState:
 
     context = json.dumps(SIM_MOVES["SIM_CC"], indent=2)
     system_prompt = f"""Current node: SIM_CC (Simulation Concept Creator)
+
+You are talking directly with a class 7 student. Remember to use direct communication.
 
 Concept in focus: "{concept_pkg.title}"
 
@@ -216,9 +218,9 @@ Guidelines:
     state["sim_current_idx"] = 0 # We start with the first concept
 
     speak = (
-        "We'll explore these concepts one by one:\n"
+        "We'll explore these concepts together, one by one:\n"
         + "\n".join([f"{i+1}. {c}" for i, c in enumerate(parsed.concepts)])
-        + f"\n\nNow let's start with the first concept: '{parsed.concepts[0]}'"
+        + f"\n\nLet's start with the first concept: '{parsed.concepts[0]}'. Are you ready?"
     )
     add_ai_message_to_conversation(state, speak)
     state["agent_output"] = speak
@@ -239,6 +241,8 @@ def sim_vars_node(state: AgentState) -> AgentState:
     context = json.dumps(SIM_MOVES["SIM_VARS"], indent=2)
     system_prompt = f"""Current node: SIM_VARS (Variables Declaration)
 
+You are talking directly with a class 7 student. Remember to address them directly using 'you' and avoid third-person references like 'the student'.
+
 We are on Simulation Concept #{idx+1}: "{concept}"
 
 Context:
@@ -247,7 +251,7 @@ Context:
 Task:
 Respond with JSON ONLY: declare variables (independent/dependent/control) that matter to this concept, and a short prompt to the learner to confirm/ask questions.
 
-Keep it concise and age-appropriate.
+Keep it concise and age-appropriate. Address the student directly in your prompt_to_learner.
 """
 
     final_prompt = build_prompt_from_template(
@@ -261,7 +265,7 @@ Keep it concise and age-appropriate.
     json_text = extract_json_block(raw)
     parsed: SimVarsResponse = sim_vars_parser.parse(json_text)
 
-    lines = ["Here are the variables we'll use:"]
+    lines = ["Here are the variables we'll work with:"]
     for v in parsed.variables:
         note = f" — {v.note}" if v.note else ""
         lines.append(f"- {v.name} ({v.role}){note}")
@@ -288,6 +292,9 @@ def sim_action_node(state: AgentState) -> AgentState:
     context = json.dumps(SIM_MOVES["SIM_ACTION"], indent=2)
     system_prompt = f"""Current node: SIM_ACTION (Single Manipulation)
 
+You are talking directly with a class 7 student. Use direct communication and address them as 'you'. 
+The student has just learned about the variables we'll be working with.
+
 We are on Simulation Concept #{idx+1}: "{concept}"
 
 Context:
@@ -295,15 +302,15 @@ Context:
 
 Task:
 Return JSON ONLY describing:
-- 'action': one specific manipulation on the independent variable
-- 'rationale': why this isolates the concept
-- 'prompt_to_learner': a quick check like "Shall we try this? (yes/no)"
+- 'action': one specific manipulation on the independent variable (explain what you will do)
+- 'rationale': why this will help the student understand the concept (speak directly to them)
+- 'prompt_to_learner': a direct question asking for their engagement (use 'you')
 """
 
     final_prompt = build_prompt_from_template(
         system_prompt=system_prompt,
         state=state,
-        include_last_message=False,
+        include_last_message=True,
         include_instructions=True,
         parser=sim_action_parser,
     )
@@ -337,6 +344,9 @@ def sim_expect_node(state: AgentState) -> AgentState:
     context = json.dumps(SIM_MOVES["SIM_EXPECT"], indent=2)
     system_prompt = f"""Current node: SIM_EXPECT (Prediction)
 
+You are talking directly with a class 7 student. Use 'you' and 'your' when asking for their prediction.
+The student has just agreed to try the proposed action/experiment.
+
 We are on Simulation Concept #{idx+1}: "{concept}"
 
 Context:
@@ -344,14 +354,14 @@ Context:
 
 Task:
 Return JSON ONLY with:
-- 'question': the prediction prompt (direct and short)
-- 'hint': optional tiny nudge (or null)
+- 'question': Ask the student directly for their prediction using 'you' and 'your'
+- 'hint': optional gentle hint phrased as if speaking directly to the student (or null)
 """
 
     final_prompt = build_prompt_from_template(
         system_prompt=system_prompt,
         state=state,
-        include_last_message=False,
+        include_last_message=True,
         include_instructions=True,
         parser=sim_expect_parser,
     )
@@ -389,14 +399,14 @@ def sim_execute_node(state: AgentState) -> AgentState:
         state["simulation_active"] = True  # New flag to track simulation lifecycle
         
         # Agent message
-        msg = f"Perfect! Let me demonstrate this concept with a simulation. {simulation_config['agent_message']}"
+        msg = f"Perfect! Let me demonstrate this concept with a simulation for you. {simulation_config['agent_message']}"
         add_ai_message_to_conversation(state, msg)
         state["agent_output"] = msg
         state["current_state"] = "SIM_OBSERVE"
         
     except Exception as e:
         # Error handling: stop simulation and provide fallback
-        error_msg = f"I encountered an issue setting up the simulation for this concept. Let me explain it differently: {str(e)}"
+        error_msg = f"I encountered an issue setting up the simulation for you. Let me explain this concept in a different way: {str(e)}"
         add_ai_message_to_conversation(state, error_msg)
         state["agent_output"] = error_msg
         state["show_simulation"] = False
@@ -417,6 +427,9 @@ def sim_observe_node(state: AgentState) -> AgentState:
     context = json.dumps(SIM_MOVES["SIM_OBSERVE"], indent=2)
     system_prompt = f"""Current node: SIM_OBSERVE (What did you notice?)
 
+You are talking directly with a class 7 student. Ask them directly what they observed using 'you'.
+The student has just watched the simulation demonstration.
+
 We are on Simulation Concept #{idx+1}: "{concept}"
 
 Context:
@@ -424,7 +437,7 @@ Context:
 
 Task:
 Return JSON ONLY with:
-- 'observation_prompt': a short, neutral request for what the learner saw
+- 'observation_prompt': Ask the student directly what they observed using 'you'
 - 'expected_observations': 2–5 strings (internal guide, not printed verbatim later)
 """
 
@@ -458,6 +471,9 @@ def sim_insight_node(state: AgentState) -> AgentState:
     context = json.dumps(SIM_MOVES["SIM_INSIGHT"], indent=2)
     system_prompt = f"""Current node: SIM_INSIGHT (Why did that happen?)
 
+You are talking directly with a class 7 student. Explain to them directly using 'you' and 'your'.
+The student has just shared their observations from the simulation.
+
 We are on Simulation Concept #{idx+1}: "{concept}"
 
 Context:
@@ -465,8 +481,8 @@ Context:
 
 Task:
 Return JSON ONLY with:
-- 'micro_explanation': ≤3 sentences connecting observation → principle
-- 'compared_to_prediction': 1 sentence linking to the learner's prediction (agree or differ)
+- 'micro_explanation': ≤3 sentences explaining to the student why they observed what they did (use 'you')
+- 'compared_to_prediction': 1 sentence connecting to the student's prediction using 'your prediction'
 """
 
     final_prompt = build_prompt_from_template(
@@ -501,6 +517,9 @@ def sim_reflection_node(state: AgentState) -> AgentState:
     context = json.dumps(SIM_MOVES["SIM_REFLECT"], indent=2)
     system_prompt = f"""Current node: SIM_REFLECT (Synthesis)
 
+You are talking directly with a class 7 student. Address them directly using 'you' and 'your'.
+We have just completed the full simulation cycle and the student understands the insights.
+
 We just completed a simulation for: "{current_concept}"
 
 Context:
@@ -508,14 +527,14 @@ Context:
 
 Task:
 Return JSON ONLY with:
-- 'bullets': 2–5 concise takeaways from this simulation
-- 'closing_prompt': a short reflective question to the learner about what they learned
+- 'bullets': 2–5 concise takeaways from this simulation, phrased as if speaking directly to the student
+- 'closing_prompt': a short reflective question to the student about what they learned (use 'you')
 """
 
     final_prompt = build_prompt_from_template(
         system_prompt=system_prompt,
         state=state,
-        include_last_message=False,
+        include_last_message=True,
         include_instructions=True,
         parser=sim_reflect_parser,
     )
@@ -523,7 +542,7 @@ Return JSON ONLY with:
     json_text = extract_json_block(raw)
     parsed: SimReflectResponse = sim_reflect_parser.parse(json_text)
 
-    msg = "Quick recap from our simulation:\n" + "\n".join([f"• {b}" for b in parsed.bullets]) + f"\n\n{parsed.closing_prompt}"
+    msg = f"Quick recap from our simulation:\n" + "\n".join([f"• {b}" for b in parsed.bullets]) + f"\n\n{parsed.closing_prompt}"
     add_ai_message_to_conversation(state, msg)
     state["agent_output"] = msg
 
