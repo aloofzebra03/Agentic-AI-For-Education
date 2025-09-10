@@ -457,7 +457,7 @@ def ge_node(state: AgentState) -> AgentState:
         return state
 
     # Handle tries for GE node - increment counter
-    state["_ge_tries"] = state.get("_ge_tries", 0) + 1
+    state["_ge_tries"] = state.get("_ge_tries",0) + 1
     
     # Check if we've reached max tries (1) - transition smoothly to MH
     if state["_ge_tries"] >= 1:
@@ -553,8 +553,8 @@ Task: Detect misconception, correct reasoning, or need for further exploration. 
             state["in_simulation"] = True
         
         state["agent_output"] = parsed.feedback
-        # state["current_state"] = parsed.next_state
-        state["current_state"] = 'MH'
+        state["current_state"] = parsed.next_state
+        # state["current_state"] = 'MH'
     except Exception as e:
         print(f"Error parsing GE response: {e}")
         print(f"Raw response: {raw}")

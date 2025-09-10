@@ -22,8 +22,10 @@ def build_vectorstore():
     docs     = load_documents()
     print(f"{len(docs)} documents loaded.")
     embedder = get_embedder()
-    print("Building vector store…")
+    print("Building vector store with HuggingFace embeddings…")
 
+    # Using Chroma with the HuggingFace embedder
+    # Note: Chroma uses cosine similarity by default, which works well with the embeddinggemma model
     vector_store = Chroma.from_documents(
         documents        = docs,
         embedding         = embedder,

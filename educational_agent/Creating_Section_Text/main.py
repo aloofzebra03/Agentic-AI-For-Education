@@ -1,7 +1,7 @@
 # main.py
 import argparse, json,sys
 
-PROJECT_ROOT = r"C:/Users/aryan/Desktop/Personalized_Education/Personalized_Education"
+PROJECT_ROOT = r"C:/Users/aryan/Desktop/Personalized_Education/Agentic-AI-For-Education/educational_agent"
 sys.path.insert(0, PROJECT_ROOT)
 
 from Creating_Section_Text.schema       import NextSectionChoice

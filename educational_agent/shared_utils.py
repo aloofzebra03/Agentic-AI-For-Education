@@ -197,46 +197,47 @@ def build_prompt_from_template(system_prompt: str, state: AgentState,
 
 
 def get_ground_truth(concept: str, section_name: str) -> str:
-    """Retrieve ground truth content for a given concept and section."""
-    try:
-        # 🔍 GROUND TRUTH RETRIEVAL - INPUT 🔍
-        print("=" * 70)
-        print("📚 GROUND TRUTH RETRIEVAL - STARTED")
-        print("=" * 70)
-        print(f"🎯 CONCEPT: {concept}")
-        print(f"📋 SECTION_NAME: {section_name}")
-        print("=" * 70)
+    # """Retrieve ground truth content for a given concept and section."""
+    # try:
+    #     # 🔍 GROUND TRUTH RETRIEVAL - INPUT 🔍
+    #     print("=" * 70)
+    #     print("📚 GROUND TRUTH RETRIEVAL - STARTED")
+    #     print("=" * 70)
+    #     print(f"🎯 CONCEPT: {concept}")
+    #     print(f"📋 SECTION_NAME: {section_name}")
+    #     print("=" * 70)
         
-        # Build a minimal NextSectionChoice object; other fields are dummy since retriever only uses section_name
-        params = NextSectionChoice(
-            section_name=section_name,
-            difficulty=1,
-            board_exam_importance=1,
-            olympiad_importance=1,
-            avg_study_time_min=1,
-            interest_evoking=1,
-            curiosity_evoking=1,
-            critical_reasoning_needed=1,
-            inquiry_learning_scope=1,
-            example_availability=1,
-        )
-        docs = retrieve_docs(concept, params)
-        combined = [f"# Page: {d.metadata['page_label']}\n{d.page_content}" for d in docs]
-        full_doc = "\n---\n".join(combined)
-        result = filter_relevant_section(concept, section_name, full_doc)
+    #     # Build a minimal NextSectionChoice object; other fields are dummy since retriever only uses section_name
+    #     params = NextSectionChoice(
+    #         section_name=section_name,
+    #         difficulty=1,
+    #         board_exam_importance=1,
+    #         olympiad_importance=1,
+    #         avg_study_time_min=1,
+    #         interest_evoking=1,
+    #         curiosity_evoking=1,
+    #         critical_reasoning_needed=1,
+    #         inquiry_learning_scope=1,
+    #         example_availability=1,
+    #     )
+    #     docs = retrieve_docs(concept, params)
+    #     combined = [f"# Page: {d.metadata['page_label']}\n{d.page_content}" for d in docs]
+    #     full_doc = "\n---\n".join(combined)
+    #     result = filter_relevant_section(concept, section_name, full_doc)
         
-        # 🔍 GROUND TRUTH RETRIEVAL - OUTPUT 🔍
-        print("📚 GROUND TRUTH RETRIEVAL - COMPLETED")
-        print(f"📄 DOC_COUNT: {len(docs)} documents")
-        print(f"📏 FULL_DOC_LENGTH: {len(full_doc)} characters")
-        print(f"📏 FILTERED_LENGTH: {len(result)} characters")
-        print(f"📄 RESULT_PREVIEW: {result[:300]}...")
-        print("=" * 70)
+    #     # 🔍 GROUND TRUTH RETRIEVAL - OUTPUT 🔍
+    #     print("📚 GROUND TRUTH RETRIEVAL - COMPLETED")
+    #     print(f"📄 DOC_COUNT: {len(docs)} documents")
+    #     print(f"📏 FULL_DOC_LENGTH: {len(full_doc)} characters")
+    #     print(f"📏 FILTERED_LENGTH: {len(result)} characters")
+    #     print(f"📄 RESULT_PREVIEW: {result[:300]}...")
+    #     print("=" * 70)
         
-        return result
-    except Exception as e:
-        print(f"Error retrieving ground truth for {concept} - {section_name}: {e}")
-        raise
+    #     return result
+    # except Exception as e:
+    #     print(f"Error retrieving ground truth for {concept} - {section_name}: {e}")
+    #     raise
+    return ""
 
 
 # ─── Pedagogical‐move context (shared between traditional and simulation nodes) ───────────
