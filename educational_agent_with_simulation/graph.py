@@ -13,13 +13,13 @@ from langchain_core.messages import AnyMessage, HumanMessage, AIMessage
 # from langfuse.langchain import CallbackHandler
 from langgraph.checkpoint.memory import InMemorySaver
 
-from educational_agent_with_simulation.main_nodes_simulation_agent import (
+from educational_agent_with_simulation.main_nodes_simulation_agent_no_mh import (
     start_node, apk_node, ci_node, ge_node,
-    mh_node, ar_node, tc_node, rlc_node, end_node,
+    ar_node, tc_node, rlc_node, end_node,
 )
 
 # ▶ NEW: import simulation agent nodes
-from educational_agent_with_simulation.simulation_nodes import (
+from educational_agent_with_simulation.simulation_nodes_no_mh_ge import (
     sim_concept_creator_node,
     sim_vars_node,
     sim_action_node,
@@ -112,7 +112,7 @@ def _START(s): return _wrap(start_node)(s)
 def _APK(s):   return _wrap(apk_node)(s)
 def _CI(s):    return _wrap(ci_node)(s)
 def _GE(s):    return _wrap(ge_node)(s)
-def _MH(s):    return _wrap(mh_node)(s)
+# def _MH(s):    return _wrap(mh_node)(s)
 def _AR(s):    return _wrap(ar_node)(s)
 def _TC(s):    return _wrap(tc_node)(s)
 def _RLC(s):   return _wrap(rlc_node)(s)
@@ -138,7 +138,7 @@ g.add_node("START", _START)
 g.add_node("APK", _APK)
 g.add_node("CI",  _CI)
 g.add_node("GE",  _GE)
-g.add_node("MH",  _MH)
+# g.add_node("MH",  _MH)
 g.add_node("AR",  _AR)
 g.add_node("TC",  _TC)
 g.add_node("RLC", _RLC)
@@ -166,16 +166,18 @@ g.add_edge("START","APK")
 g.add_conditional_edges("APK", _route, {"APK": "APK", "CI": "CI"})
 g.add_conditional_edges("CI",  _route, {"CI": "CI","SIM_CC":"SIM_CC"})
 # g.add_conditional_edges("GE",  _route, {"MH": "MH", "AR": "AR","GE": "GE"})
-g.add_conditional_edges("GE",  _route, {"MH": "MH", "GE": "GE"})
+g.add_conditional_edges("GE",  _route, {"GE": "GE","SIM_VARS":"SIM_VARS"})
 # g.add_conditional_edges("MH", _route,{"MH": "MH", "SIM_VARS": "SIM_VARS", "AR": "AR"})
-g.add_conditional_edges("MH", _route,{"MH": "MH", "SIM_VARS": "SIM_VARS"})
+# g.add_conditional_edges("MH", _route,{"MH": "MH", "SIM_VARS": "SIM_VARS"})
 g.add_conditional_edges("AR", _route, {"AR": "AR","TC": "TC", "GE": "GE"})
+# g.add_conditional_edges("AR", _route, {"AR": "AR","TC": "TC"})
 g.add_conditional_edges("TC", _route, {"TC": "TC","RLC": "RLC"})
 g.add_conditional_edges("RLC", _route, {"RLC": "RLC","END": "END"})
 g.add_edge("END", END)
 
 # Simulation flow edges
 g.add_conditional_edges("SIM_CC", _route, {"GE": "GE"})
+# g.add_edge("SIM_CC", "SIM_VARS")
 g.add_edge("SIM_VARS", "SIM_ACTION")
 g.add_edge("SIM_ACTION", "SIM_EXPECT")
 g.add_edge("SIM_EXPECT", "SIM_EXECUTE")
@@ -192,9 +194,9 @@ def build_graph():
         checkpointer=checkpointer,
         # checkpointer=CHECKPOINTER,
         interrupt_after=[
-            "START", "APK", "CI", "GE","MH", "AR", "TC", "RLC",
+            "START", "APK", "CI","GE", "AR", "TC", "RLC",
             # ▶ NEW: pause points for simulation path
-            "SIM_CC", "SIM_VARS", "SIM_ACTION", "SIM_EXPECT",
+            "SIM_CC", "SIM_VARS", "SIM_EXPECT",
             "SIM_EXECUTE", "SIM_OBSERVE", "SIM_INSIGHT",
             "SIM_REFLECT",
         ],

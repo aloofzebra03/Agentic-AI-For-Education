@@ -1,0 +1,26 @@
+{
+  "concepts_covered": [
+    "Simple Pendulum",
+    "Idealized Model",
+    "String Length",
+    "Weight",
+    "Starting Angle",
+    "Gravity",
+    "Period",
+    "Independent Variable",
+    "Dependent Variable",
+    "Control Variable"
+  ],
+  "num_concepts_covered": 10,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "High",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.95,
+  "quiz_score": 100.0,
+  "error_handling_count": 2,
+  "adaptability": true,
+  "session_id": "Eager Student-20250912-184329",
+  "total_interactions": 52,
+  "persona_name": "Eager Student"
+}

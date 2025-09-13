@@ -11,7 +11,7 @@ import time
 import soundfile as sf
 from pedalboard import Pedalboard, Resample
 import sys
-import pysqlite3
+# import pysqlite3
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -21,7 +21,7 @@ from audio_recorder_streamlit import audio_recorder
 # Import gTTS for text-to-speech
 from gtts import gTTS
 
-sys.modules["sqlite3"] = pysqlite3
+# sys.modules["sqlite3"] = pysqlite3
 
 if st.button('Clear Resource Cache'):
     st.cache_resource.clear()
@@ -80,6 +80,7 @@ def convert_to_mono_wav(input_path, output_path):
         wavfile.write(output_path, sr, data)
     except Exception as e:
         st.error(f"Error converting WAV to mono: {e}")
+        st.stop()
 
 def transcribe_recorded_audio_bytes(audio_bytes):
     """Transcribe audio bytes to text using ASR model"""
@@ -487,6 +488,7 @@ for i, (role, msg) in enumerate(st.session_state.messages):
                 play_text_as_audio(msg, st.container())
             except Exception as e:
                 st.caption("⚠️ Audio playback unavailable")
+                st.stop()
 
 # Handle user input at the bottom of the page
 if "agent" in st.session_state and st.session_state.agent.current_state() != "END":
