@@ -240,5 +240,268 @@ def get_ground_truth(concept: str, section_name: str) -> str:
     return ""
 
 
+# ─── Memory Optimization Functions ─────────────────────────────────────────────
+
+def identify_node_segments_from_transitions(messages: list, transitions: list) -> list:
+    """
+    Split messages into segments based on recorded node transitions.
+    Transition happens AFTER the agent response, so messages belong to the 'from_node'.
+    """
+    if not transitions:
+        # No transitions recorded, treat all messages as one segment  
+        return [{"node": "unknown", "messages": messages, "start_idx": 0, "end_idx": len(messages)}]
+    
+    segments = []
+    start_idx = 0
+    
+    for transition in transitions:
+        # Messages up to (and including) transition point belong to 'from_node'
+        end_idx = transition["transition_after_message_index"] 
+        
+        if end_idx > start_idx:
+            segments.append({
+                "node": transition["from_node"],
+                "messages": messages[start_idx:end_idx],
+                "start_idx": start_idx,
+                "end_idx": end_idx
+            })
+        start_idx = end_idx
+    
+    # Add the final segment (current node messages) - messages after last transition
+    if start_idx < len(messages):
+        current_node = transitions[-1]["to_node"] if transitions else "current"
+        segments.append({
+            "node": current_node,
+            "messages": messages[start_idx:], 
+            "start_idx": start_idx,
+            "end_idx": len(messages)
+        })
+    
+    return segments
+
+def create_educational_summary(messages: list) -> str:
+    """
+    Use LLM to create a proper educational summary of the conversation.
+    """
+    if not messages:
+        return ""
+    
+    # Extract agent messages for summarization
+    agent_messages = [msg.content for msg in messages if isinstance(msg, AIMessage)]
+    student_messages = [msg.content for msg in messages if isinstance(msg, HumanMessage)]
+    
+    if not agent_messages:
+        return f"Student made {len(student_messages)} responses"
+    
+    # Build conversation text for summarization
+    conversation_text = ""
+    for msg in messages:
+        if isinstance(msg, HumanMessage):
+            conversation_text += f"Student: {msg.content}\n"
+        elif isinstance(msg, AIMessage):
+            conversation_text += f"Agent: {msg.content}\n"
+    
+    # Limit conversation text to avoid token overflow
+    if len(conversation_text) > 2000:
+        conversation_text = conversation_text[:2000] + "..."
+    
+    # Use LLM to summarize
+    summary_prompt = f"""Summarize the following educational conversation in 2-3 sentences, focusing on:
+- What concept was being taught
+- Student's understanding level
+- Key pedagogical interactions
+
+Conversation:
+{conversation_text}
+
+Summary:"""
+    
+    try:
+        summary_response = get_llm().invoke([HumanMessage(content=summary_prompt)])
+        return summary_response.content.strip()
+    except Exception as e:
+        print(f"❌ Error creating LLM summary: {e}")
+        # Fallback to simple summary if LLM fails
+        return f"Educational discussion with {len(messages)} exchanges about the concept"
+
+def create_educational_summary_from_text(conversation_text: str) -> str:
+    """
+    Create an LLM-generated summary from conversation text.
+    """
+    try:
+        if not conversation_text.strip():
+            return "Empty conversation segment"
+        
+        # Limit conversation text to avoid token overflow
+        if len(conversation_text) > 2000:
+            conversation_text = conversation_text[:2000] + "..."
+        
+        # Create educational summary prompt
+        summary_prompt = f"""Summarize the following educational conversation in 2-3 sentences, focusing on:
+- What concept was being taught
+- Student's understanding level  
+- Key pedagogical interactions
+
+Conversation:
+{conversation_text}
+
+Summary:"""
+        
+        summary_response = get_llm().invoke([HumanMessage(content=summary_prompt)])
+        return summary_response.content.strip()
+    except Exception as e:
+        print(f"❌ Error creating LLM summary: {e}")
+        # Fallback to simple summary if LLM fails
+        return "Educational discussion about the concept"
+
+def build_node_aware_conversation_history(state: AgentState, current_node: str) -> str:
+    """
+    Keep exact messages from current and previous node interactions.
+    Use cached summaries and only summarize new content incrementally.
+    """
+    messages = state.get("messages", [])
+    transitions = state.get("_node_transitions", [])
+    
+    # For short conversations, use full history
+    if len(messages) <= 6:
+        return build_conversation_history(state)
+    
+    # Get node segments based on recorded transitions
+    segments = identify_node_segments_from_transitions(messages, transitions)
+    
+    print(f"📊 MEMORY OPTIMIZATION: Found {len(segments)} node segments")
+    
+    if len(segments) >= 2:
+        # Keep current + previous node segments exact
+        current_segment = segments[-1]  # Current node
+        previous_segment = segments[-2]  # Previous node
+        older_segments = segments[:-2]   # Everything before previous node
+        
+        print(f"📊 Current node: {current_segment['node']} ({len(current_segment['messages'])} messages)")
+        print(f"📊 Previous node: {previous_segment['node']} ({len(previous_segment['messages'])} messages)")
+        print(f"📊 Older segments: {len(older_segments)} segments")
+        
+        # Handle summary efficiently
+        summary = ""
+        
+        if older_segments:
+            # Calculate what needs to be summarized
+            older_messages = []
+            for segment in older_segments:
+                older_messages.extend(segment["messages"])
+            
+            # Find the highest index in older_messages in the original messages list
+            last_older_index = -1
+            if older_messages:
+                last_older_msg = older_messages[-1]
+                for i, msg in enumerate(messages):
+                    if msg == last_older_msg:
+                        last_older_index = i
+                        break
+            
+            # Check if we need to update summary
+            if last_older_index <= state["_summary_last_index"]:
+                # Use existing summary - no new messages to summarize
+                summary = state["_summary"]
+                print(f"📊 ✅ Using existing summary (covers up to index {state['_summary_last_index']})")
+            else:
+                # Need to update summary with new messages
+                new_messages_start = state["_summary_last_index"] + 1
+                new_messages = messages[new_messages_start:last_older_index + 1]
+                
+                if state["_summary"]:
+                    # Combine old summary with new messages
+                    combined_content = f"Previous summary: {state['_summary']}\n\nNew messages:\n"
+                    for msg in new_messages:
+                        if isinstance(msg, HumanMessage):
+                            combined_content += f"Student: {msg.content}\n"
+                        elif isinstance(msg, AIMessage):
+                            combined_content += f"Agent: {msg.content}\n"
+                    
+                    print(f"📊 🔄 Updating summary: old summary + {len(new_messages)} new messages...")
+                    summary = create_educational_summary_from_text(combined_content)
+                else:
+                    # First time - just summarize the messages
+                    print(f"📊 🔄 Creating first summary for {len(new_messages)} messages...")
+                    summary = create_educational_summary(new_messages)
+                
+                # Update summary state
+                state["_summary"] = summary
+                state["_summary_last_index"] = last_older_index
+                print(f"📊 💾 Updated summary (now covers up to index {last_older_index})")
+            
+            summary = f"Previous conversation summary: {summary}\n\n"
+        
+        # Format recent messages (previous + current node) exactly
+        recent_messages = previous_segment["messages"] + current_segment["messages"]
+        recent_text = ""
+        for msg in recent_messages:
+            if isinstance(msg, HumanMessage):
+                recent_text += f"Student: {msg.content}\n"
+            elif isinstance(msg, AIMessage):
+                recent_text += f"Agent: {msg.content}\n"
+        
+        optimized_history = summary + recent_text.strip()
+        print(f"📊 OPTIMIZATION RESULT: {len(build_conversation_history(state))} -> {len(optimized_history)} chars")
+        return optimized_history
+    
+    else:
+        # Not enough transitions, fall back to regular history
+        print(f"📊 Not enough transitions, using full history")
+        return build_conversation_history(state)
+
+def reset_memory_summary(state: AgentState):
+    """
+    Reset the memory summary. Useful for testing or manual management.
+    """
+    if "_summary" in state:
+        del state["_summary"]
+        del state["_summary_last_index"]
+        print("📊 🗑️ Memory summary reset")
+
+def llm_with_history_optimized(state: AgentState, final_prompt: str, current_node: str):
+    """
+    Drop-in replacement for llm_with_history with simple memory optimization.
+    
+    Key optimizations:
+    - Keeps a simple summary of old messages + last index
+    - Only summarizes new messages since last summary update
+    - Preserves exact current + previous node interactions
+    """
+    print("=" * 70)
+    print("🤖 LLM INVOCATION WITH MEMORY OPTIMIZATION - STARTED")
+    print("=" * 70)
+    
+    # Build optimized history instead of full history
+    optimized_history = build_node_aware_conversation_history(state, current_node)
+    
+    # Replace history in the prompt or build new prompt
+    if "Conversation History:" in final_prompt:
+        # Replace existing history section
+        parts = final_prompt.split("Conversation History:")
+        if len(parts) == 2:
+            base_prompt = parts[0].strip()
+            if optimized_history:
+                final_prompt = f"{base_prompt}\n\nConversation History:\n{optimized_history}"
+            else:
+                final_prompt = base_prompt
+    else:
+        # Add history if not present
+        if optimized_history:
+            final_prompt = f"{final_prompt}\n\nConversation History:\n{optimized_history}"
+    
+    print(f"📝 OPTIMIZED_PROMPT_LENGTH: {len(final_prompt)} characters")
+    print(f"📝 OPTIMIZED_PROMPT_PREVIEW: {final_prompt[:200]}...")
+    
+    # Send the optimized prompt
+    request_msgs = [HumanMessage(content=final_prompt)]
+    resp = get_llm().invoke(request_msgs)
+    
+    print("🤖 LLM INVOCATION WITH MEMORY OPTIMIZATION - COMPLETED")
+    print(f"📤 RESPONSE_LENGTH: {len(resp.content)} characters")
+    print("=" * 70)
+    
+    return resp
+
 # ─── Pedagogical‐move context (shared between traditional and simulation nodes) ───────────
 
