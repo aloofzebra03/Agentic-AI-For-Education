@@ -13,13 +13,13 @@ from langchain_core.messages import AnyMessage, HumanMessage, AIMessage
 # from langfuse.langchain import CallbackHandler
 from langgraph.checkpoint.memory import InMemorySaver
 
-from educational_agent_with_simulation.main_nodes_simulation_agent_no_mh import (
+from educational_agent_optimized.main_nodes_simulation_agent_no_mh import (
     start_node, apk_node, ci_node, ge_node,
     ar_node, tc_node, rlc_node, end_node,
 )
 
 # ▶ NEW: import simulation agent nodes
-from educational_agent_with_simulation.simulation_nodes_no_mh_ge import (
+from educational_agent_optimized.simulation_nodes_no_mh_ge import (
     sim_concept_creator_node,
     sim_vars_node,
     sim_action_node,
@@ -72,8 +72,8 @@ class AgentState(TypedDict, total=False):
     simulation_active: bool
     # NEW: Memory optimization fields
     _node_transitions: List[Dict[str, Any]]
-    _summary: str
-    _summary_last_index: int    
+    summary: str
+    summary_last_index: int
 
 # -----------------------------------------------------------------------------
 # // 4. Initialize state and wrap helper
@@ -95,6 +95,8 @@ def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
     state.setdefault("simulation_active", False)
     # NEW: Initialize memory optimization state
     state.setdefault("_node_transitions", [])
+    state.setdefault("summary", "")
+    state.setdefault("summary_last_index", 0)
     return state
 
 def _wrap(fn):

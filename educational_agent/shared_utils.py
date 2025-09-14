@@ -196,6 +196,72 @@ def build_prompt_from_template(system_prompt: str, state: AgentState,
     return prompt_template.format(**template_values)
 
 
+def build_prompt_from_template_optimized(system_prompt: str, state: AgentState, 
+                                       include_last_message: bool = False, 
+                                       include_instructions: bool = False,
+                                       parser=None, current_node: str = None) -> str:
+    """
+    Build a comprehensive prompt from template with memory optimization.
+    This is the optimized version that uses node-aware conversation history.
+    """
+    
+    # Build the template string based on what we need
+    template_parts = ["{system_prompt}"]
+    template_vars = ["system_prompt"]
+    
+    # Add optimized history if available
+    if current_node:
+        optimized_history = build_node_aware_conversation_history(state, current_node)
+        if optimized_history:
+            template_parts.append("\n\nConversation History:\n{history}")
+            template_vars.append("history")
+    else:
+        # Fall back to regular history if no current_node provided
+        history = build_conversation_history(state)
+        if history:
+            template_parts.append("\n\nConversation History:\n{history}")
+            template_vars.append("history")
+    
+    # Add last user message if requested
+    if include_last_message and state.get("last_user_msg"):
+        template_parts.append("\n\nStudent's Latest Response: {last_user_message}")
+        template_vars.append("last_user_message")
+    
+    # Add instructions at the end if requested
+    if include_instructions and parser:
+        template_parts.append("\n\n{instructions}")
+        template_vars.append("instructions")
+    
+    # Create the template
+    template_string = "".join(template_parts)
+    prompt_template = PromptTemplate(
+        input_variables=template_vars,
+        template=template_string
+    )
+    
+    # Prepare the values
+    template_values = {"system_prompt": system_prompt}
+    
+    # Add history (optimized or regular)
+    if current_node:
+        optimized_history = build_node_aware_conversation_history(state, current_node)
+        if optimized_history:
+            template_values["history"] = optimized_history
+    else:
+        history = build_conversation_history(state)
+        if history:
+            template_values["history"] = history
+    
+    if include_last_message and state.get("last_user_msg"):
+        template_values["last_user_message"] = state["last_user_msg"]
+    
+    if include_instructions and parser:
+        template_values["instructions"] = parser.get_format_instructions()
+    
+    # Format the prompt
+    return prompt_template.format(**template_values)
+
+
 def get_ground_truth(concept: str, section_name: str) -> str:
     # """Retrieve ground truth content for a given concept and section."""
     # try:
@@ -400,18 +466,18 @@ def build_node_aware_conversation_history(state: AgentState, current_node: str) 
                         break
             
             # Check if we need to update summary
-            if last_older_index <= state["_summary_last_index"]:
+            if last_older_index <= state["summary_last_index"]:
                 # Use existing summary - no new messages to summarize
-                summary = state["_summary"]
-                print(f"📊 ✅ Using existing summary (covers up to index {state['_summary_last_index']})")
+                summary = state["summary"]
+                print(f"📊 ✅ Using existing summary (covers up to index {state['summary_last_index']})")
             else:
                 # Need to update summary with new messages
-                new_messages_start = state["_summary_last_index"] + 1
+                new_messages_start = state["summary_last_index"] + 1
                 new_messages = messages[new_messages_start:last_older_index + 1]
                 
-                if state["_summary"]:
+                if state["summary"]:
                     # Combine old summary with new messages
-                    combined_content = f"Previous summary: {state['_summary']}\n\nNew messages:\n"
+                    combined_content = f"Previous summary: {state['summary']}\n\nNew messages:\n"
                     for msg in new_messages:
                         if isinstance(msg, HumanMessage):
                             combined_content += f"Student: {msg.content}\n"
@@ -426,8 +492,8 @@ def build_node_aware_conversation_history(state: AgentState, current_node: str) 
                     summary = create_educational_summary(new_messages)
                 
                 # Update summary state
-                state["_summary"] = summary
-                state["_summary_last_index"] = last_older_index
+                state["summary"] = summary
+                state["summary_last_index"] = last_older_index
                 print(f"📊 💾 Updated summary (now covers up to index {last_older_index})")
             
             summary = f"Previous conversation summary: {summary}\n\n"
@@ -454,54 +520,10 @@ def reset_memory_summary(state: AgentState):
     """
     Reset the memory summary. Useful for testing or manual management.
     """
-    if "_summary" in state:
-        del state["_summary"]
-        del state["_summary_last_index"]
+    if "summary" in state:
+        del state["summary"]
+        del state["summary_last_index"]
         print("📊 🗑️ Memory summary reset")
-
-def llm_with_history_optimized(state: AgentState, final_prompt: str, current_node: str):
-    """
-    Drop-in replacement for llm_with_history with simple memory optimization.
-    
-    Key optimizations:
-    - Keeps a simple summary of old messages + last index
-    - Only summarizes new messages since last summary update
-    - Preserves exact current + previous node interactions
-    """
-    print("=" * 70)
-    print("🤖 LLM INVOCATION WITH MEMORY OPTIMIZATION - STARTED")
-    print("=" * 70)
-    
-    # Build optimized history instead of full history
-    optimized_history = build_node_aware_conversation_history(state, current_node)
-    
-    # Replace history in the prompt or build new prompt
-    if "Conversation History:" in final_prompt:
-        # Replace existing history section
-        parts = final_prompt.split("Conversation History:")
-        if len(parts) == 2:
-            base_prompt = parts[0].strip()
-            if optimized_history:
-                final_prompt = f"{base_prompt}\n\nConversation History:\n{optimized_history}"
-            else:
-                final_prompt = base_prompt
-    else:
-        # Add history if not present
-        if optimized_history:
-            final_prompt = f"{final_prompt}\n\nConversation History:\n{optimized_history}"
-    
-    print(f"📝 OPTIMIZED_PROMPT_LENGTH: {len(final_prompt)} characters")
-    print(f"📝 OPTIMIZED_PROMPT_PREVIEW: {final_prompt[:200]}...")
-    
-    # Send the optimized prompt
-    request_msgs = [HumanMessage(content=final_prompt)]
-    resp = get_llm().invoke(request_msgs)
-    
-    print("🤖 LLM INVOCATION WITH MEMORY OPTIMIZATION - COMPLETED")
-    print(f"📤 RESPONSE_LENGTH: {len(resp.content)} characters")
-    print("=" * 70)
-    
-    return resp
 
 # ─── Pedagogical‐move context (shared between traditional and simulation nodes) ───────────
 
