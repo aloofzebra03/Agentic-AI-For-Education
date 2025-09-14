@@ -11,7 +11,7 @@ import time
 import soundfile as sf
 from pedalboard import Pedalboard, Resample
 import sys
-# import pysqlite3
+import pysqlite3
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -21,7 +21,7 @@ from audio_recorder_streamlit import audio_recorder
 # Import gTTS for text-to-speech
 from gtts import gTTS
 
-# sys.modules["sqlite3"] = pysqlite3
+sys.modules["sqlite3"] = pysqlite3
 
 if st.button('Clear Resource Cache'):
     st.cache_resource.clear()
