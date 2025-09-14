@@ -391,14 +391,14 @@ def initialize_agent():
     """Initialize the Educational Agent with Langfuse session tracking"""
     session_id = generate_session_id()
     agent = EducationalAgent(
-        session_label="streamlit-simulation-session",
+        session_label="streamlit-optimized-simulation-session",
         user_id="streamlit-user",
         persona_name="interactive-user"
     )
     return agent, session_id
 
 if "session_started" not in st.session_state:
-    st.title("🧑‍🎓 Interactive Simulation Educational Agent")
+    st.title("🧑‍🎓 Interactive Optimized Simulation Educational Agent")
     st.info(f"Welcome! Ready to learn about **{concept_pkg.title}**? Click 'Start Learning' to begin your personalized learning session.")
     
     if st.button("🚀 Start Learning", type="primary"):
