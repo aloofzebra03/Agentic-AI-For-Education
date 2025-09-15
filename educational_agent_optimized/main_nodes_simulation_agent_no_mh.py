@@ -277,11 +277,9 @@ Remember to give feedback as mentioned in the required schema."""
         raise
     return state
 
-def ci_node(state: AgentState) -> AgentState:
+def ci_node(state: AgentState) -> dict:
     # print("REACHED HERE")
     if not state.get("_asked_ci", False):
-        state["_asked_ci"] = True
-        state["_ci_tries"] = 0  # Initialize attempt counter
         # Include ground truth for Explanation (with analogies)
         gt = get_ground_truth(concept_pkg.title, "Explanation (with analogies)")
         system_prompt = (
@@ -315,14 +313,18 @@ def ci_node(state: AgentState) -> AgentState:
         print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
         print("=" * 80)
         
-        state["agent_output"] = content
-        return state
+        # Return only the changed keys following LangGraph best practices
+        return {
+            "_asked_ci": True,
+            "_ci_tries": 0,
+            "agent_output": content
+        }
 
     # Increment attempt counter
-    state["_ci_tries"] = state.get("_ci_tries", 0) + 1
+    ci_tries = state.get("_ci_tries", 0) + 1
     
     # Check if we've reached 2 attempts - if so, provide definition and move on
-    if state["_ci_tries"] >= 2:
+    if ci_tries >= 2:
         # gt = get_ground_truth(concept_pkg.title, "Explanation (with analogies)")
         system_prompt = (
             f"The student has struggled with restating the definition. Provide the correct definition of '{concept_pkg.title}' "
@@ -352,12 +354,15 @@ def ci_node(state: AgentState) -> AgentState:
         print("=" * 80)
         print(f"📄 CONTENT: {content}")
         print(f"📏 CONTENT_LENGTH: {len(content)} characters")
-        print(f"🔢 CI_TRIES: {state['_ci_tries']}")
+        print(f"🔢 CI_TRIES: {ci_tries}")
         print("=" * 80)
         
-        state["agent_output"] = content
-        state["current_state"] = "SIM_CC"
-        return state
+        # Return only the changed keys following LangGraph best practices
+        return {
+            "_ci_tries": ci_tries,
+            "agent_output": content,
+            "current_state": "SIM_CC"
+        }
 
     context = json.dumps(PEDAGOGICAL_MOVES["CI"], indent=2)
     system_prompt = f"""Current node: CI (Concept Introduction)
@@ -395,20 +400,22 @@ Task: Determine if the restatement is accurate. If accurate, move to SIM_CC to i
         print("🎯 CI NODE - PARSED OUTPUT CONTENTS 🎯")
         print("=" * 80)
         print(f"🚀 NEXT_STATE: {parsed.next_state}")
-
         print(f"📝 FEEDBACK: {parsed.feedback}")
-        print(f"🔢 CI_TRIES: {state['_ci_tries']}")
+        print(f"🔢 CI_TRIES: {ci_tries}")
         print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
         print("=" * 80)
         
-        state["agent_output"]  = parsed.feedback
-        state["current_state"] = parsed.next_state
+        # Return only the changed keys following LangGraph best practices
+        return {
+            "_ci_tries": ci_tries,
+            "agent_output": parsed.feedback,
+            "current_state": parsed.next_state
+        }
     except Exception as e:
         print(f"Error parsing CI response: {e}")
         print(f"Raw response: {raw}")
         print(f"Extracted JSON text: {json_text}")
         raise
-    return state
 
 def ge_node(state: AgentState) -> AgentState:
     # Check if we're coming from AR after finishing a concept

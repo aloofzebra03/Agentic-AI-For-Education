@@ -115,7 +115,17 @@ def _wrap(fn):
                 print(f"📝 Updated last_user_msg: {text[:50]}...")
         
         # CALL THE ORIGINAL NODE FUNCTION
-        st = fn(state)
+        result = fn(state)
+        
+        # Handle both full state returns (legacy) and partial state updates (LangGraph best practice)
+        if isinstance(result, dict):
+            # Partial state update - merge with existing state (LangGraph best practice)
+            print(f"🔄 _WRAP DEBUG - Merging partial state update with keys: {list(result.keys())}")
+            state.update(result)
+            st = state
+        else:
+            # Full state return (legacy behavior)
+            st = result
         
         # CAPTURE NEW STATE AFTER PROCESSING
         new_state = st.get("current_state")

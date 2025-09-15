@@ -17,6 +17,7 @@ from educational_agent.Creating_Section_Text.retriever import retrieve_docs
 from educational_agent.Filtering_GT.filter_utils import filter_relevant_section
 from educational_agent.Creating_Section_Text.schema import NextSectionChoice
 
+
 dotenv.load_dotenv(dotenv_path=".env", override=True)
 
 # Type alias for AgentState - flexible to work with different state structures
