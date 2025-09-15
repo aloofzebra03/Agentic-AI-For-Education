@@ -65,7 +65,7 @@ class AgentState(TypedDict, total=False):
     quiz_score: float
     session_summary: Dict[str, Any]
     # NEW: Simulation-related state fields
-    sim_variables: List[Any]
+    sim_variables: List[Dict[str, Any]]  # List of variable dictionaries for JSON serialization
     sim_action_config: Dict[str, Any]
     show_simulation: bool
     simulation_config: Dict[str, Any]
@@ -87,8 +87,8 @@ def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
     state.setdefault("sim_current_idx", 0)
     state.setdefault("concepts_completed", False)
     state.setdefault("in_simulation", False)
-    # NEW: Initialize simulation state
-    state.setdefault("sim_variables", [])
+    # NEW: Initialize simulation state - use dictionaries instead of Pydantic objects for serialization
+    state.setdefault("sim_variables", [])  # List of dict with keys: name, role, note
     state.setdefault("sim_action_config", {})
     state.setdefault("show_simulation", False)
     state.setdefault("simulation_config", {})

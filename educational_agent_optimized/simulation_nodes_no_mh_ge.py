@@ -23,6 +23,11 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
     """
     Create simulation configuration based on variables and action.
     Maps physics concepts to pendulum parameters.
+    
+    Args:
+        variables: List of variable dictionaries with keys 'name', 'role', 'note'
+        concept: The concept name string
+        action_config: Dictionary with action configuration
     """
     # Default parameters
     base_params = {"length": 1.0, "gravity": 9.8, "amplitude": 30}
@@ -30,9 +35,15 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
     # Extract independent variable that's being changed
     independent_var = None
     for var in variables:
-        if var.role == "independent":
-            independent_var = var.name.lower()
-            break
+        # Handle both Pydantic objects (legacy) and dictionaries (new format)
+        if hasattr(var, 'role'):  # Pydantic object
+            if var.role == "independent":
+                independent_var = var.name.lower()
+                break
+        elif isinstance(var, dict):  # Dictionary format
+            if var.get('role') == "independent":
+                independent_var = var.get('name', '').lower()
+                break
     
     if not independent_var:
         raise ValueError(f"No independent variable found for concept: {concept}")
@@ -275,8 +286,15 @@ Keep it concise and age-appropriate. Address the student directly in your prompt
     lines.append(parsed.prompt_to_learner)
     msg = "\n".join(lines)
 
-    # Store variables for later use in simulation
-    state["sim_variables"] = parsed.variables
+    # Store variables for later use in simulation - convert Pydantic objects to dictionaries
+    state["sim_variables"] = [
+        {
+            "name": v.name,
+            "role": v.role,
+            "note": v.note
+        }
+        for v in parsed.variables
+    ]
 
     add_ai_message_to_conversation(state, msg)
     state["agent_output"] = msg
