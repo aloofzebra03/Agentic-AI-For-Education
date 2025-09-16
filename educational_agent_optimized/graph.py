@@ -92,7 +92,7 @@ def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
     state.setdefault("misconception_detected", False)
     state.setdefault("retrieval_score", 0.0)
     state.setdefault("transfer_success", False)
-    state.setdefault("last_correction", "")
+    state.setdefault("last_correction", None)
     state.setdefault("quiz_score", 0.0)
     state.setdefault("session_summary", {})
     
