@@ -278,149 +278,144 @@ Remember to give feedback as mentioned in the required schema."""
     return state
 
 def ci_node(state: AgentState) -> dict:
-#     # print("REACHED HERE")
-#     if not state.get("_asked_ci", False):
-#         # Include ground truth for Explanation (with analogies)
-#         gt = get_ground_truth(concept_pkg.title, "Explanation (with analogies)")
-#         system_prompt = (
-#             f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
-#             f"Ground truth (Explanation):\n{gt}\nProvide a concise definition (≤30 words) of '{concept_pkg.title}', "
-#             "then ask the learner to restate it."
-#         )
+    # print("REACHED HERE")
+    if not state.get("_asked_ci", False):
+        # Include ground truth for Explanation (with analogies)
+        gt = get_ground_truth(concept_pkg.title, "Explanation (with analogies)")
+        system_prompt = (
+            f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
+            f"Ground truth (Explanation):\n{gt}\nProvide a concise definition (≤30 words) of '{concept_pkg.title}', "
+            "then ask the learner to restate it."
+        )
         
-#         # Build final prompt using optimized template
-#         final_prompt = build_prompt_from_template_optimized(
-#             system_prompt=system_prompt,
-#             state=state,
-#             include_last_message=False,
-#             include_instructions=False,
-#             current_node="CI"
-#         )
+        # Build final prompt using optimized template
+        final_prompt = build_prompt_from_template_optimized(
+            system_prompt=system_prompt,
+            state=state,
+            include_last_message=False,
+            include_instructions=False,
+            current_node="CI"
+        )
             
-#         resp = llm_with_history(state, final_prompt)
-#         # Apply JSON extraction in case LLM wraps response in markdown
-#         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+        resp = llm_with_history(state, final_prompt)
+        # Apply JSON extraction in case LLM wraps response in markdown
+        content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
-#         # Add AI message to conversation after successful processing
-#         add_ai_message_to_conversation(state, content)
+        # Add AI message to conversation after successful processing
+        add_ai_message_to_conversation(state, content)
         
-#         # 🔍 CI NODE - FIRST PASS CONTENT 🔍
-#         print("=" * 80)
-#         print("🎯 CI NODE - FIRST PASS CONTENT OUTPUT 🎯")
-#         print("=" * 80)
-#         print(f"📄 CONTENT: {content}")
-#         print(f"📏 CONTENT_LENGTH: {len(content)} characters")
-#         print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
-#         print("=" * 80)
+        # 🔍 CI NODE - FIRST PASS CONTENT 🔍
+        print("=" * 80)
+        print("🎯 CI NODE - FIRST PASS CONTENT OUTPUT 🎯")
+        print("=" * 80)
+        print(f"📄 CONTENT: {content}")
+        print(f"📏 CONTENT_LENGTH: {len(content)} characters")
+        print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
+        print("=" * 80)
         
-#         # Return only the changed keys following LangGraph best practices
-#         return {
-#             "_asked_ci": True,
-#             "_ci_tries": 0,
-#             "agent_output": content
-#         }
+        # Return only the changed keys following LangGraph best practices
+        return {
+            "_asked_ci": True,
+            "_ci_tries": 0,
+            "agent_output": content
+        }
 
-#     # Increment attempt counter
-#     ci_tries = state.get("_ci_tries", 0) + 1
+    # Increment attempt counter
+    ci_tries = state.get("_ci_tries", 0) + 1
     
-#     # Check if we've reached 2 attempts - if so, provide definition and move on
-#     if ci_tries >= 2:
-#         # gt = get_ground_truth(concept_pkg.title, "Explanation (with analogies)")
-#         system_prompt = (
-#             f"The student has struggled with restating the definition. Provide the correct definition of '{concept_pkg.title}' "
-#             f"clearly and encourage them that it's okay to struggle with new concepts. "
-#             "Then say 'Now let's explore this concept deeper with a question.'"
-#         )
+    # Check if we've reached 2 attempts - if so, provide definition and move on
+    if ci_tries >= 2:
+        # gt = get_ground_truth(concept_pkg.title, "Explanation (with analogies)")
+        system_prompt = (
+            f"The student has struggled with restating the definition. Provide the correct definition of '{concept_pkg.title}' "
+            f"clearly and encourage them that it's okay to struggle with new concepts. "
+            "Then say 'Now let's explore this concept deeper with a question.'"
+        )
         
-#         # Build final prompt using optimized template
-#         final_prompt = build_prompt_from_template_optimized(
-#             system_prompt=system_prompt,
-#             state=state,
-#             include_last_message=False,
-#             include_instructions=False,
-#             current_node="CI"
-#         )
+        # Build final prompt using optimized template
+        final_prompt = build_prompt_from_template_optimized(
+            system_prompt=system_prompt,
+            state=state,
+            include_last_message=False,
+            include_instructions=False,
+            current_node="CI"
+        )
             
-#         resp = llm_with_history(state, final_prompt)
-#         # Apply JSON extraction in case LLM wraps response in markdown
-#         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+        resp = llm_with_history(state, final_prompt)
+        # Apply JSON extraction in case LLM wraps response in markdown
+        content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
-#         # Add AI message to conversation after successful processing
-#         add_ai_message_to_conversation(state, content)
+        # Add AI message to conversation after successful processing
+        add_ai_message_to_conversation(state, content)
         
-#         # 🔍 CI NODE - AUTO-PROGRESS CONTENT 🔍
-#         print("=" * 80)
-#         print("🎯 CI NODE - AUTO-PROGRESS AFTER 2 TRIES 🎯")
-#         print("=" * 80)
-#         print(f"📄 CONTENT: {content}")
-#         print(f"📏 CONTENT_LENGTH: {len(content)} characters")
-#         print(f"🔢 CI_TRIES: {ci_tries}")
-#         print("=" * 80)
+        # 🔍 CI NODE - AUTO-PROGRESS CONTENT 🔍
+        print("=" * 80)
+        print("🎯 CI NODE - AUTO-PROGRESS AFTER 2 TRIES 🎯")
+        print("=" * 80)
+        print(f"📄 CONTENT: {content}")
+        print(f"📏 CONTENT_LENGTH: {len(content)} characters")
+        print(f"🔢 CI_TRIES: {ci_tries}")
+        print("=" * 80)
         
-#         # Return only the changed keys following LangGraph best practices
-#         return {
-#             "_ci_tries": ci_tries,
-#             "agent_output": content,
-#             "current_state": "SIM_CC"
-#         }
+        # Return only the changed keys following LangGraph best practices
+        return {
+            "_ci_tries": ci_tries,
+            "agent_output": content,
+            "current_state": "SIM_CC"
+        }
 
-#     context = json.dumps(PEDAGOGICAL_MOVES["CI"], indent=2)
-#     system_prompt = f"""Current node: CI (Concept Introduction)
-# Possible next_state values:
-# - "SIM_CC": when the student's paraphrase accurately captures the definition and we need to identify key concepts for exploration.
-# - "CI": when the paraphrase is inaccurate or incomplete.
+    context = json.dumps(PEDAGOGICAL_MOVES["CI"], indent=2)
+    system_prompt = f"""Current node: CI (Concept Introduction)
+Possible next_state values:
+- "SIM_CC": when the student's paraphrase accurately captures the definition and we need to identify key concepts for exploration.
+- "CI": when the paraphrase is inaccurate or incomplete.
 
-# Pedagogical context:
-# {context}
+Pedagogical context:
+{context}
 
-# This is attempt {state["_ci_tries"]} for the student. If they get it wrong this time, we'll provide the correct definition and move on.
+This is attempt {state["_ci_tries"]} for the student. If they get it wrong this time, we'll provide the correct definition and move on.
 
-# Task: Determine if the restatement is accurate. If accurate, move to SIM_CC to identify concepts for exploration. Respond ONLY with JSON matching the schema above. If not, help the student to do so."""
+Task: Determine if the restatement is accurate. If accurate, move to SIM_CC to identify concepts for exploration. Respond ONLY with JSON matching the schema above. If not, help the student to do so."""
 
-#     # Build final prompt using optimized template with instructions at the end
-#     final_prompt = build_prompt_from_template_optimized(
-#         system_prompt=system_prompt,
-#         state=state,
-#         include_last_message=True,
-#         include_instructions=True,
-#         parser=ci_parser,
-#         current_node="CI"
-#     )
+    # Build final prompt using optimized template with instructions at the end
+    final_prompt = build_prompt_from_template_optimized(
+        system_prompt=system_prompt,
+        state=state,
+        include_last_message=True,
+        include_instructions=True,
+        parser=ci_parser,
+        current_node="CI"
+    )
     
-#     raw = llm_with_history(state, final_prompt).content
-#     json_text = extract_json_block(raw)
-#     try:
-#         parsed: CiResponse = ci_parser.parse(json_text)
+    raw = llm_with_history(state, final_prompt).content
+    json_text = extract_json_block(raw)
+    try:
+        parsed: CiResponse = ci_parser.parse(json_text)
         
-#         # Add AI message to conversation after successful parsing
-#         add_ai_message_to_conversation(state, parsed.feedback)
+        # Add AI message to conversation after successful parsing
+        add_ai_message_to_conversation(state, parsed.feedback)
         
-#         # 🔍 CI PARSING OUTPUT - MAIN CONTENT 🔍
-#         print("=" * 80)
-#         print("🎯 CI NODE - PARSED OUTPUT CONTENTS 🎯")
-#         print("=" * 80)
-#         print(f"🚀 NEXT_STATE: {parsed.next_state}")
-#         print(f"📝 FEEDBACK: {parsed.feedback}")
-#         print(f"🔢 CI_TRIES: {ci_tries}")
-#         print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
-#         print("=" * 80)
+        # 🔍 CI PARSING OUTPUT - MAIN CONTENT 🔍
+        print("=" * 80)
+        print("🎯 CI NODE - PARSED OUTPUT CONTENTS 🎯")
+        print("=" * 80)
+        print(f"🚀 NEXT_STATE: {parsed.next_state}")
+        print(f"📝 FEEDBACK: {parsed.feedback}")
+        print(f"🔢 CI_TRIES: {ci_tries}")
+        print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
+        print("=" * 80)
         
-#         # Return only the changed keys following LangGraph best practices
-#         return {
-#             "_ci_tries": ci_tries,
-#             "agent_output": parsed.feedback,
-#             "current_state": parsed.next_state
-#         }
-#     except Exception as e:
-#         print(f"Error parsing CI response: {e}")
-#         print(f"Raw response: {raw}")
-#         print(f"Extracted JSON text: {json_text}")
-#         raise
-    print("Entering a dummy ci node to check Langfuse Output")
-    state["agent_output"]  = "This is a dummy CI node output."
-    add_ai_message_to_conversation(state, state["agent_output"])
-    state['current_state'] = "SIM_CC"
-    return state
+        # Return only the changed keys following LangGraph best practices
+        return {
+            "_ci_tries": ci_tries,
+            "agent_output": parsed.feedback,
+            "current_state": parsed.next_state
+        }
+    except Exception as e:
+        print(f"Error parsing CI response: {e}")
+        print(f"Raw response: {raw}")
+        print(f"Extracted JSON text: {json_text}")
+        raise
 
 def ge_node(state: AgentState) -> AgentState:
     # Check if we're coming from AR after finishing a concept
@@ -430,29 +425,26 @@ def ge_node(state: AgentState) -> AgentState:
     # Move to next concept if current concept is done
     current_idx = state.get("sim_current_idx", 0)
     concepts = state.get("sim_concepts", [])
-
-    if not state["_asked_ge"]:
-        state['_asked_ge'] = True
-        state['agent_output'] = "<GE_NODE_OUTPUT> Testing"
-        # state['last_correction'] = "<GE_NODE_OUTPUT> Testing"
-        add_ai_message_to_conversation(state, state['agent_output'])
-        print("Reached HERE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-        # state["current_state"] = "SIM_VARS"  # Transition to SIM_VARS for proper misconception handling
-        return state
-
-    if state["_asked_ge"]:
+    
+    if not state.get("_asked_ge", False):
         state["_asked_ge"] = True
-        # Include ground truth for Details (facts, sub-concepts)
-        gt = get_ground_truth(concept_pkg.title, "Details (facts, sub-concepts)")
-        current_concept = concepts[current_idx]
-        system_prompt = (
-           f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
+        state["_ge_tries"] = 0  # Initialize tries counter
+        
+        # Check if we have concepts to explore
+        if concepts and current_idx < len(concepts):
+            current_concept = concepts[current_idx]
+            # Include ground truth for Details (facts, sub-concepts)
+            gt = get_ground_truth(concept_pkg.title, "Details (facts, sub-concepts)")
+            system_prompt = (
+                f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
                 f"Ground truth (Details):\n{gt}\n\n"
                 f"We are now exploring concept {current_idx + 1} of {len(concepts)}: '{current_concept}'.\n"
                 f"Generate one 'why' or 'how' question to explore the mechanism of this specific concept within '{concept_pkg.title}'."
-        )
-        
-        # Build final prompt using template
+            )
+        else:
+            raise IndexError("No concepts available for exploration.")
+
+        # Build final prompt using optimized template
         final_prompt = build_prompt_from_template_optimized(
             system_prompt=system_prompt,
             state=state,
@@ -475,119 +467,12 @@ def ge_node(state: AgentState) -> AgentState:
         print(f"📄 CONTENT: {content}")
         print(f"📏 CONTENT_LENGTH: {len(content)} characters")
         print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
+        print(f"🔢 CURRENT_CONCEPT_IDX: {current_idx}")
+        print(f"📋 CURRENT_CONCEPT: {concepts[current_idx] if concepts and current_idx < len(concepts) else 'None'}")
         print("=" * 80)
         
         state["agent_output"] = content
         return state
-    
-    # state["_ge_tries"] = state.get("_ge_tries",0) + 1
-    # Check if we've reached max tries (1) - transition smoothly to MH
-    # if state["_ge_tries"] >= 1:
-    #     state['agent_output'] = "<GE_NODE_OUTPUT> Testing"
-    #     state['last_correction'] = "<GE_NODE_OUTPUT> Testing"
-    #     add_ai_message_to_conversation(state, state['agent_output'])
-    #     print("Reached HERE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-    #     state["current_state"] = "SIM_VARS"  # Transition to SIM_VARS for proper misconception handling
-    #     return state
-        # Let LLM generate a natural transition to MH with gentle correction
-
-        # current_idx = state.get("sim_current_idx", 0)
-        # concepts = state.get("sim_concepts", [])
-
-        
-#         if concepts and current_idx < len(concepts):
-#             current_concept = concepts[current_idx]
-#             gt_context = get_ground_truth(concept_pkg.title, "Details (facts, sub-concepts)")
-#             transition_prompt = f"""The student has tried once to explore concept '{current_concept}' within '{concept_pkg.title}'. 
-            
-# Based on their response, provide a gentle clarification or correction to help them understand better. Use this ground truth as reference: {gt_context[:200]}...
-
-# Keep your response conversational and supportive. Address any confusion while guiding them toward the correct understanding."""
-#         else:
-#             gt_context = get_ground_truth(concept_pkg.title, "Details (facts, sub-concepts)")
-#             transition_prompt = f"""The student has tried once to explore '{concept_pkg.title}'. 
-            
-# Based on their response, provide a gentle clarification or correction to help them understand better. Use this ground truth as reference: {gt_context[:200]}...
-
-# Keep your response conversational and supportive. Address any confusion while guiding them toward the correct understanding."""
-        
-#         final_prompt = build_prompt_from_template_optimized(
-#             system_prompt=transition_prompt,
-#             state=state,
-#             include_last_message=True,
-#             include_instructions=False
-#         )
-        
-#         resp = llm_with_history(state, final_prompt)
-#         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-        
-#         add_ai_message_to_conversation(state, content)
-        # state["agent_output"] = content
-        # state["last_correction"] = content  # Store for MH node
-        # print("Reached HERE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-        # state["current_state"] = "SIM_VARS"  # Transition to SIM_VARS for proper misconception handling
-        # return state
-
-    # state['agent_output'] = "Ge tries over."
-    # state['current_state'] = "SIM_VARS"
-    # add_ai_message_to_conversation(state, state['agent_output'])
-    # return state
-    
-    # if state.get("in_simulation", False):
-    #     state["in_simulation"] = False
-    
-    # # Move to next concept if current concept is done
-    # current_idx = state.get("sim_current_idx", 0)
-    # concepts = state.get("sim_concepts", [])
-    
-    # if not state.get("_asked_ge", False):
-    #     state["_asked_ge"] = True
-    #     state["_ge_tries"] = 0  # Initialize tries counter
-        
-    #     # Check if we have concepts to explore
-    #     if concepts and current_idx < len(concepts):
-    #         current_concept = concepts[current_idx]
-    #         # Include ground truth for Details (facts, sub-concepts)
-    #         gt = get_ground_truth(concept_pkg.title, "Details (facts, sub-concepts)")
-    #         system_prompt = (
-    #             f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
-    #             f"Ground truth (Details):\n{gt}\n\n"
-    #             f"We are now exploring concept {current_idx + 1} of {len(concepts)}: '{current_concept}'.\n"
-    #             f"Generate one 'why' or 'how' question to explore the mechanism of this specific concept within '{concept_pkg.title}'."
-    #         )
-    #     else:
-    #         raise IndexError("No concepts available for exploration.")
-
-    #     # Build final prompt using optimized template
-    #     final_prompt = build_prompt_from_template_optimized(
-    #         system_prompt=system_prompt,
-    #         state=state,
-    #         include_last_message=False,
-    #         include_instructions=False,
-    #         current_node="GE"
-    #     )
-            
-    #     resp = llm_with_history(state, final_prompt)
-    #     # Apply JSON extraction in case LLM wraps response in markdown
-    #     content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-        
-    #     # Add AI message to conversation after successful processing
-    #     add_ai_message_to_conversation(state, content)
-        
-    #     # 🔍 GE NODE - FIRST PASS CONTENT 🔍
-    #     print("=" * 80)
-    #     print("🎯 GE NODE - FIRST PASS CONTENT OUTPUT 🎯")
-    #     print("=" * 80)
-    #     print(f"📄 CONTENT: {content}")
-    #     print(f"📏 CONTENT_LENGTH: {len(content)} characters")
-    #     print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
-    #     print(f"🔢 CURRENT_CONCEPT_IDX: {current_idx}")
-    #     print(f"📋 CURRENT_CONCEPT: {concepts[current_idx] if concepts and current_idx < len(concepts) else 'None'}")
-    #     print("=" * 80)
-        
-    #     state["agent_output"] = content
-    #     state['current_state'] = "SIM_VARS"
-    #     return state
 
     # Handle tries for GE node - increment counter
 #     state["_ge_tries"] = state.get("_ge_tries",0) + 1
@@ -631,72 +516,72 @@ def ge_node(state: AgentState) -> AgentState:
 #         state["current_state"] = "SIM_VARS"  # Transition to SIM_VARS for proper misconception handling
 #         return state
 
-#     context = json.dumps(PEDAGOGICAL_MOVES["GE"], indent=2)
-#     current_idx = state.get("sim_current_idx", 0)
-#     concepts = state.get("sim_concepts", [])
+    context = json.dumps(PEDAGOGICAL_MOVES["GE"], indent=2)
+    current_idx = state.get("sim_current_idx", 0)
+    concepts = state.get("sim_concepts", [])
     
-#     system_prompt = f"""Current node: GE (Guided Exploration)
+    system_prompt = f"""Current node: GE (Guided Exploration)
 
-# Current status: 
-# - Concept {current_idx + 1} of {len(concepts) if concepts else 0}
-# - Concept name: {concepts[current_idx] if concepts and current_idx < len(concepts) else 'Unknown'}
+Current status: 
+- Concept {current_idx + 1} of {len(concepts) if concepts else 0}
+- Concept name: {concepts[current_idx] if concepts and current_idx < len(concepts) else 'Unknown'}
 
-# Possible next_state values:
-# - "SIM_VARS": if you detect a misconception in the student's reasoning (must include a non-empty "correction" ≤2 sentences).
-# - "GE": if you need to ask another question about the same concept.
+Possible next_state values:
+- "SIM_VARS": if you detect a misconception in the student's reasoning (must include a non-empty "correction" ≤2 sentences).
+- "GE": if you need to ask another question about the same concept.
 
-# Choose ONLY from these options
+Choose ONLY from these options
 
-# Pedagogical context:
-# {context}
+Pedagogical context:
+{context}
 
-# Task: Detect misconception, correct reasoning, or need for further exploration. RESPOND ONLY WITH JSON matching the schema above."""
+Task: Detect misconception, correct reasoning, or need for further exploration. RESPOND ONLY WITH JSON matching the schema above."""
 
-#     # Build final prompt using optimized template with instructions at the end
-#     final_prompt = build_prompt_from_template_optimized(
-#         system_prompt=system_prompt,
-#         state=state,
-#         include_last_message=True,
-#         include_instructions=True,
-#         parser=ge_parser,
-#         current_node="GE"
-#     )
+    # Build final prompt using optimized template with instructions at the end
+    final_prompt = build_prompt_from_template_optimized(
+        system_prompt=system_prompt,
+        state=state,
+        include_last_message=True,
+        include_instructions=True,
+        parser=ge_parser,
+        current_node="GE"
+    )
     
-#     raw = llm_with_history(state, final_prompt).content
-#     json_text = extract_json_block(raw)
-#     try:
-#         parsed: GeResponse = ge_parser.parse(json_text)
+    raw = llm_with_history(state, final_prompt).content
+    json_text = extract_json_block(raw)
+    try:
+        parsed: GeResponse = ge_parser.parse(json_text)
         
-#         # Add AI message to conversation after successful parsing
-#         add_ai_message_to_conversation(state, parsed.feedback)
+        # Add AI message to conversation after successful parsing
+        add_ai_message_to_conversation(state, parsed.feedback)
         
-#         # 🔍 GE PARSING OUTPUT - MAIN CONTENT 🔍
-#         print("=" * 80)
-#         print("🎯 GE NODE - PARSED OUTPUT CONTENTS 🎯")
-#         print("=" * 80)
-#         print(f"📝 FEEDBACK: {parsed.feedback}")
-#         print(f"🚀 NEXT_STATE: {parsed.next_state}")
-#         print(f"🔧 CORRECTION: {parsed.correction}")
-#         print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
-#         print(f"🔢 CURRENT_CONCEPT_IDX: {current_idx}")
-#         print("=" * 80)
+        # 🔍 GE PARSING OUTPUT - MAIN CONTENT 🔍
+        print("=" * 80)
+        print("🎯 GE NODE - PARSED OUTPUT CONTENTS 🎯")
+        print("=" * 80)
+        print(f"📝 FEEDBACK: {parsed.feedback}")
+        print(f"🚀 NEXT_STATE: {parsed.next_state}")
+        print(f"🔧 CORRECTION: {parsed.correction}")
+        print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
+        print(f"🔢 CURRENT_CONCEPT_IDX: {current_idx}")
+        print("=" * 80)
         
-#         if parsed.next_state == "MH":
-#             state["last_correction"] = parsed.correction or "Let me clarify that for you."
-#         elif parsed.next_state == "SIM_VARS":
-#             state["in_simulation"] = True
+        if parsed.next_state == "MH":
+            state["last_correction"] = parsed.correction or "Let me clarify that for you."
+        elif parsed.next_state == "SIM_VARS":
+            state["in_simulation"] = True
         
-#         state["agent_output"] = parsed.feedback
-#         print("Reached HERE$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", parsed.next_state)
-#         # state["current_state"] = parsed.next_state
-#         state["current_state"] = "SIM_VARS"
-#         # state["current_state"] = 'MH'
-#     except Exception as e:
-#         print(f"Error parsing GE response: {e}")
-#         print(f"Raw response: {raw}")
-#         print(f"Extracted JSON text: {json_text}")
-#         raise
-#     return state
+        state["agent_output"] = parsed.feedback
+        print("Reached HERE$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", parsed.next_state)
+        # state["current_state"] = parsed.next_state
+        state["current_state"] = "SIM_VARS"
+        # state["current_state"] = 'MH'
+    except Exception as e:
+        print(f"Error parsing GE response: {e}")
+        print(f"Raw response: {raw}")
+        print(f"Extracted JSON text: {json_text}")
+        raise
+    return state
 
 def mh_node(state: AgentState) -> AgentState:
     """Misconception Handling node - addresses student misconceptions and handles follow-up questions"""

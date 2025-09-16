@@ -79,30 +79,9 @@ class AgentState(TypedDict, total=False):
 # // 4. Initialize state and wrap helper
 # -----------------------------------------------------------------------------
 def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
-    # Core state fields
     state.setdefault("messages", [])
-    state.setdefault("current_state", "START")
     state.setdefault("last_user_msg", "")
-    state.setdefault("agent_output", "")
-    
-    # Tracking flags for different nodes
-    state.setdefault("_asked_apk", False)
-    state.setdefault("_asked_ci", False)
-    state.setdefault("_asked_ge", False)
-    state.setdefault("_asked_mh", False)
-    state.setdefault("_asked_ar", False)
-    state.setdefault("_asked_tc", False)
-    state.setdefault("_asked_rlc", False)
-    
-    # Try counters for different nodes
-    state.setdefault("_apk_tries", 0)
-    state.setdefault("_ci_tries", 0)
-    state.setdefault("_ge_tries", 0)
-    state.setdefault("_mh_tries", 0)
-    state.setdefault("_rlc_tries", 0)
-    
-    # Definition and simulation fields
-    state.setdefault("definition_echoed", False)
+    state.setdefault("current_state", "START")
     state.setdefault("sim_concepts", [])
     state.setdefault("sim_total_concepts", 0)
     state.setdefault("sim_current_idx", 0)
@@ -123,12 +102,10 @@ def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
     state.setdefault("show_simulation", False)
     state.setdefault("simulation_config", {})
     state.setdefault("simulation_active", False)
-    
-    # Memory optimization state
+    # NEW: Initialize memory optimization state
     state.setdefault("_node_transitions", [])
     state.setdefault("summary", "")
     state.setdefault("summary_last_index", 0)
-    
     return state
 
 def _wrap(fn):
