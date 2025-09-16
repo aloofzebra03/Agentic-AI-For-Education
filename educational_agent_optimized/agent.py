@@ -48,6 +48,7 @@ class EducationalAgent:
 
         # Create a FRESH Langfuse handler per run and attach it + metadata at the graph level
         langfuse_handler = LangfuseCallbackHandler()
+        self.langfuse_handler = langfuse_handler
         self.graph = base_graph.with_config({
             "callbacks": [langfuse_handler],
             "metadata": self._metadata,
@@ -119,7 +120,7 @@ class EducationalAgent:
 
         result = self.graph.invoke(
             cmd,
-            config={"configurable": {"thread_id": self.thread_id}},
+            config={"configurable": {"thread_id": self.thread_id},"callbacks": [self.langfuse_handler]},
         )
         
         # Debug logging: Verify message state

@@ -79,24 +79,56 @@ class AgentState(TypedDict, total=False):
 # // 4. Initialize state and wrap helper
 # -----------------------------------------------------------------------------
 def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
+    # Core state fields
     state.setdefault("messages", [])
-    state.setdefault("last_user_msg", "")
     state.setdefault("current_state", "START")
+    state.setdefault("last_user_msg", "")
+    state.setdefault("agent_output", "")
+    
+    # Tracking flags for different nodes
+    state.setdefault("_asked_apk", False)
+    state.setdefault("_asked_ci", False)
+    state.setdefault("_asked_ge", False)
+    state.setdefault("_asked_mh", False)
+    state.setdefault("_asked_ar", False)
+    state.setdefault("_asked_tc", False)
+    state.setdefault("_asked_rlc", False)
+    
+    # Try counters for different nodes
+    state.setdefault("_apk_tries", 0)
+    state.setdefault("_ci_tries", 0)
+    state.setdefault("_ge_tries", 0)
+    state.setdefault("_mh_tries", 0)
+    state.setdefault("_rlc_tries", 0)
+    
+    # Definition and simulation fields
+    state.setdefault("definition_echoed", False)
     state.setdefault("sim_concepts", [])
     state.setdefault("sim_total_concepts", 0)
     state.setdefault("sim_current_idx", 0)
     state.setdefault("concepts_completed", False)
     state.setdefault("in_simulation", False)
-    # NEW: Initialize simulation state - use dictionaries instead of Pydantic objects for serialization
+    
+    # Misconception and performance tracking
+    state.setdefault("misconception_detected", False)
+    state.setdefault("retrieval_score", 0.0)
+    state.setdefault("transfer_success", False)
+    state.setdefault("last_correction", None)
+    state.setdefault("quiz_score", 0.0)
+    state.setdefault("session_summary", {})
+    
+    # Simulation state - use dictionaries instead of Pydantic objects for serialization
     state.setdefault("sim_variables", [])  # List of dict with keys: name, role, note
     state.setdefault("sim_action_config", {})
     state.setdefault("show_simulation", False)
     state.setdefault("simulation_config", {})
     state.setdefault("simulation_active", False)
-    # NEW: Initialize memory optimization state
+    
+    # Memory optimization state
     state.setdefault("_node_transitions", [])
     state.setdefault("summary", "")
     state.setdefault("summary_last_index", 0)
+    
     return state
 
 def _wrap(fn):

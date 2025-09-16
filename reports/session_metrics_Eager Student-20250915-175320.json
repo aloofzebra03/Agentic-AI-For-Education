@@ -1,0 +1,25 @@
+{
+  "concepts_covered": [
+    "simple pendulum",
+    "oscillation",
+    "period",
+    "frequency",
+    "gravity",
+    "point mass",
+    "massless string",
+    "inextensible string",
+    "acceleration due to gravity"
+  ],
+  "num_concepts_covered": 9,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "High",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.95,
+  "quiz_score": 100.0,
+  "error_handling_count": 2,
+  "adaptability": true,
+  "session_id": "Eager Student-20250915-175320",
+  "total_interactions": 15,
+  "persona_name": "Eager Student"
+}

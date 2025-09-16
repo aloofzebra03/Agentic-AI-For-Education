@@ -58,7 +58,7 @@ def run_test():
             user_msg = tester_agent.respond(agent_msg)
         
         print(f"Tester Agent ({persona.name}): {user_msg}")
-        time.sleep(5)
+        time.sleep(10)
         agent_msg = educational_agent.post(user_msg)
         print(f"Educational Agent: {agent_msg}")
         # print("#########" + educational_agent.current_state())
