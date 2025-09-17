@@ -355,8 +355,7 @@ def display_simulation_if_needed():
     Only displays if simulation is active and hasn't been shown for this cycle.
     """
     if (hasattr(st.session_state, 'agent') and 
-        st.session_state.agent.state.get("show_simulation") and
-        st.session_state.agent.state.get("simulation_active", False)):
+        st.session_state.agent.state.get("show_simulation")):
         
         simulation_config = st.session_state.agent.state.get("simulation_config")
         
@@ -376,7 +375,6 @@ def display_simulation_if_needed():
                 st.error(f"Error displaying simulation: {e}")
                 # Clear flags on error
                 st.session_state.agent.state["show_simulation"] = False
-                st.session_state.agent.state["simulation_active"] = False
                 st.stop()
 
 # ── Streamlit Page Configuration & State Initialization ──────────────────

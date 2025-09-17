@@ -13,13 +13,13 @@ from langchain_core.messages import AnyMessage, HumanMessage, AIMessage
 # from langfuse.langchain import CallbackHandler
 from langgraph.checkpoint.memory import InMemorySaver
 
-from educational_agent_with_simulation.main_nodes_simulation_agent_no_mh import (
+from educational_agent_optimized.main_nodes_simulation_agent_no_mh import (
     start_node, apk_node, ci_node, ge_node,
     ar_node, tc_node, rlc_node, end_node,
 )
 
 # ▶ NEW: import simulation agent nodes
-from educational_agent_with_simulation.simulation_nodes_no_mh_ge import (
+from educational_agent_optimized.simulation_nodes_no_mh_ge import (
     sim_concept_creator_node,
     sim_vars_node,
     sim_action_node,
@@ -61,7 +61,7 @@ class AgentState(TypedDict, total=False):
     misconception_detected: bool
     retrieval_score: float
     transfer_success: bool
-    last_correction: Optional[str]
+    last_correction: str
     quiz_score: float
     session_summary: Dict[str, Any]
     # NEW: Simulation-related state fields
@@ -69,39 +69,89 @@ class AgentState(TypedDict, total=False):
     sim_action_config: Dict[str, Any]
     show_simulation: bool
     simulation_config: Dict[str, Any]
+    simulation_active: bool
+    # NEW: Memory optimization fields
+    _node_transitions: List[Dict[str, Any]]
+    summary: str
+    summary_last_index: int
 
 # -----------------------------------------------------------------------------
 # // 4. Initialize state and wrap helper
 # -----------------------------------------------------------------------------
 def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
-    state.setdefault("messages", [])
-    state.setdefault("last_user_msg", "")
-    state.setdefault("current_state", "START")
-    state.setdefault("sim_concepts", [])
-    state.setdefault("sim_total_concepts", 0)
-    state.setdefault("sim_current_idx", 0)
-    state.setdefault("concepts_completed", False)
-    state.setdefault("in_simulation", False)
-    # NEW: Initialize simulation state
-    state.setdefault("sim_variables", [])  # List of dict with keys: name, role, note
+    # state.setdefault("messages", [])
+    # state.setdefault("last_user_msg", "")
+    # state.setdefault("sim_concepts", [])
+    # state.setdefault("sim_total_concepts", 0)
+    # state.setdefault("sim_current_idx", 0)
+    # state.setdefault("concepts_completed", False)
+    # state.setdefault("in_simulation", False)
+    
+    # # Misconception and performance tracking
+    # state.setdefault("misconception_detected", False)
+    # state.setdefault("retrieval_score", 0.0)
+    # state.setdefault("transfer_success", False)
+    state.setdefault("last_correction", "")
+    # state.setdefault("quiz_score", 0.0)
+    # state.setdefault("session_summary", {})
+    
+    # # Simulation state - use dictionaries instead of Pydantic objects for serialization
+    # state.setdefault("sim_variables", [])  # List of dict with keys: name, role, note
     state.setdefault("sim_action_config", {})
     state.setdefault("show_simulation", False)
     state.setdefault("simulation_config", {})
+    state.setdefault("simulation_active", False)
+    # # NEW: Initialize memory optimization state
+    # state.setdefault("_node_transitions", [])
+    state.setdefault("summary", "")
+    state.setdefault("summary_last_index", 0)
     return state
 
 def _wrap(fn):
     def inner(state: AgentState) -> AgentState:
         print(f"🔧 _WRAP DEBUG - Node processing started")
         print(f"📊 Messages count: {len(state.get('messages', []))}")
+        
+        # CAPTURE OLD STATE BEFORE PROCESSING
+        old_state = state.get("current_state")
+        
         msgs = state.get("messages", [])
         if msgs and isinstance(msgs[-1], HumanMessage):
             text = msgs[-1].content or ""
             if text and text != state.get("last_user_msg"):
                 state["last_user_msg"] = text
                 print(f"📝 Updated last_user_msg: {text[:50]}...")
-        st = fn(state)
+        
+        # CALL THE ORIGINAL NODE FUNCTION
+        result = fn(state)
+        
+        # Handle both full state returns (legacy) and partial state updates (LangGraph best practice)
+        if isinstance(result, dict):
+            # Partial state update - merge with existing state (LangGraph best practice)
+            print(f"🔄 _WRAP DEBUG - Merging partial state update with keys: {list(result.keys())}")
+            state.update(result)
+            st = state
+        else:
+            # Full state return (legacy behavior)
+            st = result
+        
+        # CAPTURE NEW STATE AFTER PROCESSING
+        new_state = st.get("current_state")
+        final_message_count = len(st.get("messages", []))
+        
+        # TRACK TRANSITION IF STATE CHANGED
+        # The transition happens AFTER the current agent response is added
+        if old_state != new_state and old_state is not None:
+            transitions = st.setdefault("_node_transitions", [])
+            transitions.append({
+                "from_node": old_state,
+                "to_node": new_state,
+                "transition_after_message_index": final_message_count,
+            })
+            print(f"🔄 NODE TRANSITION: {old_state} -> {new_state} after message {final_message_count}")
+        
         print(f"🏁 _WRAP DEBUG - Node processing completed")
-        print(f"📊 Final messages count: {len(st.get('messages', []))}")
+        print(f"📊 Final messages count: {final_message_count}")
         return st
     return inner
 

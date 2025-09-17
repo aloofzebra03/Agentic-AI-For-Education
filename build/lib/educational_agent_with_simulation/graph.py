@@ -69,6 +69,7 @@ class AgentState(TypedDict, total=False):
     sim_action_config: Dict[str, Any]
     show_simulation: bool
     simulation_config: Dict[str, Any]
+    simulation_active: bool
 
 # -----------------------------------------------------------------------------
 # // 4. Initialize state and wrap helper
@@ -87,6 +88,7 @@ def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
     state.setdefault("sim_action_config", {})
     state.setdefault("show_simulation", False)
     state.setdefault("simulation_config", {})
+    state.setdefault("simulation_active", False)
     return state
 
 def _wrap(fn):

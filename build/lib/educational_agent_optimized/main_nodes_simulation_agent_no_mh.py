@@ -16,6 +16,7 @@ from educational_agent.shared_utils import (
     llm_with_history,
     build_conversation_history,
     build_prompt_from_template,
+    build_prompt_from_template_optimized,
     get_ground_truth,
 )
 
@@ -67,7 +68,7 @@ class CiResponse(BaseModel):
 
 class GeResponse(BaseModel):
     feedback: str
-    next_state: Literal["MH", "AR", "GE"]
+    next_state: Literal["SIM_VARS", "GE"]
     correction: Optional[str] = None
 
 class MhResponse(BaseModel):
@@ -108,16 +109,17 @@ def start_node(state: AgentState) -> AgentState:
         # "Also Remember that the student is of Kannada origin and understands olny kannada.So speak to the student in kannada.The script has to be kannada and not english.\n"
     )
     
-    # Build final prompt using template
-    final_prompt = build_prompt_from_template(
+    # Build final prompt using optimized template
+    final_prompt = build_prompt_from_template_optimized(
         system_prompt=system_prompt,
         state=state,
         include_last_message=False,
-        include_instructions=False
+        include_instructions=False,
+        current_node="START"
     )
     
     print("IN START NODE")
-    resp = llm_with_history(state, final_prompt)
+    resp = llm_with_history(state, final_prompt)  # Using regular llm_with_history since prompt is pre-built
     # Apply JSON extraction in case LLM wraps response in markdown
     content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
     
@@ -149,12 +151,13 @@ def apk_node(state: AgentState) -> AgentState:
             f"Ground truth (Concept Definition):\n{gt}\nGenerate one hook question that activates prior knowledge for '{concept_pkg.title}'.",
         )
         
-        # Build final prompt using template
-        final_prompt = build_prompt_from_template(
+        # Build final prompt using optimized template
+        final_prompt = build_prompt_from_template_optimized(
             system_prompt=system_prompt,
             state=state,
             include_last_message=False,
-            include_instructions=False
+            include_instructions=False,
+            current_node="APK"
         )
             
         resp = llm_with_history(state, final_prompt)
@@ -198,12 +201,13 @@ Task: Provide the correct identification of '{concept_pkg.title}' in a supportiv
 Respond ONLY with a clear, encouraging message (not JSON - just the message text)."""
 
         # Build final prompt for revealing the concept
-        final_prompt = build_prompt_from_template(
+        final_prompt = build_prompt_from_template_optimized(
             system_prompt=final_system_prompt,
             state=state,
             include_last_message=True,
             include_instructions=False,
-            parser=None
+            parser=None,
+            current_node="APK"
         )
         
         final_response = llm_with_history(state, final_prompt).content.strip()
@@ -234,15 +238,17 @@ Pedagogical context:
 
 This is attempt {state["_apk_tries"]} of 2 for prior knowledge activation.
 
-Task: Evaluate whether the student identified the concept correctly. Respond ONLY with JSON matching the schema above. If not, help the student to do so."""
+Task: Evaluate whether the student identified the concept correctly. Respond ONLY with JSON matching the schema above. If not, help the student to do so.
+Remember to give feedback as mentioned in the required schema."""
 
-    # Build final prompt using template with instructions at the end
-    final_prompt = build_prompt_from_template(
+    # Build final prompt using optimized template with instructions at the end
+    final_prompt = build_prompt_from_template_optimized(
         system_prompt=system_prompt,
         state=state,
         include_last_message=True,
         include_instructions=True,
-        parser=apk_parser
+        parser=apk_parser,
+        current_node="APK"
     )
     
     raw = llm_with_history(state, final_prompt).content
@@ -271,11 +277,9 @@ Task: Evaluate whether the student identified the concept correctly. Respond ONL
         raise
     return state
 
-def ci_node(state: AgentState) -> AgentState:
+def ci_node(state: AgentState) -> dict:
     # print("REACHED HERE")
     if not state.get("_asked_ci", False):
-        state["_asked_ci"] = True
-        state["_ci_tries"] = 0  # Initialize attempt counter
         # Include ground truth for Explanation (with analogies)
         gt = get_ground_truth(concept_pkg.title, "Explanation (with analogies)")
         system_prompt = (
@@ -284,12 +288,13 @@ def ci_node(state: AgentState) -> AgentState:
             "then ask the learner to restate it."
         )
         
-        # Build final prompt using template
-        final_prompt = build_prompt_from_template(
+        # Build final prompt using optimized template
+        final_prompt = build_prompt_from_template_optimized(
             system_prompt=system_prompt,
             state=state,
             include_last_message=False,
-            include_instructions=False
+            include_instructions=False,
+            current_node="CI"
         )
             
         resp = llm_with_history(state, final_prompt)
@@ -308,14 +313,18 @@ def ci_node(state: AgentState) -> AgentState:
         print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
         print("=" * 80)
         
-        state["agent_output"] = content
-        return state
+        # Return only the changed keys following LangGraph best practices
+        return {
+            "_asked_ci": True,
+            "_ci_tries": 0,
+            "agent_output": content
+        }
 
     # Increment attempt counter
-    state["_ci_tries"] = state.get("_ci_tries", 0) + 1
+    ci_tries = state.get("_ci_tries", 0) + 1
     
     # Check if we've reached 2 attempts - if so, provide definition and move on
-    if state["_ci_tries"] >= 2:
+    if ci_tries >= 2:
         # gt = get_ground_truth(concept_pkg.title, "Explanation (with analogies)")
         system_prompt = (
             f"The student has struggled with restating the definition. Provide the correct definition of '{concept_pkg.title}' "
@@ -323,12 +332,13 @@ def ci_node(state: AgentState) -> AgentState:
             "Then say 'Now let's explore this concept deeper with a question.'"
         )
         
-        # Build final prompt using template
-        final_prompt = build_prompt_from_template(
+        # Build final prompt using optimized template
+        final_prompt = build_prompt_from_template_optimized(
             system_prompt=system_prompt,
             state=state,
             include_last_message=False,
-            include_instructions=False
+            include_instructions=False,
+            current_node="CI"
         )
             
         resp = llm_with_history(state, final_prompt)
@@ -344,12 +354,15 @@ def ci_node(state: AgentState) -> AgentState:
         print("=" * 80)
         print(f"📄 CONTENT: {content}")
         print(f"📏 CONTENT_LENGTH: {len(content)} characters")
-        print(f"🔢 CI_TRIES: {state['_ci_tries']}")
+        print(f"🔢 CI_TRIES: {ci_tries}")
         print("=" * 80)
         
-        state["agent_output"] = content
-        state["current_state"] = "SIM_CC"
-        return state
+        # Return only the changed keys following LangGraph best practices
+        return {
+            "_ci_tries": ci_tries,
+            "agent_output": content,
+            "current_state": "SIM_CC"
+        }
 
     context = json.dumps(PEDAGOGICAL_MOVES["CI"], indent=2)
     system_prompt = f"""Current node: CI (Concept Introduction)
@@ -364,13 +377,14 @@ This is attempt {state["_ci_tries"]} for the student. If they get it wrong this 
 
 Task: Determine if the restatement is accurate. If accurate, move to SIM_CC to identify concepts for exploration. Respond ONLY with JSON matching the schema above. If not, help the student to do so."""
 
-    # Build final prompt using template with instructions at the end
-    final_prompt = build_prompt_from_template(
+    # Build final prompt using optimized template with instructions at the end
+    final_prompt = build_prompt_from_template_optimized(
         system_prompt=system_prompt,
         state=state,
         include_last_message=True,
         include_instructions=True,
-        parser=ci_parser
+        parser=ci_parser,
+        current_node="CI"
     )
     
     raw = llm_with_history(state, final_prompt).content
@@ -385,20 +399,23 @@ Task: Determine if the restatement is accurate. If accurate, move to SIM_CC to i
         print("=" * 80)
         print("🎯 CI NODE - PARSED OUTPUT CONTENTS 🎯")
         print("=" * 80)
-        print(f"📝 FEEDBACK: {parsed.feedback}")
         print(f"🚀 NEXT_STATE: {parsed.next_state}")
-        print(f"🔢 CI_TRIES: {state['_ci_tries']}")
+        print(f"📝 FEEDBACK: {parsed.feedback}")
+        print(f"🔢 CI_TRIES: {ci_tries}")
         print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
         print("=" * 80)
         
-        state["agent_output"]  = parsed.feedback
-        state["current_state"] = parsed.next_state
+        # Return only the changed keys following LangGraph best practices
+        return {
+            "_ci_tries": ci_tries,
+            "agent_output": parsed.feedback,
+            "current_state": parsed.next_state
+        }
     except Exception as e:
         print(f"Error parsing CI response: {e}")
         print(f"Raw response: {raw}")
         print(f"Extracted JSON text: {json_text}")
         raise
-    return state
 
 def ge_node(state: AgentState) -> AgentState:
     # Check if we're coming from AR after finishing a concept
@@ -427,12 +444,13 @@ def ge_node(state: AgentState) -> AgentState:
         else:
             raise IndexError("No concepts available for exploration.")
 
-        # Build final prompt using template
-        final_prompt = build_prompt_from_template(
+        # Build final prompt using optimized template
+        final_prompt = build_prompt_from_template_optimized(
             system_prompt=system_prompt,
             state=state,
             include_last_message=False,
-            include_instructions=False
+            include_instructions=False,
+            current_node="GE"
         )
             
         resp = llm_with_history(state, final_prompt)
@@ -481,7 +499,7 @@ Based on their response, provide a gentle clarification or correction to help th
 
 Keep your response conversational and supportive. Address any confusion while guiding them toward the correct understanding."""
         
-        final_prompt = build_prompt_from_template(
+        final_prompt = build_prompt_from_template_optimized(
             system_prompt=transition_prompt,
             state=state,
             include_last_message=True,
@@ -493,8 +511,9 @@ Keep your response conversational and supportive. Address any confusion while gu
         
         add_ai_message_to_conversation(state, content)
         state["agent_output"] = content
-        state["last_correction"] = content  # Store for MH node
-        state["current_state"] = "MH"  # Transition to MH for proper misconception handling
+        # state["last_correction"] = content  # Store for MH node
+        print("Reached HERE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        state["current_state"] = "SIM_VARS"  # Transition to SIM_VARS for proper misconception handling
         return state
 
     context = json.dumps(PEDAGOGICAL_MOVES["GE"], indent=2)
@@ -508,8 +527,7 @@ Current status:
 - Concept name: {concepts[current_idx] if concepts and current_idx < len(concepts) else 'Unknown'}
 
 Possible next_state values:
-- "MH": if you detect a misconception in the student's reasoning (must include a non-empty "correction" ≤2 sentences).
-- "AR": if the reasoning is correct and we should test this concept.
+- "SIM_VARS": if you detect a misconception in the student's reasoning (must include a non-empty "correction" ≤2 sentences).
 - "GE": if you need to ask another question about the same concept.
 
 Choose ONLY from these options
@@ -519,13 +537,14 @@ Pedagogical context:
 
 Task: Detect misconception, correct reasoning, or need for further exploration. RESPOND ONLY WITH JSON matching the schema above."""
 
-    # Build final prompt using template with instructions at the end
-    final_prompt = build_prompt_from_template(
+    # Build final prompt using optimized template with instructions at the end
+    final_prompt = build_prompt_from_template_optimized(
         system_prompt=system_prompt,
         state=state,
         include_last_message=True,
         include_instructions=True,
-        parser=ge_parser
+        parser=ge_parser,
+        current_node="GE"
     )
     
     raw = llm_with_history(state, final_prompt).content
@@ -553,7 +572,9 @@ Task: Detect misconception, correct reasoning, or need for further exploration. 
             state["in_simulation"] = True
         
         state["agent_output"] = parsed.feedback
-        state["current_state"] = parsed.next_state
+        print("Reached HERE$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", parsed.next_state)
+        # state["current_state"] = parsed.next_state
+        state["current_state"] = "SIM_VARS"
         # state["current_state"] = 'MH'
     except Exception as e:
         print(f"Error parsing GE response: {e}")
@@ -618,12 +639,13 @@ Be encouraging but definitive. This is the final clarification before moving to 
 Respond ONLY with a clear, conclusive message (not JSON - just the message text)."""
 
         # Build final prompt for concluding misconception
-        final_prompt = build_prompt_from_template(
+        final_prompt = build_prompt_from_template_optimized(
             system_prompt=final_system_prompt,
             state=state,
             include_last_message=True,
             include_instructions=False,
-            parser=None
+            parser=None,
+            current_node="MH"
         )
         
         final_response = llm_with_history(state, final_prompt).content.strip()
@@ -667,13 +689,14 @@ Analyze their response:
 
 Task: Evaluate the student's response after receiving misconception correction. Respond ONLY with JSON matching the schema above."""
 
-    # Build final prompt using template with instructions
-    final_prompt = build_prompt_from_template(
+    # Build final prompt using optimized template with instructions
+    final_prompt = build_prompt_from_template_optimized(
         system_prompt=system_prompt,
         state=state,
         include_last_message=True,
         include_instructions=True,
-        parser=mh_parser
+        parser=mh_parser,
+        current_node="MH"
     )
     
     raw = llm_with_history(state, final_prompt).content
@@ -726,17 +749,17 @@ def ar_node(state: AgentState) -> AgentState:
         else:
             system_prompt = (
                 f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
-                f"Ground truth (MCQs):\n{gt}\nGenerate a short quiz question (T/F, MCQ, or short answer) on '{concept_pkg.title}' and prompt the learner."
-            )
+            f"Ground truth (MCQs):\n{gt}\nGenerate a short quiz question (T/F, MCQ, or short answer) on '{concept_pkg.title}' and prompt the learner."
+        )
         
-        # Build final prompt using template
-        final_prompt = build_prompt_from_template(
+        # Build final prompt using optimized template
+        final_prompt = build_prompt_from_template_optimized(
             system_prompt=system_prompt,
             state=state,
             include_last_message=False,
-            include_instructions=False
+            include_instructions=False,
+            current_node="AR"
         )
-            
         resp = llm_with_history(state, final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
@@ -775,13 +798,14 @@ Pedagogical context:
 
 Task: Grade this answer on a scale from 0 to 1 and determine next state. Respond ONLY with JSON matching the schema above."""
 
-    # Build final prompt using template with instructions at the end
-    final_prompt = build_prompt_from_template(
+    # Build final prompt using optimized template with instructions at the end
+    final_prompt = build_prompt_from_template_optimized(
         system_prompt=system_prompt,
         state=state,
         include_last_message=True,
         include_instructions=True,
-        parser=ar_parser
+        parser=ar_parser,
+        current_node="AR"
     )
     
     raw = llm_with_history(state, final_prompt).content
@@ -820,11 +844,12 @@ Task: Grade this answer on a scale from 0 to 1 and determine next state. Respond
         )
         
         # Build final prompt using template
-        explain_final_prompt = build_prompt_from_template(
+        explain_final_prompt = build_prompt_from_template_optimized(
             system_prompt=explain_system_prompt,
             state=state,
             include_last_message=True,
-            include_instructions=False
+            include_instructions=False,
+            current_node="AR"
         )
             
         resp = llm_with_history(state, explain_final_prompt)
@@ -876,11 +901,12 @@ def tc_node(state: AgentState) -> AgentState:
         )
         
         # Build final prompt using template
-        final_prompt = build_prompt_from_template(
+        final_prompt = build_prompt_from_template_optimized(
             system_prompt=system_prompt,
             state=state,
             include_last_message=False,
-            include_instructions=False
+            include_instructions=False,
+            current_node="TC"
         )
             
         resp = llm_with_history(state, final_prompt)
@@ -912,13 +938,14 @@ Pedagogical context:
 
 Task: Evaluate whether the application is correct. Respond ONLY with JSON matching the schema above."""
 
-    # Build final prompt using template with instructions at the end
-    final_prompt = build_prompt_from_template(
+    # Build final prompt using optimized template with instructions at the end
+    final_prompt = build_prompt_from_template_optimized(
         system_prompt=system_prompt,
         state=state,
         include_last_message=True,
         include_instructions=True,
-        parser=tc_parser
+        parser=tc_parser,
+        current_node="TC"
     )
     
     raw = llm_with_history(state, final_prompt).content
@@ -954,11 +981,12 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
         )
         
         # Build final prompt using template
-        explain_final_prompt = build_prompt_from_template(
+        explain_final_prompt = build_prompt_from_template_optimized(
             system_prompt=explain_system_prompt,
             state=state,
             include_last_message=True,
-            include_instructions=False
+            include_instructions=False,
+            current_node="TC"
         )
             
         resp = llm_with_history(state, explain_final_prompt)
@@ -982,8 +1010,9 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
 
 def rlc_node(state: AgentState) -> AgentState:
     # Ensure simulation flags are properly reset when entering RLC
-    if state.get("show_simulation", False):
+    if state.get("simulation_active", False):
         state["show_simulation"] = False
+        state["simulation_active"] = False
         state["simulation_config"] = {}
     
     if not state.get("_asked_rlc", False):
@@ -997,11 +1026,12 @@ def rlc_node(state: AgentState) -> AgentState:
         )
         
         # Build final prompt using template
-        final_prompt = build_prompt_from_template(
+        final_prompt = build_prompt_from_template_optimized(
             system_prompt=system_prompt,
             state=state,
             include_last_message=False,
-            include_instructions=False
+            include_instructions=False,
+            current_node="RLC"
         )
             
         resp = llm_with_history(state, final_prompt)
@@ -1036,11 +1066,12 @@ def rlc_node(state: AgentState) -> AgentState:
         )
         
         # Build final prompt using template
-        final_prompt = build_prompt_from_template(
+        final_prompt = build_prompt_from_template_optimized(
             system_prompt=system_prompt,
             state=state,
             include_last_message=True,
-            include_instructions=False
+            include_instructions=False,
+            current_node="RLC"
         )
             
         resp = llm_with_history(state, final_prompt)
@@ -1075,13 +1106,14 @@ This is attempt {state["_rlc_tries"]} for the student in the RLC node. You can s
 
 Task: Evaluate whether the student has more questions about the real-life application. If they're asking relevant questions, stay in RLC. If they seem satisfied or ready to move on, go to END. Respond ONLY with JSON matching the schema above."""
 
-    # Build final prompt using template with instructions at the end
-    final_prompt = build_prompt_from_template(
+    # Build final prompt using optimized template with instructions at the end
+    final_prompt = build_prompt_from_template_optimized(
         system_prompt=system_prompt,
         state=state,
         include_last_message=True,
         include_instructions=True,
-        parser=rlc_parser
+        parser=rlc_parser,
+        current_node="RLC"
     )
     
     raw = llm_with_history(state, final_prompt).content

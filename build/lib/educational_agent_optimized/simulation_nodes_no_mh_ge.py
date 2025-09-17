@@ -11,6 +11,7 @@ from educational_agent.shared_utils import (
     add_ai_message_to_conversation,
     llm_with_history,
     build_prompt_from_template,
+    build_prompt_from_template_optimized,
     extract_json_block,
 )
 
@@ -212,12 +213,13 @@ Guidelines:
 - They must be independently variable (changing one doesn't implicitly change the others).
 """
 
-    final_prompt = build_prompt_from_template(
+    final_prompt = build_prompt_from_template_optimized(
         system_prompt=system_prompt,
         state=state,
         include_last_message=False,
         include_instructions=True,
         parser=sim_cc_parser,
+        current_node="SIM_CC"
     )
     raw = llm_with_history(state, final_prompt).content
     json_text = extract_json_block(raw)
@@ -265,12 +267,13 @@ Respond with JSON ONLY: declare variables (independent/dependent/control) that m
 Keep it concise and age-appropriate. Address the student directly in your prompt_to_learner.
 """
 
-    final_prompt = build_prompt_from_template(
+    final_prompt = build_prompt_from_template_optimized(
         system_prompt=system_prompt,
         state=state,
         include_last_message=True,
         include_instructions=True,
         parser=sim_vars_parser,
+        current_node="SIM_VARS"
     )
     raw = llm_with_history(state, final_prompt).content
     json_text = extract_json_block(raw)
@@ -325,12 +328,13 @@ Return JSON ONLY describing:
 - 'prompt_to_learner': a direct question asking for their engagement (use 'you')
 """
 
-    final_prompt = build_prompt_from_template(
+    final_prompt = build_prompt_from_template_optimized(
         system_prompt=system_prompt,
         state=state,
         include_last_message=True,
         include_instructions=True,
         parser=sim_action_parser,
+        current_node="SIM_ACTION"
     )
     raw = llm_with_history(state, final_prompt).content
     json_text = extract_json_block(raw)
@@ -376,12 +380,13 @@ Return JSON ONLY with:
 - 'hint': optional gentle hint phrased as if speaking directly to the student (or null)
 """
 
-    final_prompt = build_prompt_from_template(
+    final_prompt = build_prompt_from_template_optimized(
         system_prompt=system_prompt,
         state=state,
         include_last_message=True,
         include_instructions=True,
         parser=sim_expect_parser,
+        current_node="SIM_EXPECT"
     )
     raw = llm_with_history(state, final_prompt).content
     json_text = extract_json_block(raw)
@@ -414,6 +419,7 @@ def sim_execute_node(state: AgentState) -> AgentState:
         # Set flags for Streamlit to display simulation - but mark that it's active
         state["show_simulation"] = True
         state["simulation_config"] = simulation_config
+        state["simulation_active"] = True  # New flag to track simulation lifecycle
         
         # Agent message
         msg = f"Perfect! Let me demonstrate this concept with a simulation for you. {simulation_config['agent_message']}"
@@ -427,6 +433,7 @@ def sim_execute_node(state: AgentState) -> AgentState:
         add_ai_message_to_conversation(state, error_msg)
         state["agent_output"] = error_msg
         state["show_simulation"] = False
+        state["simulation_active"] = False
         state["current_state"] = "SIM_OBSERVE"
     
     return state
@@ -457,12 +464,13 @@ Return JSON ONLY with:
 - 'expected_observations': 2–5 strings (internal guide, not printed verbatim later)
 """
 
-    final_prompt = build_prompt_from_template(
+    final_prompt = build_prompt_from_template_optimized(
         system_prompt=system_prompt,
         state=state,
         include_last_message=True,
         include_instructions=True,
         parser=sim_observe_parser,
+        current_node="SIM_OBSERVE"
     )
     raw = llm_with_history(state, final_prompt).content
     json_text = extract_json_block(raw)
@@ -501,12 +509,13 @@ Return JSON ONLY with:
 - 'compared_to_prediction': 1 sentence connecting to the student's prediction using 'your prediction'
 """
 
-    final_prompt = build_prompt_from_template(
+    final_prompt = build_prompt_from_template_optimized(
         system_prompt=system_prompt,
         state=state,
         include_last_message=True,
         include_instructions=True,
         parser=sim_insight_parser,
+        current_node="SIM_INSIGHT"
     )
     raw = llm_with_history(state, final_prompt).content
     json_text = extract_json_block(raw)
@@ -547,12 +556,13 @@ Return JSON ONLY with:
 - 'closing_prompt': a short reflective question to the student about what they learned (use 'you')
 """
 
-    final_prompt = build_prompt_from_template(
+    final_prompt = build_prompt_from_template_optimized(
         system_prompt=system_prompt,
         state=state,
         include_last_message=True,
         include_instructions=True,
         parser=sim_reflect_parser,
+        current_node="SIM_REFLECT"
     )
     raw = llm_with_history(state, final_prompt).content
     json_text = extract_json_block(raw)
@@ -564,6 +574,7 @@ Return JSON ONLY with:
 
     # IMPORTANT: Reset simulation flags since simulation cycle is complete
     state["show_simulation"] = False
+    state["simulation_active"] = False
     state["simulation_config"] = {}
     
     # Handover to AR to ask a question about this concept

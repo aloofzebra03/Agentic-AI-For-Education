@@ -67,7 +67,7 @@ class CiResponse(BaseModel):
 
 class GeResponse(BaseModel):
     feedback: str
-    next_state: Literal["MH", "AR", "GE"]
+    next_state: Literal["SIM_VARS", "GE"]
     correction: Optional[str] = None
 
 class MhResponse(BaseModel):
@@ -457,45 +457,46 @@ def ge_node(state: AgentState) -> AgentState:
         return state
 
     # Handle tries for GE node - increment counter
-    state["_ge_tries"] = state.get("_ge_tries",0) + 1
+#     state["_ge_tries"] = state.get("_ge_tries",0) + 1
     
-    # Check if we've reached max tries (1) - transition smoothly to MH
-    if state["_ge_tries"] >= 1:
-        # Let LLM generate a natural transition to MH with gentle correction
-        current_idx = state.get("sim_current_idx", 0)
-        concepts = state.get("sim_concepts", [])
+#     # Check if we've reached max tries (1) - transition smoothly to MH
+#     if state["_ge_tries"] >= 1:
+#         # Let LLM generate a natural transition to MH with gentle correction
+#         current_idx = state.get("sim_current_idx", 0)
+#         concepts = state.get("sim_concepts", [])
         
-        if concepts and current_idx < len(concepts):
-            current_concept = concepts[current_idx]
-            gt_context = get_ground_truth(concept_pkg.title, "Details (facts, sub-concepts)")
-            transition_prompt = f"""The student has tried once to explore concept '{current_concept}' within '{concept_pkg.title}'. 
+#         if concepts and current_idx < len(concepts):
+#             current_concept = concepts[current_idx]
+#             gt_context = get_ground_truth(concept_pkg.title, "Details (facts, sub-concepts)")
+#             transition_prompt = f"""The student has tried once to explore concept '{current_concept}' within '{concept_pkg.title}'. 
             
-Based on their response, provide a gentle clarification or correction to help them understand better. Use this ground truth as reference: {gt_context[:200]}...
+# Based on their response, provide a gentle clarification or correction to help them understand better. Use this ground truth as reference: {gt_context[:200]}...
 
-Keep your response conversational and supportive. Address any confusion while guiding them toward the correct understanding."""
-        else:
-            gt_context = get_ground_truth(concept_pkg.title, "Details (facts, sub-concepts)")
-            transition_prompt = f"""The student has tried once to explore '{concept_pkg.title}'. 
+# Keep your response conversational and supportive. Address any confusion while guiding them toward the correct understanding."""
+#         else:
+#             gt_context = get_ground_truth(concept_pkg.title, "Details (facts, sub-concepts)")
+#             transition_prompt = f"""The student has tried once to explore '{concept_pkg.title}'. 
             
-Based on their response, provide a gentle clarification or correction to help them understand better. Use this ground truth as reference: {gt_context[:200]}...
+# Based on their response, provide a gentle clarification or correction to help them understand better. Use this ground truth as reference: {gt_context[:200]}...
 
-Keep your response conversational and supportive. Address any confusion while guiding them toward the correct understanding."""
+# Keep your response conversational and supportive. Address any confusion while guiding them toward the correct understanding."""
         
-        final_prompt = build_prompt_from_template(
-            system_prompt=transition_prompt,
-            state=state,
-            include_last_message=True,
-            include_instructions=False
-        )
+#         final_prompt = build_prompt_from_template(
+#             system_prompt=transition_prompt,
+#             state=state,
+#             include_last_message=True,
+#             include_instructions=False
+#         )
         
-        resp = llm_with_history(state, final_prompt)
-        content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+#         resp = llm_with_history(state, final_prompt)
+#         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
-        add_ai_message_to_conversation(state, content)
-        state["agent_output"] = content
-        state["last_correction"] = content  # Store for MH node
-        state["current_state"] = "MH"  # Transition to MH for proper misconception handling
-        return state
+#         add_ai_message_to_conversation(state, content)
+#         state["agent_output"] = content
+#         state["last_correction"] = content  # Store for MH node
+#         print("Reached HERE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+#         state["current_state"] = "SIM_VARS"  # Transition to SIM_VARS for proper misconception handling
+#         return state
 
     context = json.dumps(PEDAGOGICAL_MOVES["GE"], indent=2)
     current_idx = state.get("sim_current_idx", 0)
@@ -508,8 +509,7 @@ Current status:
 - Concept name: {concepts[current_idx] if concepts and current_idx < len(concepts) else 'Unknown'}
 
 Possible next_state values:
-- "MH": if you detect a misconception in the student's reasoning (must include a non-empty "correction" ≤2 sentences).
-- "AR": if the reasoning is correct and we should test this concept.
+- "SIM_VARS": if you detect a misconception in the student's reasoning (must include a non-empty "correction" ≤2 sentences).
 - "GE": if you need to ask another question about the same concept.
 
 Choose ONLY from these options
@@ -553,7 +553,9 @@ Task: Detect misconception, correct reasoning, or need for further exploration. 
             state["in_simulation"] = True
         
         state["agent_output"] = parsed.feedback
-        state["current_state"] = parsed.next_state
+        print("Reached HERE$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", parsed.next_state)
+        # state["current_state"] = parsed.next_state
+        state["current_state"] = "SIM_VARS"
         # state["current_state"] = 'MH'
     except Exception as e:
         print(f"Error parsing GE response: {e}")
@@ -982,8 +984,9 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
 
 def rlc_node(state: AgentState) -> AgentState:
     # Ensure simulation flags are properly reset when entering RLC
-    if state.get("show_simulation", False):
+    if state.get("simulation_active", False):
         state["show_simulation"] = False
+        state["simulation_active"] = False
         state["simulation_config"] = {}
     
     if not state.get("_asked_rlc", False):

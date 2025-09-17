@@ -12,8 +12,6 @@ import dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_core.prompts import PromptTemplate
-from langchain_groq import ChatGroq
-
 from educational_agent.config_rag import concept_pkg
 from educational_agent.Creating_Section_Text.retriever import retrieve_docs
 from educational_agent.Filtering_GT.filter_utils import filter_relevant_section
@@ -83,20 +81,15 @@ def extract_json_block(text: str) -> str:
 
 def get_llm():
     """Get configured LLM instance."""
-    # api_key = os.getenv("GOOGLE_API_KEY")
-    # if not api_key:
-    #     raise RuntimeError("Please set GOOGLE_API_KEY")
-    # return ChatGoogleGenerativeAI(
-    #     model="gemini-2.0-flash",
-    #     api_key=api_key,
-    #     temperature=0.5,
-    # )
-    llm = ChatGroq(
-        model="llama-3.1-8b-instant",
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        raise RuntimeError("Please set GOOGLE_API_KEY")
+    return ChatGoogleGenerativeAI(
+        model="gemini-2.0-flash",
+        api_key=api_key,
         temperature=0.5,
-        max_tokens=None,
     )
-    return llm
+
 
 def add_ai_message_to_conversation(state: AgentState, content: str):
     """Add AI message to conversation after successful processing."""
@@ -434,7 +427,7 @@ def build_node_aware_conversation_history(state: AgentState, current_node: str) 
     Use cached summaries and only summarize new content incrementally.
     """
     messages = state.get("messages", [])
-    transitions = state.get("node_transitions", [])
+    transitions = state.get("_node_transitions", [])
     
     # For short conversations, use full history
     if len(messages) <= 6:
@@ -474,16 +467,16 @@ def build_node_aware_conversation_history(state: AgentState, current_node: str) 
                         break
             
             # Check if we need to update summary
-            if last_older_index <= state.get("summary_last_index", 0):
+            if last_older_index <= state["summary_last_index"]:
                 # Use existing summary - no new messages to summarize
                 summary = state["summary"]
                 print(f"📊 ✅ Using existing summary (covers up to index {state['summary_last_index']})")
             else:
                 # Need to update summary with new messages
-                new_messages_start = state.get("summary_last_index", 0) + 1
+                new_messages_start = state["summary_last_index"] + 1
                 new_messages = messages[new_messages_start:last_older_index + 1]
-
-                if state.get("summary"):
+                
+                if state["summary"]:
                     # Combine old summary with new messages
                     combined_content = f"Previous summary: {state['summary']}\n\nNew messages:\n"
                     for msg in new_messages:

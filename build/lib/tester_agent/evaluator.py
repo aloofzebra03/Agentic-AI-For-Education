@@ -4,7 +4,6 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from tester_agent.personas import Persona
 from tester_agent.session_metrics import compute_and_upload_session_metrics
 from typing import Optional, Dict, Any
-from langchain_groq import ChatGroq
 
 class Evaluator:
     """
@@ -18,16 +17,11 @@ class Evaluator:
     Note: For quantitative metrics (engagement, clarity scores, etc.), use session_metrics.py
     """
     def __init__(self):
-        # self.llm = ChatGoogleGenerativeAI(
-        #     model="gemini-2.0-flash",
-        #     api_key=os.getenv("GOOGLE_API_KEY"),
-        #     temperature=0.2,
-        # )
-        self.llm = ChatGroq(
-        model="llama-3.1-8b-instant",
-        temperature=0.5,
-        max_tokens=None,
-    )
+        self.llm = ChatGoogleGenerativeAI(
+            model="gemini-2.0-flash",
+            api_key=os.getenv("GOOGLE_API_KEY"),
+            temperature=0.2,
+        )
 
     def evaluate(self, persona: Persona, history: list) -> str:
         """

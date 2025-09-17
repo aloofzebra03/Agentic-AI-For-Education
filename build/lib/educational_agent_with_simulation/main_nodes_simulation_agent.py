@@ -982,8 +982,9 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
 
 def rlc_node(state: AgentState) -> AgentState:
     # Ensure simulation flags are properly reset when entering RLC
-    if state.get("show_simulation", False):
+    if state.get("simulation_active", False):
         state["show_simulation"] = False
+        state["simulation_active"] = False
         state["simulation_config"] = {}
     
     if not state.get("_asked_rlc", False):

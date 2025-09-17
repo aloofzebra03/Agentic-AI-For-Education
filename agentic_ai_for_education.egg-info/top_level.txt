@@ -1,3 +1,4 @@
 educational_agent
+educational_agent_optimized
 educational_agent_with_simulation
 tester_agent
