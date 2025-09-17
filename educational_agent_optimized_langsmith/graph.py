@@ -13,7 +13,7 @@ from langchain_core.messages import AnyMessage, HumanMessage, AIMessage
 # from langfuse.langchain import CallbackHandler
 from langgraph.checkpoint.memory import InMemorySaver
 
-from educational_agent_optimized.main_nodes_simulation_agent_no_mh import (
+from educational_agent_optimized_langsmith.main_nodes_simulation_agent_no_mh import (
     start_node, apk_node, ci_node, ge_node,
     ar_node, tc_node, rlc_node, end_node,
 )

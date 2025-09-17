@@ -4,12 +4,12 @@ from datetime import datetime
 from typing import Optional, Dict, Any, List
 
 from langchain_core.messages import HumanMessage, AIMessage
-from langfuse.langchain import CallbackHandler as LangfuseCallbackHandler
+from langchain_core.tracers.langchain import LangChainTracer
 
 from langgraph.types import Command
 
 # Import the graph factory that returns a compiled graph WITHOUT callbacks baked in
-from educational_agent_optimized.graph import build_graph
+from educational_agent_optimized_langsmith.graph import build_graph
 
 
 class EducationalAgent:
@@ -27,29 +27,32 @@ class EducationalAgent:
         self.base = base
         self.persona_name = persona_name
 
-        # Public identifiers (handy in Langfuse UI)
+        # Public identifiers (handy in LangSmith UI)
         self.session_id = f"{base}-{ts}"
         self.thread_id = f"{base}-thread-{ts}"
         self.user_id = user_id or "local-tester"
 
-        # Metadata for the parent run in Langfuse (recognized by the Langfuse LC handler)
+        # Metadata for the parent run in LangSmith
         tags = [self.base, "educational-agent"]
         if self.persona_name:
             tags.append(f"persona:{self.persona_name}")
 
         self._metadata: Dict[str, Any] = {
-            "langfuse_session_id": self.session_id,
-            "langfuse_user_id": self.user_id,
-            "langfuse_tags": tags,
+            "session_id": self.session_id,
+            "user_id": self.user_id,
+            "tags": tags,
             "run_started_at": ts,
         }
 
         base_graph = build_graph()
 
-        # Create a FRESH Langfuse handler per run and attach it + metadata at the graph level
-        langfuse_handler = LangfuseCallbackHandler()
+        # Create a LangSmith tracer for run tracking
+        langsmith_tracer = LangChainTracer(
+            project_name="educational-agent",
+            tags=tags,
+        )
         self.graph = base_graph.with_config({
-            "callbacks": [langfuse_handler],
+            "callbacks": [langsmith_tracer],
             "metadata": self._metadata,
         })
 
@@ -188,5 +191,5 @@ class EducationalAgent:
             "session_id": self.session_id,
             "thread_id": self.thread_id,
             "user_id": self.user_id,
-            "tags": ", ".join(self._metadata.get("langfuse_tags", [])),
+            "tags": ", ".join(self._metadata.get("tags", [])),
         }
