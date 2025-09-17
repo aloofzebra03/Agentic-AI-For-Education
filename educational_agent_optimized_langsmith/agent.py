@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import os
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 
 from langchain_core.messages import HumanMessage, AIMessage
-from langchain_core.tracers.langchain import LangChainTracer
 
 from langgraph.types import Command
 
@@ -46,14 +46,10 @@ class EducationalAgent:
 
         base_graph = build_graph()
 
-        # Create a LangSmith tracer for run tracking
-        langsmith_tracer = LangChainTracer(
-            project_name="educational-agent",
-            tags=tags,
-        )
+        # Configure the graph with metadata for LangSmith
         self.graph = base_graph.with_config({
-            "callbacks": [langsmith_tracer],
             "metadata": self._metadata,
+            "tags": tags,
         })
 
         # Optional local state slot if you need to stash anything custom

@@ -11,7 +11,25 @@ from tester_agent.session_metrics import compute_and_upload_session_metrics
 from tester_agent.simulation_descriptor import format_simulation_context_for_tester
 from dotenv import load_dotenv
 
-load_dotenv(dotenv_path = r"C:\Users\aryan\Desktop\Personalized_Education\Agentic-AI-For-Education\tester_agent\.env", override=True)
+load_dotenv(dotenv_path = ".env", override=True)
+
+# Set LANGCHAIN_API_KEY from LANGCHAIN_API_KEY if needed
+if not os.getenv("LANGCHAIN_API_KEY") and os.getenv("LANGCHAIN_API_KEY"):
+    os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
+
+if os.getenv("LANGCHAIN_API_KEY"):
+    print(f"✅ LangSmith tracing configured for project: {os.environ['LANGCHAIN_PROJECT']}")
+    print(f"🔗 LangSmith endpoint: {os.environ['LANGCHAIN_ENDPOINT']}")
+    
+    # Test LangSmith connection
+    try:
+        from langsmith import Client
+        client = Client()
+        print("✅ LangSmith client connection successful")
+    except Exception as e:
+        print(f"❌ LangSmith connection test failed: {e}")
+else:
+    print("❌ Warning: LANGCHAIN_API_KEY not found. LangSmith tracing will not work.")
 
 def run_test():
     # 1. Select Persona
