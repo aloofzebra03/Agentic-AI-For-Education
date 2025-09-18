@@ -201,6 +201,7 @@ def sim_concept_creator_node(state: AgentState) -> AgentState:
 You are talking directly with a class 7 student. Remember to use direct communication.
 
 Concept in focus: "{concept_pkg.title}"
+When the concept in focus is Simple Pendulum focus ONLY on the Length,Amplitude and Mass of the pendulum.Nothing else.
 
 Context:
 {context}

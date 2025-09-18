@@ -52,7 +52,7 @@ load_dotenv(dotenv_path=".env", override=True)
 
 # Import the EducationalAgent class
 try:
-    from educational_agent_optimized.agent import EducationalAgent
+    from educational_agent_optimized_langsmith.agent import EducationalAgent
     from educational_agent.config_rag import concept_pkg
     from tester_agent.session_metrics import compute_and_upload_session_metrics
 except ImportError as e:
