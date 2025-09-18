@@ -314,6 +314,93 @@ def get_ground_truth(concept: str, section_name: str) -> str:
     return ""
 
 
+def get_ground_truth_from_json(concept: str, section_name: str) -> str:
+    """
+    Retrieve ground truth content from JSON file for a given concept and section.
+    No formatting - returns raw content for LLM consumption.
+    
+    Args:
+        concept: The concept name to find
+        section_name: The section/key within the concept to retrieve
+    
+    Returns:
+        str: The relevant content from the JSON file
+    """
+    try:        
+        # 🔍 GROUND TRUTH JSON RETRIEVAL - INPUT 🔍
+        print("=" * 70)
+        print("📚 GROUND TRUTH JSON RETRIEVAL - STARTED")
+        print("=" * 70)
+        print(f"🎯 CONCEPT: {concept}")
+        print(f"📋 SECTION_NAME: {section_name}")
+        print("=" * 70)
+        
+        # Load JSON file - adjust path based on your file structure
+        json_file_path = "educational_agent/NCERT Class 7.json"
+            
+        with open(json_file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        # Find matching concept
+        for concept_data in data["concepts"]:
+            if concept_data.get("concept", "").lower().strip() == concept.lower().strip():
+                
+                # Enhanced section key mapping covering ALL your node needs
+                section_key_mapping = {
+                    # Basic content - for teaching/explanation nodes
+                    "Concept Definition": "description",
+                    "Explanation (with analogies)":"intuition_logical_flow",
+                    "Details (facts, sub-concepts)":"detail",
+                    "MCQS":"open_ended_mcqs",
+                    "What-if Scenarios":,
+                    "Real-Life Application":"real_life_applications",
+                }
+                
+                # Handle special case for full content
+                if section_name.lower() == "full":
+                    # Return formatted string of all key content
+                    full_content = []
+                    for key in ["description", "detail", "working", "intuition_logical_flow", 
+                              "real_life_applications", "critical_thinking"]:
+                        if concept_data.get(key):
+                            full_content.append(f"{key.upper()}:\n{concept_data[key]}")
+                    result = "\n\n".join(full_content)
+                else:
+                    # Get mapped key
+                    json_key = section_key_mapping.get(section_name.lower(), section_name)
+                    
+                    # Return raw content - no formatting since LLM handles it
+                    content = concept_data.get(json_key, "")
+                    
+                    # Handle different data types but keep minimal processing
+                    if isinstance(content, list):
+                        result = "\n".join([str(item) for item in content]) if content else ""
+                    elif isinstance(content, dict):
+                        result = str(content)  # Let LLM parse the dict structure
+                    else:
+                        result = str(content) if content else ""
+                
+                # 🔍 GROUND TRUTH JSON RETRIEVAL - OUTPUT 🔍
+                print("📚 GROUND TRUTH JSON RETRIEVAL - COMPLETED")
+                print(f"📋 JSON_KEY_USED: {section_key_mapping.get(section_name.lower(), section_name)}")
+                print(f"📏 RESULT_LENGTH: {len(result)} characters")
+                print(f"📄 RESULT_PREVIEW: {result[:200]}...")
+                print("=" * 70)
+                
+                return result
+        
+        # Concept not found
+        result = f"Concept '{concept}' not found in JSON data"
+        print(f"❌ {result}")
+        print("=" * 70)
+        return result
+        
+    except Exception as e:
+        print(e)
+        raise e
+
+
+
 # ─── Memory Optimization Functions ─────────────────────────────────────────────
 
 def identify_node_segments_from_transitions(messages: list, transitions: list) -> list:
