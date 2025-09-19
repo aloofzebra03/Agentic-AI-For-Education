@@ -11,7 +11,7 @@ import time
 import soundfile as sf
 from pedalboard import Pedalboard, Resample
 import sys
-import pysqlite3
+# import pysqlite3
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -21,7 +21,7 @@ from audio_recorder_streamlit import audio_recorder
 # Import gTTS for text-to-speech
 from gtts import gTTS
 
-sys.modules["sqlite3"] = pysqlite3
+# sys.modules["sqlite3"] = pysqlite3
 
 if st.button('Clear Resource Cache'):
     st.cache_resource.clear()
@@ -103,53 +103,96 @@ def transcribe_recorded_audio_bytes(audio_bytes):
         if os.path.exists(mono_wav_path): 
             os.remove(mono_wav_path)
 
+def load_character_template(text, character_type='boy', audio_base64=None):
+    """
+    Load and populate the character template with data using template substitution.
+    Clean separation of concerns - HTML/CSS/JS in separate file.
+    """
+    # Character configuration
+    characters = {
+        'boy': {
+            'name': 'Boy',
+            'image': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9Ijk1IiBmaWxsPSIjODdDRUVCIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iNSIvPjx0ZXh0IHg9IjEwMCIgeT0iMTEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiMzMzMiPvCfkaw8L3RleHQ+PC9zdmc+',
+            'pitch': 0.9
+        },
+        'girl': {
+            'name': 'Girl', 
+            'image': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9Ijk1IiBmaWxsPSIjRkZCNkMxIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iNSIvPjx0ZXh0IHg9IjEwMCIgeT0iMTEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiMzMzMiPvCfkac8L3RleHQ+PC9zdmc+',
+            'pitch': 1.2
+        }
+    }
+    
+    character_config = characters.get(character_type, characters['boy'])
+    
+    try:
+        # Load the template file
+        template_path = os.path.join(os.path.dirname(__file__), 'character_template.html')
+        with open(template_path, 'r', encoding='utf-8') as f:
+            template = f.read()
+        
+        # Perform template substitution
+        html = template.replace('{{TEXT}}', text or '')
+        html = html.replace('{{CHARACTER_TYPE}}', character_type)
+        html = html.replace('{{CHARACTER_NAME}}', character_config['name'])
+        html = html.replace('{{CHARACTER_IMAGE}}', character_config['image'])
+        html = html.replace('{{AUDIO_BASE64}}', audio_base64 or '')
+        
+        return html
+        
+    except FileNotFoundError:
+        st.error("Character template file not found. Please ensure 'character_template.html' exists in the project directory.")
+        return "<div>Error: Character template not found</div>"
+    except Exception as e:
+        st.error(f"Error loading character template: {e}")
+        return "<div>Error loading character template</div>"
+
 def play_text_as_audio(text, container):
     """
-    Generates audio with gTTS and speeds it up using pedalboard, saving as WAV.
+    Enhanced version with character lip-sync animation using modified animation.html.
     """
     if not text or not text.strip():
         return
     
     try:
-        # 1. gTTS generates the initial MP3 audio
+        # Get current character from session state
+        character_type = st.session_state.get('selected_character', 'boy')
+        
+        # 1. Generate audio with gTTS
         tts = gTTS(text=text, lang='en', slow=False)
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
             tts.save(fp.name)
             normal_speed_path = fp.name
 
-        # 2. Load the audio file
+        # 2. Load and process audio
         audio, sample_rate = sf.read(normal_speed_path)
-
-        # 3. Create a pedalboard to resample (speed up) the audio
         board = Pedalboard([
             Resample(target_sample_rate=int(sample_rate * 1.25))
         ])
-        
-        # 4. Process the audio
         fast_audio = board(audio, sample_rate)
         
-        # 5. Export the fast audio to a temporary WAV file
+        # 3. Save processed audio
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as fp:
             sf.write(fp.name, fast_audio, int(sample_rate * 1.25), format='WAV')
             fast_speed_path = fp.name
 
-        # 6. Read bytes and encode for Streamlit
+        # 4. Read audio bytes
         with open(fast_speed_path, "rb") as audio_file:
             audio_bytes = audio_file.read()
-        
         audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
         
-        # 7. Clean up temporary files
+        # 5. Clean up temporary files
         os.remove(normal_speed_path)
         os.remove(fast_speed_path)
 
-        # 8. Display in Streamlit using the correct audio type
-        audio_html = f"""
-        <audio controls autoplay style="width: 100%; margin-top: 5px;">
-            <source src="data:audio/wav;base64,{audio_base64}" type="audio/wav">
-        </audio>
-        """
-        container.markdown(audio_html, unsafe_allow_html=True)
+        # 6. Create character animation using template substitution
+        character_html = load_character_template(
+            text=text,
+            character_type=character_type,
+            audio_base64=audio_base64
+        )
+        
+        # 7. Display the character overlay
+        components.html(character_html, height=0, scrolling=False)
 
     except Exception as e:
         st.error(f"An error occurred in audio processing: {e}")
@@ -453,7 +496,34 @@ st.title("🧑‍🎓 Interactive Simulation Educational Agent")
 
 # Display session info in sidebar
 with st.sidebar:
-    st.header("📊 Session Info")
+    st.header("🎭 Character Selection")
+    
+    # Initialize character selection if not exists
+    if 'selected_character' not in st.session_state:
+        st.session_state.selected_character = 'boy'
+    
+    # Character selection
+    character_options = {
+        'boy': '👦 Boy Character',
+        'girl': '� Girl Character'
+    }
+    
+    selected = st.radio(
+        "Choose your AI tutor:",
+        options=list(character_options.keys()),
+        format_func=lambda x: character_options[x],
+        index=0 if st.session_state.selected_character == 'boy' else 1,
+        key='character_selector'
+    )
+    
+    # Update session state when selection changes
+    if selected != st.session_state.selected_character:
+        st.session_state.selected_character = selected
+        st.rerun()  # Refresh to update character
+    
+    st.markdown("---")
+    
+    st.header("�📊 Session Info")
     if "agent" in st.session_state:
         session_info = st.session_state.agent.session_info()
         st.write(f"**Session ID:** {session_info['session_id']}")
@@ -470,6 +540,7 @@ with st.sidebar:
     st.markdown("- Type your responses in the chat input")
     st.markdown("- Or use the microphone to speak")
     st.markdown("- The agent will guide you through learning")
+    st.markdown("- Choose your preferred character above")
 
 # Display all messages. The audio player is only added for the last assistant message.
 for i, (role, msg) in enumerate(st.session_state.messages):

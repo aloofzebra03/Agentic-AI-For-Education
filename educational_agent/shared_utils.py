@@ -343,7 +343,7 @@ def get_ground_truth_from_json(concept: str, section_name: str) -> str:
         
         # Find matching concept
         for concept_data in data["concepts"]:
-            if concept_data.get("concept", "").lower().strip() == concept.lower().strip():
+            if concept_data['concept'].lower().strip() == concept.lower().strip():
                 
                 # Enhanced section key mapping covering ALL your node needs
                 section_key_mapping = {
@@ -352,7 +352,7 @@ def get_ground_truth_from_json(concept: str, section_name: str) -> str:
                     "Explanation (with analogies)":"intuition_logical_flow",
                     "Details (facts, sub-concepts)":"detail",
                     "MCQS":"open_ended_mcqs",
-                    "What-if Scenarios":,
+                    # "What-if Scenarios":,
                     "Real-Life Application":"real_life_applications",
                 }
                 
@@ -367,11 +367,14 @@ def get_ground_truth_from_json(concept: str, section_name: str) -> str:
                     result = "\n\n".join(full_content)
                 else:
                     # Get mapped key
-                    json_key = section_key_mapping.get(section_name.lower(), section_name)
-                    
-                    # Return raw content - no formatting since LLM handles it
-                    content = concept_data.get(json_key, "")
-                    
+                    json_key = section_key_mapping.get(section_name.lower(), None)
+
+                    if json_key is not None:
+                        # Return raw content - no formatting since LLM handles it
+                        content = concept_data.get(json_key, "")
+                    else:
+                        content = ""
+
                     # Handle different data types but keep minimal processing
                     if isinstance(content, list):
                         result = "\n".join([str(item) for item in content]) if content else ""
