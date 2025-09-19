@@ -103,6 +103,13 @@ def transcribe_recorded_audio_bytes(audio_bytes):
         if os.path.exists(mono_wav_path): 
             os.remove(mono_wav_path)
 
+def clear_speaking_state():
+    """Clear the speaking state after animation completes"""
+    if 'current_speaking_text' in st.session_state:
+        del st.session_state.current_speaking_text
+    if 'current_audio_base64' in st.session_state:
+        del st.session_state.current_audio_base64
+
 def load_character_template(text, character_type='boy', audio_base64=None):
     """
     Load and populate the character template with data using template substitution.
@@ -184,15 +191,12 @@ def play_text_as_audio(text, container):
         os.remove(normal_speed_path)
         os.remove(fast_speed_path)
 
-        # 6. Create character animation using template substitution
-        character_html = load_character_template(
-            text=text,
-            character_type=character_type,
-            audio_base64=audio_base64
-        )
+        # 6. Store text and audio in session state for persistent character
+        st.session_state.current_speaking_text = text
+        st.session_state.current_audio_base64 = audio_base64
         
-        # 7. Display the character overlay
-        components.html(character_html, height=0, scrolling=False)
+        # 7. Trigger a rerun to update the sidebar character
+        st.rerun()
 
     except Exception as e:
         st.error(f"An error occurred in audio processing: {e}")
@@ -534,6 +538,31 @@ with st.sidebar:
         # Show session tags
         if session_info.get('tags'):
             st.write(f"**Tags:** {session_info['tags']}")
+    
+    st.markdown("---")
+    
+    # Persistent Character Animation in Sidebar
+    st.header("🤖 Your AI Tutor")
+    
+    # Get current speaking text (if any)
+    current_text = st.session_state.get('current_speaking_text', '')
+    current_audio = st.session_state.get('current_audio_base64', '')
+    
+    # Load and display persistent character
+    character_html = load_character_template(
+        text=current_text,
+        character_type=st.session_state.selected_character,
+        audio_base64=current_audio
+    )
+    
+    # Modify the template to be sidebar-friendly (smaller size, no fixed positioning)
+    sidebar_character_html = character_html.replace(
+        'position: fixed; bottom: 20px; right: 20px; z-index: 1000; width: 200px; height: 240px;',
+        'position: relative; width: 100%; height: 200px; margin: 10px auto;'
+    )
+    
+    # Display persistent character
+    components.html(sidebar_character_html, height=220)
     
     st.markdown("---")
     st.markdown("**💡 How to interact:**")
