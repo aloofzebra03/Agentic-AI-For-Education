@@ -8,20 +8,17 @@ import numpy as np
 import tempfile
 import base64
 import time
-import soundfile as sf
-from pedalboard import Pedalboard, Resample
 import sys
-# import pysqlite3
+import pysqlite3
 from datetime import datetime
 from dotenv import load_dotenv
 
 # Import the audio_recorder component
 from audio_recorder_streamlit import audio_recorder
 
-# Import gTTS for text-to-speech
-from gtts import gTTS
+# No need for gTTS - using Web Speech API from animation.html
 
-# sys.modules["sqlite3"] = pysqlite3
+sys.modules["sqlite3"] = pysqlite3
 
 if st.button('Clear Resource Cache'):
     st.cache_resource.clear()
@@ -103,103 +100,321 @@ def transcribe_recorded_audio_bytes(audio_bytes):
         if os.path.exists(mono_wav_path): 
             os.remove(mono_wav_path)
 
-def clear_speaking_state():
-    """Clear the speaking state after animation completes"""
-    if 'current_speaking_text' in st.session_state:
-        del st.session_state.current_speaking_text
-    if 'current_audio_base64' in st.session_state:
-        del st.session_state.current_audio_base64
-
-def load_character_template(text, character_type='boy', audio_base64=None):
+def create_viseme_animation_component(text_to_speak="", character="boy", auto_play=False):
     """
-    Load and populate the character template with data using template substitution.
-    Clean separation of concerns - HTML/CSS/JS in separate file.
+    Creates the viseme animation component with Web Speech API TTS.
+    This replaces the gTTS implementation with real-time lip sync.
     """
-    # Character configuration
-    characters = {
-        'boy': {
-            'name': 'Boy',
-            'image': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9Ijk1IiBmaWxsPSIjODdDRUVCIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iNSIvPjx0ZXh0IHg9IjEwMCIgeT0iMTEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiMzMzMiPvCfkaw8L3RleHQ+PC9zdmc+',
-            'pitch': 0.9
-        },
-        'girl': {
-            'name': 'Girl', 
-            'image': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9Ijk1IiBmaWxsPSIjRkZCNkMxIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iNSIvPjx0ZXh0IHg9IjEwMCIgeT0iMTEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiMzMzMiPvCfkac8L3RleHQ+PC9zdmc+',
-            'pitch': 1.2
-        }
-    }
+    component_id = f"viseme_character_{int(time.time() * 1000)}"
     
-    character_config = characters.get(character_type, characters['boy'])
-    
-    try:
-        # Load the template file
-        template_path = os.path.join(os.path.dirname(__file__), 'character_template.html')
-        with open(template_path, 'r', encoding='utf-8') as f:
-            template = f.read()
+    return f"""
+    <div id="{component_id}" style="width: 100%; max-width: 400px; margin: 0 auto;">
+        <style>
+            .character-container {{
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 20px;
+                padding: 20px;
+                text-align: center;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+                margin-bottom: 10px;
+            }}
+            .stage {{
+                position: relative;
+                display: inline-block;
+                margin-bottom: 15px;
+            }}
+            .character {{
+                width: 200px;
+                height: auto;
+                border-radius: 15px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                transition: all 0.3s ease;
+            }}
+            .character:hover {{
+                transform: scale(1.05);
+                box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            }}
+            .mouth-container {{
+                position: absolute;
+                left: 40px;
+                top: 120px;
+                width: 120px;
+                height: 30px;
+                pointer-events: none;
+            }}
+            svg.mouth {{
+                width: 100%;
+                height: 100%;
+            }}
+            .mouth-set g {{
+                opacity: 0;
+                transition: opacity 80ms ease-out;
+            }}
+            .mouth-set g.active {{
+                opacity: 1;
+            }}
+            .character-info {{
+                color: white;
+                font-weight: bold;
+                margin: 10px 0;
+                font-size: 16px;
+            }}
+            .viseme-status {{
+                color: rgba(255,255,255,0.8);
+                font-size: 12px;
+                margin: 5px 0;
+            }}
+            .speech-controls {{
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin-top: 10px;
+            }}
+            .control-btn {{
+                background: rgba(255,255,255,0.2);
+                color: white;
+                border: 1px solid rgba(255,255,255,0.3);
+                padding: 8px 15px;
+                border-radius: 20px;
+                cursor: pointer;
+                font-size: 12px;
+                transition: all 0.3s ease;
+            }}
+            .control-btn:hover {{
+                background: rgba(255,255,255,0.3);
+                transform: translateY(-2px);
+            }}
+            .control-btn.active {{
+                background: rgba(255,255,255,0.4);
+                box-shadow: 0 0 10px rgba(255,255,255,0.3);
+            }}
+        </style>
         
-        # Perform template substitution
-        html = template.replace('{{TEXT}}', text or '')
-        html = html.replace('{{CHARACTER_TYPE}}', character_type)
-        html = html.replace('{{CHARACTER_NAME}}', character_config['name'])
-        html = html.replace('{{CHARACTER_IMAGE}}', character_config['image'])
-        html = html.replace('{{AUDIO_BASE64}}', audio_base64 or '')
-        
-        return html
-        
-    except FileNotFoundError:
-        st.error("Character template file not found. Please ensure 'character_template.html' exists in the project directory.")
-        return "<div>Error: Character template not found</div>"
-    except Exception as e:
-        st.error(f"Error loading character template: {e}")
-        return "<div>Error loading character template</div>"
+        <div class="character-container">
+            <div class="stage">
+                <img id="characterImage_{component_id}" 
+                     src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='70' r='40' fill='%23ffdbac'/%3E%3Ccircle cx='85' cy='65' r='3' fill='%23000'/%3E%3Ccircle cx='115' cy='65' r='3' fill='%23000'/%3E%3Cpath d='M90 80 Q100 85 110 80' stroke='%23000' fill='none'/%3E%3Crect x='60' y='110' width='80' height='90' rx='10' fill='{'%2300aaff' if character == 'boy' else '%23ff69b4'}'/%3E%3Ctext x='100' y='190' text-anchor='middle' fill='white' font-size='12'%3E{'👦' if character == 'boy' else '👧'}%3C/text%3E%3C/svg%3E" 
+                     class="character" 
+                     alt="{character.title()} Character" />
+                <div class="mouth-container">
+                    <svg class="mouth" viewBox="-50 -50 100 100">
+                        <g class="mouth-set" id="mouthSet_{component_id}">
+                            <g data-viseme="rest"><path d="M-26 6 q26 10 52 0" fill="#c33" stroke="#000" stroke-width="1"/></g>
+                            <g data-viseme="closed"><rect x="-30" y="-6" width="60" height="12" rx="6" fill="#9b2b2b"/></g>
+                            <g data-viseme="wide"><ellipse cx="0" cy="6" rx="42" ry="14" fill="#9b2b2b"/></g>
+                            <g data-viseme="open"><ellipse cx="0" cy="8" rx="36" ry="22" fill="#9b2b2b"/></g>
+                            <g data-viseme="round"><ellipse cx="0" cy="6" rx="22" ry="26" fill="#9b2b2b"/></g>
+                            <g data-viseme="f_v">
+                                <path d="M-28 6 q28 -24 56 0" fill="none" stroke="#000" stroke-width="3" />
+                                <rect x="-20" y="2" width="40" height="6" rx="3" fill="#9b2b2b" />
+                            </g>
+                            <g data-viseme="th">
+                                <rect x="-18" y="0" width="36" height="8" rx="4" fill="#9b2b2b" />
+                                <rect x="-6" y="-8" width="12" height="8" rx="3" fill="#ffe8d6" />
+                            </g>
+                            <g data-viseme="smush"><ellipse cx="0" cy="6" rx="28" ry="12" fill="#9b2b2b"/></g>
+                            <g data-viseme="kiss"><ellipse cx="0" cy="6" rx="16" ry="12" fill="#9b2b2b"/></g>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="character-info">
+                🤖 AI Assistant {'👦' if character == 'boy' else '👧'}
+            </div>
+            <div class="viseme-status" id="visemeStatus_{component_id}">
+                Viseme: <strong id="visemeName_{component_id}">rest</strong>
+            </div>
+            
+            <div class="speech-controls">
+                <button class="control-btn" onclick="playText_{component_id}()">▶️ Speak</button>
+                <button class="control-btn" onclick="stopSpeech_{component_id}()">⏹️ Stop</button>
+            </div>
+        </div>
+    </div>
 
-def play_text_as_audio(text, container):
+    <script>
+        (function() {{
+            const componentId = "{component_id}";
+            const textToSpeak = `{text_to_speak}`;
+            const autoPlay = {str(auto_play).lower()};
+            const character = "{character}";
+            
+            // Component elements
+            const visemeName = document.getElementById(`visemeName_${{componentId}}`);
+            const mouthSet = document.getElementById(`mouthSet_${{componentId}}`);
+            
+            // Animation state
+            let queue = [], timer = null, playing = false, forceStop = false;
+            let utterance = null;
+            let voices = [];
+            let selectedVoice = null;
+
+            // Viseme animation functions
+            function simpleG2P(text) {{
+                let s = text.toLowerCase().replace(/[^a-z\\s]/g, ' ');
+                const tokens = [];
+                for (let i = 0; i < s.length;) {{
+                    if (s[i] === " ") {{ i++; continue }}
+                    const dig = s.slice(i, i + 2);
+                    if (['ch','sh','th','ng','ph','qu','ck','wh'].includes(dig)) {{ 
+                        tokens.push(dig); 
+                        i += 2; 
+                        continue 
+                    }}
+                    tokens.push(s[i]); 
+                    i++;
+                }}
+                return tokens;
+            }}
+
+            function phonemeToViseme(p) {{
+                if (['p','b','m'].includes(p)) return 'closed';
+                if (['a','o'].includes(p)) return 'open';
+                if (['e','i','y'].includes(p)) return 'wide';
+                if (['u','oo','w'].includes(p)) return 'round';
+                if (['f','v'].includes(p)) return 'f_v';
+                if (['th','t','d','n'].includes(p)) return 'th';
+                if (['s','z','sh','ch','j'].includes(p)) return 'smush';
+                if (['q'].includes(p)) return 'kiss';
+                return 'rest';
+            }}
+
+            function estimateDur(tok) {{
+                return /[aeiou]/.test(tok) ? 140 : 90;
+            }}
+
+            function prepareQueue(text) {{
+                const toks = simpleG2P(text);
+                const frames = toks.map(t => ({{vis: phonemeToViseme(t), dur: estimateDur(t)}}));
+                const comp = [];
+                for (const f of frames) {{
+                    const last = comp[comp.length - 1];
+                    if (last && last.vis === f.vis) last.dur += f.dur;
+                    else comp.push({{...f}});
+                }}
+                return comp;
+            }}
+
+            function setViseme(v) {{
+                mouthSet.querySelectorAll("[data-viseme]").forEach(g => g.classList.remove("active"));
+                const el = mouthSet.querySelector(`[data-viseme="${{v}}"]`);
+                if (el) el.classList.add("active");
+                if (visemeName) visemeName.innerText = v;
+            }}
+
+            function stepQueue() {{
+                if (!playing || forceStop) return;
+                if (queue.length === 0) {{ 
+                    setViseme("rest"); 
+                    playing = false; 
+                    return 
+                }}
+                const frame = queue.shift();
+                setViseme(frame.vis);
+                timer = setTimeout(stepQueue, frame.dur);
+            }}
+
+            function loadVoices() {{
+                voices = speechSynthesis.getVoices();
+                if (voices.length > 0) {{
+                    // Select appropriate voice based on character
+                    if (character === 'boy') {{
+                        selectedVoice = voices.find(voice => {{
+                            const name = voice.name.toLowerCase();
+                            return name.includes('male') || name.includes('david') || name.includes('alex');
+                        }}) || voices[0];
+                    }} else {{
+                        selectedVoice = voices.find(voice => {{
+                            const name = voice.name.toLowerCase();
+                            return name.includes('female') || name.includes('karen') || name.includes('samantha');
+                        }}) || voices[0];
+                    }}
+                }}
+            }}
+
+            function playText(text) {{
+                if (!text || !text.trim()) return;
+                
+                stopSpeech();
+                utterance = new SpeechSynthesisUtterance(text);
+                
+                if (selectedVoice) {{
+                    utterance.voice = selectedVoice;
+                }}
+                utterance.rate = 1.1;
+                utterance.pitch = character === 'boy' ? 0.9 : 1.2;
+                utterance.volume = 1;
+
+                utterance.onstart = () => {{
+                    queue = prepareQueue(text);
+                    if (queue.length > 0) {{
+                        playing = true;
+                        forceStop = false;
+                        stepQueue();
+                    }}
+                }};
+
+                utterance.onend = () => {{
+                    stopSpeech(true);
+                }};
+
+                utterance.onerror = () => {{
+                    stopSpeech(true);
+                }};
+
+                speechSynthesis.speak(utterance);
+            }}
+
+            function stopSpeech(hard = false) {{
+                playing = false;
+                forceStop = hard || false;
+                queue = [];
+                if (timer) {{
+                    clearTimeout(timer);
+                    timer = null;
+                }}
+                setViseme("rest");
+                if (utterance) {{
+                    speechSynthesis.cancel();
+                    utterance = null;
+                }}
+            }}
+
+            // Global functions for button controls
+            window[`playText_${{componentId}}`] = function() {{
+                playText(textToSpeak);
+            }};
+
+            window[`stopSpeech_${{componentId}}`] = function() {{
+                stopSpeech(true);
+            }};
+
+            // Initialize
+            setViseme("rest");
+            speechSynthesis.onvoiceschanged = loadVoices;
+            loadVoices();
+
+            // Auto-play if requested
+            if (autoPlay && textToSpeak) {{
+                setTimeout(() => {{
+                    playText(textToSpeak);
+                }}, 500);
+            }}
+        }})();
+    </script>
     """
-    Enhanced version with character lip-sync animation using modified animation.html.
+
+def update_character_speech(text_to_speak):
     """
-    if not text or not text.strip():
+    Updates the persistent character in sidebar to speak new text.
+    """
+    if not text_to_speak or not text_to_speak.strip():
         return
     
-    try:
-        # Get current character from session state
-        character_type = st.session_state.get('selected_character', 'boy')
-        
-        # 1. Generate audio with gTTS
-        tts = gTTS(text=text, lang='en', slow=False)
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
-            tts.save(fp.name)
-            normal_speed_path = fp.name
-
-        # 2. Load and process audio
-        audio, sample_rate = sf.read(normal_speed_path)
-        board = Pedalboard([
-            Resample(target_sample_rate=int(sample_rate * 1.25))
-        ])
-        fast_audio = board(audio, sample_rate)
-        
-        # 3. Save processed audio
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as fp:
-            sf.write(fp.name, fast_audio, int(sample_rate * 1.25), format='WAV')
-            fast_speed_path = fp.name
-
-        # 4. Read audio bytes
-        with open(fast_speed_path, "rb") as audio_file:
-            audio_bytes = audio_file.read()
-        audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
-        
-        # 5. Clean up temporary files
-        os.remove(normal_speed_path)
-        os.remove(fast_speed_path)
-
-        # 6. Store text and audio in session state for persistent character
-        st.session_state.current_speaking_text = text
-        st.session_state.current_audio_base64 = audio_base64
-        
-        # 7. Trigger a rerun to update the sidebar character
-        st.rerun()
-
-    except Exception as e:
-        st.error(f"An error occurred in audio processing: {e}")
+    # Store the text in session state for the character to speak
+    st.session_state.character_speech_text = text_to_speak
+    st.session_state.character_should_speak = True
 
 # ── Simulation Integration Functions ──────────────────────────────────────
 def create_pendulum_simulation_html(config):
@@ -498,36 +713,48 @@ if st.session_state.get("processing_request"):
 # ── Main Application Logic & UI Display ──────────────────────────────────
 st.title("🧑‍🎓 Interactive Simulation Educational Agent")
 
-# Display session info in sidebar
+# Display persistent character and session info in sidebar
 with st.sidebar:
-    st.header("🎭 Character Selection")
+    # Initialize character settings if not exists
+    if "character_type" not in st.session_state:
+        st.session_state.character_type = "boy"
+    if "character_speech_text" not in st.session_state:
+        st.session_state.character_speech_text = ""
+    if "character_should_speak" not in st.session_state:
+        st.session_state.character_should_speak = False
     
-    # Initialize character selection if not exists
-    if 'selected_character' not in st.session_state:
-        st.session_state.selected_character = 'boy'
+    # Character selection and display
+    st.header("🤖 AI Assistant")
     
-    # Character selection
-    character_options = {
-        'boy': '👦 Boy Character',
-        'girl': '� Girl Character'
-    }
-    
-    selected = st.radio(
-        "Choose your AI tutor:",
-        options=list(character_options.keys()),
-        format_func=lambda x: character_options[x],
-        index=0 if st.session_state.selected_character == 'boy' else 1,
-        key='character_selector'
+    # Character type selector
+    character_option = st.selectbox(
+        "Choose Character:",
+        ["boy", "girl"],
+        index=0 if st.session_state.character_type == "boy" else 1,
+        key="character_selector"
     )
     
-    # Update session state when selection changes
-    if selected != st.session_state.selected_character:
-        st.session_state.selected_character = selected
-        st.rerun()  # Refresh to update character
+    # Update character type if changed
+    if character_option != st.session_state.character_type:
+        st.session_state.character_type = character_option
+        st.rerun()
+    
+    # Display the persistent character with current speech text
+    character_html = create_viseme_animation_component(
+        text_to_speak=st.session_state.character_speech_text,
+        character=st.session_state.character_type,
+        auto_play=st.session_state.character_should_speak
+    )
+    
+    components.html(character_html, height=350, key=f"persistent_character_{st.session_state.character_type}")
+    
+    # Reset speech flag after displaying
+    if st.session_state.character_should_speak:
+        st.session_state.character_should_speak = False
     
     st.markdown("---")
     
-    st.header("�📊 Session Info")
+    st.header("📊 Session Info")
     if "agent" in st.session_state:
         session_info = st.session_state.agent.session_info()
         st.write(f"**Session ID:** {session_info['session_id']}")
@@ -540,36 +767,11 @@ with st.sidebar:
             st.write(f"**Tags:** {session_info['tags']}")
     
     st.markdown("---")
-    
-    # Persistent Character Animation in Sidebar
-    st.header("🤖 Your AI Tutor")
-    
-    # Get current speaking text (if any)
-    current_text = st.session_state.get('current_speaking_text', '')
-    current_audio = st.session_state.get('current_audio_base64', '')
-    
-    # Load and display persistent character
-    character_html = load_character_template(
-        text=current_text,
-        character_type=st.session_state.selected_character,
-        audio_base64=current_audio
-    )
-    
-    # Modify the template to be sidebar-friendly (smaller size, no fixed positioning)
-    sidebar_character_html = character_html.replace(
-        'position: fixed; bottom: 20px; right: 20px; z-index: 1000; width: 200px; height: 240px;',
-        'position: relative; width: 100%; height: 200px; margin: 10px auto;'
-    )
-    
-    # Display persistent character
-    components.html(sidebar_character_html, height=220)
-    
-    st.markdown("---")
     st.markdown("**💡 How to interact:**")
     st.markdown("- Type your responses in the chat input")
     st.markdown("- Or use the microphone to speak")
-    st.markdown("- The agent will guide you through learning")
-    st.markdown("- Choose your preferred character above")
+    st.markdown("- The character will speak agent responses")
+    st.markdown("- Choose boy/girl character above")
 
 # Display all messages. The audio player is only added for the last assistant message.
 for i, (role, msg) in enumerate(st.session_state.messages):
@@ -581,12 +783,11 @@ for i, (role, msg) in enumerate(st.session_state.messages):
             # Display simulation if needed
             display_simulation_if_needed()
             
-            # Add audio playback for the latest assistant message
+            # Update character to speak the latest assistant message
             try:
-                play_text_as_audio(msg, st.container())
+                update_character_speech(msg)
             except Exception as e:
-                st.caption("⚠️ Audio playback unavailable")
-                st.stop()
+                st.caption("⚠️ Character speech unavailable")
 
 # Handle user input at the bottom of the page
 if "agent" in st.session_state and st.session_state.agent.current_state() != "END":
