@@ -131,6 +131,7 @@ langchain-google-genai
 langchain-huggingface
 langchain-openai
 langchain-text-splitters
+langchain-groq
 langfuse
 langgraph
 langgraph-api
