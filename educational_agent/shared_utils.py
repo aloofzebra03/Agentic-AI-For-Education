@@ -83,19 +83,19 @@ def extract_json_block(text: str) -> str:
 
 def get_llm():
     """Get configured LLM instance."""
-    # api_key = os.getenv("GOOGLE_API_KEY")
-    # if not api_key:
-    #     raise RuntimeError("Please set GOOGLE_API_KEY")
-    # return ChatGoogleGenerativeAI(
-    #     model="gemini-2.0-flash",
-    #     api_key=api_key,
-    #     temperature=0.5,
-    # )
-    llm = ChatGroq(
-        model="llama-3.1-8b-instant",
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        raise RuntimeError("Please set GOOGLE_API_KEY")
+    return ChatGoogleGenerativeAI(
+        model="gemini-2.0-flash",
+        api_key=api_key,
         temperature=0.5,
-        max_tokens=None,
     )
+    # llm = ChatGroq(
+    #     model="llama-3.1-8b-instant",
+    #     temperature=0.5,
+    #     max_tokens=None,
+    # )
     return llm
 
 def add_ai_message_to_conversation(state: AgentState, content: str):
