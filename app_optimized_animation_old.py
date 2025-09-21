@@ -23,12 +23,6 @@ from gtts import gTTS
 
 sys.modules["sqlite3"] = pysqlite3
 
-import hashlib
-
-def msg_id_from_text(text: str) -> str:
-    return hashlib.sha1((text or "").encode("utf-8")).hexdigest()
-
-
 def get_image_base64(image_path):
     """Convert image to base64 for embedding in HTML"""
     try:
@@ -118,89 +112,68 @@ def transcribe_recorded_audio_bytes(audio_bytes):
         if os.path.exists(mono_wav_path): 
             os.remove(mono_wav_path)
 
-from uuid import uuid4
-import streamlit.components.v1 as components
-
-def play_text_as_audio(text, container, message_id=None, speed_factor=1.25):
+def play_text_as_audio(text, container):
     """
-    gTTS -> speedup with Pedalboard -> WAV playback.
-    Also emits postMessage('audio_play'/'audio_end') to the sidebar iframe.
+    Generates audio with gTTS and speeds it up using pedalboard, saving as WAV.
     """
     if not text or not text.strip():
         return
-
+    
     try:
-        # 1) TTS to mp3
+        # 1. gTTS generates the initial MP3 audio
         tts = gTTS(text=text, lang='en', slow=False)
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
             tts.save(fp.name)
             normal_speed_path = fp.name
 
-        # 2) Read + resample (speed up)
+        # 2. Load the audio file
         audio, sample_rate = sf.read(normal_speed_path)
-        board = Pedalboard([Resample(target_sample_rate=int(sample_rate * speed_factor))])
-        fast_audio = board(audio, sample_rate)
 
-        # 3) Calculate correct duration for sped-up audio
-        original_duration_ms = int((len(audio) / float(sample_rate)) * 1000)
-        dur_ms = int(original_duration_ms / speed_factor)  # Actual playback duration after speedup
-        new_sr = int(sample_rate * speed_factor)
+        # 3. Create a pedalboard to resample (speed up) the audio
+        board = Pedalboard([
+            Resample(target_sample_rate=int(sample_rate * 1.25))
+        ])
+        
+        # 4. Process the audio
+        fast_audio = board(audio, sample_rate)
+        
+        # 5. Export the fast audio to a temporary WAV file
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as fp:
-            sf.write(fp.name, fast_audio, new_sr, format='WAV')
+            sf.write(fp.name, fast_audio, int(sample_rate * 1.25), format='WAV')
             fast_speed_path = fp.name
 
-        # 4) Base64
+        # 6. Read bytes and encode for Streamlit
         with open(fast_speed_path, "rb") as audio_file:
-            audio_base64 = base64.b64encode(audio_file.read()).decode("utf-8")
-
-        # 5) Clean up
+            audio_bytes = audio_file.read()
+        
+        audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
+        
+        # 7. Clean up temporary files
         os.remove(normal_speed_path)
         os.remove(fast_speed_path)
 
-        # 6) Render with JS hooks. Use components.html so <script> can run.
-        msg_id = message_id or str(uuid4())
+        # 8. Display in Streamlit using the correct audio type
         audio_html = f"""
-        <audio id="agentAudio" controls autoplay style="width: 100%; margin-top: 5px;">
-          <source src="data:audio/wav;base64,{audio_base64}" type="audio/wav">
+        <audio controls autoplay style="width: 100%; margin-top: 5px;">
+            <source src="data:audio/wav;base64,{audio_base64}" type="audio/wav">
         </audio>
-        <script>
-          (function() {{
-            const SPEED = {speed_factor};
-            const DURATION_MS = {dur_ms};
-            const MSG_ID = "{msg_id}";
-            const a = document.getElementById('agentAudio');
-            
-            function notify(type) {{
-              // Tell ALL parent listeners; sidebar will filter by id.
-              window.parent.postMessage({{ type, speed: SPEED, id: MSG_ID, dur: DURATION_MS, ts: Date.now() }}, "*");
-            }}
-            
-            // Better audio ready detection
-            a.addEventListener('loadeddata', () => {{
-              // Audio is loaded and ready - notify immediately for better sync
-              setTimeout(() => notify('audio_play'), 50); // Small delay for browser processing
-            }});
-            
-            a.addEventListener('play',  ()=>notify('audio_play'));
-            a.addEventListener('ended', ()=>notify('audio_end'));
-            a.addEventListener('pause', ()=>notify('audio_pause'));
-          }})();
-        </script>
         """
-        with container:
-            components.html(audio_html, height=80)
-        return msg_id
+        container.markdown(audio_html, unsafe_allow_html=True)
 
     except Exception as e:
         st.error(f"An error occurred in audio processing: {e}")
-        return None
 
+# ── Simulation Integration Functions ──────────────────────────────────────
 def create_pendulum_simulation_html(config):
+    """
+    Generate HTML for pendulum simulation based on configuration.
+    Uses the simulation from index.html with automated before/after demonstration.
+    """
     before_params = config['before_params']
     after_params = config['after_params']
     timing = config['timing']
     agent_message = config['agent_message']
-
+    
     return f"""
     <!DOCTYPE html>
     <html>
@@ -208,7 +181,7 @@ def create_pendulum_simulation_html(config):
         <style>
             .simulation-container {{
                 width: 100%;
-                max-width: 700px;
+                max-width: 600px;
                 margin: 10px auto;
                 background: #f0f6ff;
                 border: 2px solid #c4afe9;
@@ -229,7 +202,6 @@ def create_pendulum_simulation_html(config):
                 gap: 20px;
                 margin: 10px 0;
                 font-family: 'Segoe UI', sans-serif;
-                flex-wrap: wrap;
             }}
             .param-display {{
                 background: rgba(124, 58, 237, 0.1);
@@ -256,26 +228,6 @@ def create_pendulum_simulation_html(config):
                 font-weight: 600;
                 margin: 10px 0;
             }}
-            .hint-box {{
-                text-align: left;
-                background: #ffffff;
-                border: 1px dashed #7c3aed;
-                border-radius: 10px;
-                padding: 10px 12px;
-                margin-top: 8px;
-                line-height: 1.5;
-                color: #333;
-            }}
-            .hint-box b {{
-                color: #7c3aed;
-            }}
-            .formula {{
-                font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-                background: #f7f2ff;
-                padding: 2px 6px;
-                border-radius: 6px;
-                border: 1px solid #e4d7ff;
-            }}
         </style>
     </head>
     <body>
@@ -283,7 +235,7 @@ def create_pendulum_simulation_html(config):
             <div class="agent-message">{agent_message}</div>
             <div id="phase-indicator" class="phase-indicator">Phase: Before Change</div>
             
-            <canvas id="pendulum-canvas" class="simulation-canvas" width="420" height="320"></canvas>
+            <canvas id="pendulum-canvas" class="simulation-canvas" width="400" height="300"></canvas>
             
             <div class="simulation-controls">
                 <div class="param-display">
@@ -295,43 +247,29 @@ def create_pendulum_simulation_html(config):
                 <div class="param-display">
                     Amplitude: <span id="amplitude-display">{before_params['amplitude']}°</span>
                 </div>
-                <div class="param-display">
-                    Period ≈ <span id="period-display">—</span> s
-                </div>
-            </div>
-
-            <div class="hint-box">
-                <b>Try this:</b>
-                <ul style="margin:6px 0 0 18px; padding:0;">
-                  <li>Watch how the <b>period</b> (time for one swing) changes as <b>length (L)</b> changes.</li>
-                  <li>Notice that increasing <b>gravity (g)</b> makes the pendulum swing <b>faster</b> (shorter period).</li>
-                  <li>For small angles, the period is approximately <span class="formula">T ≈ 2π √(L / g)</span>. Keep an eye on the live value above!</li>
-                </ul>
             </div>
         </div>
         
         <script>
+            // Simulation parameters
             const beforeParams = {json.dumps(before_params)};
             const afterParams = {json.dumps(after_params)};
             const timing = {json.dumps(timing)};
             
+            // Canvas setup
             const canvas = document.getElementById('pendulum-canvas');
             const ctx = canvas.getContext('2d');
-            const originX = 210, originY = 60;
+            const originX = 200, originY = 60;
             const baseScale = 80;
             
+            // Animation state
             let currentParams = {{...beforeParams}};
             let angle = (currentParams.amplitude * Math.PI) / 180;
             let aVel = 0, aAcc = 0;
             const dt = 0.02;
             let startTime = Date.now();
-            let phase = 'before';
-
-            function smallAnglePeriod(L, g) {{
-                if (L <= 0 || g <= 0) return NaN;
-                return 2 * Math.PI * Math.sqrt(L / g);
-            }}
-
+            let phase = 'before'; // 'before', 'transition', 'after'
+            
             function updatePhaseIndicator() {{
                 const indicator = document.getElementById('phase-indicator');
                 const elapsed = (Date.now() - startTime) / 1000;
@@ -343,13 +281,16 @@ def create_pendulum_simulation_html(config):
                     indicator.textContent = 'Phase: Changing Parameters...';
                     phase = 'transition';
                     
+                    // Smooth transition
                     const transitionProgress = (elapsed - timing.before_duration) / timing.transition_duration;
                     const progress = Math.min(transitionProgress, 1);
                     
+                    // Interpolate parameters
                     currentParams.length = beforeParams.length + (afterParams.length - beforeParams.length) * progress;
                     currentParams.gravity = beforeParams.gravity + (afterParams.gravity - beforeParams.gravity) * progress;
                     currentParams.amplitude = beforeParams.amplitude + (afterParams.amplitude - beforeParams.amplitude) * progress;
                     
+                    // Reset pendulum when transition completes
                     if (progress === 1) {{
                         angle = (currentParams.amplitude * Math.PI) / 180;
                         aVel = 0;
@@ -360,32 +301,33 @@ def create_pendulum_simulation_html(config):
                     currentParams = {{...afterParams}};
                 }}
                 
+                // Update displays
                 document.getElementById('length-display').textContent = currentParams.length.toFixed(1) + 'm';
                 document.getElementById('gravity-display').textContent = currentParams.gravity.toFixed(1) + ' m/s²';
                 document.getElementById('amplitude-display').textContent = Math.round(currentParams.amplitude) + '°';
-
-                const T = smallAnglePeriod(currentParams.length, currentParams.gravity);
-                const pd = document.getElementById('period-display');
-                pd.textContent = isFinite(T) ? T.toFixed(2) : '—';
             }}
             
             function drawPendulum() {{
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
+                // Calculate pendulum physics
                 const lengthPixels = currentParams.length * baseScale;
                 aAcc = (-currentParams.gravity / currentParams.length) * Math.sin(angle);
                 aVel += aAcc * dt;
-                aVel *= 0.998;
+                aVel *= 0.998; // Damping
                 angle += aVel * dt;
                 
+                // Calculate bob position
                 const bobX = originX + lengthPixels * Math.sin(angle);
                 const bobY = originY + lengthPixels * Math.cos(angle);
                 
+                // Draw pivot point
                 ctx.beginPath();
                 ctx.arc(originX, originY, 6, 0, 2 * Math.PI);
                 ctx.fillStyle = '#7c3aed';
                 ctx.fill();
                 
+                // Draw string
                 ctx.beginPath();
                 ctx.moveTo(originX, originY);
                 ctx.lineTo(bobX, bobY);
@@ -393,6 +335,7 @@ def create_pendulum_simulation_html(config):
                 ctx.lineWidth = 3;
                 ctx.stroke();
                 
+                // Draw bob
                 ctx.beginPath();
                 ctx.arc(bobX, bobY, 15, 0, 2 * Math.PI);
                 ctx.fillStyle = '#ede9fe';
@@ -407,13 +350,13 @@ def create_pendulum_simulation_html(config):
                 drawPendulum();
                 requestAnimationFrame(animate);
             }}
+            
+            // Start animation
             animate();
         </script>
     </body>
     </html>
     """
-
-
 
 def display_simulation_if_needed():
     """
@@ -444,23 +387,33 @@ def display_simulation_if_needed():
                 st.stop()
 
 def render_viseme_sidebar(latest_text: str, key: str = "viseme_iframe"):
-    latest_text = (latest_text or "").strip()
+    """
+    Renders the viseme character (from animation.html) in the sidebar and auto-plays
+    SpeechSynthesis for `latest_text`, with lip-sync.
 
+    Notes:
+      - Uses browser SpeechSynthesis (no gTTS for this playback).
+      - Auto plays whenever this component is re-rendered with new text.
+      - Minimal UI: character + small status; voice & char selectors kept compact.
+    """
+    # Fallback text if empty/None
+    latest_text = (latest_text or "").strip()
+    # Escape for JS
     def js_escape(s):
         return s.replace("\\", "\\\\").replace("`", "\\`").replace("${", "\\${}")
     safe_text = js_escape(latest_text)
-
-    # Pull the most recent audio's message id (so we sync only to the latest)
-    current_msg_id = st.session_state.get('latest_audio_msg_id', "")
-
+    
+    # Load and encode images
     boy_image_path = os.path.join("static", "myphoto2.png")
     girl_image_path = os.path.join("static", "myphoto.png")
     boy_image_b64 = get_image_base64(boy_image_path)
     girl_image_b64 = get_image_base64(girl_image_path)
+    
     if not boy_image_b64 or not girl_image_b64:
         st.error("Could not load character images from static folder")
         return
 
+    # --- Compact HTML adapted from your animation.html with small CSS tweaks ---
     html = f"""
     <!doctype html>
     <html>
@@ -468,15 +421,33 @@ def render_viseme_sidebar(latest_text: str, key: str = "viseme_iframe"):
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width,initial-scale=1" />
       <style>
-        body {{ background: transparent; color: #eee; font-family: Arial, sans-serif; margin: 0; padding: 0; }}
-        .container {{ padding: 8px 6px 2px 6px; }}
+        body {{
+          background: transparent; color: #eee; font-family: Arial, sans-serif;
+          margin: 0; padding: 0;
+        }}
+        .container {{
+          padding: 8px 6px 2px 6px;
+        }}
         .stage {{ position:relative; display:block; }}
-        .character {{ width:100%; max-width:260px; display:block; margin:0 auto; position: relative; z-index: 1; }}
-        .mouth-container {{ position:absolute; left:25px; top:145px; width:151px; height:36px; pointer-events:none; z-index: 2; }}
+        .character {{ width:100%; max-width:260px; display:block; margin:0 auto; }}
+        .mouth-container {{
+          position:absolute; left:25px; top:145px; width:151px; height:36px; pointer-events:none;
+        }}
         svg.mouth {{ width:100%; height:100%; }}
         .mouth-set g {{ opacity:0; transition:opacity 80ms ease-out; }}
         .mouth-set g.active {{ opacity:1; }}
         .status {{ margin:6px 0 2px 0; text-align:center; font-size:12px; color:#bbb; }}
+        .row {{ display:flex; align-items:center; gap:6px; justify-content:center; }}
+        select {{
+          background:#222; color:#eee; border:1px solid #555; padding:4px 6px; border-radius:4px; font-size:12px;
+          max-width: 180px;
+        }}
+        .character-selector button {{
+          background:#444; color:#eee; border:1px solid #666; padding:3px 8px; border-radius:10px; cursor:pointer;
+          font-size:12px;
+        }}
+        .character-selector button.active {{ background:#0066cc; border-color:#0088ff; }}
+        .controls, #textInput, #playBtn, #stopBtn {{ display:none; }} /* hide manual controls */
       </style>
     </head>
     <body>
@@ -486,7 +457,7 @@ def render_viseme_sidebar(latest_text: str, key: str = "viseme_iframe"):
           <div class="mouth-container">
             <svg class="mouth" viewBox="-50 -50 100 100">
               <g class="mouth-set" id="mouthSet">
-                <g data-viseme="rest" class="active"><path d="M-26 6 q26 10 52 0" fill="#c33" stroke="#000" stroke-width="1"/></g>
+                <g data-viseme="rest"><path d="M-26 6 q26 10 52 0" fill="#c33" stroke="#000" stroke-width="1"/></g>
                 <g data-viseme="closed"><rect x="-30" y="-6" width="60" height="12" rx="6" fill="#9b2b2b"/></g>
                 <g data-viseme="wide"><ellipse cx="0" cy="6" rx="42" ry="14" fill="#9b2b2b"/></g>
                 <g data-viseme="open"><ellipse cx="0" cy="8" rx="36" ry="22" fill="#9b2b2b"/></g>
@@ -507,24 +478,82 @@ def render_viseme_sidebar(latest_text: str, key: str = "viseme_iframe"):
         </div>
 
         <div class="status">
+          <div class="row">
+            <span id="currentCharacterName">Boy</span> ·
+            <span>Voice:</span>
+            <select id="voiceSelect"></select>
+          </div>
           <div>Viseme: <strong id="visemeName">rest</strong></div>
+        </div>
+
+        <!-- Hidden controls we reuse -->
+        <textarea id="textInput" rows="2" cols="20"></textarea>
+        <div class="controls">
+          <button id="playBtn">Play</button>
+          <button id="stopBtn">Stop</button>
         </div>
       </div>
 
       <script>
-        const INJECTED_TEXT = `{safe_text}`;
-        const CURRENT_MSG_ID = `{current_msg_id}`;
-
-        const mouthSet = document.getElementById("mouthSet");
         const visemeName = document.getElementById("visemeName");
+        const mouthSet = document.getElementById("mouthSet");
+        const textInput = document.getElementById("textInput");
+        const voiceSelect = document.getElementById("voiceSelect");
+        const characterImage = document.getElementById("characterImage");
+        const currentCharacterName = document.getElementById("currentCharacterName");
 
-        let queue = [], timer = null, playing = false, forceStop = false;
-        let rateMultiplier = 1.0;       // dynamic: computed per audio
-        let watchdog = null;            // hard stop timer
-        let lastDurMs = 0;              // last computed duration for fallback
+        let queue = [], timer=null, playing=false, forceStop=false;
+        let utterance = null;
+        let voices = [];
+        let selectedVoice = null;
+        let currentCharacter = 'boy';
+
+        // Character assets (same as your HTML)
+        const characters = {{
+          boy: {{ name:'Boy', image:'data:image/png;base64,{boy_image_b64}', preferMale: true }},
+          girl: {{ name:'Girl', image:'data:image/png;base64,{girl_image_b64}', preferMale: false }}
+        }};
+
+        // Voice loading
+        function loadVoicesForCharacter() {{
+          const preferMale = characters[currentCharacter].preferMale;
+          voiceSelect.innerHTML = '';
+          let all = speechSynthesis.getVoices();
+          voices = all;
+
+          let filtered = all.filter(v => {{
+            const name = v.name.toLowerCase();
+            const maleMarkers = ['male','man','boy','david','mark','alex','daniel','james','thomas','richard'];
+            const femaleMarkers = ['female','woman','girl','karen','samantha','victoria','zira','susan','anna','lily','emma','sophia'];
+            const markerHit = (arr)=>arr.some(m=>name.includes(m));
+            return preferMale ? markerHit(maleMarkers) : markerHit(femaleMarkers);
+          }});
+          if (filtered.length === 0) filtered = all;
+
+          filtered.forEach(voice => {{
+            const opt = document.createElement('option');
+            opt.value = all.indexOf(voice);
+            opt.textContent = voice.name + ' (' + voice.lang + ')';
+            voiceSelect.appendChild(opt);
+          }});
+
+          selectedVoice = filtered[0] || all[0] || null;
+          if (selectedVoice) voiceSelect.value = all.indexOf(selectedVoice);
+        }}
+
+        function loadVoices() {{
+          loadVoicesForCharacter();
+        }}
+        speechSynthesis.onvoiceschanged = loadVoices;
+        loadVoices();
+
+        voiceSelect.onchange = function() {{
+          const idx = parseInt(this.value);
+          selectedVoice = speechSynthesis.getVoices()[idx] || null;
+        }};
 
         function simpleG2P(text) {{
-          let s = (text || "").toLowerCase().replace(/[^a-z\\s]/g, ' ');
+          let s = text.toLowerCase().replace(/[^a-z\\s]/g, ' ');
           const tokens = [];
           for (let i=0;i<s.length;) {{
             if (s[i]===" ") {{ i++; continue }}
@@ -568,105 +597,64 @@ def render_viseme_sidebar(latest_text: str, key: str = "viseme_iframe"):
           visemeName.innerText=v;
         }}
 
-        function stopPlay(hard=false) {{
-          playing=false; forceStop=hard; queue=[];
-          if (timer) {{ clearTimeout(timer); timer=null; }}
-          if (watchdog) {{ clearTimeout(watchdog); watchdog=null; }}
-          setViseme("rest");
-        }}
-
         function stepQueue() {{
           if (!playing || forceStop) return;
-          if (queue.length===0) {{ setViseme("rest"); playing=false; return; }}
+          if (queue.length===0) {{ setViseme("rest"); playing=false; return }}
           const frame=queue.shift();
           setViseme(frame.vis);
-          const scaled = Math.max(10, Math.round(frame.dur / rateMultiplier));
-          lastDurMs += scaled;
-          timer = setTimeout(stepQueue, scaled);
+          timer=setTimeout(stepQueue, frame.dur);
         }}
 
-        function totalTextMs(frames) {{
-          return frames.reduce((sum,f)=>sum+f.dur, 0);
+        function stopPlay(hard=false) {{
+          playing = false; forceStop = hard || false; queue = [];
+          if (timer) {{ clearTimeout(timer); timer = null; }}
+          setViseme("rest");
+          if (utterance) {{ speechSynthesis.cancel(); utterance = null; }}
         }}
 
-        function playVisemes(text, audioMs=null) {{
+        function playText(text) {{
+          const t = (text || "").trim();
+          if (!t) return;
           stopPlay();
-          queue = prepareQueue(text || "");
-          const textMs = totalTextMs(queue);
-          if (audioMs && isFinite(audioMs) && audioMs > 50) {{
-            rateMultiplier = Math.max(0.1, textMs / audioMs); // Scale visemes to match actual audio duration
-          }} else {{
-            rateMultiplier = 1.25; // fallback: speed up visemes to match 1.25x audio speed
-          }}
-          lastDurMs = 0;
+          utterance = new SpeechSynthesisUtterance(t);
+          if (selectedVoice) utterance.voice = selectedVoice;
+          utterance.rate = 1.0;
+          utterance.pitch = (currentCharacter === 'girl') ? 1.2 : 0.9;
+          utterance.volume = 1.0;
 
-          if (queue.length>0) {{
-            playing=true; stepQueue();
-            // Set a watchdog to force-stop when audio should end (with small buffer for precision)
-            const wd = audioMs && isFinite(audioMs) && audioMs > 50 ? audioMs : Math.round(textMs / rateMultiplier);
-            watchdog = setTimeout(() => stopPlay(true), wd + 100);
-          }}
+          utterance.onstart = () => {{
+            queue = prepareQueue(t);
+            if (queue.length > 0) {{ playing = true; forceStop = false; stepQueue(); }}
+          }};
+          utterance.onend = () => stopPlay(true);
+          utterance.onerror = () => stopPlay(true);
+
+          speechSynthesis.speak(utterance);
         }}
 
-        // Ensure a mouth is visible even before any audio message arrives
+        // Injected text from Streamlit:
+        const INJECTED_TEXT = `{safe_text}`;
+
+        // Set textarea (hidden) and auto-play on load
         document.addEventListener('DOMContentLoaded', () => {{
-          const el = mouthSet.querySelector('[data-viseme="rest"]');
-          if (el) el.classList.add('active');
-          visemeName.innerText = 'rest';
+          textInput.value = INJECTED_TEXT;
+          // default character: boy (image already set). You can switch by setting currentCharacter='girl' and image:
+          // characterImage.src = characters['girl'].image; currentCharacterName.textContent = characters['girl'].name;
+          setViseme("rest");
+          // Give voices a moment to load on some browsers
+          setTimeout(() => playText(INJECTED_TEXT), 200);
         }});
-
-        // Sync via postMessage from the main app audio.
-        window.addEventListener("message", (ev) => {{
-          const d = ev.data || {{}};
-          if (!d || !d.type) return;
-          // Only react to the latest message id (avoid stale audio events)
-          if (d.id && d.id !== CURRENT_MSG_ID) return;
-
-          if (d.type === 'audio_play') {{
-            // Audio is actually playing - this takes priority over fallback
-            if (playing) stopPlay(true); // Stop any fallback animation
-            const audioMs = d.dur || 0;      // real WAV duration from Python
-            playVisemes(INJECTED_TEXT, audioMs);
-          }} else if (d.type === 'audio_end' || d.type === 'audio_pause') {{
-            stopPlay(true);
-          }}
-        }});
-
-        // Enhanced fallback with multiple timing checks
-        let fallbackAttempts = 0;
-        function tryFallback() {{
-          fallbackAttempts++;
-          if (!playing && fallbackAttempts < 4) {{
-            // Check if we should wait longer based on network/processing
-            const shouldWait = fallbackAttempts < 3;
-            if (shouldWait) {{
-              setTimeout(tryFallback, 600 * fallbackAttempts); // Progressive delays: 600ms, 1200ms, 1800ms
-              return;
-            }}
-            
-            // Final fallback - start visemes
-            const tmp = prepareQueue(INJECTED_TEXT);
-            const textMs = totalTextMs(tmp);
-            const guessedAudioMs = Math.round(textMs / 1.25);
-            playVisemes(INJECTED_TEXT, guessedAudioMs);
-          }}
-        }}
-        
-        // Start fallback checks after initial delay
-        setTimeout(tryFallback, 800);
       </script>
     </body>
     </html>
     """
+    # Render in sidebar (top)
     with st.sidebar:
         components.html(html, height=330, scrolling=False)
 
 
-
 # ── Streamlit Page Configuration & State Initialization ──────────────────
 st.set_page_config(page_title="Interactive Educational Agent", page_icon="🤖")
-if "audio_rendered_for_ids" not in st.session_state:
-    st.session_state.audio_rendered_for_ids = set()
 
 def generate_session_id():
     """Generate a unique session ID for Langfuse tracking"""
@@ -750,9 +738,6 @@ with st.sidebar:
             last_assistant_text = msg
             break
 
-    if last_assistant_text:
-        st.session_state['latest_audio_msg_id'] = msg_id_from_text(last_assistant_text)
-
     # Render the character (auto-plays on each new assistant msg)
     render_viseme_sidebar(last_assistant_text or "Hello! I'm ready to explain 😊", key="viseme_iframe_top")
 
@@ -784,31 +769,13 @@ for i, (role, msg) in enumerate(st.session_state.messages):
             # Display simulation if needed
             display_simulation_if_needed()
             
-            # Add audio playback for the latest assistant message (only once per message)
-            try:
-                # stable id from assistant text so reruns don't create a new id
-                mid = msg_id_from_text(msg)
-
-                if mid not in st.session_state.audio_rendered_for_ids:
-                    # First render for this assistant reply → create <audio autoplay> + postMessage hooks
-                    returned_id = play_text_as_audio(
-                        msg,
-                        st.container(),
-                        message_id=mid,          # keep the id stable across reruns
-                        speed_factor=1.25        # your audio speed-up
-                    )
-                    st.session_state.audio_rendered_for_ids.add(mid)
-                    st.session_state['latest_audio_msg_id'] = returned_id  # same as mid
-                else:
-                    # Already rendered this audio; DO NOT create a new <audio> element (prevents restart)
-                    # Just keep the id for the viseme sidebar to know what to sync to
-                    st.session_state['latest_audio_msg_id'] = mid
-
-            except Exception as e:
-                st.caption("⚠️ Audio playback unavailable")
-                st.stop()
-
-            # pass
+            # Add audio playback for the latest assistant message
+            # try:
+            #     play_text_as_audio(msg, st.container())
+            # except Exception as e:
+            #     st.caption("⚠️ Audio playback unavailable")
+            #     st.stop()
+            pass
 
 # Handle user input at the bottom of the page
 if "agent" in st.session_state and st.session_state.agent.current_state() != "END":

@@ -144,7 +144,7 @@ class SimVarsResponse(BaseModel):
 class SimActionResponse(BaseModel):
     action: str = Field(description="Describe the action in clear terms that can be communicated directly to the student. Build on the variables just discussed.")
     rationale: str = Field(description="Explain to the student why this action will help them understand the concept. Reference the variables they just learned about.")
-    prompt_to_learner: str = Field(description="Direct question to the student asking for their consent or engagement. Use 'you' and speak directly to them.")
+    prompt_to_learner: str = Field(description="Direct question to the student asking for their consent or engagement. Use 'you' and speak directly to them.Also respond to previous user response")
 
 # SIM_EXPECT
 class SimExpectResponse(BaseModel):
@@ -201,7 +201,7 @@ def sim_concept_creator_node(state: AgentState) -> AgentState:
 You are talking directly with a class 7 student. Remember to use direct communication.
 
 Concept in focus: "{concept_pkg.title}"
-When the concept in focus is Simple Pendulum focus ONLY on the Length,Amplitude and Mass of the pendulum.Nothing else.
+When the concept in focus is Simple Pendulum or pendulum and its Time Period focus ONLY on the Length,Amplitude and Mass of the pendulum.NOTHING else.
 
 Context:
 {context}
@@ -326,7 +326,7 @@ Task:
 Return JSON ONLY describing:
 - 'action': one specific manipulation on the independent variable (explain what you will do)
 - 'rationale': why this will help the student understand the concept (speak directly to them)
-- 'prompt_to_learner': a direct question asking for their engagement (use 'you')
+- 'prompt_to_learner': a direct question asking for their engagement (use 'you')In this itself also acknowledge what the user said before and respond accordingly.
 """
 
     final_prompt = build_prompt_from_template_optimized(

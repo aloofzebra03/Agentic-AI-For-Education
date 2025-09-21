@@ -106,6 +106,7 @@ def start_node(state: AgentState) -> AgentState:
     system_prompt = (
         f"You are an educational agent helping a learner understand '{concept_pkg.title}'. The learner is a student of class 7. Remember that you are interacting directly with the learner.\n"
         "Greet the learner and ask if they are ready to begin."
+        "DONT use emojis as a TTS to speech model will break because of that."
         # "Also Remember that the student is of Kannada origin and understands olny kannada.So speak to the student in kannada.The script has to be kannada and not english.\n"
     )
     
