@@ -424,8 +424,8 @@ def sim_execute_node(state: AgentState) -> AgentState:
     # state["show_simulation"] = not flag  # New flag to track simulation lifecycle
     
     # Agent message
-    # msg = f"Perfect! Let me demonstrate this concept with a simulation for you. {simulation_config['agent_message']}"
-    msg = f"Perfect! Let me demonstrate this concept with a simulation for you."
+    msg = f"Perfect! Let me demonstrate this concept with a simulation for you. {simulation_config['agent_message']}"
+    # msg = f"Perfect! Let me demonstrate this concept with a simulation for you."
     add_ai_message_to_conversation(state, msg)
     state["agent_output"] = msg
     state["current_state"] = "SIM_OBSERVE"
