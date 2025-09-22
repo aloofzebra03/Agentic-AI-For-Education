@@ -11,7 +11,7 @@ import time
 import soundfile as sf
 from pedalboard import Pedalboard, Resample
 import sys
-import pysqlite3
+# import pysqlite3
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -21,7 +21,7 @@ from audio_recorder_streamlit import audio_recorder
 # Import gTTS for text-to-speech
 from gtts import gTTS
 
-sys.modules["sqlite3"] = pysqlite3
+# sys.modules["sqlite3"] = pysqlite3
 
 import hashlib
 
@@ -79,10 +79,10 @@ except ImportError as e:
 def load_asr_model():
     print("BOOT: about to init ASR...", flush=True)
     # model = onnx_asr.load_model("nemo-parakeet-tdt-0.6b-v2")
-    model = WhisperASR(model_name="small")
+    # model = WhisperASR(model_name="small")
     print("BOOT: ASR ready", flush=True)
-    return model
-    # return None
+    # return model
+    return None
     # return onnx_asr.load_model(model = "nemo-parakeet-tdt-0.6b-v2", path = "parakeet-tdt-0.6b-v2-onnx")
 
 asr_model = load_asr_model()
@@ -449,13 +449,13 @@ def display_image_with_context(image_data, show_explanation=True):
     # Main image with responsive sizing
     st.image(
         image_data["url"],
-        caption=f"🎯 {image_data['description']}",
-        use_column_width=True
+        caption=f"{image_data['description']}",
+        use_container_width=False
     )
     
     # Optional: Educational context in an expander
     if show_explanation and image_data.get("relevance_reason"):
-        with st.expander("🤔 Why this image helps your learning"):
+        with st.expander(" Why this image helps your learning"):
             st.write(image_data["relevance_reason"])
             
     # Add a subtle divider after image

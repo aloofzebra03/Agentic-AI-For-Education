@@ -73,6 +73,7 @@ class AgentState(TypedDict, total=False):
     node_transitions: List[Dict[str, Any]]
     summary: str
     summary_last_index: int
+    enhanced_message_metadata: Dict[str, Any]
 
 # -----------------------------------------------------------------------------
 # // 4. Initialize state and wrap helper

@@ -449,13 +449,13 @@ def display_image_with_context(image_data, show_explanation=True):
     # Main image with responsive sizing
     st.image(
         image_data["url"],
-        caption=f"🎯 {image_data['description']}",
-        use_column_width=True
+        caption=f"{image_data['description']}",
+        use_container_width=False
     )
     
     # Optional: Educational context in an expander
     if show_explanation and image_data.get("relevance_reason"):
-        with st.expander("🤔 Why this image helps your learning"):
+        with st.expander(" Why this image helps your learning"):
             st.write(image_data["relevance_reason"])
             
     # Add a subtle divider after image

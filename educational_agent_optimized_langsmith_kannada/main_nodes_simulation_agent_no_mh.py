@@ -336,7 +336,7 @@ def ci_node(state: AgentState) -> dict:
                 "image": selected_image,
                 "node": "CI"
             }
-        
+        print(result)
         return result
 
     # Increment attempt counter
