@@ -19,7 +19,7 @@ from educational_agent_optimized_langsmith.main_nodes_simulation_agent_no_mh imp
 )
 
 # ▶ NEW: import simulation agent nodes
-from educational_agent_optimized.simulation_nodes_no_mh_ge import (
+from educational_agent_optimized_langsmith.simulation_nodes_no_mh_ge import (
     sim_concept_creator_node,
     sim_vars_node,
     sim_action_node,

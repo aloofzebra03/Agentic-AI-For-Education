@@ -403,6 +403,95 @@ def get_ground_truth_from_json(concept: str, section_name: str) -> str:
         raise e
 
 
+def select_most_relevant_image_for_concept_introduction(concept: str, definition_context: str) -> Optional[Dict]:
+    """
+    Use LLM to select the most pedagogically relevant image for concept introduction.
+    
+    Args:
+        concept: The concept name (e.g., "Pendulum and its Time Period")
+        definition_context: The definition/explanation being provided to student
+    
+    Returns:
+        Dict with 'url', 'description', 'relevance_reason' or None if no suitable image
+    """
+    try:
+        import json
+        
+        # Load JSON file - adjust path based on your file structure
+        json_file_path = "educational_agent/NCERT Class 7.json"
+            
+        with open(json_file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        # Find the concept and its images
+        concept_data = None
+        for concept_item in data.get("concepts", []):
+            if concept_item.get("concept", "").lower().strip() == concept.lower().strip():
+                concept_data = concept_item
+                break
+        
+        if not concept_data:
+            print(f"Concept '{concept}' not found in JSON")
+            return None
+        
+        available_images = concept_data.get("images", [])
+        if not available_images:
+            print(f"No images found for concept '{concept}'")
+            return None
+        
+        # Create LLM prompt for image selection
+        images_text = "\n".join([
+            f"Image {i+1}: {img.get('description', 'No description')}" 
+            for i, img in enumerate(available_images)
+        ])
+        
+        selection_prompt = f"""You are helping select the most pedagogically effective image for introducing the concept "{concept}" to a Class 7 student.
+
+Context being provided to student:
+{definition_context}
+
+Available images:
+{images_text}
+
+Select the image that would be MOST helpful for a 12-13 year old student to understand this concept during the definition phase.
+
+Consider:
+- Visual clarity and simplicity
+- Direct relevance to the core concept
+- Age-appropriate complexity
+- Ability to reinforce the definition
+
+Respond with JSON only:
+{{
+    "selected_image_number": <1-based index>,
+    "relevance_reason": "<2-3 sentences explaining why this image is best for concept introduction>"
+}}"""
+        
+        # Get LLM response
+        llm = get_llm()
+        response = llm.invoke([HumanMessage(content=selection_prompt)])
+        
+        # Parse response
+        json_text = extract_json_block(response.content)
+        selection_data = json.loads(json_text)
+        
+        selected_index = selection_data.get("selected_image_number", 1) - 1  # Convert to 0-based
+        
+        if 0 <= selected_index < len(available_images):
+            selected_image = available_images[selected_index]
+            return {
+                "url": selected_image.get("url", ""),
+                "description": selected_image.get("description", ""),
+                "relevance_reason": selection_data.get("relevance_reason", "This image was selected as most relevant for concept introduction.")
+            }
+        else:
+            print(f"Invalid image selection index: {selected_index}")
+            return None
+            
+    except Exception as e:
+        print(f"Error selecting image for concept '{concept}': {e}")
+        return None
+
 
 # ─── Memory Optimization Functions ─────────────────────────────────────────────
 

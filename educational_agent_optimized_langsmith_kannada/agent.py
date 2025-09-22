@@ -9,7 +9,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 from langgraph.types import Command
 
 # Import the graph factory that returns a compiled graph WITHOUT callbacks baked in
-from educational_agent_optimized_langsmith.graph import build_graph
+from educational_agent_optimized_langsmith_kannada.graph import build_graph
 
 
 class EducationalAgent:

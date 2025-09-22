@@ -443,6 +443,25 @@ def display_simulation_if_needed():
                 st.session_state.agent.state["show_simulation"] = False
                 st.stop()
 
+def display_image_with_context(image_data, show_explanation=True):
+    """Enhanced image display with educational context"""
+    
+    # Main image with responsive sizing
+    st.image(
+        image_data["url"],
+        caption=f"🎯 {image_data['description']}",
+        use_column_width=True
+    )
+    
+    # Optional: Educational context in an expander
+    if show_explanation and image_data.get("relevance_reason"):
+        with st.expander("🤔 Why this image helps your learning"):
+            st.write(image_data["relevance_reason"])
+            
+    # Add a subtle divider after image
+    st.markdown("---")
+
+
 def render_viseme_sidebar(latest_text: str, key: str = "viseme_iframe"):
     latest_text = (latest_text or "").strip()
 
@@ -717,7 +736,13 @@ if st.session_state.get("processing_request"):
             else:
                 # Continue the conversation with the last user message
                 last_user_msg = None
-                for role, msg in reversed(st.session_state.messages):
+                for message_data in reversed(st.session_state.messages):
+                    # Handle both old and new message formats
+                    if len(message_data) == 2:
+                        role, msg = message_data
+                    else:
+                        role, msg, _ = message_data
+                    
                     if role == "user":
                         last_user_msg = msg
                         break
@@ -728,7 +753,15 @@ if st.session_state.get("processing_request"):
                     agent_reply = "I'm waiting for your response."
             
             if agent_reply:
-                st.session_state.messages.append(("assistant", agent_reply))
+                # Check if there's enhanced metadata from the agent
+                if (hasattr(st.session_state.agent, 'state') and 
+                    st.session_state.agent.state.get("enhanced_message_metadata")):
+                    metadata = st.session_state.agent.state["enhanced_message_metadata"]
+                    st.session_state.messages.append(("assistant", agent_reply, metadata))
+                    # Clear the metadata after use to prevent duplication
+                    st.session_state.agent.state.pop("enhanced_message_metadata", None)
+                else:
+                    st.session_state.messages.append(("assistant", agent_reply))
         
         except Exception as e:
             st.error(f"An error occurred: {e}")
@@ -745,7 +778,13 @@ st.title("🧑‍🎓 Interactive Simulation Educational Agent")
 with st.sidebar:
     # 1) VISeme at the very top (latest assistant message)
     last_assistant_text = None
-    for role, msg in reversed(st.session_state.get("messages", [])):
+    for message_data in reversed(st.session_state.get("messages", [])):
+        # Handle both old and new message formats
+        if len(message_data) == 2:
+            role, msg = message_data
+        else:
+            role, msg, _ = message_data
+        
         if role == "assistant" and isinstance(msg, str) and msg.strip():
             last_assistant_text = msg
             break
@@ -775,9 +814,19 @@ with st.sidebar:
 
 
 # Display all messages. The audio player is only added for the last assistant message.
-for i, (role, msg) in enumerate(st.session_state.messages):
+for i, message_data in enumerate(st.session_state.messages):
+    # Handle both old format (role, content) and new format (role, content, metadata)
+    if len(message_data) == 2:  # Old format
+        role, msg = message_data
+        metadata = {}
+    else:  # New format with metadata
+        role, msg, metadata = message_data
     with st.chat_message(role):
         st.write(msg)
+        
+        # Display image if present in metadata for assistant messages
+        if role == "assistant" and metadata.get("image"):
+            display_image_with_context(metadata["image"])
         
         # Check if we need to show simulation after this assistant message
         if role == "assistant" and (i == len(st.session_state.messages) - 1):

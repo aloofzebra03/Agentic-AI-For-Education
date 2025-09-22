@@ -18,6 +18,7 @@ from educational_agent.shared_utils import (
     build_prompt_from_template,
     build_prompt_from_template_optimized,
     get_ground_truth_from_json,
+    select_most_relevant_image_for_concept_introduction,
 )
 
 PEDAGOGICAL_MOVES: Dict[str, Dict[str, str]] = {
@@ -306,6 +307,12 @@ def ci_node(state: AgentState) -> dict:
         # Add AI message to conversation after successful processing
         add_ai_message_to_conversation(state, content)
         
+        # NEW: Select most relevant image for concept introduction
+        selected_image = select_most_relevant_image_for_concept_introduction(
+            concept=concept_pkg.title,
+            definition_context=gt + "\n\n" + content
+        )
+        
         # 🔍 CI NODE - FIRST PASS CONTENT 🔍
         print("=" * 80)
         print("🎯 CI NODE - FIRST PASS CONTENT OUTPUT 🎯")
@@ -313,14 +320,24 @@ def ci_node(state: AgentState) -> dict:
         print(f"📄 CONTENT: {content}")
         print(f"📏 CONTENT_LENGTH: {len(content)} characters")
         print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
+        print(f"🖼️ SELECTED_IMAGE: {selected_image['url'] if selected_image else 'None'}")
         print("=" * 80)
         
         # Return only the changed keys following LangGraph best practices
-        return {
+        result = {
             "asked_ci": True,
             "ci_tries": 0,
             "agent_output": content
         }
+        
+        # Add image metadata if image was selected
+        if selected_image:
+            result["enhanced_message_metadata"] = {
+                "image": selected_image,
+                "node": "CI"
+            }
+        
+        return result
 
     # Increment attempt counter
     ci_tries = state.get("ci_tries", 0) + 1
