@@ -7,7 +7,7 @@ Contains common helper functions used by both traditional nodes and simulation n
 import os
 import json
 import re
-from typing import Dict, Optional, Any
+from typing import Dict, List, Optional, Any
 import dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
@@ -401,6 +401,95 @@ def get_ground_truth_from_json(concept: str, section_name: str) -> str:
     except Exception as e:
         print(e)
         raise e
+
+# ─────────────────────────────────────────────────────────────────────
+# Simulation configuration helpers
+# ─────────────────────────────────────────────────────────────────────
+
+def create_simulation_config(variables: List, concept: str, action_config: Dict) -> Dict:
+    """
+    Create simulation configuration based on variables and action.
+    Maps physics concepts to pendulum parameters.
+    
+    Args:
+        variables: List of variable dictionaries with keys 'name', 'role', 'note'
+        concept: The concept name string
+        action_config: Dictionary with action configuration
+    """
+    # Default parameters
+    base_params = {"length": 1.0, "gravity": 9.8, "amplitude": 75}
+    
+    # Extract independent variable that's being changed
+    independent_var = None
+    for var in variables:
+        # Handle both Pydantic objects (legacy) and dictionaries (new format)
+        if hasattr(var, 'role'):  # Pydantic object
+            if var.role == "independent":
+                independent_var = var.name.lower()
+                break
+        elif isinstance(var, dict):  # Dictionary format
+            if var.get('role') == "independent":
+                independent_var = var.get('name', '').lower()
+                break
+    
+    if not independent_var:
+        raise ValueError(f"No independent variable found for concept: {concept}")
+    
+    # Map concept variables to simulation parameters
+    if "length" in independent_var or "length" in concept.lower():
+        return {
+            "concept": concept,
+            "parameter_name": "length",
+            "before_params": {**base_params, "length": 1.0},
+            "after_params": {**base_params, "length": 2.0},
+            "action_description": "increasing the pendulum length from 1.0m to 2.0m",
+            "timing": {"before_duration": 8, "transition_duration": 3, "after_duration": 8},
+            "agent_message": "Watch how the period changes as I increase the length for you..."
+        }
+    elif "gravity" in independent_var or "gravity" in concept.lower():
+        return {
+            "concept": concept,
+            "parameter_name": "gravity",
+            "before_params": {**base_params, "gravity": 9.8},
+            "after_params": {**base_params, "gravity": 50.0},  # High gravity demonstration
+            "action_description": "changing gravity from Earth (9.8 m/s²) to high gravity (50 m/s²)",
+            "timing": {"before_duration": 8, "transition_duration": 3, "after_duration": 8},
+            "agent_message": "Watch carefully as I change the gravity for you to see how the period changes..."
+        }
+    elif "amplitude" in independent_var or "angle" in independent_var:
+        return {
+            "concept": concept,
+            "parameter_name": "amplitude",
+            "before_params": {**base_params, "amplitude": 15},
+            "after_params": {**base_params, "amplitude": 60},
+            "action_description": "increasing the starting angle from 15° to 60°",
+            "timing": {"before_duration": 6, "transition_duration": 2, "after_duration": 6},
+            "agent_message": "Watch closely as I increase the swing angle for you to see how the period changes..."
+        }
+    elif "mass" in independent_var or "bob" in independent_var:
+        # For pendulum physics, mass doesn't affect the period, but we can demonstrate this
+        return {
+            "concept": concept,
+            "parameter_name": "mass_demo",
+            "before_params": {**base_params, "amplitude": 30},
+            "after_params": {**base_params, "amplitude": 30},  # Same parameters to show no change
+            "action_description": "comparing pendulums with different bob masses (but same period)",
+            "timing": {"before_duration": 10, "transition_duration": 2, "after_duration": 10},
+            "agent_message": "Watch this carefully! I'll show you how changing the bob mass affects the period - this might surprise you!"
+        }
+    elif "frequency" in independent_var or "period" in independent_var:
+        # Demonstrate period/frequency by changing length
+        return {
+            "concept": concept,
+            "parameter_name": "length",
+            "before_params": {**base_params, "length": 0.5},
+            "after_params": {**base_params, "length": 2.0},
+            "action_description": "changing length to show how period and frequency are related",
+            "timing": {"before_duration": 7, "transition_duration": 3, "after_duration": 7},
+            "agent_message": "I'll show you how changing length affects both period and frequency - watch this demonstration..."
+        }
+    else:
+            raise ValueError(f"Unrecognized independent variable '{independent_var}' for concept: {concept}")
 
 
 def select_most_relevant_image_for_concept_introduction(concept: str, definition_context: str) -> Optional[Dict]:

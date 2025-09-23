@@ -444,9 +444,7 @@ def ge_node(state: AgentState) -> AgentState:
     # Check if we're coming from AR after finishing a concept
     if state.get("in_simulation", False):
         state["in_simulation"] = False
-    
-    state['metadata']
-    
+        
     # Move to next concept if current concept is done
     current_idx = state.get("sim_current_idx", 0)
     concepts = state.get("sim_concepts", [])
