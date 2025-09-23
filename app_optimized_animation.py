@@ -79,10 +79,10 @@ except ImportError as e:
 def load_asr_model():
     print("BOOT: about to init ASR...", flush=True)
     # model = onnx_asr.load_model("nemo-parakeet-tdt-0.6b-v2")
-    # model = WhisperASR(model_name="small")
+    model = WhisperASR(model_name="small")
     print("BOOT: ASR ready", flush=True)
-    # return model
-    return None
+    return model
+    # return None
     # return onnx_asr.load_model(model = "nemo-parakeet-tdt-0.6b-v2", path = "parakeet-tdt-0.6b-v2-onnx")
 
 asr_model = load_asr_model()
