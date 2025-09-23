@@ -58,7 +58,7 @@ class WhisperASR:
 
     def recognize(self, audio_path: str) -> str:
         # fp16=False is safer on CPU; set True on GPU with half precision.
-        result = self.model.transcribe(audio_path, language='en', fp16=False)
+        result = self.model.transcribe(audio_path, language='kn', fp16=False)
         return result.get("text", "").strip()
 
 
