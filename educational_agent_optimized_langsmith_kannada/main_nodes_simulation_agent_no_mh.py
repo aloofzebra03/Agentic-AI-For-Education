@@ -380,7 +380,8 @@ def ci_node(state: AgentState) -> dict:
         return {
             "ci_tries": ci_tries,
             "agent_output": content,
-            "current_state": "SIM_CC"
+            "current_state": "SIM_CC",
+            "enhanced_message_metadata": {}
         }
 
     context = json.dumps(PEDAGOGICAL_MOVES["CI"], indent=2)
@@ -429,7 +430,8 @@ Task: Determine if the restatement is accurate. If accurate, move to SIM_CC to i
         return {
             "ci_tries": ci_tries,
             "agent_output": parsed['feedback'],
-            "current_state": parsed['next_state']
+            "current_state": parsed['next_state'],
+            "enhanced_message_metadata": {}
         }
     except Exception as e:
         print(f"Error parsing CI response: {e}")
