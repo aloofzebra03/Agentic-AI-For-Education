@@ -52,6 +52,8 @@ class EducationalAgent:
             "tags": tags,
         })
 
+        print("LangSmith header attached")
+
         # Optional local state slot if you need to stash anything custom
         self.state: Dict[str, Any] = {}
 
