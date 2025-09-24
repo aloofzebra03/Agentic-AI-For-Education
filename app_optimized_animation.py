@@ -65,6 +65,28 @@ class WhisperASR:
 # Load environment variables
 load_dotenv(dotenv_path=".env", override=True)
 
+# Ensure LangSmith environment variables are set if available
+if not os.getenv("LANGCHAIN_API_KEY") and os.getenv("LANGCHAIN_API_KEY"):
+    os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
+    
+# Verify LangSmith configuration
+langsmith_configured = all([
+    os.getenv("LANGCHAIN_API_KEY"),
+    os.getenv("LANGCHAIN_TRACING_V2"),
+    os.getenv("LANGCHAIN_ENDPOINT"),
+    os.getenv("LANGCHAIN_PROJECT")
+])
+
+if langsmith_configured:
+    print("✅ LangSmith configuration detected - tracing enabled")
+else:
+    print("⚠️  LangSmith configuration incomplete - tracing disabled")
+    print(f"LANGCHAIN_API_KEY: {'✓' if os.getenv('LANGCHAIN_API_KEY') else '✗'}")
+    print(f"LANGCHAIN_TRACING_V2: {'✓' if os.getenv('LANGCHAIN_TRACING_V2') else '✗'}")
+    print(f"LANGCHAIN_ENDPOINT: {'✓' if os.getenv('LANGCHAIN_ENDPOINT') else '✗'}")
+    print(f"LANGCHAIN_PROJECT: {'✓' if os.getenv('LANGCHAIN_PROJECT') else '✗'}")
+
+
 # Import the EducationalAgent class
 try:
     from educational_agent_optimized_langsmith.agent import EducationalAgent
