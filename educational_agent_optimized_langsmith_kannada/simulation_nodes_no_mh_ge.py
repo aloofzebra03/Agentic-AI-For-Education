@@ -6,6 +6,8 @@ from langchain.output_parsers import PydanticOutputParser
 from langchain_core.messages import HumanMessage, AIMessage
 
 from educational_agent_optimized_langsmith.config import concept_pkg
+from langdetect import detect
+from googletrans import Translator
 from educational_agent.shared_utils import (
     AgentState,
     add_ai_message_to_conversation,
@@ -319,7 +321,18 @@ def sim_execute_node(state: AgentState) -> AgentState:
     
     # Create simulation configuration
     simulation_config = create_simulation_config(variables, current_concept, action_config)
-    
+
+    agent_message = simulation_config.get('agent_message')
+    try:
+        if agent_message and detect(agent_message) == 'en':
+            translator = Translator()
+            kannada_message = translator.translate(agent_message, dest='kn').text
+            simulation_config['agent_message'] = kannada_message
+    except Exception:
+        # If detection or translation fails, keep the original message
+        print("Translation to Kannada failed, using original message.")
+        pass
+
     # Set flags for Streamlit to display simulation - but mark that it's active
     state["show_simulation"] = True
     state["simulation_config"] = simulation_config

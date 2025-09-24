@@ -208,7 +208,7 @@ def create_pendulum_simulation_html(config):
         <style>
             .simulation-container {{
                 width: 100%;
-                max-width: 700px;
+                max-width: 600px;
                 margin: 10px auto;
                 background: #f0f6ff;
                 border: 2px solid #c4afe9;
@@ -429,7 +429,7 @@ def display_simulation_if_needed():
             try:
                 # Create and display the simulation
                 simulation_html = create_pendulum_simulation_html(simulation_config)
-                components.html(simulation_html, height=450)
+                components.html(simulation_html, height=500)
                 
                 # Add a brief pause instruction
                 st.info("🔬 **Simulation running above** - Watch the pendulum carefully and notice what changes!")

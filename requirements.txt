@@ -83,6 +83,7 @@ google-genai
 google-generativeai
 google-pasta
 googleapis-common-protos
+googletrans
 grandalf
 greenlet
 grpcio
@@ -132,6 +133,7 @@ langchain-huggingface
 langchain-openai
 langchain-text-splitters
 langchain-groq
+langdetect
 langfuse
 langgraph
 langgraph-api
