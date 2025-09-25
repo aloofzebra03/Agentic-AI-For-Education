@@ -14,6 +14,9 @@ import sys
 import pysqlite3
 from datetime import datetime
 from dotenv import load_dotenv
+from langdetect import detect
+from deep_translator import GoogleTranslator
+
 
 # Import the audio_recorder component
 from audio_recorder_streamlit import audio_recorder
@@ -821,6 +824,23 @@ for i, message_data in enumerate(st.session_state.messages):
         metadata = {}
     else:  # New format with metadata
         role, msg, metadata = message_data
+    
+    # Check if message needs translation and update session state
+    try:
+        detected_lang = detect(msg)
+        if detected_lang == 'en':
+            translated_msg = GoogleTranslator(source='en', target='kn').translate(msg)
+            # Update the message in session state with the translated version
+            if len(message_data) == 2:  # Old format
+                st.session_state.messages[i] = (role, translated_msg)
+            else:  # New format with metadata
+                st.session_state.messages[i] = (role, translated_msg, metadata)
+            msg = translated_msg
+    except Exception as e:
+        # If language detection or translation fails, use original message
+        st.warning(f"Translation failed for message {i+1}: {e}")
+        pass
+    
     with st.chat_message(role):
         st.write(msg)
         

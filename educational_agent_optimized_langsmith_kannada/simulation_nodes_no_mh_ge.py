@@ -7,7 +7,6 @@ from langchain_core.messages import HumanMessage, AIMessage
 
 from educational_agent_optimized_langsmith.config import concept_pkg
 from langdetect import detect
-from googletrans import Translator
 from educational_agent.shared_utils import (
     AgentState,
     add_ai_message_to_conversation,
@@ -17,6 +16,8 @@ from educational_agent.shared_utils import (
     extract_json_block,
     create_simulation_config
 )
+from deep_translator import GoogleTranslator
+
 
 # ─────────────────────────────────────────────────────────────────────
 # Simulation moves
@@ -325,8 +326,7 @@ def sim_execute_node(state: AgentState) -> AgentState:
     agent_message = simulation_config.get('agent_message')
     try:
         if agent_message and detect(agent_message) == 'en':
-            translator = Translator()
-            kannada_message = translator.translate(agent_message, dest='kn').text
+            kannada_message = GoogleTranslator(source='en', target='kn').translate(agent_message)
             simulation_config['agent_message'] = kannada_message
     except Exception:
         # If detection or translation fails, keep the original message

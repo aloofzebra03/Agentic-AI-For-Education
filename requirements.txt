@@ -53,6 +53,7 @@ datasets
 debugpy
 decorator
 defusedxml
+deep-translator
 dill
 distro
 docopt
