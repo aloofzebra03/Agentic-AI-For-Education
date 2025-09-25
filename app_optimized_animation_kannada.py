@@ -57,12 +57,14 @@ import whisper
 class WhisperASR:
     def __init__(self, model_name: str = "tiny"):
         # Load tiny (~75MB). Use "base", "small", etc. if you want better accuracy.
+        # model_name = "vasista22/whisper-kannada-tiny"
         self.model = whisper.load_model(model_name)
 
     def recognize(self, audio_path: str) -> str:
         # fp16=False is safer on CPU; set True on GPU with half precision.
         result = self.model.transcribe(audio_path, language='kn', fp16=False)
         return result.get("text", "").strip()
+        
 
 
 # Load environment variables
@@ -204,6 +206,217 @@ def create_pendulum_simulation_html(config):
     timing = config['timing']
     agent_message = config['agent_message']
 
+    # return f"""
+    # <!DOCTYPE html>
+    # <html>
+    # <head>
+    #     <style>
+    #         .simulation-container {{
+    #             width: 100%;
+    #             max-width: 600px;
+    #             margin: 10px auto;
+    #             background: #f0f6ff;
+    #             border: 2px solid #c4afe9;
+    #             border-radius: 15px;
+    #             padding: 15px;
+    #             text-align: center;
+    #             position: relative;
+    #         }}
+    #         .simulation-canvas {{
+    #             background: #ede9fe;
+    #             border-radius: 12px;
+    #             margin: 10px auto;
+    #             display: block;
+    #         }}
+    #         .simulation-controls {{
+    #             display: flex;
+    #             justify-content: center;
+    #             gap: 20px;
+    #             margin: 10px 0;
+    #             font-family: 'Segoe UI', sans-serif;
+    #             flex-wrap: wrap;
+    #         }}
+    #         .param-display {{
+    #             background: rgba(124, 58, 237, 0.1);
+    #             padding: 8px 12px;
+    #             border-radius: 8px;
+    #             font-size: 14px;
+    #             font-weight: 500;
+    #         }}
+    #         .agent-message {{
+    #             background: rgba(124, 58, 237, 0.9);
+    #             color: white;
+    #             padding: 10px 15px;
+    #             border-radius: 10px;
+    #             margin: 10px 0;
+    #             font-size: 16px;
+    #             font-weight: 500;
+    #         }}
+    #         .phase-indicator {{
+    #             background: #7c3aed;
+    #             color: white;
+    #             padding: 5px 15px;
+    #             border-radius: 20px;
+    #             font-size: 14px;
+    #             font-weight: 600;
+    #             margin: 10px 0;
+    #         }}
+    #         .hint-box {{
+    #             text-align: left;
+    #             background: #ffffff;
+    #             border: 1px dashed #7c3aed;
+    #             border-radius: 10px;
+    #             padding: 10px 12px;
+    #             margin-top: 8px;
+    #             line-height: 1.5;
+    #             color: #333;
+    #         }}
+    #         .hint-box b {{
+    #             color: #7c3aed;
+    #         }}
+    #         .formula {{
+    #             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    #             background: #f7f2ff;
+    #             padding: 2px 6px;
+    #             border-radius: 6px;
+    #             border: 1px solid #e4d7ff;
+    #         }}
+    #     </style>
+    # </head>
+    # <body>
+    #     <div class="simulation-container">
+    #         <div class="agent-message">{agent_message}</div>
+    #         <div id="phase-indicator" class="phase-indicator">Phase: Before Change</div>
+            
+    #         <canvas id="pendulum-canvas" class="simulation-canvas" width="420" height="320"></canvas>
+            
+    #         <div class="simulation-controls">
+    #             <div class="param-display">
+    #                 Length: <span id="length-display">{before_params['length']:.1f}m</span>
+    #             </div>
+    #             <div class="param-display">
+    #                 Gravity: <span id="gravity-display">{before_params['gravity']:.1f} m/s²</span>
+    #             </div>
+    #             <div class="param-display">
+    #                 Amplitude: <span id="amplitude-display">{before_params['amplitude']}°</span>
+    #             </div>
+    #             <div class="param-display">
+    #                 Period ≈ <span id="period-display">—</span> s
+    #             </div>
+    #         </div>
+
+    #         <div class="hint-box">
+    #             <b>Try this:</b>
+    #             <ul style="margin:6px 0 0 18px; padding:0;">
+    #               <li>Watch how the <b>period</b> (time for one swing) changes as <b>length (L)</b> changes.</li>
+    #               <li>Notice that increasing <b>gravity (g)</b> makes the pendulum swing <b>faster</b> (shorter period).</li>
+    #               <li>For small angles, the period is approximately <span class="formula">T ≈ 2π √(L / g)</span>. Keep an eye on the live value above!</li>
+    #             </ul>
+    #         </div>
+    #     </div>
+        
+    #     <script>
+    #         const beforeParams = {json.dumps(before_params)};
+    #         const afterParams = {json.dumps(after_params)};
+    #         const timing = {json.dumps(timing)};
+            
+    #         const canvas = document.getElementById('pendulum-canvas');
+    #         const ctx = canvas.getContext('2d');
+    #         const originX = 210, originY = 60;
+    #         const baseScale = 80;
+            
+    #         let currentParams = {{...beforeParams}};
+    #         let angle = (currentParams.amplitude * Math.PI) / 180;
+    #         let aVel = 0, aAcc = 0;
+    #         const dt = 0.02;
+    #         let startTime = Date.now();
+    #         let phase = 'before';
+
+    #         function smallAnglePeriod(L, g) {{
+    #             if (L <= 0 || g <= 0) return NaN;
+    #             return 2 * Math.PI * Math.sqrt(L / g);
+    #         }}
+
+    #         function updatePhaseIndicator() {{
+    #             const indicator = document.getElementById('phase-indicator');
+    #             const elapsed = (Date.now() - startTime) / 1000;
+                
+    #             if (elapsed < timing.before_duration) {{
+    #                 indicator.textContent = 'Phase: Before Change';
+    #                 phase = 'before';
+    #             }} else if (elapsed < timing.before_duration + timing.transition_duration) {{
+    #                 indicator.textContent = 'Phase: Changing Parameters...';
+    #                 phase = 'transition';
+                    
+    #                 const transitionProgress = (elapsed - timing.before_duration) / timing.transition_duration;
+    #                 const progress = Math.min(transitionProgress, 1);
+                    
+    #                 currentParams.length = beforeParams.length + (afterParams.length - beforeParams.length) * progress;
+    #                 currentParams.gravity = beforeParams.gravity + (afterParams.gravity - beforeParams.gravity) * progress;
+    #                 currentParams.amplitude = beforeParams.amplitude + (afterParams.amplitude - beforeParams.amplitude) * progress;
+                    
+    #                 if (progress === 1) {{
+    #                     angle = (currentParams.amplitude * Math.PI) / 180;
+    #                     aVel = 0;
+    #                 }}
+    #             }} else {{
+    #                 indicator.textContent = 'Phase: After Change';
+    #                 phase = 'after';
+    #                 currentParams = {{...afterParams}};
+    #             }}
+                
+    #             document.getElementById('length-display').textContent = currentParams.length.toFixed(1) + 'm';
+    #             document.getElementById('gravity-display').textContent = currentParams.gravity.toFixed(1) + ' m/s²';
+    #             document.getElementById('amplitude-display').textContent = Math.round(currentParams.amplitude) + '°';
+
+    #             const T = smallAnglePeriod(currentParams.length, currentParams.gravity);
+    #             const pd = document.getElementById('period-display');
+    #             pd.textContent = isFinite(T) ? T.toFixed(2) : '—';
+    #         }}
+            
+    #         function drawPendulum() {{
+    #             ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+    #             const lengthPixels = currentParams.length * baseScale;
+    #             aAcc = (-currentParams.gravity / currentParams.length) * Math.sin(angle);
+    #             aVel += aAcc * dt;
+    #             aVel *= 0.998;
+    #             angle += aVel * dt;
+                
+    #             const bobX = originX + lengthPixels * Math.sin(angle);
+    #             const bobY = originY + lengthPixels * Math.cos(angle);
+                
+    #             ctx.beginPath();
+    #             ctx.arc(originX, originY, 6, 0, 2 * Math.PI);
+    #             ctx.fillStyle = '#7c3aed';
+    #             ctx.fill();
+                
+    #             ctx.beginPath();
+    #             ctx.moveTo(originX, originY);
+    #             ctx.lineTo(bobX, bobY);
+    #             ctx.strokeStyle = '#7c3aed';
+    #             ctx.lineWidth = 3;
+    #             ctx.stroke();
+                
+    #             ctx.beginPath();
+    #             ctx.arc(bobX, bobY, 15, 0, 2 * Math.PI);
+    #             ctx.fillStyle = '#ede9fe';
+    #             ctx.strokeStyle = '#7c3aed';
+    #             ctx.lineWidth = 2.5;
+    #             ctx.fill();
+    #             ctx.stroke();
+    #         }}
+            
+    #         function animate() {{
+    #             updatePhaseIndicator();
+    #             drawPendulum();
+    #             requestAnimationFrame(animate);
+    #         }}
+    #         animate();
+    #     </script>
+    # </body>
+    # </html>
+    # """
     return f"""
     <!DOCTYPE html>
     <html>
@@ -299,6 +512,9 @@ def create_pendulum_simulation_html(config):
                     Amplitude: <span id="amplitude-display">{before_params['amplitude']}°</span>
                 </div>
                 <div class="param-display">
+                    Mass: <span id="mass-display">{before_params.get('mass', 1):.2f} kg</span>
+                </div>
+                <div class="param-display">
                     Period ≈ <span id="period-display">—</span> s
                 </div>
             </div>
@@ -317,6 +533,11 @@ def create_pendulum_simulation_html(config):
             const beforeParams = {json.dumps(before_params)};
             const afterParams = {json.dumps(after_params)};
             const timing = {json.dumps(timing)};
+            
+            // ---- MASS DEFAULTS (added) ----
+            if (beforeParams.mass === undefined) beforeParams.mass = 1;
+            if (afterParams.mass === undefined)  afterParams.mass  = 1;
+            // --------------------------------
             
             const canvas = document.getElementById('pendulum-canvas');
             const ctx = canvas.getContext('2d');
@@ -349,9 +570,10 @@ def create_pendulum_simulation_html(config):
                     const transitionProgress = (elapsed - timing.before_duration) / timing.transition_duration;
                     const progress = Math.min(transitionProgress, 1);
                     
-                    currentParams.length = beforeParams.length + (afterParams.length - beforeParams.length) * progress;
-                    currentParams.gravity = beforeParams.gravity + (afterParams.gravity - beforeParams.gravity) * progress;
+                    currentParams.length    = beforeParams.length    + (afterParams.length    - beforeParams.length)    * progress;
+                    currentParams.gravity   = beforeParams.gravity   + (afterParams.gravity   - beforeParams.gravity)   * progress;
                     currentParams.amplitude = beforeParams.amplitude + (afterParams.amplitude - beforeParams.amplitude) * progress;
+                    currentParams.mass      = beforeParams.mass      + (afterParams.mass      - beforeParams.mass)      * progress;
                     
                     if (progress === 1) {{
                         angle = (currentParams.amplitude * Math.PI) / 180;
@@ -362,10 +584,11 @@ def create_pendulum_simulation_html(config):
                     phase = 'after';
                     currentParams = {{...afterParams}};
                 }}
-                
-                document.getElementById('length-display').textContent = currentParams.length.toFixed(1) + 'm';
-                document.getElementById('gravity-display').textContent = currentParams.gravity.toFixed(1) + ' m/s²';
+
+                document.getElementById('length-display').textContent    = currentParams.length.toFixed(1) + 'm';
+                document.getElementById('gravity-display').textContent   = currentParams.gravity.toFixed(1) + ' m/s²';
                 document.getElementById('amplitude-display').textContent = Math.round(currentParams.amplitude) + '°';
+                document.getElementById('mass-display').textContent      = (currentParams.mass ?? 1).toFixed(2) + ' kg';
 
                 const T = smallAnglePeriod(currentParams.length, currentParams.gravity);
                 const pd = document.getElementById('period-display');
@@ -396,8 +619,14 @@ def create_pendulum_simulation_html(config):
                 ctx.lineWidth = 3;
                 ctx.stroke();
                 
+                // ---- MASS VISUALIZATION (added) ----
+                // Bob radius grows with mass (visual only); capped for aesthetics
+                const m = Math.max(0.1, currentParams.mass || 1);
+                const bobRadius = Math.min(12 + 3 * m, 30);
+                // ------------------------------------
+                
                 ctx.beginPath();
-                ctx.arc(bobX, bobY, 15, 0, 2 * Math.PI);
+                ctx.arc(bobX, bobY, bobRadius, 0, 2 * Math.PI);
                 ctx.fillStyle = '#ede9fe';
                 ctx.strokeStyle = '#7c3aed';
                 ctx.lineWidth = 2.5;
@@ -415,8 +644,6 @@ def create_pendulum_simulation_html(config):
     </body>
     </html>
     """
-
-
 
 def display_simulation_if_needed():
     """

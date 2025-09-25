@@ -417,7 +417,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
         action_config: Dictionary with action configuration
     """
     # Default parameters
-    base_params = {"length": 1.0, "gravity": 9.8, "amplitude": 30}
+    base_params = {"length": 1.0, "gravity": 9.8, "amplitude": 30, "mass": 1.0}
     
     # Extract independent variable that's being changed
     independent_var = None
@@ -471,8 +471,8 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
         return {
             "concept": concept,
             "parameter_name": "mass_demo",
-            "before_params": {**base_params, "amplitude": 30},
-            "after_params": {**base_params, "amplitude": 30},  # Same parameters to show no change
+            "before_params": {**base_params, "mass": 1},
+            "after_params": {**base_params, "mass": 10},  # Same parameters to show no change
             "action_description": "comparing pendulums with different bob masses (but same period)",
             "timing": {"before_duration": 10, "transition_duration": 2, "after_duration": 10},
             "agent_message": "Watch this carefully! I'll show you how changing the bob mass affects the period - this might surprise you!"

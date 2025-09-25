@@ -82,7 +82,7 @@ position: relative;
 }
 .demo-controls {
 margin: 10px 0 5px 0;
-display: flex; justify-content: center; gap: 16px;
+display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
 }
 .demo-controls label {
 display: flex; flex-direction: column; color: var(--text-muted);font-weight: 500; align-items: flex-start; font-size:15px;}
@@ -144,9 +144,10 @@ margin-top: 25px;
 }
 #test-controls {
 display: flex;
-gap: 13px;
+gap: 10px;
 justify-content: center;
 margin-top: 12px;
+flex-wrap: wrap;
 }
 #test-controls label {
 display: flex;flex-direction: column;color: var(--text-muted);font-weight: 500;align-items: flex-start;}
@@ -173,7 +174,8 @@ const educationalContent = {
   concepts: [
     "Effect of pendulum length on period",
     "Impact of amplitude on period", 
-    "Role of gravity on swing time"
+    "Role of gravity on swing time",
+    "Effect of mass on pendulum period"
   ],
   responses: {
     0: { // Concept 1: Length effect
@@ -199,6 +201,14 @@ const educationalContent = {
       execute: "Watch the pendulum swing under different gravitational conditions. Notice how gravity affects the restoring force and timing.",
       observe: "What difference did you see in the swing time between Earth and Moon gravity? How did the motion change?",
       insight: (pred, obs) => `Lower gravity dramatically increases the period - the pendulum swings much slower on the Moon. ${pred.toLowerCase().includes('slow') || pred.toLowerCase().includes('longer') ? 'Your prediction was spot on!' : 'Gravity has an inverse square root relationship with period.'}`
+    },
+    3: { // Concept 4: Mass effect
+      variables: "Mass is the variable here, while length, gravity, and amplitude stay constant. This tests if mass affects the period.",
+      action: "Compare a light mass (0.5 kg) with a heavy mass (5 kg) using the same pendulum length, gravity, and amplitude.",
+      prediction: "Do you think a heavier pendulum bob will swing faster, slower, or at the same speed as a lighter one?",
+      execute: "Watch pendulums with different masses but identical length and conditions. Pay attention to the timing of each complete swing.",
+      observe: "What did you notice about the swing times with different masses? Did the heavier bob swing differently?",
+      insight: (pred, obs) => `Surprisingly, mass has NO effect on the pendulum period! Both light and heavy bobs swing at exactly the same rate. ${pred.toLowerCase().includes('same') || pred.toLowerCase().includes('no') ? 'Excellent prediction!' : 'This counterintuitive result shows that gravity accelerates all masses equally.'}`
     }
   }
 };
@@ -217,7 +227,7 @@ function agentBlock(msg, agent, current=false) {
 }
 
 function createPendulumSimulation(parent, params) {
-  let {length, gravity, amplitude} = params;
+  let {length, gravity, amplitude, mass = 1} = params;
   const canvas = document.createElement('canvas');
   canvas.width = 400; canvas.height = 400;
   canvas.style.background = '#ede9fe';
@@ -239,6 +249,7 @@ function createPendulumSimulation(parent, params) {
   let lengthMeters = length;
   let lengthPixels = calculateVisualScale(lengthMeters);
   let gravityVal = gravity;
+  let massKg = mass;
   let initialAngle = (amplitude * Math.PI) / 180;
   let angle = initialAngle;
   let aVel = 0, aAcc = 0;
@@ -260,7 +271,10 @@ function createPendulumSimulation(parent, params) {
     const bobY = originY + lengthPixels * Math.cos(angle);
     ctx.beginPath(); ctx.moveTo(originX, originY); ctx.lineTo(bobX, bobY);
     ctx.strokeStyle = "#7c3aed"; ctx.lineWidth = 3; ctx.stroke();
-    ctx.beginPath(); ctx.arc(bobX, bobY, 18, 0, 2*Math.PI);
+    
+    // Mass affects visual size of the bob (radius = 12 + mass*3, capped at 30)
+    const bobRadius = Math.min(12 + massKg * 3, 30);
+    ctx.beginPath(); ctx.arc(bobX, bobY, bobRadius, 0, 2*Math.PI);
     ctx.fillStyle = "#ede9fe";
     ctx.strokeStyle = "#7c3aed"; ctx.lineWidth = 2.5; ctx.fill(); ctx.stroke();
   }
@@ -276,6 +290,7 @@ function createPendulumSimulation(parent, params) {
     setParams: function(p) {
       lengthMeters = p.length;
       gravityVal = p.gravity;
+      massKg = p.mass || 1;
       initialAngle = (p.amplitude*Math.PI)/180;
       angle = initialAngle;
       aVel = 0; aAcc = 0;
@@ -283,7 +298,7 @@ function createPendulumSimulation(parent, params) {
       running = true;
     },
     getParams: function(){
-      return {length:lengthMeters, gravity:gravityVal, amplitude:Math.round(initialAngle*180/Math.PI)};
+      return {length:lengthMeters, gravity:gravityVal, amplitude:Math.round(initialAngle*180/Math.PI), mass:massKg};
     },
     stop: function() { running = false; },
     canvas
@@ -316,15 +331,15 @@ let guidedDiv = document.getElementById('guided-flow');
 let stepIdx = 0;
 let flowIdx = 0;
 let userConcepts = educationalContent.concepts;
-let userPreds = ["", "", ""];
-let userObs = ["", "", ""];
+let userPreds = ["", "", "", ""];
+let userObs = ["", "", "", ""];
 
 function render() {
   guidedDiv.innerHTML = '';
   
   if (stepIdx === 0) {
-    guidedDiv.appendChild(agentBlock(`<div style="font-size:17px;color:#5b21b6;font-weight:600;margin-bottom:2px;">Here are three key concepts you can explore:</div><ol style="margin-top:7px;margin-left:13px;"><li>${userConcepts[0]}</li><li>${userConcepts[1]}</li><li>${userConcepts[2]}</li></ol>`,1,true));
-    guidedDiv.appendChild(agentBlock(`<span class="step-ind">Step 1/3</span>Let's start with the first concept!`,2));
+    guidedDiv.appendChild(agentBlock(`<div style="font-size:17px;color:#5b21b6;font-weight:600;margin-bottom:2px;">Here are four key concepts you can explore:</div><ol style="margin-top:7px;margin-left:13px;"><li>${userConcepts[0]}</li><li>${userConcepts[1]}</li><li>${userConcepts[2]}</li><li>${userConcepts[3]}</li></ol>`,1,true));
+    guidedDiv.appendChild(agentBlock(`<span class="step-ind">Step 1/4</span>Let's start with the first concept!`,2));
     showNextBtn(()=>{stepIdx=1;flowIdx=0;render();});
     return;
   }
@@ -339,7 +354,7 @@ function render() {
   
   let answer = getEducationalResponse(currentStepType, flowIdx, predictionVal, observationVal);
   
-  let block = agentBlock(`<span class="step-ind">Step ${flowIdx+1}/3</span>` + answer, 2, true);
+  let block = agentBlock(`<span class="step-ind">Step ${flowIdx+1}/4</span>` + answer, 2, true);
   guidedDiv.appendChild(block);
   
   if (currentStepType === 'prediction') {
@@ -371,13 +386,14 @@ function render() {
     
     // Different parameter sets for each concept
     let paramSets = [
-      [{length:0.5,gravity:9.81,amplitude:10},{length:2.0,gravity:9.81,amplitude:10}], // Length effect
-      [{length:1,gravity:9.81,amplitude:5},{length:1,gravity:9.81,amplitude:60}],      // Amplitude effect  
-      [{length:1,gravity:9.81,amplitude:30},{length:1,gravity:1.62,amplitude:30}]      // Gravity effect
+      [{length:0.5,gravity:9.81,amplitude:10,mass:1},{length:2.0,gravity:9.81,amplitude:10,mass:1}], // Length effect
+      [{length:1,gravity:9.81,amplitude:5,mass:1},{length:1,gravity:9.81,amplitude:60,mass:1}],      // Amplitude effect  
+      [{length:1,gravity:9.81,amplitude:30,mass:1},{length:1,gravity:1.62,amplitude:30,mass:1}],      // Gravity effect
+      [{length:1,gravity:9.81,amplitude:30,mass:0.5},{length:1,gravity:9.81,amplitude:30,mass:5}]     // Mass effect
     ];
     
     let paramSet = paramSets[flowIdx];
-    let currParams = Object.assign({}, paramSet[0]);
+    let currParams = Object.assign({mass: 1}, paramSet[0]);
     
     let getPeriod = () => 2*Math.PI*Math.sqrt(currParams.length/currParams.gravity);
     let periodText = document.createElement('div');
@@ -401,6 +417,7 @@ function render() {
       <label>Length (m)<input id="demo-length" type="number" min="0.1" step="0.05" value="${currParams.length}"/></label>
       <label>Gravity (m/s²)<input id="demo-gravity" type="number" min="0.1" step="0.05" value="${currParams.gravity}"/></label>
       <label>Amplitude (°)<input id="demo-ampl" type="number" min="1" max="90" step="1" value="${currParams.amplitude}"/></label>
+      <label>Mass (kg)<input id="demo-mass" type="number" min="0.1" step="0.1" value="${currParams.mass}"/></label>
     `;
     demoBlock.appendChild(controls);
     
@@ -409,6 +426,7 @@ function render() {
         currParams.length = parseFloat(document.getElementById('demo-length').value);
         currParams.gravity = parseFloat(document.getElementById('demo-gravity').value);
         currParams.amplitude = parseFloat(document.getElementById('demo-ampl').value);
+        currParams.mass = parseFloat(document.getElementById('demo-mass').value);
         sim.setParams({...currParams});
         renderPeriod();
       };
@@ -423,6 +441,7 @@ function render() {
         document.getElementById('demo-length').value = currParams.length;
         document.getElementById('demo-gravity').value = currParams.gravity;
         document.getElementById('demo-ampl').value = currParams.amplitude;
+        document.getElementById('demo-mass').value = currParams.mass;
         sim.setParams(currParams);
         renderPeriod();
         nextDemoBtn.textContent = 'Continue to next step';
@@ -451,7 +470,7 @@ function nextAgentNode(predictionInput, observationInput) {
   
   if (subStep === 5) {
     flowIdx++;
-    if (flowIdx >= 3) {
+    if (flowIdx >= 4) {
       renderSummary();
       return;
     } else {
@@ -480,7 +499,7 @@ function renderSummary() {
   testBlock.innerHTML = '<b>Test and explore yourself!</b> Change values below to continue learning.';
   
   let canDiv = document.createElement('div');
-  let initialParams = {length:1,gravity:9.81,amplitude:30};
+  let initialParams = {length:1,gravity:9.81,amplitude:30,mass:1};
   let pendSim = createPendulumSimulation(canDiv, initialParams);
   testBlock.appendChild(canDiv);
   
@@ -488,7 +507,8 @@ function renderSummary() {
   controls.id = 'test-controls';
   controls.innerHTML = `<label>Length<br><input id="test-length" type="number" min="0.1" step="0.05" value="1"/></label>
     <label>Gravity<br><input id="test-gravity" type="number" min="0.1" step="0.05" value="9.81"/></label>
-    <label>Amplitude<br><input id="test-ampl" type="number" min="1" max="90" step="1" value="30"/></label>`;
+    <label>Amplitude<br><input id="test-ampl" type="number" min="1" max="90" step="1" value="30"/></label>
+    <label>Mass<br><input id="test-mass" type="number" min="0.1" step="0.1" value="1"/></label>`;
   testBlock.appendChild(controls);
   guidedDiv.appendChild(testBlock);
   
@@ -497,7 +517,8 @@ function renderSummary() {
       let l = parseFloat(document.getElementById('test-length').value);
       let g = parseFloat(document.getElementById('test-gravity').value);
       let a = parseFloat(document.getElementById('test-ampl').value);
-      pendSim.setParams({length:l,gravity:g,amplitude:a});
+      let m = parseFloat(document.getElementById('test-mass').value);
+      pendSim.setParams({length:l,gravity:g,amplitude:a,mass:m});
     };
   });
 }
