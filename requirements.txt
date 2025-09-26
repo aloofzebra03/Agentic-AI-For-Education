@@ -120,7 +120,7 @@ jsonschema_rs
 jupyter_client
 jupyter_core
 jupyterlab_pygments
-keras
+tf-keras
 kiwisolver
 kubernetes
 langchain
