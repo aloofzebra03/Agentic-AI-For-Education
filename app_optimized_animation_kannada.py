@@ -116,7 +116,7 @@ except ImportError as e:
 def load_asr_model():
     print("BOOT: about to init ASR...", flush=True)
     # Use the fine-tuned Kannada Whisper model
-    model = WhisperASR(model_name="vasista22/whisper-kannada-base")
+    model = WhisperASR(model_name="vasista22/whisper-kannada-tiny")
     print("BOOT: ASR ready", flush=True)
     return model
 
