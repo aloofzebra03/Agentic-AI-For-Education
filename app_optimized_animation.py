@@ -859,7 +859,7 @@ def render_viseme_sidebar(latest_text: str, key: str = "viseme_iframe"):
         // ----- render helper -----
         function setViseme(v) {{
             mouthSet.querySelectorAll("[data-viseme]").forEach(g => g.classList.remove("active"));
-            const el = mouthSet.querySelector(`[data-viseme="${v}"]`);
+            const el = mouthSet.querySelector(`[data-viseme="${{v}}"]`);
             if (el) el.classList.add("active");
             visemeLbl.innerText = v;
         }}
