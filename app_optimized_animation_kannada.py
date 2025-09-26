@@ -11,7 +11,7 @@ import time
 import soundfile as sf
 from pedalboard import Pedalboard, Resample
 import sys
-# import pysqlite3
+import pysqlite3
 from datetime import datetime
 from dotenv import load_dotenv
 from langdetect import detect
@@ -24,7 +24,7 @@ from audio_recorder_streamlit import audio_recorder
 # Import gTTS for text-to-speech
 from gtts import gTTS
 
-# sys.modules["sqlite3"] = pysqlite3
+sys.modules["sqlite3"] = pysqlite3
 
 import hashlib
 
@@ -61,17 +61,12 @@ class WhisperASR:
         # Use the fine-tuned Kannada Whisper model from Hugging Face
         self.model_name = model_name
         print(f"Loading Whisper model: {model_name}")
-        
         try:
-            # Use GPU if available
-            self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
-            
             # Create the ASR pipeline as per the official usage example
             self.transcribe = pipeline(
-                task="automatic-speech-recognition", 
-                model=model_name, 
-                chunk_length_s=30, 
-                device=self.device
+                task="automatic-speech-recognition",
+                model=model_name,
+                token=False
             )
             
             # Set the forced decoder IDs for Kannada transcription
