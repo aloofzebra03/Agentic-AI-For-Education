@@ -11,7 +11,7 @@ import time
 import soundfile as sf
 from pedalboard import Pedalboard, Resample
 import sys
-import pysqlite3
+# import pysqlite3
 from datetime import datetime
 from dotenv import load_dotenv
 from langdetect import detect
@@ -24,7 +24,7 @@ from audio_recorder_streamlit import audio_recorder
 # Import gTTS for text-to-speech
 from gtts import gTTS
 
-sys.modules["sqlite3"] = pysqlite3
+# sys.modules["sqlite3"] = pysqlite3
 
 import hashlib
 
@@ -53,20 +53,60 @@ except RuntimeError:
     asyncio.set_event_loop(loop)
 
 import whisper
+import torch
+from transformers import pipeline
 
 class WhisperASR:
-    def __init__(self, model_name: str = "tiny"):
-        # Load tiny (~75MB). Use "base", "small", etc. if you want better accuracy.
-        # model_name = "vasista22/whisper-kannada-tiny"
-        self.model = whisper.load_model(model_name)
+    def __init__(self, model_name: str = "vasista22/whisper-kannada-base"):
+        # Use the fine-tuned Kannada Whisper model from Hugging Face
+        self.model_name = model_name
+        print(f"Loading Whisper model: {model_name}")
+        
+        try:
+            # Use GPU if available
+            self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
+            
+            # Create the ASR pipeline as per the official usage example
+            self.transcribe = pipeline(
+                task="automatic-speech-recognition", 
+                model=model_name, 
+                chunk_length_s=30, 
+                device=self.device
+            )
+            
+            # Set the forced decoder IDs for Kannada transcription
+            self.transcribe.model.config.forced_decoder_ids = self.transcribe.tokenizer.get_decoder_prompt_ids(
+                language="kn", 
+                task="transcribe"
+            )
+            
+            print(f"Model loaded successfully on {self.device}")
+            
+        except Exception as e:
+            print(f"Error loading fine-tuned model: {e}")
+            st.error(e)
+            print("Falling back to OpenAI Whisper tiny model...")
+            # Fallback to OpenAI Whisper if HF model fails
+            self.transcribe = None
+            self.fallback_model = whisper.load_model("tiny")
+            self.device = "cpu"
 
     def recognize(self, audio_path: str) -> str:
-        # fp16=False is safer on CPU; set True on GPU with half precision.
-        result = self.model.transcribe(audio_path, language='kn', fp16=False)
-        return result.get("text", "").strip()
+        try:
+            if self.transcribe is not None:
+                # Use Hugging Face Transformers pipeline (preferred method)
+                result = self.transcribe(audio_path)
+                return result["text"].strip() if result and "text" in result else ""
+            else:
+                # Fallback to OpenAI Whisper
+                result = self.fallback_model.transcribe(audio_path, language='kn', fp16=False)
+                return result.get("text", "").strip()
+                
+        except Exception as e:
+            print(f"Error in speech recognition: {e}")
+            st.error(e)
+            return "[Speech recognition failed]"
         
-
-
 # Load environment variables
 load_dotenv(dotenv_path=".env", override=True)
 
@@ -83,12 +123,10 @@ except ImportError as e:
 @st.cache_resource(ttl=36000)
 def load_asr_model():
     print("BOOT: about to init ASR...", flush=True)
-    # model = onnx_asr.load_model("nemo-parakeet-tdt-0.6b-v2")
-    model = WhisperASR(model_name="small")
+    # Use the fine-tuned Kannada Whisper model
+    model = WhisperASR(model_name="vasista22/whisper-kannada-base")
     print("BOOT: ASR ready", flush=True)
     return model
-    # return None
-    # return onnx_asr.load_model(model = "nemo-parakeet-tdt-0.6b-v2", path = "parakeet-tdt-0.6b-v2-onnx")
 
 asr_model = load_asr_model()
 
@@ -1022,8 +1060,12 @@ with st.sidebar:
     if last_assistant_text:
         st.session_state['latest_audio_msg_id'] = msg_id_from_text(last_assistant_text)
 
+
+    if(detect(last_assistant_text) == 'kn'):
+        last_assistant_text = GoogleTranslator(source='kn', target='en').translate(last_assistant_text)
+
     # Render the character (auto-plays on each new assistant msg)
-    render_viseme_sidebar(last_assistant_text or "Hello! I'm ready to explain 😊", key="viseme_iframe_top")
+    render_viseme_sidebar(last_assistant_text, key="viseme_iframe_top")
 
     # 2) The rest of your existing sidebar content
     st.header("📊 Session Info")
