@@ -74,9 +74,7 @@ class WhisperASR:
                 language="kn", 
                 task="transcribe"
             )
-            
-            print(f"Model loaded successfully on {self.device}")
-            
+                        
         except Exception as e:
             print(f"Error loading fine-tuned model: {e}")
             st.error(e)
@@ -84,7 +82,6 @@ class WhisperASR:
             # Fallback to OpenAI Whisper if HF model fails
             self.transcribe = None
             self.fallback_model = whisper.load_model("tiny")
-            self.device = "cpu"
 
     def recognize(self, audio_path: str) -> str:
         try:
