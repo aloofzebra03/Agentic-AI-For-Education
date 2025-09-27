@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import streamlit.components.v1 as components
 import json
-import onnx_asr
+# import onnx_asr
 from scipy.io import wavfile
 import numpy as np
 import tempfile
@@ -16,7 +16,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 # Import the audio_recorder component
-from audio_recorder_streamlit import audio_recorder
+from audio_recorder_streamlit import audio_recorder 
 
 # Import gTTS for text-to-speech
 from gtts import gTTS
@@ -60,7 +60,6 @@ class WhisperASR:
         # fp16=False is safer on CPU; set True on GPU with half precision.
         result = self.model.transcribe(audio_path, language='en', fp16=False)
         return result.get("text", "").strip()
-
 
 # Load environment variables
 load_dotenv(dotenv_path=".env", override=True)
@@ -186,57 +185,60 @@ def play_text_as_audio(text, container, message_id=None, speed_factor=1.25):
           <source src="data:audio/wav;base64,{audio_base64}" type="audio/wav">
         </audio>
         <script>
-        (function() {{
+            (function() {{
             const MSG_ID = "{msg_id}";
             const a = document.getElementById('agentAudio');
+
+            // Use BroadcastChannel so sibling iframes can talk directly
+            const bc = new BroadcastChannel('agent_audio');
 
             // Throttle ticks to ~30fps
             let raf = null, lastTick = 0;
             const TICK_MS = 33;
 
-            function send(type, extra={{}}) {{
-            window.parent.postMessage({{ type, id: MSG_ID, ...extra }}, "*");
+            function send(type, extra = {{}}) {{
+                bc.postMessage({{ type, id: MSG_ID, ...extra }});
             }}
 
             function tick(ts) {{
-            if (!a.paused && !a.ended) {{
+                if (!a.paused && !a.ended) {{
                 if (!lastTick || (ts - lastTick) >= TICK_MS) {{
-                lastTick = ts;
-                send('audio_tick', {{
+                    lastTick = ts;
+                    send('audio_tick', {{
                     t: Math.round(a.currentTime * 1000),
                     dur: Math.round((a.duration || 0) * 1000)
-                }});
+                    }});
                 }}
                 raf = requestAnimationFrame(tick);
-            }}
+                }}
             }}
 
             a.addEventListener('loadedmetadata', () => {{
-            // give sidebar precise duration as soon as the browser knows it
-            send('audio_meta', {{ dur: Math.round((a.duration || 0) * 1000) }});
+                // precise duration once known
+                send('audio_meta', {{ dur: Math.round((a.duration || 0) * 1000) }});
             }});
 
-            // IMPORTANT: start signal is play (not loadeddata)
+            // IMPORTANT: start signal is "play"
             a.addEventListener('play', () => {{
-            send('audio_play', {{
+                send('audio_play', {{
                 t: Math.round(a.currentTime * 1000),
                 dur: Math.round((a.duration || 0) * 1000)
-            }});
-            cancelAnimationFrame(raf);
-            raf = requestAnimationFrame(tick);
+                }});
+                cancelAnimationFrame(raf);
+                raf = requestAnimationFrame(tick);
             }});
 
             a.addEventListener('pause', () => {{
-            send('audio_pause');
-            cancelAnimationFrame(raf);
+                send('audio_pause');
+                cancelAnimationFrame(raf);
             }});
 
             a.addEventListener('ended', () => {{
-            send('audio_end');
-            cancelAnimationFrame(raf);
+                send('audio_end');
+                cancelAnimationFrame(raf);
             }});
         }})();
-        </script>
+            </script>
 
         """
         with container:
@@ -896,26 +898,27 @@ def render_viseme_sidebar(latest_text: str, key: str = "viseme_iframe"):
         }}
 
         // ----- messages from the audio iframe -----
-        window.addEventListener("message", (ev) => {{
-            const d = ev.data || {{}};
-            if (!d.type) return;
-            if (d.id && d.id !== CURRENT_MSG_ID) return; // stay on the latest message only
+        const bc = new BroadcastChannel('agent_audio');
+        bc.onmessage = (ev) => {{
+        const d = ev.data || {{}};
+        if (!d.type) return;
+        if (d.id && d.id !== CURRENT_MSG_ID) return; // only react to the latest message
 
-            if (d.type === 'audio_meta') {{
+        if (d.type === 'audio_meta') {{
             if (d.dur && d.dur > 0) audioDurMs = d.dur;
-            }}
-            if (d.type === 'audio_play') {{
+        }}
+        if (d.type === 'audio_play') {{
             audioDurMs = d.dur || audioDurMs;
-            setViseme(visemeAtTime(d.t || 0)); // start exactly when audio starts
-            }}
-            if (d.type === 'audio_tick') {{
+            setViseme(visemeAtTime(d.t || 0)); // start exactly with audio
+        }}
+        if (d.type === 'audio_tick') {{
             audioDurMs = d.dur || audioDurMs;
-            setViseme(visemeAtTime(d.t || 0)); // follow the audio clock each frame
-            }}
-            if (d.type === 'audio_pause' || d.type === 'audio_end') {{
+            setViseme(visemeAtTime(d.t || 0)); // follow the audio clock
+        }}
+        if (d.type === 'audio_pause' || d.type === 'audio_end') {{
             setViseme('rest');
-            }}
-        }});
+        }}
+    }};
         </script>
 
     </body>
