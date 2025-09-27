@@ -1,7 +1,7 @@
 {
   "dependencies": ["."],
   "graphs": {
-    "agent": "educational_agent_optimized.graph:graph"
+    "agent": "educational_agent_optimized_langsmith_kannada.graph:graph"
   },
   "env": "../.env",
   "image_distro": "wolfi"
