@@ -474,6 +474,7 @@ def create_pendulum_simulation_html(config):
             .simulation-container {{
                 width: 100%;
                 max-width: 600px;
+                min-height: 600px;
                 margin: 10px auto;
                 background: #f0f6ff;
                 border: 2px solid #c4afe9;
@@ -548,7 +549,7 @@ def create_pendulum_simulation_html(config):
             <div class="agent-message">{agent_message}</div>
             <div id="phase-indicator" class="phase-indicator">Phase: Before Change</div>
             
-            <canvas id="pendulum-canvas" class="simulation-canvas" width="420" height="320"></canvas>
+            <canvas id="pendulum-canvas" class="simulation-canvas" width="420" height="380"></canvas>
             
             <div class="simulation-controls">
                 <div class="param-display">
@@ -711,7 +712,7 @@ def display_simulation_if_needed():
             try:
                 # Create and display the simulation
                 simulation_html = create_pendulum_simulation_html(simulation_config)
-                components.html(simulation_html, height=500)
+                components.html(simulation_html, height=750)
                 
                 # Add a brief pause instruction
                 st.info("🔬 **Simulation running above** - Watch the pendulum carefully and notice what changes!")

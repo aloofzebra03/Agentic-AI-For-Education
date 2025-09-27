@@ -343,8 +343,10 @@ def sim_execute_node(state: AgentState) -> AgentState:
     # Agent message
     msg = f"Perfect! Let me demonstrate this concept with a simulation for you. {simulation_config['agent_message']}"
     # msg = f"Perfect! Let me demonstrate this concept with a simulation for you."
-    add_ai_message_to_conversation(state, msg)
-    state["agent_output"] = msg
+    kannada_msg = GoogleTranslator(source='en', target='kn').translate(msg)
+
+    add_ai_message_to_conversation(state, kannada_msg)
+    state["agent_output"] = kannada_msg
     state["current_state"] = "SIM_OBSERVE"
     return state
 
@@ -478,8 +480,10 @@ Return JSON ONLY with:
     parsed: SimReflectResponse = sim_reflect_parser.parse(json_text)
 
     msg = f"Quick recap from our simulation:\n" + "\n".join([f"• {b}" for b in parsed.bullets]) + f"\n\n{parsed.closing_prompt}"
-    add_ai_message_to_conversation(state, msg)
-    state["agent_output"] = msg
+    
+    kannada_msg = GoogleTranslator(source='en', target='kn').translate(msg)
+    add_ai_message_to_conversation(state, kannada_msg)
+    state["agent_output"] = kannada_msg
 
     # # IMPORTANT: Reset simulation flags since simulation cycle is complete
     state["show_simulation"] = False
