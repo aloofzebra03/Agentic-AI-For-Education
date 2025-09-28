@@ -7,7 +7,7 @@ from educational_agent_optimized_langsmith.config import concept_pkg
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 
 # Import shared utilities
-from educational_agent.shared_utils import (
+from utils.shared_utils import (
     AgentState,
     extract_json_block,
     get_llm,

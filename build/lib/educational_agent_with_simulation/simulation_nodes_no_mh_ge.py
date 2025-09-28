@@ -5,8 +5,8 @@ from pydantic import BaseModel, Field
 from langchain.output_parsers import PydanticOutputParser
 from langchain_core.messages import HumanMessage, AIMessage
 
-from educational_agent.config_rag import concept_pkg
-from educational_agent.shared_utils import (
+from educational_agent_v1.config_rag import concept_pkg
+from educational_agent_v1.shared_utils import (
     AgentState,
     add_ai_message_to_conversation,
     llm_with_history,

@@ -7,11 +7,13 @@ Contains common helper functions used by both traditional nodes and simulation n
 import os
 import json
 import re
-from typing import Dict, Optional, Any
+from typing import Dict, List, Optional, Any
 import dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_core.prompts import PromptTemplate
+from langchain_groq import ChatGroq
+
 from educational_agent_v1.config_rag import concept_pkg
 from educational_agent_v1.Creating_Section_Text.retriever import retrieve_docs
 from educational_agent_v1.Filtering_GT.filter_utils import filter_relevant_section
@@ -89,7 +91,12 @@ def get_llm():
         api_key=api_key,
         temperature=0.5,
     )
-
+    # llm = ChatGroq(
+    #     model="llama-3.1-8b-instant",
+    #     temperature=0.5,
+    #     max_tokens=None,
+    # )
+    # return llm
 
 def add_ai_message_to_conversation(state: AgentState, content: str):
     """Add AI message to conversation after successful processing."""
@@ -307,6 +314,274 @@ def get_ground_truth(concept: str, section_name: str) -> str:
     return ""
 
 
+def get_ground_truth_from_json(concept: str, section_name: str) -> str:
+    """
+    Retrieve ground truth content from JSON file for a given concept and section.
+    No formatting - returns raw content for LLM consumption.
+    
+    Args:
+        concept: The concept name to find
+        section_name: The section/key within the concept to retrieve
+    
+    Returns:
+        str: The relevant content from the JSON file
+    """
+    try:        
+        # 🔍 GROUND TRUTH JSON RETRIEVAL - INPUT 🔍
+        print("=" * 70)
+        print("📚 GROUND TRUTH JSON RETRIEVAL - STARTED")
+        print("=" * 70)
+        print(f"🎯 CONCEPT: {concept}")
+        print(f"📋 SECTION_NAME: {section_name}")
+        print("=" * 70)
+        
+        # Load JSON file - adjust path based on your file structure
+        json_file_path = "educational_agent/NCERT Class 7.json"
+            
+        with open(json_file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        # Find matching concept
+        for concept_data in data["concepts"]:
+            if concept_data['concept'].lower().strip() == concept.lower().strip():
+                
+                # Enhanced section key mapping covering ALL your node needs
+                section_key_mapping = {
+                    # Basic content - for teaching/explanation nodes
+                    "Concept Definition": "description",
+                    "Explanation (with analogies)":"intuition_logical_flow",
+                    "Details (facts, sub-concepts)":"detail",
+                    "MCQS":"open_ended_mcqs",
+                    # "What-if Scenarios":,
+                    "Real-Life Application":"real_life_applications",
+                }
+                
+                # Handle special case for full content
+                if section_name.lower() == "full":
+                    # Return formatted string of all key content
+                    full_content = []
+                    for key in ["description", "detail", "working", "intuition_logical_flow", 
+                              "real_life_applications", "critical_thinking"]:
+                        if concept_data.get(key):
+                            full_content.append(f"{key.upper()}:\n{concept_data[key]}")
+                    result = "\n\n".join(full_content)
+                else:
+                    # Get mapped key
+                    json_key = section_key_mapping.get(section_name.lower(), None)
+
+                    if json_key is not None:
+                        # Return raw content - no formatting since LLM handles it
+                        content = concept_data.get(json_key, "")
+                    else:
+                        content = ""
+
+                    # Handle different data types but keep minimal processing
+                    if isinstance(content, list):
+                        result = "\n".join([str(item) for item in content]) if content else ""
+                    elif isinstance(content, dict):
+                        result = str(content)  # Let LLM parse the dict structure
+                    else:
+                        result = str(content) if content else ""
+                
+                # 🔍 GROUND TRUTH JSON RETRIEVAL - OUTPUT 🔍
+                print("📚 GROUND TRUTH JSON RETRIEVAL - COMPLETED")
+                print(f"📋 JSON_KEY_USED: {section_key_mapping.get(section_name.lower(), section_name)}")
+                print(f"📏 RESULT_LENGTH: {len(result)} characters")
+                print(f"📄 RESULT_PREVIEW: {result[:200]}...")
+                print("=" * 70)
+                
+                return result
+        
+        # Concept not found
+        result = f"Concept '{concept}' not found in JSON data"
+        print(f"❌ {result}")
+        print("=" * 70)
+        return result
+        
+    except Exception as e:
+        print(e)
+        raise e
+
+# ─────────────────────────────────────────────────────────────────────
+# Simulation configuration helpers
+# ─────────────────────────────────────────────────────────────────────
+
+def create_simulation_config(variables: List, concept: str, action_config: Dict) -> Dict:
+    """
+    Create simulation configuration based on variables and action.
+    Maps physics concepts to pendulum parameters.
+    
+    Args:
+        variables: List of variable dictionaries with keys 'name', 'role', 'note'
+        concept: The concept name string
+        action_config: Dictionary with action configuration
+    """
+    # Default parameters
+    base_params = {"length": 1.0, "gravity": 9.8, "amplitude": 30, "mass": 1.0}
+    
+    # Extract independent variable that's being changed
+    independent_var = None
+    for var in variables:
+        # Handle both Pydantic objects (legacy) and dictionaries (new format)
+        if hasattr(var, 'role'):  # Pydantic object
+            if var.role == "independent":
+                independent_var = var.name.lower()
+                break
+        elif isinstance(var, dict):  # Dictionary format
+            if var.get('role') == "independent":
+                independent_var = var.get('name', '').lower()
+                break
+    
+    if not independent_var:
+        raise ValueError(f"No independent variable found for concept: {concept}")
+    
+    # Map concept variables to simulation parameters
+    if "length" in independent_var or "length" in concept.lower():
+        return {
+            "concept": concept,
+            "parameter_name": "length",
+            "before_params": {**base_params, "length": 1.0},
+            "after_params": {**base_params, "length": 5.0},
+            "action_description": "increasing the pendulum length from 1.0m to 5.0m",
+            "timing": {"before_duration": 8, "transition_duration": 3, "after_duration": 8},
+            "agent_message": "Watch how the period changes as I increase the length for you..."
+        }
+    elif "gravity" in independent_var or "gravity" in concept.lower():
+        return {
+            "concept": concept,
+            "parameter_name": "gravity",
+            "before_params": {**base_params, "gravity": 9.8},
+            "after_params": {**base_params, "gravity": 50.0},  # High gravity demonstration
+            "action_description": "changing gravity from Earth (9.8 m/s²) to high gravity (50 m/s²)",
+            "timing": {"before_duration": 8, "transition_duration": 3, "after_duration": 8},
+            "agent_message": "Watch carefully as I change the gravity for you to see how the period changes..."
+        }
+    elif "amplitude" in independent_var or "angle" in independent_var:
+        return {
+            "concept": concept,
+            "parameter_name": "amplitude",
+            "before_params": {**base_params, "amplitude": 30},
+            "after_params": {**base_params, "amplitude": 80},
+            "action_description": "increasing the starting angle from 15° to 60°",
+            "timing": {"before_duration": 6, "transition_duration": 2, "after_duration": 6},
+            "agent_message": "Watch closely as I increase the swing angle for you to see how the period changes..."
+        }
+    elif "mass" in independent_var or "bob" in independent_var:
+        # For pendulum physics, mass doesn't affect the period, but we can demonstrate this
+        return {
+            "concept": concept,
+            "parameter_name": "mass_demo",
+            "before_params": {**base_params, "mass": 1},
+            "after_params": {**base_params, "mass": 10},  # Same parameters to show no change
+            "action_description": "comparing pendulums with different bob masses (but same period)",
+            "timing": {"before_duration": 10, "transition_duration": 2, "after_duration": 10},
+            "agent_message": "Watch this carefully! I'll show you how changing the bob mass affects the period - this might surprise you!"
+        }
+    elif "frequency" in independent_var or "period" in independent_var:
+        # Demonstrate period/frequency by changing length
+        return {
+            "concept": concept,
+            "parameter_name": "length",
+            "before_params": {**base_params, "length": 0.5},
+            "after_params": {**base_params, "length": 2.0},
+            "action_description": "changing length to show how period and frequency are related",
+            "timing": {"before_duration": 7, "transition_duration": 3, "after_duration": 7},
+            "agent_message": "I'll show you how changing length affects both period and frequency - watch this demonstration..."
+        }
+    else:
+            raise ValueError(f"Unrecognized independent variable '{independent_var}' for concept: {concept}")
+
+
+def select_most_relevant_image_for_concept_introduction(concept: str, definition_context: str) -> Optional[Dict]:
+    """
+    Use LLM to select the most pedagogically relevant image for concept introduction.
+    
+    Args:
+        concept: The concept name (e.g., "Pendulum and its Time Period")
+        definition_context: The definition/explanation being provided to student
+    
+    Returns:
+        Dict with 'url', 'description', 'relevance_reason' or None if no suitable image
+    """
+    try:
+        import json
+        
+        # Load JSON file - adjust path based on your file structure
+        json_file_path = "educational_agent/NCERT Class 7.json"
+            
+        with open(json_file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        # Find the concept and its images
+        concept_data = None
+        for concept_item in data.get("concepts", []):
+            if concept_item.get("concept", "").lower().strip() == concept.lower().strip():
+                concept_data = concept_item
+                break
+        
+        if not concept_data:
+            print(f"Concept '{concept}' not found in JSON")
+            return None
+        
+        available_images = concept_data.get("images", [])
+        if not available_images:
+            print(f"No images found for concept '{concept}'")
+            return None
+        
+        # Create LLM prompt for image selection
+        images_text = "\n".join([
+            f"Image {i+1}: {img.get('description', 'No description')}" 
+            for i, img in enumerate(available_images)
+        ])
+        
+        selection_prompt = f"""You are helping select the most pedagogically effective image for introducing the concept "{concept}" to a Class 7 student.
+
+Context being provided to student:
+{definition_context}
+
+Available images:
+{images_text}
+
+Select the image that would be MOST helpful for a 12-13 year old student to understand this concept during the definition phase.
+
+Consider:
+- Visual clarity and simplicity
+- Direct relevance to the core concept
+- Age-appropriate complexity
+- Ability to reinforce the definition
+
+Respond with JSON only:
+{{
+    "selected_image_number": <1-based index>,
+    "relevance_reason": "<2-3 sentences explaining why this image is best for concept introduction>"
+}}"""
+        
+        # Get LLM response
+        llm = get_llm()
+        response = llm.invoke([HumanMessage(content=selection_prompt)])
+        
+        # Parse response
+        json_text = extract_json_block(response.content)
+        selection_data = json.loads(json_text)
+        
+        selected_index = selection_data.get("selected_image_number", 1) - 1  # Convert to 0-based
+        
+        if 0 <= selected_index < len(available_images):
+            selected_image = available_images[selected_index]
+            return {
+                "url": selected_image.get("url", ""),
+                "description": selected_image.get("description", ""),
+                "relevance_reason": selection_data.get("relevance_reason", "This image was selected as most relevant for concept introduction.")
+            }
+        else:
+            print(f"Invalid image selection index: {selected_index}")
+            return None
+            
+    except Exception as e:
+        print(f"Error selecting image for concept '{concept}': {e}")
+        return None
+
+
 # ─── Memory Optimization Functions ─────────────────────────────────────────────
 
 def identify_node_segments_from_transitions(messages: list, transitions: list) -> list:
@@ -427,7 +702,7 @@ def build_node_aware_conversation_history(state: AgentState, current_node: str) 
     Use cached summaries and only summarize new content incrementally.
     """
     messages = state.get("messages", [])
-    transitions = state.get("_node_transitions", [])
+    transitions = state.get("node_transitions", [])
     
     # For short conversations, use full history
     if len(messages) <= 6:
@@ -467,16 +742,16 @@ def build_node_aware_conversation_history(state: AgentState, current_node: str) 
                         break
             
             # Check if we need to update summary
-            if last_older_index <= state["summary_last_index"]:
+            if last_older_index <= state.get("summary_last_index", 0):
                 # Use existing summary - no new messages to summarize
                 summary = state["summary"]
                 print(f"📊 ✅ Using existing summary (covers up to index {state['summary_last_index']})")
             else:
                 # Need to update summary with new messages
-                new_messages_start = state["summary_last_index"] + 1
+                new_messages_start = state.get("summary_last_index", 0) + 1
                 new_messages = messages[new_messages_start:last_older_index + 1]
-                
-                if state["summary"]:
+
+                if state.get("summary"):
                     # Combine old summary with new messages
                     combined_content = f"Previous summary: {state['summary']}\n\nNew messages:\n"
                     for msg in new_messages:

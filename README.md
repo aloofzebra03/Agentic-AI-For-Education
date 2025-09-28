@@ -189,13 +189,13 @@ Others included in requirements.txt
 #### **Main Production Interface** (Recommended):
 
 ```bash
-streamlit run app_optimized_animation.py
+streamlit run Streamlit_UI/app_optimized_animation.py
 ```
 
 #### **Kannada Language Support**:
 
 ```bash
-streamlit run app_optimized_animation_kannada.py
+streamlit run Streamlit_UI/app_optimized_animation_kannada.py
 ```
 
 #### **Command Line Interface**:

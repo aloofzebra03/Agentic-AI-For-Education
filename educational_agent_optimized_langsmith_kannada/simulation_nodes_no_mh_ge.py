@@ -7,7 +7,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 
 from educational_agent_optimized_langsmith.config import concept_pkg
 from langdetect import detect
-from educational_agent.shared_utils import (
+from utils.shared_utils import (
     AgentState,
     add_ai_message_to_conversation,
     llm_with_history,

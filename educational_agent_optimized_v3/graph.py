@@ -40,18 +40,18 @@ class AgentState(TypedDict, total=False):
     current_state: str
     last_user_msg: str
     agent_output: str
-    _asked_apk: bool
-    _asked_ci: bool
-    _asked_ge: bool
-    _asked_mh: bool
-    _asked_ar: bool
-    _asked_tc: bool
-    _asked_rlc: bool
-    _apk_tries: int
-    _ci_tries: int
-    _ge_tries: int
-    _mh_tries: int
-    _rlc_tries: int
+    asked_apk: bool
+    asked_ci: bool
+    asked_ge: bool
+    asked_mh: bool
+    asked_ar: bool
+    asked_tc: bool
+    asked_rlc: bool
+    apk_tries: int
+    ci_tries: int
+    ge_tries: int
+    mh_tries: int
+    rlc_tries: int
     definition_echoed: bool
     sim_concepts: List[str]
     sim_total_concepts: int
@@ -69,9 +69,8 @@ class AgentState(TypedDict, total=False):
     sim_action_config: Dict[str, Any]
     show_simulation: bool
     simulation_config: Dict[str, Any]
-    simulation_active: bool
     # NEW: Memory optimization fields
-    _node_transitions: List[Dict[str, Any]]
+    node_transitions: List[Dict[str, Any]]
     summary: str
     summary_last_index: int
 
@@ -100,9 +99,8 @@ def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
     state.setdefault("sim_action_config", {})
     state.setdefault("show_simulation", False)
     state.setdefault("simulation_config", {})
-    state.setdefault("simulation_active", False)
     # # NEW: Initialize memory optimization state
-    # state.setdefault("_node_transitions", [])
+    # state.setdefault("node_transitions", [])
     state.setdefault("summary", "")
     state.setdefault("summary_last_index", 0)
     return state
@@ -126,14 +124,15 @@ def _wrap(fn):
         result = fn(state)
         
         # Handle both full state returns (legacy) and partial state updates (LangGraph best practice)
-        if isinstance(result, dict):
+        if isinstance(result, dict) and result.get("messages") is None:
             # Partial state update - merge with existing state (LangGraph best practice)
             print(f"🔄 _WRAP DEBUG - Merging partial state update with keys: {list(result.keys())}")
             state.update(result)
-            st = state
         else:
-            # Full state return (legacy behavior)
-            st = result
+            # Full state return (legacy behavior) - update the original state dictionary
+            state.update(result)
+        
+        st = state # Always use the original state reference
         
         # CAPTURE NEW STATE AFTER PROCESSING
         new_state = st.get("current_state")
@@ -142,7 +141,7 @@ def _wrap(fn):
         # TRACK TRANSITION IF STATE CHANGED
         # The transition happens AFTER the current agent response is added
         if old_state != new_state and old_state is not None:
-            transitions = st.setdefault("_node_transitions", [])
+            transitions = st.setdefault("node_transitions", [])
             transitions.append({
                 "from_node": old_state,
                 "to_node": new_state,
@@ -206,8 +205,9 @@ g.add_node("SIM_REFLECT", _SIM_REFLECT)
 def _route(state: AgentState) -> str:
     return state.get("current_state")
 
-g.add_edge(START, "INIT")
-g.add_edge("INIT", "START")
+# g.add_edge(START, "INIT")
+# g.add_edge("INIT", "START")
+g.add_edge(START,"START")
 
 g.add_edge("START","APK")
 # Core flow
@@ -234,8 +234,8 @@ g.add_edge("SIM_OBSERVE", "SIM_INSIGHT")
 g.add_edge("SIM_INSIGHT", "SIM_REFLECT")
 g.add_edge("SIM_REFLECT", "AR")   # After simulation, go to AR to ask question about the concept
 
-# checkpointer = InMemorySaver()
-checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")
+checkpointer = InMemorySaver()
+# checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")
 
 def build_graph():
     compiled = g.compile(

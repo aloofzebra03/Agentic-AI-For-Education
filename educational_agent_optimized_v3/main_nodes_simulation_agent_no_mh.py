@@ -3,11 +3,11 @@ from typing import Literal, Optional, Dict
 
 from pydantic import BaseModel
 from langchain.output_parsers import PydanticOutputParser
-from educational_agent_optimized_langsmith.config import concept_pkg
+from educational_agent_v1.config_rag import concept_pkg
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 
 # Import shared utilities
-from utils.shared_utils import (
+from educational_agent_v1.shared_utils import (
     AgentState,
     extract_json_block,
     get_llm,
@@ -17,8 +17,7 @@ from utils.shared_utils import (
     build_conversation_history,
     build_prompt_from_template,
     build_prompt_from_template_optimized,
-    get_ground_truth_from_json,
-    select_most_relevant_image_for_concept_introduction,
+    get_ground_truth,
 )
 
 PEDAGOGICAL_MOVES: Dict[str, Dict[str, str]] = {
@@ -107,7 +106,6 @@ def start_node(state: AgentState) -> AgentState:
     system_prompt = (
         f"You are an educational agent helping a learner understand '{concept_pkg.title}'. The learner is a student of class 7. Remember that you are interacting directly with the learner.\n"
         "Greet the learner and ask if they are ready to begin."
-        "DONT use emojis as a TTS to speech model will break because of that."
         # "Also Remember that the student is of Kannada origin and understands olny kannada.So speak to the student in kannada.The script has to be kannada and not english.\n"
     )
     
@@ -147,7 +145,7 @@ def apk_node(state: AgentState) -> AgentState:
         state["asked_apk"] = True
         state["apk_tries"] = 0
         # Include ground truth for Concept Definition
-        gt = get_ground_truth_from_json(concept_pkg.title, "Concept Definition")
+        gt = get_ground_truth(concept_pkg.title, "Concept Definition")
         system_prompt = (
             f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
             f"Ground truth (Concept Definition):\n{gt}\nGenerate one hook question that activates prior knowledge for '{concept_pkg.title}'.",
@@ -186,7 +184,7 @@ def apk_node(state: AgentState) -> AgentState:
     
     # Check if we've reached max tries (2) - provide answer and move to CI
     if state["apk_tries"] >= 2:
-        gt = get_ground_truth_from_json(concept_pkg.title, "Concept Definition")
+        gt = get_ground_truth(concept_pkg.title, "Concept Definition")
         final_system_prompt = f"""Current node: APK (Activate Prior Knowledge) - FINAL ATTEMPT
 This is the final attempt to help the student identify the concept.
 
@@ -284,7 +282,7 @@ def ci_node(state: AgentState) -> dict:
     # print("REACHED HERE")
     if not state.get("asked_ci", False):
         # Include ground truth for Explanation (with analogies)
-        gt = get_ground_truth_from_json(concept_pkg.title, "Explanation (with analogies)")
+        gt = get_ground_truth(concept_pkg.title, "Explanation (with analogies)")
         system_prompt = (
             f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
             f"Ground truth (Explanation):\n{gt}\nProvide a concise definition (≤30 words) of '{concept_pkg.title}', "
@@ -307,12 +305,6 @@ def ci_node(state: AgentState) -> dict:
         # Add AI message to conversation after successful processing
         add_ai_message_to_conversation(state, content)
         
-        # NEW: Select most relevant image for concept introduction
-        selected_image = select_most_relevant_image_for_concept_introduction(
-            concept=concept_pkg.title,
-            definition_context=gt + "\n\n" + content
-        )
-        
         # 🔍 CI NODE - FIRST PASS CONTENT 🔍
         print("=" * 80)
         print("🎯 CI NODE - FIRST PASS CONTENT OUTPUT 🎯")
@@ -320,31 +312,21 @@ def ci_node(state: AgentState) -> dict:
         print(f"📄 CONTENT: {content}")
         print(f"📏 CONTENT_LENGTH: {len(content)} characters")
         print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
-        print(f"🖼️ SELECTED_IMAGE: {selected_image['url'] if selected_image else 'None'}")
         print("=" * 80)
         
         # Return only the changed keys following LangGraph best practices
-        result = {
+        return {
             "asked_ci": True,
             "ci_tries": 0,
             "agent_output": content
         }
-        
-        # Add image metadata if image was selected
-        if selected_image:
-            result["enhanced_message_metadata"] = {
-                "image": selected_image,
-                "node": "CI"
-            }
-        
-        return result
 
     # Increment attempt counter
     ci_tries = state.get("ci_tries", 0) + 1
     
     # Check if we've reached 2 attempts - if so, provide definition and move on
     if ci_tries >= 2:
-        # gt = get_ground_truth_from_json(concept_pkg.title, "Explanation (with analogies)")
+        # gt = get_ground_truth(concept_pkg.title, "Explanation (with analogies)")
         system_prompt = (
             f"The student has struggled with restating the definition. Provide the correct definition of '{concept_pkg.title}' "
             f"clearly and encourage them that it's okay to struggle with new concepts. "
@@ -380,8 +362,7 @@ def ci_node(state: AgentState) -> dict:
         return {
             "ci_tries": ci_tries,
             "agent_output": content,
-            "current_state": "SIM_CC",
-            "enhanced_message_metadata": {}
+            "current_state": "SIM_CC"
         }
 
     context = json.dumps(PEDAGOGICAL_MOVES["CI"], indent=2)
@@ -430,9 +411,7 @@ Task: Determine if the restatement is accurate. If accurate, move to SIM_CC to i
         return {
             "ci_tries": ci_tries,
             "agent_output": parsed['feedback'],
-            "current_state": parsed['next_state'],
-            "enhanced_message_metadata": {}
-
+            "current_state": parsed['next_state']
         }
     except Exception as e:
         print(f"Error parsing CI response: {e}")
@@ -444,7 +423,7 @@ def ge_node(state: AgentState) -> AgentState:
     # Check if we're coming from AR after finishing a concept
     if state.get("in_simulation", False):
         state["in_simulation"] = False
-        
+    
     # Move to next concept if current concept is done
     current_idx = state.get("sim_current_idx", 0)
     concepts = state.get("sim_concepts", [])
@@ -457,7 +436,7 @@ def ge_node(state: AgentState) -> AgentState:
         if concepts and current_idx < len(concepts):
             current_concept = concepts[current_idx]
             # Include ground truth for Details (facts, sub-concepts)
-            gt = get_ground_truth_from_json(concept_pkg.title, "Details (facts, sub-concepts)")
+            gt = get_ground_truth(concept_pkg.title, "Details (facts, sub-concepts)")
             system_prompt = (
                 f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
                 f"Ground truth (Details):\n{gt}\n\n"
@@ -511,14 +490,14 @@ def ge_node(state: AgentState) -> AgentState:
         
         if concepts and current_idx < len(concepts):
             current_concept = concepts[current_idx]
-            gt_context = get_ground_truth_from_json(concept_pkg.title, "Details (facts, sub-concepts)")
+            gt_context = get_ground_truth(concept_pkg.title, "Details (facts, sub-concepts)")
             transition_prompt = f"""The student has tried once to explore concept '{current_concept}' within '{concept_pkg.title}'. 
             
 Based on their response, provide a gentle clarification or correction to help them understand better. Use this ground truth as reference: {gt_context[:200]}...
 
 Keep your response conversational and supportive. Address any confusion while guiding them toward the correct understanding."""
         else:
-            gt_context = get_ground_truth_from_json(concept_pkg.title, "Details (facts, sub-concepts)")
+            gt_context = get_ground_truth(concept_pkg.title, "Details (facts, sub-concepts)")
             transition_prompt = f"""The student has tried once to explore '{concept_pkg.title}'. 
             
 Based on their response, provide a gentle clarification or correction to help them understand better. Use this ground truth as reference: {gt_context[:200]}...
@@ -764,7 +743,7 @@ def ar_node(state: AgentState) -> AgentState:
         concepts = state.get("sim_concepts", [])
         
         # Include ground truth for MCQs
-        gt = get_ground_truth_from_json(concept_pkg.title, "MCQs")
+        gt = get_ground_truth(concept_pkg.title, "MCQs")
         
         if concepts and current_idx < len(concepts):
             current_concept = concepts[current_idx]
@@ -924,7 +903,7 @@ def tc_node(state: AgentState) -> AgentState:
     if not state.get("asked_tc", False):
         # state["asked_tc"] = True
         # Include ground truth for What-if Scenarios
-        gt = get_ground_truth_from_json(concept_pkg.title, "What-if Scenarios")
+        gt = get_ground_truth(concept_pkg.title, "What-if Scenarios")
         system_prompt = (
             f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
             f"Ground truth (What-if Scenarios):\n{gt}\nGenerate a 'what-if' or transfer question to apply '{concept_pkg.title}' in a new context."
@@ -1049,7 +1028,7 @@ def rlc_node(state: AgentState) -> AgentState:
         state["asked_rlc"] = True
         state["rlc_tries"] = 0  # Initialize attempt counter
         # Include ground truth for Real-Life Application
-        gt = get_ground_truth_from_json(concept_pkg.title, "Real-Life Application")
+        gt = get_ground_truth(concept_pkg.title, "Real-Life Application")
         system_prompt = (
             f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
             f"Ground truth (Real-Life Application):\n{gt}\nProvide a real-life application for '{concept_pkg.title}', then ask if the learner has seen or used it themselves."
@@ -1087,7 +1066,7 @@ def rlc_node(state: AgentState) -> AgentState:
     # Check if we've reached 2 attempts - if so, answer final doubts and move to END
     if state["rlc_tries"] >= 2:
         # Include ground truth for Real-Life Application to help answer any final questions
-        # gt = get_ground_truth_from_json(concept_pkg.title, "Real-Life Application")
+        # gt = get_ground_truth(concept_pkg.title, "Real-Life Application")
         system_prompt = (
             f"The student has been discussing real-life applications of '{concept_pkg.title}' and this is their final interaction in this section. "
             f"Answer any remaining questions or doubts they might have about the real-life application thoroughly and helpfully. "
