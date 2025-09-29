@@ -336,7 +336,7 @@ def get_ground_truth_from_json(concept: str, section_name: str) -> str:
         print("=" * 70)
         
         # Load JSON file - adjust path based on your file structure
-        json_file_path = "educational_agent/NCERT Class 7.json"
+        json_file_path = "utils/NCERT Class 7.json"
             
         with open(json_file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
