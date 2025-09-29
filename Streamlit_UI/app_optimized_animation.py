@@ -11,7 +11,7 @@ import time
 import soundfile as sf
 from pedalboard import Pedalboard, Resample
 import sys
-# import pysqlite3
+import pysqlite3
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -21,7 +21,7 @@ from audio_recorder_streamlit import audio_recorder
 # Import gTTS for text-to-speech
 from gtts import gTTS
 
-# sys.modules["sqlite3"] = pysqlite3
+sys.modules["sqlite3"] = pysqlite3
 
 import hashlib
 
@@ -557,7 +557,7 @@ def create_pendulum_simulation_html(config):
             <div class="agent-message">{agent_message}</div>
             <div id="phase-indicator" class="phase-indicator">Phase: Before Change</div>
             
-            <canvas id="pendulum-canvas" class="simulation-canvas" width="420" height="380"></canvas>
+            <canvas id="pendulum-canvas" class="simulation-canvas" width="420" height="350"></canvas>
             
             <div class="simulation-controls">
                 <div class="param-display">
@@ -577,14 +577,14 @@ def create_pendulum_simulation_html(config):
                 </div>
             </div>
 
-            <div class="hint-box">
-                <b>Try this:</b>
-                <ul style="margin:6px 0 0 18px; padding:0;">
-                  <li>Watch how the <b>period</b> (time for one swing) changes as <b>length (L)</b> changes.</li>
-                  <li>Notice that increasing <b>gravity (g)</b> makes the pendulum swing <b>faster</b> (shorter period).</li>
-                  <li>For small angles, the period is approximately <span class="formula">T ≈ 2π √(L / g)</span>. Keep an eye on the live value above!</li>
-                </ul>
-            </div>
+            # <div class="hint-box">
+            #     <b>Try this:</b>
+            #     <ul style="margin:6px 0 0 18px; padding:0;">
+            #       <li>Watch how the <b>period</b> (time for one swing) changes as <b>length (L)</b> changes.</li>
+            #       <li>Notice that increasing <b>gravity (g)</b> makes the pendulum swing <b>faster</b> (shorter period).</li>
+            #       <li>For small angles, the period is approximately <span class="formula">T ≈ 2π √(L / g)</span>. Keep an eye on the live value above!</li>
+            #     </ul>
+            # </div>
         </div>
         
         <script>
@@ -720,7 +720,7 @@ def display_simulation_if_needed():
             try:
                 # Create and display the simulation
                 simulation_html = create_pendulum_simulation_html(simulation_config)
-                components.html(simulation_html, height=750)
+                components.html(simulation_html, height=600)
                 
                 # Add a brief pause instruction
                 st.info("🔬 **Simulation running above** - Watch the pendulum carefully and notice what changes!")

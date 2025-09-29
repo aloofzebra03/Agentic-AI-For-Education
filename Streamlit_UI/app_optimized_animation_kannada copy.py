@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import streamlit.components.v1 as components
 import json
-import onnx_asr
+# import onnx_asr
 from scipy.io import wavfile
 import numpy as np
 import tempfile
@@ -11,7 +11,7 @@ import time
 import soundfile as sf
 from pedalboard import Pedalboard, Resample
 import sys
-import pysqlite3
+# import pysqlite3
 from datetime import datetime
 from dotenv import load_dotenv
 from langdetect import detect
@@ -24,7 +24,7 @@ from audio_recorder_streamlit import audio_recorder
 # Import gTTS for text-to-speech
 from gtts import gTTS
 
-sys.modules["sqlite3"] = pysqlite3
+# sys.modules["sqlite3"] = pysqlite3
 
 import hashlib
 
@@ -199,28 +199,61 @@ def play_text_as_audio(text, container, message_id=None, speed_factor=1.25):
           <source src="data:audio/wav;base64,{audio_base64}" type="audio/wav">
         </audio>
         <script>
-          (function() {{
-            const SPEED = {speed_factor};
-            const DURATION_MS = {dur_ms};
+            (function() {{
             const MSG_ID = "{msg_id}";
             const a = document.getElementById('agentAudio');
-            
-            function notify(type) {{
-              // Tell ALL parent listeners; sidebar will filter by id.
-              window.parent.postMessage({{ type, speed: SPEED, id: MSG_ID, dur: DURATION_MS, ts: Date.now() }}, "*");
+
+            // Use BroadcastChannel so sibling iframes can talk directly
+            const bc = new BroadcastChannel('agent_audio');
+
+            // Throttle ticks to ~30fps
+            let raf = null, lastTick = 0;
+            const TICK_MS = 33;
+
+            function send(type, extra = {{}}) {{
+                bc.postMessage({{ type, id: MSG_ID, ...extra }});
             }}
-            
-            // Better audio ready detection
-            a.addEventListener('loadeddata', () => {{
-              // Audio is loaded and ready - notify immediately for better sync
-              setTimeout(() => notify('audio_play'), 50); // Small delay for browser processing
+
+            function tick(ts) {{
+                if (!a.paused && !a.ended) {{
+                if (!lastTick || (ts - lastTick) >= TICK_MS) {{
+                    lastTick = ts;
+                    send('audio_tick', {{
+                    t: Math.round(a.currentTime * 1000),
+                    dur: Math.round((a.duration || 0) * 1000)
+                    }});
+                }}
+                raf = requestAnimationFrame(tick);
+                }}
+            }}
+
+            a.addEventListener('loadedmetadata', () => {{
+                // precise duration once known
+                send('audio_meta', {{ dur: Math.round((a.duration || 0) * 1000) }});
             }});
-            
-            a.addEventListener('play',  ()=>notify('audio_play'));
-            a.addEventListener('ended', ()=>notify('audio_end'));
-            a.addEventListener('pause', ()=>notify('audio_pause'));
-          }})();
-        </script>
+
+            // IMPORTANT: start signal is "play"
+            a.addEventListener('play', () => {{
+                send('audio_play', {{
+                t: Math.round(a.currentTime * 1000),
+                dur: Math.round((a.duration || 0) * 1000)
+                }});
+                cancelAnimationFrame(raf);
+                raf = requestAnimationFrame(tick);
+            }});
+
+            a.addEventListener('pause', () => {{
+                send('audio_pause');
+                cancelAnimationFrame(raf);
+            }});
+
+            a.addEventListener('ended', () => {{
+                send('audio_end');
+                cancelAnimationFrame(raf);
+            }});
+        }})();
+            </script>
+
         """
         with container:
             components.html(audio_html, height=80)
@@ -455,6 +488,7 @@ def create_pendulum_simulation_html(config):
             .simulation-container {{
                 width: 100%;
                 max-width: 600px;
+                min-height: 600px;
                 margin: 10px auto;
                 background: #f0f6ff;
                 border: 2px solid #c4afe9;
@@ -529,7 +563,7 @@ def create_pendulum_simulation_html(config):
             <div class="agent-message">{agent_message}</div>
             <div id="phase-indicator" class="phase-indicator">Phase: Before Change</div>
             
-            <canvas id="pendulum-canvas" class="simulation-canvas" width="420" height="320"></canvas>
+            <canvas id="pendulum-canvas" class="simulation-canvas" width="420" height="380"></canvas>
             
             <div class="simulation-controls">
                 <div class="param-display">
@@ -689,7 +723,7 @@ def display_simulation_if_needed():
             try:
                 # Create and display the simulation
                 simulation_html = create_pendulum_simulation_html(simulation_config)
-                components.html(simulation_html, height=500)
+                components.html(simulation_html, height=750)
                 
                 # Add a brief pause instruction
                 st.info("🔬 **Simulation running above** - Watch the pendulum carefully and notice what changes!")
@@ -794,146 +828,111 @@ def render_viseme_sidebar(latest_text: str, key: str = "viseme_iframe"):
         const INJECTED_TEXT = `{safe_text}`;
         const CURRENT_MSG_ID = `{current_msg_id}`;
 
-        const mouthSet = document.getElementById("mouthSet");
-        const visemeName = document.getElementById("visemeName");
+        const mouthSet  = document.getElementById("mouthSet");
+        const visemeLbl = document.getElementById("visemeName");
 
-        let queue = [], timer = null, playing = false, forceStop = false;
-        let rateMultiplier = 1.0;       // dynamic: computed per audio
-        let watchdog = null;            // hard stop timer
-        let lastDurMs = 0;              // last computed duration for fallback
-
+        // ----- text → frames (your precompute, kept) -----
         function simpleG2P(text) {{
-          let s = (text || "").toLowerCase().replace(/[^a-z\\s]/g, ' ');
-          const tokens = [];
-          for (let i=0;i<s.length;) {{
+            let s = (text || "").toLowerCase().replace(/[^a-z\s]/g, ' ');
+            const tokens = [];
+            for (let i=0;i<s.length;) {{
             if (s[i]===" ") {{ i++; continue }}
-            const dig=s.slice(i,i+2);
+            const dig = s.slice(i,i+2);
             if (['ch','sh','th','ng','ph','qu','ck','wh'].includes(dig)) {{ tokens.push(dig); i+=2; continue }}
             tokens.push(s[i]); i++;
-          }}
-          return tokens;
-        }}
-
-        function phonemeToViseme(p) {{
-          if (['p','b','m'].includes(p)) return 'closed';
-          if (['a','o'].includes(p)) return 'open';
-          if (['e','i','y'].includes(p)) return 'wide';
-          if (['u','oo','w'].includes(p)) return 'round';
-          if (['f','v'].includes(p)) return 'f_v';
-          if (['th','t','d','n'].includes(p)) return 'th';
-          if (['s','z','sh','ch','j'].includes(p)) return 'smush';
-          if (['q'].includes(p)) return 'kiss';
-          return 'rest';
-        }}
-
-        function estimateDur(tok) {{ return /[aeiou]/.test(tok) ? 140 : 90; }}
-
-        function prepareQueue(text) {{
-          const toks = simpleG2P(text);
-          const frames = toks.map(t=>({{vis:phonemeToViseme(t), dur:estimateDur(t)}}));
-          const comp=[];
-          for (const f of frames) {{
-            const last=comp[comp.length-1];
-            if (last && last.vis===f.vis) last.dur+=f.dur;
-            else comp.push({{...f}});
-          }}
-          return comp;
-        }}
-
-        function setViseme(v) {{
-          mouthSet.querySelectorAll("[data-viseme]").forEach(g=>g.classList.remove("active"));
-          const el=mouthSet.querySelector(`[data-viseme="${{v}}"]`);
-          if (el) el.classList.add("active");
-          visemeName.innerText=v;
-        }}
-
-        function stopPlay(hard=false) {{
-          playing=false; forceStop=hard; queue=[];
-          if (timer) {{ clearTimeout(timer); timer=null; }}
-          if (watchdog) {{ clearTimeout(watchdog); watchdog=null; }}
-          setViseme("rest");
-        }}
-
-        function stepQueue() {{
-          if (!playing || forceStop) return;
-          if (queue.length===0) {{ setViseme("rest"); playing=false; return; }}
-          const frame=queue.shift();
-          setViseme(frame.vis);
-          const scaled = Math.max(10, Math.round(frame.dur / rateMultiplier));
-          lastDurMs += scaled;
-          timer = setTimeout(stepQueue, scaled);
-        }}
-
-        function totalTextMs(frames) {{
-          return frames.reduce((sum,f)=>sum+f.dur, 0);
-        }}
-
-        function playVisemes(text, audioMs=null) {{
-          stopPlay();
-          queue = prepareQueue(text || "");
-          const textMs = totalTextMs(queue);
-          if (audioMs && isFinite(audioMs) && audioMs > 50) {{
-            rateMultiplier = Math.max(0.1, textMs / audioMs); // Scale visemes to match actual audio duration
-          }} else {{
-            rateMultiplier = 1.25; // fallback: speed up visemes to match 1.25x audio speed
-          }}
-          lastDurMs = 0;
-
-          if (queue.length>0) {{
-            playing=true; stepQueue();
-            // Set a watchdog to force-stop when audio should end (with small buffer for precision)
-            const wd = audioMs && isFinite(audioMs) && audioMs > 50 ? audioMs : Math.round(textMs / rateMultiplier);
-            watchdog = setTimeout(() => stopPlay(true), wd + 100);
-          }}
-        }}
-
-        // Ensure a mouth is visible even before any audio message arrives
-        document.addEventListener('DOMContentLoaded', () => {{
-          const el = mouthSet.querySelector('[data-viseme="rest"]');
-          if (el) el.classList.add('active');
-          visemeName.innerText = 'rest';
-        }});
-
-        // Sync via postMessage from the main app audio.
-        window.addEventListener("message", (ev) => {{
-          const d = ev.data || {{}};
-          if (!d || !d.type) return;
-          // Only react to the latest message id (avoid stale audio events)
-          if (d.id && d.id !== CURRENT_MSG_ID) return;
-
-          if (d.type === 'audio_play') {{
-            // Audio is actually playing - this takes priority over fallback
-            if (playing) stopPlay(true); // Stop any fallback animation
-            const audioMs = d.dur || 0;      // real WAV duration from Python
-            playVisemes(INJECTED_TEXT, audioMs);
-          }} else if (d.type === 'audio_end' || d.type === 'audio_pause') {{
-            stopPlay(true);
-          }}
-        }});
-
-        // Enhanced fallback with multiple timing checks
-        let fallbackAttempts = 0;
-        function tryFallback() {{
-          fallbackAttempts++;
-          if (!playing && fallbackAttempts < 4) {{
-            // Check if we should wait longer based on network/processing
-            const shouldWait = fallbackAttempts < 3;
-            if (shouldWait) {{
-              setTimeout(tryFallback, 600 * fallbackAttempts); // Progressive delays: 600ms, 1200ms, 1800ms
-              return;
             }}
-            
-            // Final fallback - start visemes
-            const tmp = prepareQueue(INJECTED_TEXT);
-            const textMs = totalTextMs(tmp);
-            const guessedAudioMs = Math.round(textMs / 1.25);
-            playVisemes(INJECTED_TEXT, guessedAudioMs);
-          }}
+            return tokens;
         }}
-        
-        // Start fallback checks after initial delay
-        setTimeout(tryFallback, 800);
-      </script>
+        function phonemeToViseme(p) {{
+            if (['p','b','m'].includes(p))      return 'closed';
+            if (['a','o'].includes(p))          return 'open';
+            if (['e','i','y'].includes(p))      return 'wide';
+            if (['u','oo','w'].includes(p))     return 'round';
+            if (['f','v'].includes(p))          return 'f_v';
+            if (['th','t','d','n'].includes(p)) return 'th';
+            if (['s','z','sh','ch','j'].includes(p)) return 'smush';
+            return 'rest';
+        }}
+        function estimateDur(tok) {{ return /[aeiou]/.test(tok) ? 140 : 90; }} // ms
+
+        function buildFrames(text) {{
+            const toks   = simpleG2P(text);
+            const frames = toks.map(t => ({{ vis: phonemeToViseme(t), dur: estimateDur(t) }}));
+            // merge adjacent identical visemes
+            const merged = [];
+            for (const f of frames) {{
+            const last = merged[merged.length - 1];
+            if (last && last.vis === f.vis) last.dur += f.dur; else merged.push({{ ...f }});
+            }}
+            let cum = 0;
+            for (const f of merged) {{ f.start = cum; cum += f.dur; f.end = cum; }}
+            merged.totalTextMs = cum;
+            return merged;
+        }}
+
+        // ----- render helper -----
+        function setViseme(v) {{
+            mouthSet.querySelectorAll("[data-viseme]").forEach(g => g.classList.remove("active"));
+            const el = mouthSet.querySelector(`[data-viseme="${{v}}"]`);
+            if (el) el.classList.add("active");
+            visemeLbl.innerText = v;
+        }}
+
+        // Initial state
+        document.addEventListener('DOMContentLoaded', () => {{
+            const el = mouthSet.querySelector('[data-viseme="rest"]');
+            if (el) el.classList.add('active');
+            visemeLbl.innerText = 'rest';
+        }});
+
+        // ----- time-driven mapping -----
+        let frames     = buildFrames(INJECTED_TEXT);
+        let audioDurMs = null;
+
+        function visemeAtTime(tMs) {{
+            if (!frames || !frames.length) return 'rest';
+            const totalText = frames.totalTextMs || 1;
+            const dur = (audioDurMs && audioDurMs > 0) ? audioDurMs : (totalText / 1.25); // fallback if no duration yet
+            const progress = Math.max(0, Math.min(1, (tMs || 0) / dur));
+            const targetText = progress * totalText;
+
+            // binary search frame whose [start, end) contains targetText
+            let lo = 0, hi = frames.length - 1, ans = 0;
+            while (lo <= hi) {{
+            const mid = (lo + hi) >> 1;
+            const f = frames[mid];
+            if (targetText < f.start) hi = mid - 1;
+            else if (targetText >= f.end) lo = mid + 1;
+            else {{ ans = mid; break; }}
+            ans = Math.min(Math.max(ans, 0), frames.length - 1);
+            }}
+            return frames[ans].vis || 'rest';
+        }}
+
+        // ----- messages from the audio iframe -----
+        const bc = new BroadcastChannel('agent_audio');
+        bc.onmessage = (ev) => {{
+        const d = ev.data || {{}};
+        if (!d.type) return;
+        if (d.id && d.id !== CURRENT_MSG_ID) return; // only react to the latest message
+
+        if (d.type === 'audio_meta') {{
+            if (d.dur && d.dur > 0) audioDurMs = d.dur;
+        }}
+        if (d.type === 'audio_play') {{
+            audioDurMs = d.dur || audioDurMs;
+            setViseme(visemeAtTime(d.t || 0)); // start exactly with audio
+        }}
+        if (d.type === 'audio_tick') {{
+            audioDurMs = d.dur || audioDurMs;
+            setViseme(visemeAtTime(d.t || 0)); // follow the audio clock
+        }}
+        if (d.type === 'audio_pause' || d.type === 'audio_end') {{
+            setViseme('rest');
+        }}
+    }};
+        </script>
+
     </body>
     </html>
     """
@@ -1050,12 +1049,22 @@ with st.sidebar:
             break
 
     if last_assistant_text:
-        st.session_state['latest_audio_msg_id'] = msg_id_from_text(last_assistant_text)
+        viseme_hash = msg_id_from_text(last_assistant_text)
+        st.session_state['latest_audio_msg_id'] = viseme_hash
+        print(f"👄 VISEME HASH: '{viseme_hash[:12]}...' from text: '{last_assistant_text[:50]}...'")
 
 
-    if(detect(last_assistant_text) == 'kn'):
+    # if(detect(last_assistant_text) == 'kn'):
+    try:
+        print(f"🔄 TRANSLATING for viseme: '{last_assistant_text[:30]}...'")
         last_assistant_text = GoogleTranslator(source='kn', target='en').translate(last_assistant_text)
+        print(f"✅ TRANSLATED for viseme: '{last_assistant_text[:30]}...'")
+    except Exception as e:
+        st.warning(f"Translation failed for sidebar message: {e}")
+        pass
 
+    print(f"👄 Final viseme text: '{last_assistant_text[:50]}...'")
+    print(f"📊 Hash comparison - Audio vs Viseme: {st.session_state.get('latest_audio_msg_id', 'None')[:12] if st.session_state.get('latest_audio_msg_id') else 'None'}...")
     # Render the character (auto-plays on each new assistant msg)
     render_viseme_sidebar(last_assistant_text, key="viseme_iframe_top")
 
@@ -1090,6 +1099,7 @@ for i, message_data in enumerate(st.session_state.messages):
     try:
         detected_lang = detect(msg)
         if detected_lang == 'en':
+            print(f"🔄 TRANSLATING message {i+1}: '{msg[:30]}...' (detected: {detected_lang})")
             translated_msg = GoogleTranslator(source='en', target='kn').translate(msg)
             # Update the message in session state with the translated version
             if len(message_data) == 2:  # Old format
@@ -1097,6 +1107,9 @@ for i, message_data in enumerate(st.session_state.messages):
             else:  # New format with metadata
                 st.session_state.messages[i] = (role, translated_msg, metadata)
             msg = translated_msg
+            print(f"✅ TRANSLATED to: '{msg[:30]}...'")
+        else:
+            print(f"ℹ️ No translation needed for message {i+1}: '{msg[:30]}...' (detected: {detected_lang})")
     except Exception as e:
         # If language detection or translation fails, use original message
         st.warning(f"Translation failed for message {i+1}: {e}")
@@ -1118,6 +1131,7 @@ for i, message_data in enumerate(st.session_state.messages):
             try:
                 # stable id from assistant text so reruns don't create a new id
                 mid = msg_id_from_text(msg)
+                print(f"🔊 AUDIO HASH: '{mid[:12]}...' from text: '{msg[:50]}...'")
 
                 if mid not in st.session_state.audio_rendered_for_ids:
                     # First render for this assistant reply → create <audio autoplay> + postMessage hooks

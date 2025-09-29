@@ -11,7 +11,7 @@ import time
 import soundfile as sf
 from pedalboard import Pedalboard, Resample
 import sys
-import pysqlite3
+# import pysqlite3
 from datetime import datetime
 from dotenv import load_dotenv
 from langdetect import detect
@@ -24,7 +24,7 @@ from audio_recorder_streamlit import audio_recorder
 # Import gTTS for text-to-speech
 from gtts import gTTS
 
-sys.modules["sqlite3"] = pysqlite3
+# sys.modules["sqlite3"] = pysqlite3
 
 import hashlib
 
@@ -583,14 +583,6 @@ def create_pendulum_simulation_html(config):
                 </div>
             </div>
 
-            <div class="hint-box">
-                <b>Try this:</b>
-                <ul style="margin:6px 0 0 18px; padding:0;">
-                  <li>Watch how the <b>period</b> (time for one swing) changes as <b>length (L)</b> changes.</li>
-                  <li>Notice that increasing <b>gravity (g)</b> makes the pendulum swing <b>faster</b> (shorter period).</li>
-                  <li>For small angles, the period is approximately <span class="formula">T ≈ 2π √(L / g)</span>. Keep an eye on the live value above!</li>
-                </ul>
-            </div>
         </div>
         
         <script>
@@ -723,11 +715,13 @@ def display_simulation_if_needed():
             try:
                 # Create and display the simulation
                 simulation_html = create_pendulum_simulation_html(simulation_config)
-                components.html(simulation_html, height=750)
+                components.html(simulation_html, height=650)
                 
                 # Add a brief pause instruction
-                st.info("🔬 **Simulation running above** - Watch the pendulum carefully and notice what changes!")
-                
+                s =  "**Simulation running above** - Watch the pendulum carefully and notice what changes!"
+                s = GoogleTranslator(source='en', target='kn').translate(s)
+                st.info("🔬 " + s)
+
                 # Mark simulation as displayed but keep it available for this cycle
                 # We don't reset show_simulation here - let the nodes manage the lifecycle
                 
@@ -945,6 +939,8 @@ def render_viseme_sidebar(latest_text: str, key: str = "viseme_iframe"):
 st.set_page_config(page_title="Interactive Educational Agent", page_icon="🤖")
 if "audio_rendered_for_ids" not in st.session_state:
     st.session_state.audio_rendered_for_ids = set()
+if "original_english_texts" not in st.session_state:
+    st.session_state.original_english_texts = {}
 
 def generate_session_id():
     """Generate a unique session ID for Langfuse tracking"""
@@ -1012,6 +1008,11 @@ if st.session_state.get("processing_request"):
                     agent_reply = "I'm waiting for your response."
             
             if agent_reply:
+                # Store original English text for stable hashing
+                message_index = len(st.session_state.messages)
+                st.session_state.original_english_texts[message_index] = agent_reply
+                print(f"📝 STORED original English for message {message_index}: '{agent_reply[:50]}...'")
+                
                 # Check if there's enhanced metadata from the agent
                 if (hasattr(st.session_state.agent, 'state') and 
                     st.session_state.agent.state.get("enhanced_message_metadata")):
@@ -1049,12 +1050,35 @@ with st.sidebar:
             break
 
     if last_assistant_text:
-        st.session_state['latest_audio_msg_id'] = msg_id_from_text(last_assistant_text)
+        # Find the latest assistant message index to get original English
+        latest_assistant_index = None
+        for idx, message_data in enumerate(reversed(st.session_state.get("messages", []))):
+            if len(message_data) >= 2 and message_data[0] == "assistant":
+                latest_assistant_index = len(st.session_state.messages) - 1 - idx
+                break
+        
+        # Use original English for hash generation
+        if latest_assistant_index is not None:
+            original_english = st.session_state.original_english_texts.get(latest_assistant_index, last_assistant_text)
+        else:
+            original_english = last_assistant_text
+            
+        viseme_hash = msg_id_from_text(original_english)
+        st.session_state['latest_audio_msg_id'] = viseme_hash
+        print(f"👄 VISEME HASH: '{viseme_hash[:12]}...' from ORIGINAL English: '{original_english[:50]}...'")
+        print(f"👄 (Viseme will process English: '{original_english[:30]}...')")
 
 
-    if(detect(last_assistant_text) == 'kn'):
-        last_assistant_text = GoogleTranslator(source='kn', target='en').translate(last_assistant_text)
+    # Use original English for viseme processing (no translation needed)
+    if latest_assistant_index is not None:
+        original_english_for_viseme = st.session_state.original_english_texts.get(latest_assistant_index, last_assistant_text)
+        print(f"👄 Using ORIGINAL English for viseme: '{original_english_for_viseme[:50]}...'")
+        last_assistant_text = original_english_for_viseme
+    else:
+        print(f"⚠️ No original English found, using current text: '{last_assistant_text[:50]}...'")
 
+    print(f"👄 Final viseme text: '{last_assistant_text[:50]}...'")
+    print(f"📊 Hash comparison - Both should now match: {st.session_state.get('latest_audio_msg_id', 'None')[:12] if st.session_state.get('latest_audio_msg_id') else 'None'}...")
     # Render the character (auto-plays on each new assistant msg)
     render_viseme_sidebar(last_assistant_text, key="viseme_iframe_top")
 
@@ -1089,6 +1113,7 @@ for i, message_data in enumerate(st.session_state.messages):
     try:
         detected_lang = detect(msg)
         if detected_lang == 'en':
+            print(f"🔄 TRANSLATING message {i+1}: '{msg[:30]}...' (detected: {detected_lang})")
             translated_msg = GoogleTranslator(source='en', target='kn').translate(msg)
             # Update the message in session state with the translated version
             if len(message_data) == 2:  # Old format
@@ -1096,6 +1121,9 @@ for i, message_data in enumerate(st.session_state.messages):
             else:  # New format with metadata
                 st.session_state.messages[i] = (role, translated_msg, metadata)
             msg = translated_msg
+            print(f"✅ TRANSLATED to: '{msg[:30]}...'")
+        else:
+            print(f"ℹ️ No translation needed for message {i+1}: '{msg[:30]}...' (detected: {detected_lang})")
     except Exception as e:
         # If language detection or translation fails, use original message
         st.warning(f"Translation failed for message {i+1}: {e}")
@@ -1115,8 +1143,11 @@ for i, message_data in enumerate(st.session_state.messages):
             
             # Add audio playback for the latest assistant message (only once per message)
             try:
-                # stable id from assistant text so reruns don't create a new id
-                mid = msg_id_from_text(msg)
+                # Use original English text for stable hashing
+                original_english = st.session_state.original_english_texts.get(i, msg)
+                mid = msg_id_from_text(original_english)
+                print(f"🔊 AUDIO HASH: '{mid[:12]}...' from ORIGINAL English: '{original_english[:50]}...'")
+                print(f"🔊 (Audio will play Kannada: '{msg[:30]}...')")
 
                 if mid not in st.session_state.audio_rendered_for_ids:
                     # First render for this assistant reply → create <audio autoplay> + postMessage hooks

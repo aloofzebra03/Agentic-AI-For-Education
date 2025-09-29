@@ -417,7 +417,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
         action_config: Dictionary with action configuration
     """
     # Default parameters
-    base_params = {"length": 1.0, "gravity": 9.8, "amplitude": 30, "mass": 1.0}
+    base_params = {"length": 1.0, "gravity": 9.8, "amplitude": 75, "mass": 1.0}
     
     # Extract independent variable that's being changed
     independent_var = None
@@ -441,8 +441,8 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "concept": concept,
             "parameter_name": "length",
             "before_params": {**base_params, "length": 1.0},
-            "after_params": {**base_params, "length": 5.0},
-            "action_description": "increasing the pendulum length from 1.0m to 5.0m",
+            "after_params": {**base_params, "length": 3.0},
+            "action_description": "increasing the pendulum length from 1.0m to 3.0m",
             "timing": {"before_duration": 8, "transition_duration": 3, "after_duration": 8},
             "agent_message": "Watch how the period changes as I increase the length for you..."
         }
@@ -461,8 +461,8 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "concept": concept,
             "parameter_name": "amplitude",
             "before_params": {**base_params, "amplitude": 30},
-            "after_params": {**base_params, "amplitude": 80},
-            "action_description": "increasing the starting angle from 15° to 60°",
+            "after_params": {**base_params, "amplitude": 60},
+            "action_description": "increasing the starting angle from 30° to 60°",
             "timing": {"before_duration": 6, "transition_duration": 2, "after_duration": 6},
             "agent_message": "Watch closely as I increase the swing angle for you to see how the period changes..."
         }
@@ -474,7 +474,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "before_params": {**base_params, "mass": 1},
             "after_params": {**base_params, "mass": 10},  # Same parameters to show no change
             "action_description": "comparing pendulums with different bob masses (but same period)",
-            "timing": {"before_duration": 10, "transition_duration": 2, "after_duration": 10},
+            "timing": {"before_duration": 8, "transition_duration": 3, "after_duration": 8},
             "agent_message": "Watch this carefully! I'll show you how changing the bob mass affects the period - this might surprise you!"
         }
     elif "frequency" in independent_var or "period" in independent_var:

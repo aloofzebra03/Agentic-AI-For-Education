@@ -343,7 +343,12 @@ def sim_execute_node(state: AgentState) -> AgentState:
     # Agent message
     msg = f"Perfect! Let me demonstrate this concept with a simulation for you. {simulation_config['agent_message']}"
     # msg = f"Perfect! Let me demonstrate this concept with a simulation for you."
-    kannada_msg = GoogleTranslator(source='en', target='kn').translate(msg)
+    try:
+        kannada_msg = GoogleTranslator(source='en', target='kn').translate(msg)
+    except Exception as e:
+        print("FAILED!!!!!!!!!! Translation to Kannada failed, using original message.")
+        kannada_msg = msg
+        raise e
 
     add_ai_message_to_conversation(state, kannada_msg)
     state["agent_output"] = kannada_msg
@@ -480,8 +485,12 @@ Return JSON ONLY with:
     parsed: SimReflectResponse = sim_reflect_parser.parse(json_text)
 
     msg = f"Quick recap from our simulation:\n" + "\n".join([f"• {b}" for b in parsed.bullets]) + f"\n\n{parsed.closing_prompt}"
-    
-    kannada_msg = GoogleTranslator(source='en', target='kn').translate(msg)
+    try:
+        kannada_msg = GoogleTranslator(source='en', target='kn').translate(msg)
+    except Exception as e:
+        print("FAILED!!!!!!!!!! Translation to Kannada failed, using original message.")
+        kannada_msg = msg
+        raise e
     add_ai_message_to_conversation(state, kannada_msg)
     state["agent_output"] = kannada_msg
 
