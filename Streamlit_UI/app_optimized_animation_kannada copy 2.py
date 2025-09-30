@@ -18,119 +18,6 @@ from langdetect import detect
 from deep_translator import GoogleTranslator
 from indic_numtowords import num2words
 
-# ── Translation Cache System ──────────────────────────────────────────────
-
-@st.cache_data
-def get_ui_translations():
-    """Cache all UI translations to reduce latency"""
-    translations = {}
-    
-    try:
-        translator = GoogleTranslator(source='en', target='kn')
-        
-        # Main UI elements
-        translations.update({
-            'interactive_simulation_educational_agent': translator.translate("Interactive Simulation Educational Agent"),
-            'welcome_msg_template': translator.translate("Welcome! Ready to learn about **{concept}**? Click 'Start Learning' to begin your personalized learning session."),
-            'start_learning': translator.translate("Start Learning"),
-            'session_info': translator.translate("Session Info"),
-            'how_to_interact': translator.translate("How to interact:"),
-            'type_responses': translator.translate("Type your responses in the chat input"),
-            'use_microphone': translator.translate("Or use the microphone to speak"),
-            'agent_guide': translator.translate("The agent will guide you through learning"),
-            
-            # Audio/Input elements
-            'voice_input': translator.translate("Voice Input"),
-            'click_to_speak': translator.translate("Click to speak"),
-            'transcribing': translator.translate("Transcribing..."),
-            'you_said': translator.translate("You said:"),
-            'type_response_here': translator.translate("Type your response here..."),
-            
-            # Simulation elements
-            'phase_before_change': translator.translate("Phase: Before Change"),
-            'phase_changing_parameters': translator.translate("Phase: Changing Parameters..."),
-            'phase_after_change': translator.translate("Phase: After Change"),
-            'simulation_running_msg': translator.translate("**Simulation running above** - Watch the pendulum carefully and notice what changes!"),
-            
-            # Image context
-            'why_image_helps': translator.translate("Why this image helps your learning"),
-            
-            # Session end elements
-            'learning_session_complete': "Learning Session Complete!",
-            'session_summary': "Session Summary",
-            'download_session_summary': "Download Session Summary",
-            'session_completed': "Session completed successfully!",
-            'langfuse_session_details': "Langfuse Session Details",
-            'computing_session_metrics': "Computing session metrics...",
-            'session_metrics_computed': "Session metrics computed and uploaded to Langfuse!",
-            'failed_compute_metrics': "Failed to compute metrics:",
-            'session_metrics': "Session Metrics",
-            'quiz_score': "Quiz Score",
-            'user_type': "User Type",
-            'engagement_rating': "Engagement Rating",
-            'interest_rating': "Interest Rating",
-            'concepts_covered': "Concepts Covered",
-            'enjoyment_probability': "Enjoyment Probability",
-            'download_session_metrics': "Download Session Metrics",
-            'start_new_session': "Start New Session",
-
-            # Footer
-            'powered_by': "Powered by Educational AI Agent",
-            'tracked_with': "Tracked with Langfuse",
-
-            # Thinking/Processing
-            'thinking': translator.translate("Thinking...")
-        })
-        
-    except Exception as e:
-        st.warning(f"Translation service unavailable, using English fallback: {e}")
-        # English fallbacks
-        translations.update({
-            'interactive_simulation_educational_agent': "Interactive Simulation Educational Agent",
-            'welcome_msg_template': "Welcome! Ready to learn about **{concept}**? Click 'Start Learning' to begin your personalized learning session.",
-            'start_learning': "Start Learning",
-            'session_info': "Session Info",
-            'how_to_interact': "How to interact:",
-            'type_responses': "Type your responses in the chat input",
-            'use_microphone': "Or use the microphone to speak",
-            'agent_guide': "The agent will guide you through learning",
-            'voice_input': "Voice Input",
-            'click_to_speak': "Click to speak",
-            'transcribing': "Transcribing...",
-            'you_said': "You said:",
-            'type_response_here': "Type your response here...",
-            'phase_before_change': "Phase: Before Change",
-            'phase_changing_parameters': "Phase: Changing Parameters...",
-            'phase_after_change': "Phase: After Change",
-            'simulation_running_msg': "**Simulation running above** - Watch the pendulum carefully and notice what changes!",
-            'why_image_helps': "Why this image helps your learning",
-            'learning_session_complete': "Learning Session Complete!",
-            'session_summary': "Session Summary",
-            'download_session_summary': "Download Session Summary",
-            'session_completed': "Session completed successfully!",
-            'langfuse_session_details': "Langfuse Session Details",
-            'computing_session_metrics': "Computing session metrics...",
-            'session_metrics_computed': "Session metrics computed and uploaded to Langfuse!",
-            'failed_compute_metrics': "Failed to compute metrics:",
-            'session_metrics': "Session Metrics",
-            'quiz_score': "Quiz Score",
-            'user_type': "User Type",
-            'engagement_rating': "Engagement Rating",
-            'interest_rating': "Interest Rating",
-            'concepts_covered': "Concepts Covered",
-            'enjoyment_probability': "Enjoyment Probability",
-            'download_session_metrics': "Download Session Metrics",
-            'start_new_session': "Start New Session",
-            'powered_by': "Powered by Educational AI Agent",
-            'tracked_with': "Tracked with Langfuse",
-            'thinking': "Thinking..."
-        })
-    
-    return translations
-
-# Initialize translations at startup
-UI_TRANSLATIONS = get_ui_translations()
-
 
 # Import the audio_recorder component
 from audio_recorder_streamlit import audio_recorder
@@ -440,12 +327,218 @@ def create_pendulum_simulation_html(config):
     after_params = config['after_params']
     timing = config['timing']
     agent_message = config['agent_message']
-    
-    # Use cached translations for phase indicators
-    phase_before = UI_TRANSLATIONS['phase_before_change']
-    phase_changing = UI_TRANSLATIONS['phase_changing_parameters']
-    phase_after = UI_TRANSLATIONS['phase_after_change']
 
+    # return f"""
+    # <!DOCTYPE html>
+    # <html>
+    # <head>
+    #     <style>
+    #         .simulation-container {{
+    #             width: 100%;
+    #             max-width: 600px;
+    #             margin: 10px auto;
+    #             background: #f0f6ff;
+    #             border: 2px solid #c4afe9;
+    #             border-radius: 15px;
+    #             padding: 15px;
+    #             text-align: center;
+    #             position: relative;
+    #         }}
+    #         .simulation-canvas {{
+    #             background: #ede9fe;
+    #             border-radius: 12px;
+    #             margin: 10px auto;
+    #             display: block;
+    #         }}
+    #         .simulation-controls {{
+    #             display: flex;
+    #             justify-content: center;
+    #             gap: 20px;
+    #             margin: 10px 0;
+    #             font-family: 'Segoe UI', sans-serif;
+    #             flex-wrap: wrap;
+    #         }}
+    #         .param-display {{
+    #             background: rgba(124, 58, 237, 0.1);
+    #             padding: 8px 12px;
+    #             border-radius: 8px;
+    #             font-size: 14px;
+    #             font-weight: 500;
+    #         }}
+    #         .agent-message {{
+    #             background: rgba(124, 58, 237, 0.9);
+    #             color: white;
+    #             padding: 10px 15px;
+    #             border-radius: 10px;
+    #             margin: 10px 0;
+    #             font-size: 16px;
+    #             font-weight: 500;
+    #         }}
+    #         .phase-indicator {{
+    #             background: #7c3aed;
+    #             color: white;
+    #             padding: 5px 15px;
+    #             border-radius: 20px;
+    #             font-size: 14px;
+    #             font-weight: 600;
+    #             margin: 10px 0;
+    #         }}
+    #         .hint-box {{
+    #             text-align: left;
+    #             background: #ffffff;
+    #             border: 1px dashed #7c3aed;
+    #             border-radius: 10px;
+    #             padding: 10px 12px;
+    #             margin-top: 8px;
+    #             line-height: 1.5;
+    #             color: #333;
+    #         }}
+    #         .hint-box b {{
+    #             color: #7c3aed;
+    #         }}
+    #         .formula {{
+    #             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    #             background: #f7f2ff;
+    #             padding: 2px 6px;
+    #             border-radius: 6px;
+    #             border: 1px solid #e4d7ff;
+    #         }}
+    #     </style>
+    # </head>
+    # <body>
+    #     <div class="simulation-container">
+    #         <div class="agent-message">{agent_message}</div>
+    #         <div id="phase-indicator" class="phase-indicator">Phase: Before Change</div>
+            
+    #         <canvas id="pendulum-canvas" class="simulation-canvas" width="420" height="320"></canvas>
+            
+    #         <div class="simulation-controls">
+    #             <div class="param-display">
+    #                 Length: <span id="length-display">{before_params['length']:.1f}m</span>
+    #             </div>
+    #             <div class="param-display">
+    #                 Gravity: <span id="gravity-display">{before_params['gravity']:.1f} m/s²</span>
+    #             </div>
+    #             <div class="param-display">
+    #                 Amplitude: <span id="amplitude-display">{before_params['amplitude']}°</span>
+    #             </div>
+    #             <div class="param-display">
+    #                 Period ≈ <span id="period-display">—</span> s
+    #             </div>
+    #         </div>
+
+    #         <div class="hint-box">
+    #             <b>Try this:</b>
+    #             <ul style="margin:6px 0 0 18px; padding:0;">
+    #               <li>Watch how the <b>period</b> (time for one swing) changes as <b>length (L)</b> changes.</li>
+    #               <li>Notice that increasing <b>gravity (g)</b> makes the pendulum swing <b>faster</b> (shorter period).</li>
+    #               <li>For small angles, the period is approximately <span class="formula">T ≈ 2π √(L / g)</span>. Keep an eye on the live value above!</li>
+    #             </ul>
+    #         </div>
+    #     </div>
+        
+    #     <script>
+    #         const beforeParams = {json.dumps(before_params)};
+    #         const afterParams = {json.dumps(after_params)};
+    #         const timing = {json.dumps(timing)};
+            
+    #         const canvas = document.getElementById('pendulum-canvas');
+    #         const ctx = canvas.getContext('2d');
+    #         const originX = 210, originY = 60;
+    #         const baseScale = 80;
+            
+    #         let currentParams = {{...beforeParams}};
+    #         let angle = (currentParams.amplitude * Math.PI) / 180;
+    #         let aVel = 0, aAcc = 0;
+    #         const dt = 0.02;
+    #         let startTime = Date.now();
+    #         let phase = 'before';
+
+    #         function smallAnglePeriod(L, g) {{
+    #             if (L <= 0 || g <= 0) return NaN;
+    #             return 2 * Math.PI * Math.sqrt(L / g);
+    #         }}
+
+    #         function updatePhaseIndicator() {{
+    #             const indicator = document.getElementById('phase-indicator');
+    #             const elapsed = (Date.now() - startTime) / 1000;
+                
+    #             if (elapsed < timing.before_duration) {{
+    #                 indicator.textContent = 'Phase: Before Change';
+    #                 phase = 'before';
+    #             }} else if (elapsed < timing.before_duration + timing.transition_duration) {{
+    #                 indicator.textContent = 'Phase: Changing Parameters...';
+    #                 phase = 'transition';
+                    
+    #                 const transitionProgress = (elapsed - timing.before_duration) / timing.transition_duration;
+    #                 const progress = Math.min(transitionProgress, 1);
+                    
+    #                 currentParams.length = beforeParams.length + (afterParams.length - beforeParams.length) * progress;
+    #                 currentParams.gravity = beforeParams.gravity + (afterParams.gravity - beforeParams.gravity) * progress;
+    #                 currentParams.amplitude = beforeParams.amplitude + (afterParams.amplitude - beforeParams.amplitude) * progress;
+                    
+    #                 if (progress === 1) {{
+    #                     angle = (currentParams.amplitude * Math.PI) / 180;
+    #                     aVel = 0;
+    #                 }}
+    #             }} else {{
+    #                 indicator.textContent = 'Phase: After Change';
+    #                 phase = 'after';
+    #                 currentParams = {{...afterParams}};
+    #             }}
+                
+    #             document.getElementById('length-display').textContent = currentParams.length.toFixed(1) + 'm';
+    #             document.getElementById('gravity-display').textContent = currentParams.gravity.toFixed(1) + ' m/s²';
+    #             document.getElementById('amplitude-display').textContent = Math.round(currentParams.amplitude) + '°';
+
+    #             const T = smallAnglePeriod(currentParams.length, currentParams.gravity);
+    #             const pd = document.getElementById('period-display');
+    #             pd.textContent = isFinite(T) ? T.toFixed(2) : '—';
+    #         }}
+            
+    #         function drawPendulum() {{
+    #             ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+    #             const lengthPixels = currentParams.length * baseScale;
+    #             aAcc = (-currentParams.gravity / currentParams.length) * Math.sin(angle);
+    #             aVel += aAcc * dt;
+    #             aVel *= 0.998;
+    #             angle += aVel * dt;
+                
+    #             const bobX = originX + lengthPixels * Math.sin(angle);
+    #             const bobY = originY + lengthPixels * Math.cos(angle);
+                
+    #             ctx.beginPath();
+    #             ctx.arc(originX, originY, 6, 0, 2 * Math.PI);
+    #             ctx.fillStyle = '#7c3aed';
+    #             ctx.fill();
+                
+    #             ctx.beginPath();
+    #             ctx.moveTo(originX, originY);
+    #             ctx.lineTo(bobX, bobY);
+    #             ctx.strokeStyle = '#7c3aed';
+    #             ctx.lineWidth = 3;
+    #             ctx.stroke();
+                
+    #             ctx.beginPath();
+    #             ctx.arc(bobX, bobY, 15, 0, 2 * Math.PI);
+    #             ctx.fillStyle = '#ede9fe';
+    #             ctx.strokeStyle = '#7c3aed';
+    #             ctx.lineWidth = 2.5;
+    #             ctx.fill();
+    #             ctx.stroke();
+    #         }}
+            
+    #         function animate() {{
+    #             updatePhaseIndicator();
+    #             drawPendulum();
+    #             requestAnimationFrame(animate);
+    #         }}
+    #         animate();
+    #     </script>
+    # </body>
+    # </html>
+    # """
     return f"""
     <!DOCTYPE html>
     <html>
@@ -527,7 +620,7 @@ def create_pendulum_simulation_html(config):
     <body>
         <div class="simulation-container">
             <div class="agent-message">{agent_message}</div>
-            <div id="phase-indicator" class="phase-indicator">{phase_before}</div>
+            <div id="phase-indicator" class="phase-indicator">Phase: Before Change</div>
             
             <canvas id="pendulum-canvas" class="simulation-canvas" width="420" height="380"></canvas>
             
@@ -557,11 +650,6 @@ def create_pendulum_simulation_html(config):
             const afterParams = {json.dumps(after_params)};
             const timing = {json.dumps(timing)};
             
-            // Translated phase indicators
-            const phaseBefore = "{phase_before}";
-            const phaseChanging = "{phase_changing}";
-            const phaseAfter = "{phase_after}";
-            
             // ---- MASS DEFAULTS (added) ----
             if (beforeParams.mass === undefined) beforeParams.mass = 1;
             if (afterParams.mass === undefined)  afterParams.mass  = 1;
@@ -584,28 +672,15 @@ def create_pendulum_simulation_html(config):
                 return 2 * Math.PI * Math.sqrt(L / g);
             }}
 
-            const KN_DIGITS = {{ "0":"೦","1":"೧","2":"೨","3":"೩","4":"೪","5":"೫","6":"೬","7":"೭","8":"೮","9":"೯" }};
-
-            // Format any number/string to Kannada digits; preserves '.', '-', 'e', units, etc.
-            function toKannadaNumber(val, decimals = null) {{
-                let s;
-                if (typeof val === "number" && decimals !== null) {{
-                    s = val.toFixed(decimals);            // e.g., 9.81 → "9.81"
-                }} else {{
-                    s = String(val);
-                }}
-                return s.replace(/[0-9]/g, d => KN_DIGITS[d]);
-            }}
-
             function updatePhaseIndicator() {{
                 const indicator = document.getElementById('phase-indicator');
                 const elapsed = (Date.now() - startTime) / 1000;
                 
                 if (elapsed < timing.before_duration) {{
-                    indicator.textContent = phaseBefore;
+                    indicator.textContent = 'Phase: Before Change';
                     phase = 'before';
                 }} else if (elapsed < timing.before_duration + timing.transition_duration) {{
-                    indicator.textContent = phaseChanging;
+                    indicator.textContent = 'Phase: Changing Parameters...';
                     phase = 'transition';
                     
                     const transitionProgress = (elapsed - timing.before_duration) / timing.transition_duration;
@@ -621,27 +696,19 @@ def create_pendulum_simulation_html(config):
                         aVel = 0;
                     }}
                 }} else {{
-                    indicator.textContent = phaseAfter;
+                    indicator.textContent = 'Phase: After Change';
                     phase = 'after';
                     currentParams = {{...afterParams}};
                 }}
 
-                document.getElementById('length-display').textContent    =
-                toKannadaNumber(currentParams.length, 1) + 'm';
-
-                document.getElementById('gravity-display').textContent   =
-                toKannadaNumber(currentParams.gravity, 1) + ' m/s²';
-
-                document.getElementById('amplitude-display').textContent =
-                toKannadaNumber(Math.round(currentParams.amplitude), 0) + '°';
-
-                document.getElementById('mass-display').textContent      =
-                toKannadaNumber((currentParams.mass ?? 1), 2) + ' kg';
+                document.getElementById('length-display').textContent    = currentParams.length.toFixed(1) + 'm';
+                document.getElementById('gravity-display').textContent   = currentParams.gravity.toFixed(1) + ' m/s²';
+                document.getElementById('amplitude-display').textContent = Math.round(currentParams.amplitude) + '°';
+                document.getElementById('mass-display').textContent      = (currentParams.mass ?? 1).toFixed(2) + ' kg';
 
                 const T = smallAnglePeriod(currentParams.length, currentParams.gravity);
                 const pd = document.getElementById('period-display');
-                pd.textContent = isFinite(T) ? toKannadaNumber(T, 2) : '—';
-
+                pd.textContent = isFinite(T) ? T.toFixed(2) : '—';
             }}
             
             function drawPendulum() {{
@@ -710,8 +777,10 @@ def display_simulation_if_needed():
                 simulation_html = create_pendulum_simulation_html(simulation_config)
                 components.html(simulation_html, height=650)
                 
-                # Add a brief pause instruction using cached translation
-                st.info("🔬 " + UI_TRANSLATIONS['simulation_running_msg'])
+                # Add a brief pause instruction
+                s =  "**Simulation running above** - Watch the pendulum carefully and notice what changes!"
+                s = GoogleTranslator(source='en', target='kn').translate(s)
+                st.info("🔬 " + s)
 
                 # Mark simulation as displayed but keep it available for this cycle
                 # We don't reset show_simulation here - let the nodes manage the lifecycle
@@ -734,7 +803,7 @@ def display_image_with_context(image_data, show_explanation=True):
     
     # Optional: Educational context in an expander
     if show_explanation and image_data.get("relevance_reason"):
-        with st.expander(f" {UI_TRANSLATIONS['why_image_helps']}"):
+        with st.expander(" Why this image helps your learning"):
             st.write(image_data["relevance_reason"])
             
     # Add a subtle divider after image
@@ -951,14 +1020,10 @@ def initialize_agent():
 
 
 if "session_started" not in st.session_state:
-    # Use cached translations
-    st.title(f"🧑‍🎓 {UI_TRANSLATIONS['interactive_simulation_educational_agent']}")
+    st.title("🧑‍🎓 Interactive Simulation Educational Agent")
+    st.info(f"Welcome! Ready to learn about **{concept_pkg.title}**? Click 'Start Learning' to begin your personalized learning session.")
     
-    # Format welcome message with concept title
-    welcome_text = UI_TRANSLATIONS['welcome_msg_template'].format(concept=concept_pkg.title)
-    st.info(welcome_text)
-    
-    if st.button(f"🚀 {UI_TRANSLATIONS['start_learning']}", type="primary"):
+    if st.button("🚀 Start Learning", type="primary"):
         # Initialize the agent and session
         agent, session_id = initialize_agent()
         
@@ -977,7 +1042,7 @@ if st.session_state.get("processing_request"):
     st.session_state.processing_request = False  # Unset flag to prevent re-running
 
     # Use a spinner during the potentially slow LLM call
-    with st.spinner(f"🤔 {UI_TRANSLATIONS['thinking']}"):
+    with st.spinner("🤔 Thinking..."):
         try:
             # Check if this is the initial start
             if not st.session_state.messages:
@@ -1027,7 +1092,7 @@ if st.session_state.get("processing_request"):
     st.rerun()
 
 # ── Main Application Logic & UI Display ──────────────────────────────────
-st.title(f"🧑‍🎓 {UI_TRANSLATIONS['interactive_simulation_educational_agent']}")
+st.title("🧑‍🎓 Interactive Simulation Educational Agent")
 
 # Display session info in sidebar
 with st.sidebar:
@@ -1078,7 +1143,7 @@ with st.sidebar:
     render_viseme_sidebar(last_assistant_text, key="viseme_iframe_top")
 
     # 2) The rest of your existing sidebar content
-    st.header(f"📊 {UI_TRANSLATIONS['session_info']}")
+    st.header("📊 Session Info")
     if "agent" in st.session_state:
         session_info = st.session_state.agent.session_info()
         st.write(f"**Session ID:** {session_info['session_id']}")
@@ -1089,10 +1154,10 @@ with st.sidebar:
             st.write(f"**Tags:** {session_info['tags']}")
 
     st.markdown("---")
-    st.markdown(f"**💡 {UI_TRANSLATIONS['how_to_interact']}**")
-    st.markdown(f"- {UI_TRANSLATIONS['type_responses']}")
-    st.markdown(f"- {UI_TRANSLATIONS['use_microphone']}")
-    st.markdown(f"- {UI_TRANSLATIONS['agent_guide']}")
+    st.markdown("**💡 How to interact:**")
+    st.markdown("- Type your responses in the chat input")
+    st.markdown("- Or use the microphone to speak")
+    st.markdown("- The agent will guide you through learning")
 
 
 # Display all messages. The audio player is only added for the last assistant message.
@@ -1172,22 +1237,22 @@ if "agent" in st.session_state and st.session_state.agent.current_state() != "EN
     # Audio input
     col1, col2 = st.columns([3, 1])
     with col2:
-        st.caption(f"🎤 {UI_TRANSLATIONS['voice_input']}")
+        st.caption("🎤 Voice Input")
         recorded_audio_bytes = audio_recorder(
-            text=UI_TRANSLATIONS['click_to_speak'],
+            text="Click to speak",
             key=f"audio_recorder_{st.session_state.audio_recorder_key_counter}",
             icon_size="1x", 
             pause_threshold=2.0
         )
         
     if recorded_audio_bytes:
-        with st.spinner(f"🎯 {UI_TRANSLATIONS['transcribing']}"):
+        with st.spinner("🎯 Transcribing..."):
             user_msg = transcribe_recorded_audio_bytes(recorded_audio_bytes)
             if user_msg and not user_msg.startswith("["):  # Valid transcription
-                st.success(f"{UI_TRANSLATIONS['you_said']} {user_msg}")
+                st.success(f"You said: {user_msg}")
 
     # Text input
-    text_input = st.chat_input(f"💬 {UI_TRANSLATIONS['type_response_here']}")
+    text_input = st.chat_input("💬 Type your response here...")
     if text_input:
         user_msg = text_input
 
@@ -1205,35 +1270,35 @@ if "agent" in st.session_state and st.session_state.agent.current_state() != "EN
 # Session End Summary
 if "agent" in st.session_state and st.session_state.agent.current_state() == "END":
     st.markdown("---")
-    st.success(f"🎉 {UI_TRANSLATIONS['learning_session_complete']}")
+    st.success("🎉 Learning Session Complete!")
     
     # Get session summary from agent state
     session_summary = st.session_state.agent.state.get("session_summary", {})
     
     if session_summary:
-        st.subheader(f"📋 {UI_TRANSLATIONS['session_summary']}")
+        st.subheader("📋 Session Summary")
         st.json(session_summary)
         
         # Download session summary
         summary_json = json.dumps(session_summary, indent=2)
         st.download_button(
-            label=f"📥 {UI_TRANSLATIONS['download_session_summary']}", 
+            label="📥 Download Session Summary", 
             data=summary_json, 
             file_name=f"session_summary_{st.session_state.session_id}.json", 
             mime="application/json"
         )
     else:
-        st.info(UI_TRANSLATIONS['session_completed'])
+        st.info("Session completed successfully!")
     
     # Show session info for Langfuse tracking
     if "agent" in st.session_state:
         session_info = st.session_state.agent.session_info()
-        st.subheader(f"🔍 {UI_TRANSLATIONS['langfuse_session_details']}")
+        st.subheader("🔍 Langfuse Session Details")
         st.code(f"Session ID: {session_info['session_id']}\nThread ID: {session_info['thread_id']}")
     
     # Compute and upload session metrics
     if "session_metrics_computed" not in st.session_state:
-        with st.spinner(f"📊 {UI_TRANSLATIONS['computing_session_metrics']}"):
+        with st.spinner("📊 Computing session metrics..."):
             try:
                 # Convert messages to history format for metrics
                 history_for_reports = st.session_state.agent.get_history_for_reports()
@@ -1246,39 +1311,39 @@ if "agent" in st.session_state and st.session_state.agent.current_state() == "EN
                 )
                 st.session_state.session_metrics = session_metrics
                 st.session_state.session_metrics_computed = True
-                st.success(f"✅ {UI_TRANSLATIONS['session_metrics_computed']}")
+                st.success("✅ Session metrics computed and uploaded to Langfuse!")
             except Exception as e:
-                st.error(f"❌ {UI_TRANSLATIONS['failed_compute_metrics']} {e}")
+                st.error(f"❌ Failed to compute metrics: {e}")
                 st.session_state.session_metrics_computed = True  # Mark as attempted to avoid retry
     
     # Display computed metrics
     if "session_metrics" in st.session_state:
-        st.subheader(f"📊 {UI_TRANSLATIONS['session_metrics']}")
+        st.subheader("📊 Session Metrics")
         metrics = st.session_state.session_metrics
         
         # Key metrics in columns
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric(UI_TRANSLATIONS['quiz_score'], f"{metrics.quiz_score:.1f}%")
-            st.metric(UI_TRANSLATIONS['user_type'], metrics.user_type)
+            st.metric("Quiz Score", f"{metrics.quiz_score:.1f}%")
+            st.metric("User Type", metrics.user_type)
         with col2:
-            st.metric(UI_TRANSLATIONS['engagement_rating'], f"{metrics.user_engagement_rating:.1f}/5")
-            st.metric(UI_TRANSLATIONS['interest_rating'], f"{metrics.user_interest_rating:.1f}/5")
+            st.metric("Engagement Rating", f"{metrics.user_engagement_rating:.1f}/5")
+            st.metric("Interest Rating", f"{metrics.user_interest_rating:.1f}/5")
         with col3:
-            st.metric(UI_TRANSLATIONS['concepts_covered'], metrics.num_concepts_covered)
-            st.metric(UI_TRANSLATIONS['enjoyment_probability'], f"{metrics.enjoyment_probability:.0%}")
+            st.metric("Concepts Covered", metrics.num_concepts_covered)
+            st.metric("Enjoyment Probability", f"{metrics.enjoyment_probability:.0%}")
         
         # Download metrics
         metrics_json = metrics.model_dump_json(indent=2)
         st.download_button(
-            label=f"📊 {UI_TRANSLATIONS['download_session_metrics']}",
+            label="📊 Download Session Metrics",
             data=metrics_json,
             file_name=f"session_metrics_{st.session_state.session_id}.json",
             mime="application/json"
         )
     
     # Option to start a new session
-    if st.button(f"🔄 {UI_TRANSLATIONS['start_new_session']}", type="primary"):
+    if st.button("🔄 Start New Session", type="primary"):
         # Clear session state
         for key in list(st.session_state.keys()):
             del st.session_state[key]
@@ -1286,4 +1351,4 @@ if "agent" in st.session_state and st.session_state.agent.current_state() == "EN
 
 # Footer
 st.markdown("---")
-st.caption(f"🤖 {UI_TRANSLATIONS['powered_by']} | 📊 {UI_TRANSLATIONS['tracked_with']}")
+st.caption("🤖 Powered by Educational AI Agent | 📊 Tracked with Langfuse")
