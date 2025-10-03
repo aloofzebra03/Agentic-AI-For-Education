@@ -464,7 +464,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "after_params": {**base_params, "amplitude": 60},
             "action_description": "increasing the starting angle from 30° to 60°",
             "timing": {"before_duration": 6, "transition_duration": 2, "after_duration": 6},
-            "agent_message": "Watch closely as I increase the swing angle for you to see how the period changes...(The time Periods will remain the same before and after)"
+            "agent_message": "Watch closely as I increase the swing angle for you to see how the period changes...(The time periods will remaain the same as 2.01 seconds before and after)"
         }
     elif "mass" in independent_var or "bob" in independent_var:
         # For pendulum physics, mass doesn't affect the period, but we can demonstrate this
@@ -475,7 +475,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "after_params": {**base_params, "mass": 10},  # Same parameters to show no change
             "action_description": "comparing pendulums with different bob masses (but same period)",
             "timing": {"before_duration": 8, "transition_duration": 3, "after_duration": 8},
-            "agent_message": "Watch this carefully! I'll show you how changing the bob mass affects the period - this might surprise you!(The time periods will remain the same before and after)"
+            "agent_message": "Watch this carefully! I'll show you how changing the bob mass affects the period - this might surprise you!(The time periods will remain the same as 2.01 seconds before and after)"
         }
     elif "frequency" in independent_var or "period" in independent_var:
         # Demonstrate period/frequency by changing length

@@ -708,8 +708,8 @@ def display_simulation_if_needed():
             try:
                 # Create and display the simulation
                 simulation_html = create_pendulum_simulation_html(simulation_config)
-                components.html(simulation_html, height=650)
-                
+                components.html(simulation_html, height=700, scrolling=True)
+
                 # Add a brief pause instruction using cached translation
                 st.info("🔬 " + UI_TRANSLATIONS['simulation_running_msg'])
 
