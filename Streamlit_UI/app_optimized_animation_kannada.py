@@ -79,7 +79,14 @@ def get_ui_translations():
             'tracked_with': "Tracked with Langsmith",
 
             # Thinking/Processing
-            'thinking': translator.translate("Thinking...")
+            'thinking': translator.translate("Thinking..."),
+            
+            # Physics simulation parameters
+            'length': translator.translate("Length"),
+            'gravity': translator.translate("Gravity"),
+            'amplitude': translator.translate("Amplitude"),
+            'mass': translator.translate("Mass"),
+            'period': translator.translate("Period")
         })
         
     except Exception as e:
@@ -123,7 +130,14 @@ def get_ui_translations():
             'start_new_session': "Start New Session",
             'powered_by': "Powered by Educational AI Agent",
             'tracked_with': "Tracked with Langfuse",
-            'thinking': "Thinking..."
+            'thinking': "Thinking...",
+            
+            # Physics simulation parameters (English fallbacks)
+            'length': "Length",
+            'gravity': "Gravity", 
+            'amplitude': "Amplitude",
+            'mass': "Mass",
+            'period': "Period"
         })
     
     return translations
@@ -533,19 +547,19 @@ def create_pendulum_simulation_html(config):
             
             <div class="simulation-controls">
                 <div class="param-display">
-                    Length: <span id="length-display">{translate_number_to_kannada(f"{before_params['length']:.1f}")}m</span>
+                    {UI_TRANSLATIONS['length']}: <span id="length-display">{translate_number_to_kannada(f"{before_params['length']:.1f}")}m</span>
                 </div>
                 <div class="param-display">
-                    Gravity: <span id="gravity-display">{translate_number_to_kannada(f"{before_params['gravity']:.1f}")} m/s²</span>
+                    {UI_TRANSLATIONS['gravity']}: <span id="gravity-display">{translate_number_to_kannada(f"{before_params['gravity']:.1f}")} m/s²</span>
                 </div>
                 <div class="param-display">
-                    Amplitude: <span id="amplitude-display">{translate_number_to_kannada(str(before_params['amplitude']))}°</span>
+                    {UI_TRANSLATIONS['amplitude']}: <span id="amplitude-display">{translate_number_to_kannada(str(before_params['amplitude']))}°</span>
                 </div>
                 <div class="param-display">
-                    Mass: <span id="mass-display">{translate_number_to_kannada(f"{before_params.get('mass', 1):.2f}")} kg</span>
+                    {UI_TRANSLATIONS['mass']}: <span id="mass-display">{translate_number_to_kannada(f"{before_params.get('mass', 1):.2f}")} kg</span>
                 </div>
                 <div class="param-display">
-                    Period ≈ <span id="period-display">—</span> s
+                    {UI_TRANSLATIONS['period']} ≈ <span id="period-display">—</span> s
                 </div>
             </div>
 
