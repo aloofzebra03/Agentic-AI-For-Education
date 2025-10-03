@@ -507,8 +507,8 @@ def select_most_relevant_image_for_concept_introduction(concept: str, definition
         import json
         
         # Load JSON file - adjust path based on your file structure
-        json_file_path = "educational_agent/NCERT Class 7.json"
-            
+        json_file_path = "utils/NCERT Class 7.json"
+
         with open(json_file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
@@ -579,6 +579,7 @@ Respond with JSON only:
             
     except Exception as e:
         print(f"Error selecting image for concept '{concept}': {e}")
+        raise e
         return None
 
 

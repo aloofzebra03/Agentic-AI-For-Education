@@ -31,7 +31,7 @@ def get_ui_translations():
         # Main UI elements
         translations.update({
             'interactive_simulation_educational_agent': translator.translate("Interactive Simulation Educational Agent"),
-            'welcome_msg_template': translator.translate("Welcome! Ready to learn about **{concept}**? Click 'Start Learning' to begin your personalized learning session."),
+            'welcome_msg_template': "Welcome! Ready to learn about **{concept}**? Click 'Start Learning' to begin your personalized learning session.",
             'start_learning': translator.translate("Start Learning"),
             'session_info': translator.translate("Session Info"),
             'how_to_interact': translator.translate("How to interact:"),
@@ -76,7 +76,7 @@ def get_ui_translations():
 
             # Footer
             'powered_by': "Powered by Educational AI Agent",
-            'tracked_with': "Tracked with Langfuse",
+            'tracked_with': "Tracked with Langsmith",
 
             # Thinking/Processing
             'thinking': translator.translate("Thinking...")
@@ -724,6 +724,8 @@ def display_simulation_if_needed():
 
 def display_image_with_context(image_data, show_explanation=True):
     """Enhanced image display with educational context"""
+
+    print("reached here,IMAGE SHOULD print")
     
     # Main image with responsive sizing
     st.image(
