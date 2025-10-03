@@ -8,16 +8,16 @@ from langchain_groq import ChatGroq
 class TesterAgent:
     def __init__(self, persona: Persona):
         self.persona = persona
-        # self.llm = ChatGoogleGenerativeAI(
-        #     model="gemini-2.0-flash",
-        #     api_key=os.getenv("GOOGLE_API_KEY"),
-        #     temperature=0.7,
-        # )
-        self.llm = ChatGroq(
-        model="llama-3.1-8b-instant",
-        temperature=0.5,
-        max_tokens=None,
-    )
+        self.llm = ChatGoogleGenerativeAI(
+            model="gemini-2.0-flash",
+            api_key=os.getenv("GOOGLE_API_KEY"),
+            temperature=0.7,
+        )
+    #     self.llm = ChatGroq(
+    #     model="llama-3.1-8b-instant",
+    #     temperature=0.5,
+    #     max_tokens=None,
+    # )
         # Initialize history with the persona's description as a system prompt
         self.history = [
             SystemMessage(content=f"You are a student with the persona of a '{self.persona.name}'. Your characteristics are: {self.persona.description}. You must consistently act according to this persona.")

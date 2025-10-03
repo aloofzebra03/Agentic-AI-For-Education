@@ -21,7 +21,7 @@ This project is a comprehensive **AI-powered educational system** that combines 
 
 The project contains **5 different variants** of the educational agent, each building upon the previous with incremental improvements:
 
-#### 1. **`educational_agent/`** - Base Agent with RAG
+#### 1. **`educational_agent_v1/`** - Base Agent with RAG
 
 - **Primary Files**: `agent.py`, `nodes4_rag.py`, `graph_fuse.py`, `config.py`
 - **Features**: Basic conversational agent with RAG integration
@@ -30,7 +30,7 @@ The project contains **5 different variants** of the educational agent, each bui
   - `Creating_Section_Text/` - RAG content generation pipeline
   - `Filtering_GT/` - Ground truth filtering utilities
 
-#### 2. **`educational_agent_with_simulation/`** - Full Simulation Integration
+#### 2. **`educational_agent_with_simulation_v2/`** - Full Simulation Integration
 
 - **Primary Files**: Complete simulation implementation alongwith above
 - **Key Features**:
@@ -39,7 +39,7 @@ The project contains **5 different variants** of the educational agent, each bui
   - Real-time parameter manipulation
 - **Dependencies**: Most feature-complete variant
 
-#### 3. **`educational_agent_optimized/`** - Memory-Optimized Agent
+#### 3. **`educational_agent_optimized_v3/`** - Memory-Optimized Agent
 
 - **Primary Files**: `agent.py`, `graph.py`, `main_nodes_simulation_agent_no_mh.py`
 - Includes everything from above  + memory optimization.
@@ -54,7 +54,7 @@ The project contains **5 different variants** of the educational agent, each bui
 - **Key Differences**:
   - Uses Langsmith instead of Langfuse
   - Enhanced tracing and monitoring capabilities
-- **Dependencies**: Imports from base `educational_agent` for shared utilities
+- **Dependencies**: Imports from base `utils` for shared utilities
 
 #### 4. **`educational_agent_optimized_langsmith_kannada/`** - Multilingual Support
 
@@ -63,7 +63,7 @@ The project contains **5 different variants** of the educational agent, each bui
   - Kannada language support for Indian education market(System Prompt Changed)
   - Hard Coded Messages also changed to Kannada
   - Language-specific model configurations
-- **Dependencies**: Imports from base `educational_agent` for shared utilities
+- **Dependencies**: Imports from base `utils` for shared utilities
 
 ### **Streamlit Application Variants**
 

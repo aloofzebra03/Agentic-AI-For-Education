@@ -16,7 +16,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from langdetect import detect
 from deep_translator import GoogleTranslator
-from indic_numtowords import num2words
+# from indic_numtowords import num2words
 
 # ── Translation Cache System ──────────────────────────────────────────────
 

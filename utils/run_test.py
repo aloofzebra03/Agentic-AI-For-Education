@@ -11,7 +11,7 @@ from tester_agent.session_metrics import compute_and_upload_session_metrics
 from tester_agent.simulation_descriptor import format_simulation_context_for_tester
 from dotenv import load_dotenv
 
-load_dotenv(dotenv_path = ".env", override=True)
+load_dotenv(dotenv_path = "tester_agent\\.env", override=True)
 
 # Set LANGCHAIN_API_KEY from LANGCHAIN_API_KEY if needed
 if not os.getenv("LANGCHAIN_API_KEY") and os.getenv("LANGCHAIN_API_KEY"):
@@ -76,7 +76,7 @@ def run_test():
             user_msg = tester_agent.respond(agent_msg)
         
         print(f"Tester Agent ({persona.name}): {user_msg}")
-        time.sleep(5)
+        time.sleep(15)
         agent_msg = educational_agent.post(user_msg)
         print(f"Educational Agent: {agent_msg}")
         # print("#########" + educational_agent.current_state())
