@@ -444,7 +444,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "after_params": {**base_params, "length": 3.0},
             "action_description": "increasing the pendulum length from 1.0m to 3.0m",
             "timing": {"before_duration": 8, "transition_duration": 3, "after_duration": 8},
-            "agent_message": "Watch how the period changes as I increase the length for you..."
+            "agent_message": "Watch how the period changes as I increase the length for you...(Before Time Period was 2.01s and After Time Period is 3.47s)"
         }
     elif "gravity" in independent_var or "gravity" in concept.lower():
         return {
@@ -454,7 +454,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "after_params": {**base_params, "gravity": 50.0},  # High gravity demonstration
             "action_description": "changing gravity from Earth (9.8 m/s²) to high gravity (50 m/s²)",
             "timing": {"before_duration": 8, "transition_duration": 3, "after_duration": 8},
-            "agent_message": "Watch carefully as I change the gravity for you to see how the period changes..."
+            "agent_message": "Watch carefully as I change the gravity for you to see how the period changes...(Before Time Period was 2.01s and After Time Period is 0.89s)"
         }
     elif "amplitude" in independent_var or "angle" in independent_var:
         return {
@@ -464,7 +464,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "after_params": {**base_params, "amplitude": 60},
             "action_description": "increasing the starting angle from 30° to 60°",
             "timing": {"before_duration": 6, "transition_duration": 2, "after_duration": 6},
-            "agent_message": "Watch closely as I increase the swing angle for you to see how the period changes..."
+            "agent_message": "Watch closely as I increase the swing angle for you to see how the period changes...(The time Periods will remain the same before and after)"
         }
     elif "mass" in independent_var or "bob" in independent_var:
         # For pendulum physics, mass doesn't affect the period, but we can demonstrate this
@@ -475,7 +475,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "after_params": {**base_params, "mass": 10},  # Same parameters to show no change
             "action_description": "comparing pendulums with different bob masses (but same period)",
             "timing": {"before_duration": 8, "transition_duration": 3, "after_duration": 8},
-            "agent_message": "Watch this carefully! I'll show you how changing the bob mass affects the period - this might surprise you!"
+            "agent_message": "Watch this carefully! I'll show you how changing the bob mass affects the period - this might surprise you!(The time periods will remain the same before and after)"
         }
     elif "frequency" in independent_var or "period" in independent_var:
         # Demonstrate period/frequency by changing length
