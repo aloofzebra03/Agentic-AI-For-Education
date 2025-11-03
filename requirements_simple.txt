@@ -1,0 +1,77 @@
+# Core Dependencies for API Deployment
+
+# LangChain Core
+langchain
+langchain-core
+langchain-community
+langchain-text-splitters
+
+# LangChain Integrations
+langchain-chroma
+langchain-huggingface
+
+# LangGraph for agent workflow
+langgraph
+langgraph-checkpoint
+langgraph-checkpoint-sqlite
+
+# LLM Providers
+langchain-google-genai
+langchain-groq
+langchain-openai
+langchain-anthropic
+
+# LangSmith for observability
+langsmith
+
+# Vector Database & Embeddings
+chromadb
+sentence-transformers
+huggingface_hub
+
+# SQLite with vector support
+pysqlite3-binary
+sqlite-vec
+
+# Document Processing for RAG
+pypdf
+beautifulsoup4
+lxml
+
+# Data validation and parsing
+pydantic
+pydantic-settings
+
+# Environment variables
+python-dotenv
+
+# HTTP client
+httpx
+
+# JSON handling
+orjson
+
+# Async support
+aiohttp
+aiosignal
+aiosqlite
+
+# Database
+SQLAlchemy
+
+# Utilities
+python-dateutil
+pytz
+typing-extensions
+tenacity
+
+# Numerical & ML
+numpy
+scikit-learn
+
+# API framework
+fastapi
+uvicorn
+
+# Install current project in editable mode
+-e .
