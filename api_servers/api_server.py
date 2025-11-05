@@ -21,8 +21,12 @@ from api_servers.schemas import (
     ContinueSessionRequest, ContinueSessionResponse,
     SessionStatusRequest, SessionStatusResponse,
     SessionHistoryResponse, SessionSummaryResponse,
-    TestPersonaRequest, HealthResponse, ErrorResponse
+    TestPersonaRequest, HealthResponse, ErrorResponse,
+    PersonaInfo, PersonasListResponse
 )
+
+# Import personas from tester_agent
+from tester_agent.personas import personas
 
 # ============================================================================
 # FASTAPI APP INITIALIZATION
@@ -47,17 +51,12 @@ app.add_middleware(
 # ============================================================================
 
 def generate_thread_id(label: Optional[str] = None, user_id: Optional[str] = None) -> str:
-    """Generate a unique thread ID for a new session"""
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     base = label or user_id or "session"
     return f"{base}-thread-{timestamp}"
 
 
 def get_state_from_checkpoint(thread_id: str) -> Optional[Dict[str, Any]]:
-    """
-    Retrieve state from LangGraph checkpoint for a given thread_id.
-    Returns None if thread doesn't exist in checkpoint.
-    """
     try:
         # Get the state snapshot from the graph using the thread_id
         state_snapshot = graph.get_state(config={"configurable": {"thread_id": thread_id}})
@@ -72,7 +71,6 @@ def get_state_from_checkpoint(thread_id: str) -> Optional[Dict[str, Any]]:
 
 
 def extract_metadata_from_state(state: Dict[str, Any]) -> Dict[str, Any]:
-    """Extract useful metadata from agent state for API response"""
     metadata = {}
     
     # Simulation flags
@@ -110,7 +108,6 @@ def extract_metadata_from_state(state: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def get_history_from_state(state: Dict[str, Any]) -> list[Dict[str, Any]]:
-    """Convert messages from state to history format for reports"""
     history = []
     messages = state.get("messages", [])
     
@@ -152,6 +149,7 @@ def read_root():
             "GET  /session/history/{thread_id} - Get conversation history",
             "GET  /session/summary/{thread_id} - Get session summary",
             "DELETE /session/{thread_id} - Delete session",
+            "GET  /test/personas - List available test personas",
             "POST /test/persona - Test with predefined persona"
         ]
     }
@@ -173,6 +171,7 @@ def health_check():
             "/session/history/{thread_id}",
             "/session/summary/{thread_id}",
             "/session/{thread_id}",
+            "/test/personas",
             "/test/persona"
         ]
     )
@@ -180,12 +179,6 @@ def health_check():
 
 @app.post("/session/start", response_model=StartSessionResponse)
 def start_session(request: StartSessionRequest):
-    """
-    Start a new learning session
-    
-    Creates a new thread_id and begins the conversation using LangGraph's checkpointer.
-    Returns the initial greeting and session identifiers.
-    """
     try:
         print(f"API /session/start - concept: {request.concept_title}, student: {request.student_id}")
         
@@ -239,12 +232,6 @@ def start_session(request: StartSessionRequest):
 
 @app.post("/session/continue", response_model=ContinueSessionResponse)
 def continue_session(request: ContinueSessionRequest):
-    """
-    Continue an existing session with user input
-    
-    Processes student's message using LangGraph's checkpointer for state persistence.
-    Automatically handles state transitions and simulations.
-    """
     try:
         print(f"API /session/continue - thread: {request.thread_id}, message: {request.user_message[:50]}...")
         
@@ -301,11 +288,6 @@ def continue_session(request: ContinueSessionRequest):
 
 @app.get("/session/status/{thread_id}", response_model=SessionStatusResponse)
 def get_session_status(thread_id: str):
-    """
-    Get current status and progress of a session
-    
-    Returns current pedagogical state, concept progress, and other metrics.
-    """
     try:
         print(f"API /session/status - thread: {thread_id}")
         
@@ -351,11 +333,6 @@ def get_session_status(thread_id: str):
 
 @app.get("/session/history/{thread_id}", response_model=SessionHistoryResponse)
 def get_session_history(thread_id: str):
-    """
-    Get full conversation history for a session
-    
-    Returns all messages and node transitions for analysis or display.
-    """
     try:
         print(f"API /session/history - thread: {thread_id}")
         
@@ -392,11 +369,6 @@ def get_session_history(thread_id: str):
 
 @app.get("/session/summary/{thread_id}", response_model=SessionSummaryResponse)
 def get_session_summary(thread_id: str):
-    """
-    Get session summary with metrics
-    
-    Returns quiz scores, transfer success, misconceptions, and other performance indicators.
-    """
     try:
         print(f"API /session/summary - thread: {thread_id}")
         
@@ -431,13 +403,6 @@ def get_session_summary(thread_id: str):
 
 @app.delete("/session/{thread_id}")
 def delete_session(thread_id: str):
-    """
-    Delete/clear a session from the checkpointer
-    
-    Note: This depends on the checkpointer implementation.
-    For InMemorySaver, sessions are volatile and cleared on restart.
-    For persistent checkpointers (SQLite, Postgres), you may need to implement cleanup logic.
-    """
     try:
         print(f"API /session DELETE - thread: {thread_id}")
         
@@ -465,15 +430,42 @@ def delete_session(thread_id: str):
         raise HTTPException(status_code=500, detail=f"Error deleting session: {str(e)}")
 
 
+@app.get("/test/personas", response_model=PersonasListResponse)
+def list_available_personas():
+    try:
+        print("API /test/personas - listing available personas")
+        
+        # Convert personas to PersonaInfo objects
+        persona_infos = [
+            PersonaInfo(
+                name=p.name,
+                description=p.description,
+                sample_phrases=p.sample_phrases
+            )
+            for p in personas
+        ]
+        
+        return PersonasListResponse(
+            success=True,
+            personas=persona_infos,
+            total=len(persona_infos),
+            message="Available test personas retrieved successfully"
+        )
+        
+    except Exception as e:
+        print(f"API error in /test/personas: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving personas: {str(e)}")
+
+
 @app.post("/test/persona")
 def test_with_persona(request: TestPersonaRequest):
-    """
-    Test endpoint to create a session with predefined persona
-    
-    Useful for automated testing with different student behaviors.
-    """
     try:
         print(f"API /test/persona - persona: {request.persona_name}, concept: {request.concept_title}")
+        
+        # Validate persona name (optional - warn if not in predefined list)
+        available_persona_names = [p.name for p in personas]
+        if request.persona_name not in available_persona_names:
+            print(f"⚠️  Warning: '{request.persona_name}' is not a predefined persona. Available: {available_persona_names}")
         
         # Create session with persona
         start_request = StartSessionRequest(
@@ -491,13 +483,6 @@ def test_with_persona(request: TestPersonaRequest):
 
 @app.get("/sessions")
 def list_sessions():
-    """
-    List all active sessions (debugging endpoint)
-    
-    Note: This functionality is limited with checkpoint-based persistence.
-    The checkpointer doesn't provide a way to list all thread_ids.
-    This endpoint now returns an informational message.
-    """
     try:
         return {
             "success": True,
@@ -511,32 +496,38 @@ def list_sessions():
         raise HTTPException(status_code=500, detail=f"Error listing sessions: {str(e)}")
 
 
-# ============================================================================
-# MAIN ENTRY POINT
-# ============================================================================
+print("=" * 80)
+print("🎓 Educational Agent API Server Starting...")
+print("=" * 80)
+print(f"Agent Type: educational_agent_optimized_langsmith")
+print(f"Default Concept: {concept_pkg.title}")
+print(f"Persistence: InMemorySaver (LangGraph)")
+print("=" * 80)
+print("Available Endpoints:")
+print("  GET  / - API information")
+print("  GET  /health - Health check")
+print("  POST /session/start - Start new learning session")
+print("  POST /session/continue - Continue existing session")
+print("  GET  /session/status/{thread_id} - Get session status")
+print("  GET  /session/history/{thread_id} - Get conversation history")
+print("  GET  /session/summary/{thread_id} - Get session summary")
+print("  DELETE /session/{thread_id} - Delete session")
+print("  GET  /test/personas - List available test personas")
+print("  POST /test/persona - Test with predefined persona")
+print("  GET  /sessions - List all active sessions")
+print("=" * 80)
+print(f"Available Test Personas: {len(personas)}")
+for p in personas:
+    print(f"  - {p.name}: {p.description}")
+print("=" * 80)
+print("Starting server on http://0.0.0.0:8000")
+print("API Docs available at http://localhost:8000/docs")
+print("=" * 80)
 
-if __name__ == "__main__":
-    print("=" * 80)
-    print("🎓 Educational Agent API Server Starting...")
-    print("=" * 80)
-    print(f"Agent Type: educational_agent_optimized_langsmith")
-    print(f"Default Concept: {concept_pkg.title}")
-    print(f"Persistence: InMemorySaver (LangGraph)")
-    print("=" * 80)
-    print("Available Endpoints:")
-    print("  GET  / - API information")
-    print("  GET  /health - Health check")
-    print("  POST /session/start - Start new learning session")
-    print("  POST /session/continue - Continue existing session")
-    print("  GET  /session/status/{thread_id} - Get session status")
-    print("  GET  /session/history/{thread_id} - Get conversation history")
-    print("  GET  /session/summary/{thread_id} - Get session summary")
-    print("  DELETE /session/{thread_id} - Delete session")
-    print("  POST /test/persona - Test with predefined persona")
-    print("  GET  /sessions - List all active sessions")
-    print("=" * 80)
-    print("Starting server on http://0.0.0.0:8000")
-    print("API Docs available at http://localhost:8000/docs")
-    print("=" * 80)
-    
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+###To Do for now:
+#1. Write postgres specific deletion logic.
+#2. Think about the list_sessions endpoint more.(Maybe not needed/can't be implemented)
+#3. How will the test personas talk to agent via endpoint?Right now we have to call continue everytime after starting a session with a persona.

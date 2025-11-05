@@ -46,7 +46,10 @@ class SessionStatusRequest(BaseModel):
 class TestPersonaRequest(BaseModel):
     persona_name: str = Field(
         ..., 
-        description="Persona to test: 'Confused Student', 'Distracted Student', 'Dull Student', etc."
+        description="Persona to test. Available: 'Eager Student' (engaged & motivated), "
+                    "'Confused Student' (struggling to understand), "
+                    "'Distracted Student' (easily distracted, off-topic), "
+                    "'Dull Student' (not very bright, needs extra help)"
     )
     concept_title: str = Field(
         default="Pendulum and its Time Period",
@@ -126,3 +129,18 @@ class ErrorResponse(BaseModel):
     success: bool = False
     error: str
     detail: Optional[str] = None
+
+
+class PersonaInfo(BaseModel):
+    """Information about a test persona"""
+    name: str
+    description: str
+    sample_phrases: List[str]
+
+
+class PersonasListResponse(BaseModel):
+    """Response listing all available test personas"""
+    success: bool = True
+    personas: List[PersonaInfo]
+    total: int
+    message: str = "Available test personas retrieved successfully"
