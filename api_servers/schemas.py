@@ -1,6 +1,3 @@
-"""
-Pydantic schemas for Educational Agent API
-"""
 from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any, List
 
@@ -10,7 +7,6 @@ from typing import Optional, Dict, Any, List
 # ============================================================================
 
 class StartSessionRequest(BaseModel):
-    """Request to start a new learning session"""
     concept_title: str = Field(
         ..., 
         description="The concept to teach (e.g., 'Pendulum and its Time Period')"
@@ -30,7 +26,6 @@ class StartSessionRequest(BaseModel):
 
 
 class ContinueSessionRequest(BaseModel):
-    """Request to continue an existing session with user input"""
     thread_id: str = Field(
         ..., 
         description="The thread ID of the session to continue"
@@ -42,7 +37,6 @@ class ContinueSessionRequest(BaseModel):
 
 
 class SessionStatusRequest(BaseModel):
-    """Request to get status of a session"""
     thread_id: str = Field(
         ..., 
         description="The thread ID of the session"
@@ -50,7 +44,6 @@ class SessionStatusRequest(BaseModel):
 
 
 class TestPersonaRequest(BaseModel):
-    """Request to test with a predefined persona"""
     persona_name: str = Field(
         ..., 
         description="Persona to test: 'Confused Student', 'Distracted Student', 'Dull Student', etc."
@@ -66,7 +59,6 @@ class TestPersonaRequest(BaseModel):
 # ============================================================================
 
 class StartSessionResponse(BaseModel):
-    """Response when starting a new session"""
     success: bool
     session_id: str
     thread_id: str
@@ -79,7 +71,6 @@ class StartSessionResponse(BaseModel):
 
 
 class ContinueSessionResponse(BaseModel):
-    """Response when continuing a session"""
     success: bool
     thread_id: str
     agent_response: str
@@ -92,7 +83,6 @@ class ContinueSessionResponse(BaseModel):
 
 
 class SessionStatusResponse(BaseModel):
-    """Response with session status and progress"""
     success: bool
     thread_id: str
     exists: bool
@@ -103,7 +93,6 @@ class SessionStatusResponse(BaseModel):
 
 
 class SessionHistoryResponse(BaseModel):
-    """Response with full conversation history"""
     success: bool
     thread_id: str
     exists: bool
@@ -114,7 +103,6 @@ class SessionHistoryResponse(BaseModel):
 
 
 class SessionSummaryResponse(BaseModel):
-    """Response with session summary and metrics"""
     success: bool
     thread_id: str
     exists: bool
@@ -127,7 +115,6 @@ class SessionSummaryResponse(BaseModel):
 
 
 class HealthResponse(BaseModel):
-    """Health check response"""
     status: str
     version: str
     persistence: str
@@ -136,7 +123,6 @@ class HealthResponse(BaseModel):
 
 
 class ErrorResponse(BaseModel):
-    """Error response"""
     success: bool = False
     error: str
     detail: Optional[str] = None
