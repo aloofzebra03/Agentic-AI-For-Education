@@ -5,6 +5,8 @@ Streamlit_UI/app_graph.py
 Streamlit_UI/app_gt.py
 Streamlit_UI/app_optimized_animation copy.py
 Streamlit_UI/app_optimized_animation.py
+Streamlit_UI/app_optimized_animation_kannada copy 2.py
+Streamlit_UI/app_optimized_animation_kannada copy 3.py
 Streamlit_UI/app_optimized_animation_kannada copy.py
 Streamlit_UI/app_optimized_animation_kannada.py
 Streamlit_UI/app_optimized_animation_old.py
@@ -15,6 +17,10 @@ agentic_ai_for_education.egg-info/SOURCES.txt
 agentic_ai_for_education.egg-info/dependency_links.txt
 agentic_ai_for_education.egg-info/requires.txt
 agentic_ai_for_education.egg-info/top_level.txt
+api_servers/__init__.py
+api_servers/api_server.py
+api_servers/schemas.py
+api_servers/test_api.py
 educational_agent_optimized_langsmith/__init__.py
 educational_agent_optimized_langsmith/agent.py
 educational_agent_optimized_langsmith/config.py

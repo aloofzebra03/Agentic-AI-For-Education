@@ -524,7 +524,7 @@ print("Starting server on http://0.0.0.0:8000")
 print("API Docs available at http://localhost:8000/docs")
 print("=" * 80)
 
-uvicorn.run(app, host="0.0.0.0", port=8000)
+# uvicorn.run(app, host="0.0.0.0", port=8000)
 
 
 ###To Do for now:
