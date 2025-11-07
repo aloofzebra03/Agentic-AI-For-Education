@@ -9,51 +9,48 @@ from typing import Optional, Dict, Any, List
 class StartSessionRequest(BaseModel):
     concept_title: str = Field(
         ..., 
-        description="The concept to teach (e.g., 'Pendulum and its Time Period')"
+        description="The educational concept to teach (e.g., 'Pendulum and its Time Period', 'Photosynthesis')"
     )
     student_id: Optional[str] = Field(
         None, 
-        description="Optional student identifier for tracking"
+        description="Optional unique identifier for the student (for tracking and analytics)"
     )
     persona_name: Optional[str] = Field(
         None, 
-        description="Optional persona name for testing (e.g., 'Confused Student')"
+        description="Optional test persona name for simulated student behavior (e.g., 'Confused Student', 'Eager Student')"
     )
     session_label: Optional[str] = Field(
         None, 
-        description="Optional custom session label"
+        description="Optional custom label for this session (used in thread_id generation)"
     )
 
 
 class ContinueSessionRequest(BaseModel):
     thread_id: str = Field(
         ..., 
-        description="The thread ID of the session to continue"
+        description="The unique thread ID of the session to continue (returned from /session/start)"
     )
     user_message: str = Field(
         ..., 
-        description="The student's message/response"
+        description="The student's message or response to the agent's previous question"
     )
 
 
 class SessionStatusRequest(BaseModel):
     thread_id: str = Field(
         ..., 
-        description="The thread ID of the session"
+        description="The unique thread ID of the session to check"
     )
 
 
 class TestPersonaRequest(BaseModel):
     persona_name: str = Field(
         ..., 
-        description="Persona to test. Available: 'Eager Student' (engaged & motivated), "
-                    "'Confused Student' (struggling to understand), "
-                    "'Distracted Student' (easily distracted, off-topic), "
-                    "'Dull Student' (not very bright, needs extra help)"
+        description="Name of the test persona."
     )
     concept_title: str = Field(
         default="Pendulum and its Time Period",
-        description="Concept to teach"
+        description="The educational concept to teach to the test persona"
     )
 
 
@@ -62,115 +59,271 @@ class TestPersonaRequest(BaseModel):
 # ============================================================================
 
 class SessionMetadata(BaseModel):
-    """Fixed structure for session metadata - always includes all fields"""
+
     # Simulation flags
-    show_simulation: bool = False
-    simulation_config: Optional[Dict[str, Any]] = None
+    show_simulation: bool = Field(
+        default=False,
+        description="Whether a simulation should be displayed to the student. When true, check simulation_config for parameters."
+    )
+    simulation_config: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Configuration for the simulation (type, parameters, etc.). Empty dict if no simulation is active."
+    )
     
-    # Image metadata (only image URL and node where it appeared)
-    image_url: Optional[str] = None
-    image_node: Optional[str] = None
+    # Image metadata
+    image_url: str = Field(
+        default=None,
+        description="Base64-encoded image URL (e.g., 'data:image/png;base64,...'). None if no image is present."
+    )
+    image_node: str = Field(
+        default=None,
+        description="The pedagogical node where the image was generated (e.g., 'CI', 'GE', 'APK'). None if no image."
+    )
     
     # Scores and progress
-    quiz_score: Optional[float] = None
-    retrieval_score: Optional[float] = None
+    quiz_score: float = Field(
+        default=-1.0,
+        description="Student's quiz performance score from 0.0 to 1.0. Set to -1.0 if no quiz has been taken yet."
+    )
+    retrieval_score: float = Field(
+        default=-1.0,
+        description="RAG retrieval confidence score from 0.0 to 1.0. Set to -1.0 if no retrieval has occurred."
+    )
     
     # Concept tracking
-    sim_concepts: Optional[List[str]] = None
-    sim_current_idx: Optional[int] = None
-    sim_total_concepts: Optional[int] = None
+    sim_concepts: List[str] = Field(
+        default_factory=list,
+        description="List of concepts in the simulation learning sequence. Empty list if not in simulation mode."
+    )
+    sim_current_idx: int = Field(
+        default=-1,
+        description="Index of the current concept being taught in simulation (0-based). Set to -1 if not in simulation."
+    )
+    sim_total_concepts: int = Field(
+        default=0,
+        description="Total number of concepts in the simulation sequence. Set to 0 if not in simulation mode."
+    )
     
     # Misconception tracking
-    misconception_detected: bool = False
-    last_correction: Optional[str] = None
+    misconception_detected: bool = Field(
+        default=False,
+        description="Whether a misconception was detected in the student's latest response."
+    )
+    last_correction: str = Field(
+        default="",
+        description="The correction message provided for the most recent misconception. Empty string if no misconception."
+    )
     
     # Node transitions
-    node_transitions: Optional[List[Dict[str, Any]]] = None
+    node_transitions: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="History of pedagogical node transitions (e.g., [{from: 'APK', to: 'CI', timestamp: '...'}]). Empty list at session start."
+    )
 
 
 class StartSessionResponse(BaseModel):
-    success: bool
-    session_id: str
-    thread_id: str
-    user_id: str
-    agent_response: str
-    current_state: str
-    concept_title: str
-    message: str = "Session started successfully"
+    success: bool = Field(
+        description="Whether the session was started successfully"
+    )
+    session_id: str = Field(
+        description="Unique session identifier for tracking purposes"
+    )
+    thread_id: str = Field(
+        description="Unique thread ID for continuing this session (store this on client side)"
+    )
+    user_id: str = Field(
+        description="User identifier ('anonymous' if not provided in request)"
+    )
+    agent_response: str = Field(
+        description="The agent's initial greeting or first teaching message"
+    )
+    current_state: str = Field(
+        description="Current pedagogical node/state (e.g., 'APK', 'CI', 'GE', 'AR', 'TC', 'RLC', 'END')"
+    )
+    concept_title: str = Field(
+        description="The concept being taught in this session"
+    )
+    message: str = Field(
+        default="Session started successfully",
+        description="Status message about the session creation"
+    )
     metadata: SessionMetadata = Field(
         default_factory=SessionMetadata,
-        description="Session metadata with consistent structure"
+        description="Session metadata with scores, images, simulation status, etc."
     )
 
 
 class ContinueSessionResponse(BaseModel):
-    success: bool
-    thread_id: str
-    agent_response: str
-    current_state: str
+    success: bool = Field(
+        description="Whether the agent response was generated successfully"
+    )
+    thread_id: str = Field(
+        description="The thread ID of this session (same as request)"
+    )
+    agent_response: str = Field(
+        description="The agent's response to the student's message (teaching, questions, feedback, etc.)"
+    )
+    current_state: str = Field(
+        description="Current pedagogical node/state after processing the student's message"
+    )
     metadata: SessionMetadata = Field(
         default_factory=SessionMetadata,
-        description="Session metadata with consistent structure"
+        description="Session metadata with scores, images, simulation status, misconceptions, etc."
     )
-    message: str = "Response generated successfully"
+    message: str = Field(
+        default="Response generated successfully",
+        description="Status message about the response generation"
+    )
 
 
 class SessionStatusResponse(BaseModel):
-    success: bool
-    thread_id: str
-    exists: bool
-    current_state: Optional[str] = None
-    progress: Optional[Dict[str, Any]] = None
-    concept_title: Optional[str] = None
-    message: str = "Status retrieved successfully"
+    success: bool = Field(
+        description="Whether the status was retrieved successfully"
+    )
+    thread_id: str = Field(
+        description="The thread ID of the session"
+    )
+    exists: bool = Field(
+        description="Whether the session exists in the checkpoint store"
+    )
+    current_state: Optional[str] = Field(
+        None,
+        description="Current pedagogical node if session exists (e.g., 'APK', 'CI', 'GE')"
+    )
+    progress: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Progress information: nodes visited (asked_apk, asked_ci, etc.), concepts, simulation status"
+    )
+    concept_title: Optional[str] = Field(
+        None,
+        description="The concept being taught in this session"
+    )
+    message: str = Field(
+        default="Status retrieved successfully",
+        description="Status message about the retrieval"
+    )
 
 
 class SessionHistoryResponse(BaseModel):
-    success: bool
-    thread_id: str
-    exists: bool
-    messages: List[Dict[str, Any]] = Field(default_factory=list)
-    node_transitions: List[Dict[str, Any]] = Field(default_factory=list)
-    concept_title: Optional[str] = None
-    message: str = "History retrieved successfully"
+    success: bool = Field(
+        description="Whether the history was retrieved successfully"
+    )
+    thread_id: str = Field(
+        description="The thread ID of the session"
+    )
+    exists: bool = Field(
+        description="Whether the session exists in the checkpoint store"
+    )
+    messages: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="List of conversation messages with role ('user' or 'assistant'), content, and node information"
+    )
+    node_transitions: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="History of pedagogical node transitions during the session"
+    )
+    concept_title: Optional[str] = Field(
+        None,
+        description="The concept being taught in this session"
+    )
+    message: str = Field(
+        default="History retrieved successfully",
+        description="Status message about the retrieval"
+    )
 
 
 class SessionSummaryResponse(BaseModel):
-    success: bool
-    thread_id: str
-    exists: bool
-    summary: Optional[Dict[str, Any]] = None
-    quiz_score: Optional[float] = None
-    transfer_success: Optional[bool] = None
-    misconception_detected: Optional[bool] = None
-    definition_echoed: Optional[bool] = None
-    message: str = "Summary retrieved successfully"
+    success: bool = Field(
+        description="Whether the summary was retrieved successfully"
+    )
+    thread_id: str = Field(
+        description="The thread ID of the session"
+    )
+    exists: bool = Field(
+        description="Whether the session exists in the checkpoint store"
+    )
+    summary: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Detailed session summary with learning outcomes and metrics"
+    )
+    quiz_score: Optional[float] = Field(
+        None,
+        description="Final quiz score from 0.0 to 1.0 (null if no quiz taken)"
+    )
+    transfer_success: Optional[bool] = Field(
+        None,
+        description="Whether knowledge transfer was successful (null if not assessed)"
+    )
+    misconception_detected: Optional[bool] = Field(
+        None,
+        description="Whether any misconceptions were detected during the session"
+    )
+    definition_echoed: Optional[bool] = Field(
+        None,
+        description="Whether the student successfully echoed/restated the definition"
+    )
+    message: str = Field(
+        default="Summary retrieved successfully",
+        description="Status message about the retrieval"
+    )
 
 
 class HealthResponse(BaseModel):
-    status: str
-    version: str
-    persistence: str
-    agent_type: str
-    available_endpoints: List[str]
+    status: str = Field(
+        description="Health status of the API (e.g., 'healthy')"
+    )
+    version: str = Field(
+        description="API version number"
+    )
+    persistence: str = Field(
+        description="Type of persistence/checkpoint storage being used (e.g., 'InMemorySaver', 'PostgreSQL')"
+    )
+    agent_type: str = Field(
+        description="Type of educational agent being used"
+    )
+    available_endpoints: List[str] = Field(
+        description="List of all available API endpoints"
+    )
 
 
 class ErrorResponse(BaseModel):
-    success: bool = False
-    error: str
-    detail: Optional[str] = None
+    success: bool = Field(
+        default=False,
+        description="Always false for error responses"
+    )
+    error: str = Field(
+        description="Short error type or category"
+    )
+    detail: Optional[str] = Field(
+        None,
+        description="Detailed error message explaining what went wrong"
+    )
 
 
 class PersonaInfo(BaseModel):
-    """Information about a test persona"""
-    name: str
-    description: str
-    sample_phrases: List[str]
+    name: str = Field(
+        description="Name of the persona (e.g., 'Eager Student', 'Confused Student')"
+    )
+    description: str = Field(
+        description="Description of the persona's behavior and characteristics"
+    )
+    sample_phrases: List[str] = Field(
+        description="Example phrases this persona might use when responding to the agent"
+    )
 
 
 class PersonasListResponse(BaseModel):
-    """Response listing all available test personas"""
-    success: bool = True
-    personas: List[PersonaInfo]
-    total: int
-    message: str = "Available test personas retrieved successfully"
+    success: bool = Field(
+        default=True,
+        description="Whether the personas were retrieved successfully"
+    )
+    personas: List[PersonaInfo] = Field(
+        description="List of available test personas with their details"
+    )
+    total: int = Field(
+        description="Total number of available personas"
+    )
+    message: str = Field(
+        default="Available test personas retrieved successfully",
+        description="Status message about the retrieval"
+    )

@@ -72,42 +72,42 @@ def get_state_from_checkpoint(thread_id: str) -> Optional[Dict[str, Any]]:
 
 def extract_metadata_from_state(state: Dict[str, Any]):
     """Extract metadata from state with consistent structure.
-    Returns SessionMetadata object with all fields always present."""
+    Returns SessionMetadata object with all fields always present (no None values)."""
     from api_servers.schemas import SessionMetadata
     
     # Extract image metadata (only image URL and node)
-    image_url = None
-    image_node = None
+    image_url = ""
+    image_node = ""
     enhanced_meta = state.get("enhanced_message_metadata")
     if enhanced_meta:
-        image_url = enhanced_meta.get("image")
-        image_node = enhanced_meta.get("node")
+        image_url = enhanced_meta.get("image", "")
+        image_node = enhanced_meta.get("node", "")
     
-    # Build metadata with consistent structure - all fields always present
+    # Build metadata with consistent structure - all fields present with defaults
     return SessionMetadata(
         # Simulation flags
         show_simulation=state.get("show_simulation", False),
-        simulation_config=state.get("simulation_config") if state.get("show_simulation") else None,
+        simulation_config=state.get("simulation_config", {}) if state.get("show_simulation") else {},
         
         # Image metadata
         image_url=image_url,
         image_node=image_node,
         
-        # Scores and progress
-        quiz_score=state.get("quiz_score"),
-        retrieval_score=state.get("retrieval_score"),
+        # Scores and progress (-1.0 means not set yet)
+        quiz_score=state.get("quiz_score", -1.0) if state.get("quiz_score") is not None else -1.0,
+        retrieval_score=state.get("retrieval_score", -1.0) if state.get("retrieval_score") is not None else -1.0,
         
         # Concept tracking
-        sim_concepts=state.get("sim_concepts"),
-        sim_current_idx=state.get("sim_current_idx"),
-        sim_total_concepts=state.get("sim_total_concepts"),
+        sim_concepts=state.get("sim_concepts", []),
+        sim_current_idx=state.get("sim_current_idx", -1),
+        sim_total_concepts=state.get("sim_total_concepts", 0),
         
         # Misconception tracking
         misconception_detected=state.get("misconception_detected", False),
-        last_correction=state.get("last_correction"),
+        last_correction=state.get("last_correction", ""),
         
         # Node transitions
-        node_transitions=state.get("node_transitions")
+        node_transitions=state.get("node_transitions", [])
     )
 
 
