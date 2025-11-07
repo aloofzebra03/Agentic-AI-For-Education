@@ -61,6 +61,33 @@ class TestPersonaRequest(BaseModel):
 # RESPONSE MODELS
 # ============================================================================
 
+class SessionMetadata(BaseModel):
+    """Fixed structure for session metadata - always includes all fields"""
+    # Simulation flags
+    show_simulation: bool = False
+    simulation_config: Optional[Dict[str, Any]] = None
+    
+    # Image metadata (only image URL and node where it appeared)
+    image_url: Optional[str] = None
+    image_node: Optional[str] = None
+    
+    # Scores and progress
+    quiz_score: Optional[float] = None
+    retrieval_score: Optional[float] = None
+    
+    # Concept tracking
+    sim_concepts: Optional[List[str]] = None
+    sim_current_idx: Optional[int] = None
+    sim_total_concepts: Optional[int] = None
+    
+    # Misconception tracking
+    misconception_detected: bool = False
+    last_correction: Optional[str] = None
+    
+    # Node transitions
+    node_transitions: Optional[List[Dict[str, Any]]] = None
+
+
 class StartSessionResponse(BaseModel):
     success: bool
     session_id: str
@@ -70,7 +97,10 @@ class StartSessionResponse(BaseModel):
     current_state: str
     concept_title: str
     message: str = "Session started successfully"
-    metadata: Optional[Dict[str, Any]] = None
+    metadata: SessionMetadata = Field(
+        default_factory=SessionMetadata,
+        description="Session metadata with consistent structure"
+    )
 
 
 class ContinueSessionResponse(BaseModel):
@@ -78,9 +108,9 @@ class ContinueSessionResponse(BaseModel):
     thread_id: str
     agent_response: str
     current_state: str
-    metadata: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Additional metadata: scores, images, simulation configs, etc."
+    metadata: SessionMetadata = Field(
+        default_factory=SessionMetadata,
+        description="Session metadata with consistent structure"
     )
     message: str = "Response generated successfully"
 

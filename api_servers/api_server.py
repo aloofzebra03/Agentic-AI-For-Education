@@ -70,41 +70,45 @@ def get_state_from_checkpoint(thread_id: str) -> Optional[Dict[str, Any]]:
         return None
 
 
-def extract_metadata_from_state(state: Dict[str, Any]) -> Dict[str, Any]:
-    metadata = {}
+def extract_metadata_from_state(state: Dict[str, Any]):
+    """Extract metadata from state with consistent structure.
+    Returns SessionMetadata object with all fields always present."""
+    from api_servers.schemas import SessionMetadata
     
-    # Simulation flags
-    if state.get("show_simulation"):
-        metadata["show_simulation"] = True
-        metadata["simulation_config"] = state.get("simulation_config", {})
+    # Extract image metadata (only image URL and node)
+    image_url = None
+    image_node = None
+    enhanced_meta = state.get("enhanced_message_metadata")
+    if enhanced_meta:
+        image_url = enhanced_meta.get("image")
+        image_node = enhanced_meta.get("node")
     
-    # Image metadata
-    if state.get("enhanced_message_metadata"):
-        metadata["enhanced_message_metadata"] = state["enhanced_message_metadata"]
-    
-    # Scores and progress
-    if state.get("quiz_score") is not None:
-        metadata["quiz_score"] = state["quiz_score"]
-    
-    if state.get("retrieval_score") is not None:
-        metadata["retrieval_score"] = state["retrieval_score"]
-    
-    # Current concept tracking
-    if state.get("sim_concepts"):
-        metadata["sim_concepts"] = state["sim_concepts"]
-        metadata["sim_current_idx"] = state.get("sim_current_idx", 0)
-        metadata["sim_total_concepts"] = state.get("sim_total_concepts", len(state["sim_concepts"]))
-    
-    # Misconception tracking
-    if state.get("misconception_detected"):
-        metadata["misconception_detected"] = True
-        metadata["last_correction"] = state.get("last_correction", "")
-    
-    # Node transition info
-    if state.get("node_transitions"):
-        metadata["node_transitions"] = state["node_transitions"]
-    
-    return metadata
+    # Build metadata with consistent structure - all fields always present
+    return SessionMetadata(
+        # Simulation flags
+        show_simulation=state.get("show_simulation", False),
+        simulation_config=state.get("simulation_config") if state.get("show_simulation") else None,
+        
+        # Image metadata
+        image_url=image_url,
+        image_node=image_node,
+        
+        # Scores and progress
+        quiz_score=state.get("quiz_score"),
+        retrieval_score=state.get("retrieval_score"),
+        
+        # Concept tracking
+        sim_concepts=state.get("sim_concepts"),
+        sim_current_idx=state.get("sim_current_idx"),
+        sim_total_concepts=state.get("sim_total_concepts"),
+        
+        # Misconception tracking
+        misconception_detected=state.get("misconception_detected", False),
+        last_correction=state.get("last_correction"),
+        
+        # Node transitions
+        node_transitions=state.get("node_transitions")
+    )
 
 
 def get_history_from_state(state: Dict[str, Any]) -> list[Dict[str, Any]]:
