@@ -334,7 +334,6 @@ class PersonasListResponse(BaseModel):
 
 
 class TestImageRequest(BaseModel):
-    """Request to get a specific image for a concept."""
     concept_title: str = Field(
         ...,
         description="The concept to get an image for (e.g., 'Pendulum and its Time Period')"
@@ -346,7 +345,6 @@ class TestImageRequest(BaseModel):
 
 
 class TestImageResponse(BaseModel):
-    """Response containing image URL and metadata."""
     success: bool = Field(
         description="Whether the image was retrieved successfully"
     )
@@ -367,19 +365,17 @@ class TestImageResponse(BaseModel):
 
 
 class TestSimulationRequest(BaseModel):
-    """Request to get simulation configuration for a concept."""
     concept_title: str = Field(
         ...,
         description="The concept to get simulation config for (e.g., 'Pendulum and its Time Period')"
     )
     simulation_type: Optional[str] = Field(
         default=None,
-        description="Optional specific simulation type (e.g., 'pendulum_motion', 'pendulum_energy')"
+        description="Optional specific simulation type (e.g., independent variable to vary like 'length', 'gravity', etc.)"
     )
 
 
 class TestSimulationResponse(BaseModel):
-    """Response containing simulation configuration."""
     success: bool = Field(
         description="Whether the simulation config was retrieved successfully"
     )

@@ -515,8 +515,7 @@ def get_test_image(request: TestImageRequest):
     try:
         print(f"API /test/images - concept: {request.concept_title}")
         
-        # Get image using the same function used in the agent
-        selected_image = select_most_relevant_image_for_concept_introduction(
+        selected_image = select_most_relevant_image_for_concept_introduction( #Same function is called by the agent when selecting images
             concept=request.concept_title,
             definition_context=request.definition_context or f"Learning about {request.concept_title}"
         )
@@ -548,29 +547,17 @@ def get_test_simulation(request: TestSimulationRequest):
     try:
         print(f"API /test/simulation - concept: {request.concept_title}, type: {request.simulation_type}")
         
-        # Create a simple simulation config
-        # For a full simulation, you'd need variables and action_config
-        # This is a simplified version for testing
-        
         # Example variables for pendulum
         example_variables = [
             {"name": "length", "role": "Independent Variable", "note": "Length of pendulum string"},
             {"name": "time_period", "role": "Dependent Variable", "note": "Time for one complete oscillation"}
         ]
         
-        # Example action config
-        example_action_config = {
-            "action": "vary",
-            "variable": "length",
-            "values": [0.5, 1.0, 1.5],
-            "observe": "time_period"
-        }
-        
-        # Create simulation config
-        simulation_config = create_simulation_config(
+        # Create simulation config using the simulation_type from user input
+        simulation_config = create_simulation_config( #Same function is called by the agent when simulation config needed
             variables=example_variables,
             concept=request.concept_title,
-            action_config=example_action_config
+            simulation_type=request.simulation_type  # Use the simulation_type provided by user
         )
         
         return TestSimulationResponse(

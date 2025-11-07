@@ -406,16 +406,9 @@ def get_ground_truth_from_json(concept: str, section_name: str) -> str:
 # Simulation configuration helpers
 # ─────────────────────────────────────────────────────────────────────
 
-def create_simulation_config(variables: List, concept: str, action_config: Dict) -> Dict:
-    """
-    Create simulation configuration based on variables and action.
-    Maps physics concepts to pendulum parameters.
-    
-    Args:
-        variables: List of variable dictionaries with keys 'name', 'role', 'note'
-        concept: The concept name string
-        action_config: Dictionary with action configuration
-    """
+def create_simulation_config(variables: List, concept: str, action_config: Optional[Dict] = None) -> Dict:
+
+    action_config = action_config or {}
     # Default parameters
     base_params = {"length": 1.0, "gravity": 9.8, "amplitude": 75, "mass": 1.0}
     
@@ -489,7 +482,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Dict)
             "agent_message": "I'll show you how changing length affects both period and frequency - watch this demonstration..."
         }
     else:
-            raise ValueError(f"Unrecognized independent variable '{independent_var}' for concept: {concept}")
+        raise ValueError(f"Unrecognized independent variable '{independent_var}' for concept: {concept}")
 
 
 def select_most_relevant_image_for_concept_introduction(concept: str, definition_context: str) -> Optional[Dict]:
