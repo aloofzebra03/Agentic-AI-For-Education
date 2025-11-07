@@ -72,16 +72,16 @@ def get_state_from_checkpoint(thread_id: str) -> Optional[Dict[str, Any]]:
 
 def extract_metadata_from_state(state: Dict[str, Any]):
     """Extract metadata from state with consistent structure.
-    Returns SessionMetadata object with all fields always present (no None values)."""
+    Returns SessionMetadata object with all fields always present."""
     from api_servers.schemas import SessionMetadata
     
     # Extract image metadata (only image URL and node)
-    image_url = ""
-    image_node = ""
+    image_url = None
+    image_node = None
     enhanced_meta = state.get("enhanced_message_metadata")
     if enhanced_meta:
-        image_url = enhanced_meta.get("image", "")
-        image_node = enhanced_meta.get("node", "")
+        image_url = enhanced_meta.get("image")
+        image_node = enhanced_meta.get("node")
     
     # Build metadata with consistent structure - all fields present with defaults
     return SessionMetadata(

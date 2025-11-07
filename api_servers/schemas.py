@@ -7,6 +7,7 @@ from typing import Optional, Dict, Any, List
 # ============================================================================
 
 class StartSessionRequest(BaseModel):
+    """Request to start a new learning session with the educational agent."""
     concept_title: str = Field(
         ..., 
         description="The educational concept to teach (e.g., 'Pendulum and its Time Period', 'Photosynthesis')"
@@ -26,6 +27,7 @@ class StartSessionRequest(BaseModel):
 
 
 class ContinueSessionRequest(BaseModel):
+    """Request to continue an existing learning session with a student's message."""
     thread_id: str = Field(
         ..., 
         description="The unique thread ID of the session to continue (returned from /session/start)"
@@ -37,6 +39,7 @@ class ContinueSessionRequest(BaseModel):
 
 
 class SessionStatusRequest(BaseModel):
+    """Request to get the current status of a learning session."""
     thread_id: str = Field(
         ..., 
         description="The unique thread ID of the session to check"
@@ -44,9 +47,10 @@ class SessionStatusRequest(BaseModel):
 
 
 class TestPersonaRequest(BaseModel):
+    """Request to start a test session with a predefined student persona."""
     persona_name: str = Field(
         ..., 
-        description="Name of the test persona."
+        description="Name of the test persona. Available: 'Eager Student', 'Confused Student', 'Distracted Student', 'Dull Student'"
     )
     concept_title: str = Field(
         default="Pendulum and its Time Period",
@@ -71,11 +75,11 @@ class SessionMetadata(BaseModel):
     )
     
     # Image metadata
-    image_url: str = Field(
+    image_url: Optional[str] = Field(
         default=None,
         description="Base64-encoded image URL (e.g., 'data:image/png;base64,...'). None if no image is present."
     )
-    image_node: str = Field(
+    image_node: Optional[str] = Field(
         default=None,
         description="The pedagogical node where the image was generated (e.g., 'CI', 'GE', 'APK'). None if no image."
     )
