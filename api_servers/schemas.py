@@ -331,3 +331,65 @@ class PersonasListResponse(BaseModel):
         default="Available test personas retrieved successfully",
         description="Status message about the retrieval"
     )
+
+
+class TestImageRequest(BaseModel):
+    """Request to get a specific image for a concept."""
+    concept_title: str = Field(
+        ...,
+        description="The concept to get an image for (e.g., 'Pendulum and its Time Period')"
+    )
+    definition_context: str = Field(
+        default="",
+        description="Optional definition/explanation context to help select the most relevant image"
+    )
+
+
+class TestImageResponse(BaseModel):
+    """Response containing image URL and metadata."""
+    success: bool = Field(
+        description="Whether the image was retrieved successfully"
+    )
+    concept: str = Field(
+        description="The concept the image is for"
+    )
+    image_url: Optional[str] = Field(
+        default=None,
+        description="Base64-encoded image URL. None if no image found."
+    )
+    image_description: Optional[str] = Field(
+        default=None,
+        description="Description of the image"
+    )
+    message: str = Field(
+        description="Status message about the retrieval"
+    )
+
+
+class TestSimulationRequest(BaseModel):
+    """Request to get simulation configuration for a concept."""
+    concept_title: str = Field(
+        ...,
+        description="The concept to get simulation config for (e.g., 'Pendulum and its Time Period')"
+    )
+    simulation_type: Optional[str] = Field(
+        default=None,
+        description="Optional specific simulation type (e.g., 'pendulum_motion', 'pendulum_energy')"
+    )
+
+
+class TestSimulationResponse(BaseModel):
+    """Response containing simulation configuration."""
+    success: bool = Field(
+        description="Whether the simulation config was retrieved successfully"
+    )
+    concept: str = Field(
+        description="The concept the simulation is for"
+    )
+    simulation_config: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Simulation configuration with type, parameters, agent message, etc."
+    )
+    message: str = Field(
+        description="Status message about the retrieval"
+    )

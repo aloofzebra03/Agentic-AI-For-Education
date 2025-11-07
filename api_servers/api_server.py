@@ -22,11 +22,19 @@ from api_servers.schemas import (
     SessionStatusRequest, SessionStatusResponse,
     SessionHistoryResponse, SessionSummaryResponse,
     TestPersonaRequest, HealthResponse, ErrorResponse,
-    PersonaInfo, PersonasListResponse
+    PersonaInfo, PersonasListResponse,
+    TestImageRequest, TestImageResponse,
+    TestSimulationRequest, TestSimulationResponse
 )
 
 # Import personas from tester_agent
 from tester_agent.personas import personas
+
+# Import utility functions for testing
+from utils.shared_utils import (
+    select_most_relevant_image_for_concept_introduction,
+    create_simulation_config
+)
 
 # ============================================================================
 # FASTAPI APP INITIALIZATION
@@ -71,8 +79,6 @@ def get_state_from_checkpoint(thread_id: str) -> Optional[Dict[str, Any]]:
 
 
 def extract_metadata_from_state(state: Dict[str, Any]):
-    """Extract metadata from state with consistent structure.
-    Returns SessionMetadata object with all fields always present."""
     from api_servers.schemas import SessionMetadata
     
     # Extract image metadata (only image URL and node)
@@ -154,7 +160,9 @@ def read_root():
             "GET  /session/summary/{thread_id} - Get session summary",
             "DELETE /session/{thread_id} - Delete session",
             "GET  /test/personas - List available test personas",
-            "POST /test/persona - Test with predefined persona"
+            "POST /test/persona - Test with predefined persona",
+            "POST /test/images - Get image for a concept",
+            "POST /test/simulation - Get simulation config for a concept"
         ]
     }
 
@@ -176,7 +184,9 @@ def health_check():
             "/session/summary/{thread_id}",
             "/session/{thread_id}",
             "/test/personas",
-            "/test/persona"
+            "/test/persona",
+            "/test/images",
+            "/test/simulation"
         ]
     )
 
@@ -500,6 +510,81 @@ def list_sessions():
         raise HTTPException(status_code=500, detail=f"Error listing sessions: {str(e)}")
 
 
+@app.post("/test/images", response_model=TestImageResponse)
+def get_test_image(request: TestImageRequest):
+    try:
+        print(f"API /test/images - concept: {request.concept_title}")
+        
+        # Get image using the same function used in the agent
+        selected_image = select_most_relevant_image_for_concept_introduction(
+            concept=request.concept_title,
+            definition_context=request.definition_context or f"Learning about {request.concept_title}"
+        )
+        
+        if selected_image:
+            return TestImageResponse(
+                success=True,
+                concept=request.concept_title,
+                image_url=selected_image.get("url"),
+                image_description=selected_image.get("description", ""),
+                message=f"Image retrieved successfully for '{request.concept_title}'"
+            )
+        else:
+            return TestImageResponse(
+                success=False,
+                concept=request.concept_title,
+                image_url=None,
+                image_description=None,
+                message=f"No image found for concept '{request.concept_title}'"
+            )
+        
+    except Exception as e:
+        print(f"API error in /test/images: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving image: {str(e)}")
+
+
+@app.post("/test/simulation", response_model=TestSimulationResponse)
+def get_test_simulation(request: TestSimulationRequest):
+    try:
+        print(f"API /test/simulation - concept: {request.concept_title}, type: {request.simulation_type}")
+        
+        # Create a simple simulation config
+        # For a full simulation, you'd need variables and action_config
+        # This is a simplified version for testing
+        
+        # Example variables for pendulum
+        example_variables = [
+            {"name": "length", "role": "Independent Variable", "note": "Length of pendulum string"},
+            {"name": "time_period", "role": "Dependent Variable", "note": "Time for one complete oscillation"}
+        ]
+        
+        # Example action config
+        example_action_config = {
+            "action": "vary",
+            "variable": "length",
+            "values": [0.5, 1.0, 1.5],
+            "observe": "time_period"
+        }
+        
+        # Create simulation config
+        simulation_config = create_simulation_config(
+            variables=example_variables,
+            concept=request.concept_title,
+            action_config=example_action_config
+        )
+        
+        return TestSimulationResponse(
+            success=True,
+            concept=request.concept_title,
+            simulation_config=simulation_config,
+            message=f"Simulation config retrieved successfully for '{request.concept_title}'"
+        )
+        
+    except Exception as e:
+        print(f"API error in /test/simulation: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving simulation config: {str(e)}")
+
+
 print("=" * 80)
 print("🎓 Educational Agent API Server Starting...")
 print("=" * 80)
@@ -518,6 +603,8 @@ print("  GET  /session/summary/{thread_id} - Get session summary")
 print("  DELETE /session/{thread_id} - Delete session")
 print("  GET  /test/personas - List available test personas")
 print("  POST /test/persona - Test with predefined persona")
+print("  POST /test/images - Get image for a concept")
+print("  POST /test/simulation - Get simulation config for a concept")
 print("  GET  /sessions - List all active sessions")
 print("=" * 80)
 print(f"Available Test Personas: {len(personas)}")
