@@ -239,7 +239,7 @@ g.add_edge("SIM_INSIGHT", "SIM_REFLECT")
 g.add_edge("SIM_REFLECT", "AR")   # After simulation, go to AR to ask question about the concept
 
 # checkpointer = InMemorySaver()
-# checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")
+checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")
 
 # Initialize PostgreSQL checkpointer
 try:
@@ -263,11 +263,10 @@ try:
 except Exception as e:
     print(f"❌ Error initializing Postgres checkpointer: {e}")
     raise e
-    # checkpointer = InMemorySaver()
 
 def build_graph():
     compiled = g.compile(
-        checkpointer=checkpointer,
+        # checkpointer=checkpointer,
         # checkpointer=CHECKPOINTER,
         interrupt_after=[
             "START", "APK", "CI","GE", "AR", "TC", "RLC",
