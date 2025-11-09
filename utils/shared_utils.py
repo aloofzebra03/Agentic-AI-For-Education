@@ -486,16 +486,6 @@ def create_simulation_config(variables: List, concept: str, action_config: Optio
 
 
 def select_most_relevant_image_for_concept_introduction(concept: str, definition_context: str) -> Optional[Dict]:
-    """
-    Use LLM to select the most pedagogically relevant image for concept introduction.
-    
-    Args:
-        concept: The concept name (e.g., "Pendulum and its Time Period")
-        definition_context: The definition/explanation being provided to student
-    
-    Returns:
-        Dict with 'url', 'description', 'relevance_reason' or None if no suitable image
-    """
     try:
         import json
         

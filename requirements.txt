@@ -311,6 +311,10 @@ zstandard
 pysqlite3-binary>=0.0.6
 onnx-asr[cpu,hub]
 
+# PostgreSQL support for LangGraph
+psycopg[binary]>=3.0.0
+psycopg-pool>=3.0.0
+
 # Install the current project in editable mode (equivalent to pip install -e .)
 -e .
 

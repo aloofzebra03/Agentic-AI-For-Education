@@ -429,16 +429,57 @@ def delete_session(thread_id: str):
                 "message": "Session not found"
             }
         
-        # Note: LangGraph checkpointer doesn't have a direct delete method
-        # For InMemorySaver, sessions are in-memory and will be cleared on restart
-        # For persistent storage, you'd need to implement custom cleanup
-        
-        return {
-            "success": True,
-            "thread_id": thread_id,
-            "message": "Session marked for cleanup (actual deletion depends on checkpointer type)"
-        }
+        try:
+            from educational_agent_optimized_langsmith.graph import checkpointer
             
+            # Get the connection pool from the checkpointer
+            if hasattr(checkpointer, 'conn'):
+                with checkpointer.conn.cursor() as cur:
+                    # Delete from checkpoints table where thread_id matches
+                    cur.execute(
+                        "DELETE FROM checkpoints WHERE thread_id = %s",
+                        (thread_id,)
+                    )
+                    deleted_checkpoints = cur.rowcount
+                    
+                    # Delete from checkpoint_writes table where thread_id matches
+                    cur.execute(
+                        "DELETE FROM checkpoint_writes WHERE thread_id = %s",
+                        (thread_id,)
+                    )
+                    deleted_writes = cur.rowcount
+                    
+                    # Delete from checkpoint_blobs table if it exists
+                    try:
+                        cur.execute(
+                            "DELETE FROM checkpoint_blobs WHERE thread_id = %s",
+                            (thread_id,)
+                        )
+                        deleted_blobs = cur.rowcount
+                    except:
+                        deleted_blobs = 0
+                    
+                    print(f"🗑️ Deleted {deleted_checkpoints} checkpoints, {deleted_writes} writes, {deleted_blobs} blobs for thread {thread_id}")
+                    
+                    return {
+                        "success": True,
+                        "thread_id": thread_id,
+                        "message": f"Session deleted successfully from Postgres (removed {deleted_checkpoints} checkpoint records)"
+                    }
+            else:
+                # Fallback for non-Postgres checkpointers (InMemorySaver)
+                return {
+                    "success": True,
+                    "thread_id": thread_id,
+                    "message": "Session marked for cleanup (in-memory session will be cleared on restart)"
+                }
+                
+        except Exception as delete_error:
+            print(f"Error during deletion: {delete_error}")
+            raise HTTPException(status_code=500, detail=f"Error deleting session from database: {str(delete_error)}")
+            
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"API error in DELETE /session: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error deleting session: {str(e)}")
@@ -495,21 +536,6 @@ def test_with_persona(request: TestPersonaRequest):
         raise HTTPException(status_code=500, detail=f"Error creating test session: {str(e)}")
 
 
-@app.get("/sessions")
-def list_sessions():
-    try:
-        return {
-            "success": True,
-            "message": "Session listing not available with checkpoint-based persistence",
-            "info": "Each Android device/user should maintain their own thread_id for session continuity",
-            "recommendation": "Store thread_id on the client side after session/start"
-        }
-        
-    except Exception as e:
-        print(f"API error in /sessions: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error listing sessions: {str(e)}")
-
-
 @app.post("/test/images", response_model=TestImageResponse)
 def get_test_image(request: TestImageRequest):
     try:
@@ -549,15 +575,13 @@ def get_test_simulation(request: TestSimulationRequest):
         
         # Example variables for pendulum
         example_variables = [
-            {"name": "length", "role": "Independent Variable", "note": "Length of pendulum string"},
-            {"name": "time_period", "role": "Dependent Variable", "note": "Time for one complete oscillation"}
+            {"name": f"{request.simulation_type}", "role": "Independent Variable", "note": f"{request.simulation_type} of pendulum string"},
         ]
         
         # Create simulation config using the simulation_type from user input
         simulation_config = create_simulation_config( #Same function is called by the agent when simulation config needed
             variables=example_variables,
             concept=request.concept_title,
-            simulation_type=request.simulation_type  # Use the simulation_type provided by user
         )
         
         return TestSimulationResponse(
@@ -592,7 +616,6 @@ print("  GET  /test/personas - List available test personas")
 print("  POST /test/persona - Test with predefined persona")
 print("  POST /test/images - Get image for a concept")
 print("  POST /test/simulation - Get simulation config for a concept")
-print("  GET  /sessions - List all active sessions")
 print("=" * 80)
 print(f"Available Test Personas: {len(personas)}")
 for p in personas:
@@ -605,7 +628,7 @@ print("=" * 80)
 # uvicorn.run(app, host="0.0.0.0", port=8000)
 
 
-###To Do for now:
-#1. Write postgres specific deletion logic.
-#2. Think about the list_sessions endpoint more.(Maybe not needed/can't be implemented)
-#3. How will the test personas talk to agent via endpoint?Right now we have to call continue everytime after starting a session with a persona.
+###To Do:
+#1. ✅ Write postgres specific deletion logic - DONE
+#2. ✅ Remove /sessions endpoint - DONE (useless endpoint removed)
+#3. How will the test personas talk to agent via endpoint? Right now we have to call continue everytime after starting a session with a persona.

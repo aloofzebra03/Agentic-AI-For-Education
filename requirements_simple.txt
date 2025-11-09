@@ -44,6 +44,8 @@ pydantic-settings
 
 # Environment variables
 python-dotenv
+psycopg[binary]>=3.0.0
+psycopg-pool>=3.0.0
 
 # HTTP client
 httpx

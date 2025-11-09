@@ -12,6 +12,9 @@ from langchain_core.messages import AnyMessage, HumanMessage, AIMessage
 # from langfuse import get_client
 # from langfuse.langchain import CallbackHandler
 from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.checkpoint.postgres import PostgresSaver
+from psycopg_pool import ConnectionPool
+
 
 from educational_agent_optimized_langsmith.main_nodes_simulation_agent_no_mh import (
     start_node, apk_node, ci_node, ge_node,
@@ -235,8 +238,32 @@ g.add_edge("SIM_OBSERVE", "SIM_INSIGHT")
 g.add_edge("SIM_INSIGHT", "SIM_REFLECT")
 g.add_edge("SIM_REFLECT", "AR")   # After simulation, go to AR to ask question about the concept
 
-checkpointer = InMemorySaver()
+# checkpointer = InMemorySaver()
 # checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")
+
+# Initialize PostgreSQL checkpointer
+try:
+    connection_kwargs = {
+        "autocommit": True,
+        "prepare_threshold": 0,
+    }
+    
+    postgres_url = os.getenv('POSTGRES_DATABASE_URL')
+    if not postgres_url:
+        raise ValueError("POSTGRES_DATABASE_URL environment variable is not set")
+    
+    pool = ConnectionPool(
+        conninfo=postgres_url,
+        max_size=20,
+        kwargs=connection_kwargs,
+    )
+    checkpointer = PostgresSaver(pool)
+    checkpointer.setup()  # Create tables if they don't exist
+    print("✅ Postgres checkpointer initialized successfully")
+except Exception as e:
+    print(f"❌ Error initializing Postgres checkpointer: {e}")
+    raise e
+    # checkpointer = InMemorySaver()
 
 def build_graph():
     compiled = g.compile(
