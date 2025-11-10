@@ -84,6 +84,9 @@ def extract_metadata_from_state(state: Dict[str, Any]):
     # Extract image metadata (only image URL and node)
     image_url = None
     image_node = None
+    video_url = None
+    video_node = None
+    
     enhanced_meta = state.get("enhanced_message_metadata")
     if enhanced_meta:
         image_url = enhanced_meta.get("image")
