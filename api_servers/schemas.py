@@ -83,6 +83,15 @@ class SessionMetadata(BaseModel):
         default=None,
         description="The pedagogical node where the image was generated (e.g., 'CI', 'GE', 'APK'). None if no image."
     )
+
+    video_url: Optional[str] = Field(
+        default=None,
+        description="Base64-encoded video URL (e.g., 'data:video/mp4;base64,...'). None if no video is present."
+    )
+    video_node: Optional[str] = Field(
+        default=None,
+        description="The pedagogical node where the video was generated (e.g., 'CI', 'GE', 'APK'). None if no video."
+    )
     
     # Scores and progress
     quiz_score: float = Field(

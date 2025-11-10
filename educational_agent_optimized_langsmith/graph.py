@@ -230,13 +230,14 @@ g.add_edge("END", END)
 # Simulation flow edges
 g.add_conditional_edges("SIM_CC", _route, {"GE": "GE"})
 # g.add_edge("SIM_CC", "SIM_VARS")
-g.add_edge("SIM_VARS", "SIM_ACTION")
-g.add_edge("SIM_ACTION", "SIM_EXPECT")
-g.add_edge("SIM_EXPECT", "SIM_EXECUTE")
-g.add_edge("SIM_EXECUTE", "SIM_OBSERVE")
-g.add_edge("SIM_OBSERVE", "SIM_INSIGHT")
-g.add_edge("SIM_INSIGHT", "SIM_REFLECT")
-g.add_edge("SIM_REFLECT", "AR")   # After simulation, go to AR to ask question about the concept
+# g.add_edge("SIM_VARS", "SIM_ACTION")
+# g.add_edge("SIM_ACTION", "SIM_EXPECT")
+# g.add_edge("SIM_EXPECT", "SIM_EXECUTE")
+# g.add_edge("SIM_EXECUTE", "SIM_OBSERVE")
+# g.add_edge("SIM_OBSERVE", "SIM_INSIGHT")
+# g.add_edge("SIM_INSIGHT", "SIM_REFLECT")
+# g.add_edge("SIM_REFLECT", "AR")   # After simulation, go to AR to ask question about the concept
+g.add_edge("SIM_VARS", "AR")
 
 # checkpointer = InMemorySaver()
 checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")

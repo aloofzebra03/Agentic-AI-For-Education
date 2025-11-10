@@ -88,6 +88,8 @@ def extract_metadata_from_state(state: Dict[str, Any]):
     if enhanced_meta:
         image_url = enhanced_meta.get("image")
         image_node = enhanced_meta.get("node")
+        video_url = enhanced_meta.get("video")
+        video_node = enhanced_meta.get("video_node")
     
     # Build metadata with consistent structure - all fields present with defaults
     return SessionMetadata(
@@ -98,6 +100,10 @@ def extract_metadata_from_state(state: Dict[str, Any]):
         # Image metadata
         image_url=image_url,
         image_node=image_node,
+
+        # Video metadata
+        video_url=video_url,
+        video_node=video_node,
         
         # Scores and progress (-1.0 means not set yet)
         quiz_score=state.get("quiz_score", -1.0) if state.get("quiz_score") is not None else -1.0,
