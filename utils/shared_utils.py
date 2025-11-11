@@ -14,10 +14,10 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_core.prompts import PromptTemplate
 from langchain_groq import ChatGroq
 
-from educational_agent_v1.config_rag import concept_pkg
-from educational_agent_v1.Creating_Section_Text.retriever import retrieve_docs
-from educational_agent_v1.Filtering_GT.filter_utils import filter_relevant_section
-from educational_agent_v1.Creating_Section_Text.schema import NextSectionChoice
+# from educational_agent_v1.config_rag import concept_pkg
+# from educational_agent_v1.Creating_Section_Text.retriever import retrieve_docs
+# from educational_agent_v1.Filtering_GT.filter_utils import filter_relevant_section
+# from educational_agent_v1.Creating_Section_Text.schema import NextSectionChoice
 
 
 dotenv.load_dotenv(dotenv_path=".env", override=True)

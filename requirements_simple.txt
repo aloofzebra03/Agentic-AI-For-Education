@@ -17,9 +17,9 @@ langgraph-checkpoint-sqlite
 
 # LLM Providers
 langchain-google-genai
-langchain-groq
-langchain-openai
-langchain-anthropic
+# langchain-groq
+# langchain-openai
+# langchain-anthropic
 
 # LangSmith for observability
 langsmith
@@ -35,8 +35,8 @@ sqlite-vec
 
 # Document Processing for RAG
 pypdf
-beautifulsoup4
-lxml
+# beautifulsoup4
+# lxml
 
 # Data validation and parsing
 pydantic
@@ -44,6 +44,8 @@ pydantic-settings
 
 # Environment variables
 python-dotenv
+
+# PostgreSQL driver and pool
 psycopg[binary]>=3.0.0
 psycopg-pool>=3.0.0
 

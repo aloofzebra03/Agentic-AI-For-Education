@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements file FIRST (for Docker layer caching)
-COPY requirements_simple.txt /app/requirements.txt
+COPY requirements-minimal2.txt /app/requirements.txt
 
 # Fix potential Windows CRLF line endings
 RUN sed -i 's/\r$//' /app/requirements.txt
@@ -29,7 +29,9 @@ COPY pyproject.toml /app/pyproject.toml
 
 # Upgrade pip and install dependencies
 RUN python -m pip install --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir -r /app/requirements.txt
+    pip install --no-cache-dir uv==0.4.21 && \
+    uv pip install --system --no-cache -vvv -r /app/requirements.txt
+
 
 # Copy application code
 COPY utils/ /app/utils/

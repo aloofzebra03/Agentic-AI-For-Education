@@ -2,7 +2,9 @@ import json
 from typing import Literal, Optional, Dict
 
 from pydantic import BaseModel
-from langchain.output_parsers import PydanticOutputParser
+# from langchain.output_parsers import PydanticOutputParser
+from langchain_core.output_parsers import PydanticOutputParser
+# from langchain_.output_parsers import PydanticOutputParser
 from educational_agent_optimized_langsmith.config import concept_pkg
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 
