@@ -150,14 +150,18 @@ def export_json_report(stats, timestamp, user_count, reports_dir):
     }
     
     # Add per-endpoint stats
+    duration = stats.total.last_request_timestamp - stats.total.start_time if stats.total.num_requests > 0 else 1
     for name, endpoint_stats in stats.entries.items():
+        # Calculate RPS properly for each endpoint
+        rps = endpoint_stats.num_requests / duration if duration > 0 else 0
+        
         report_data["endpoint_stats"][str(name)] = {
             "num_requests": endpoint_stats.num_requests,
             "num_failures": endpoint_stats.num_failures,
             "avg_response_time_ms": endpoint_stats.avg_response_time,
             "min_response_time_ms": endpoint_stats.min_response_time,
             "max_response_time_ms": endpoint_stats.max_response_time,
-            "requests_per_second": endpoint_stats.total_rps
+            "requests_per_second": rps
         }
     
     # Write JSON file
@@ -175,13 +179,24 @@ def export_csv_report(stats, timestamp, user_count, reports_dir):
         
         # Per-endpoint stats
         for name, endpoint_stats in stats.entries.items():
-            method = str(name).split()[0] if ' ' in str(name) else "GET"
-            endpoint = str(name).split(' ', 1)[1] if ' ' in str(name) else str(name)
+            # Handle both string and StatsEntry name formats
+            name_str = str(name)
+            if ' ' in name_str:
+                parts = name_str.split(' ', 1)
+                method = parts[0]
+                endpoint = parts[1]
+            else:
+                method = "GET"
+                endpoint = name_str
+            
+            # Calculate RPS properly
+            duration = stats.total.last_request_timestamp - stats.total.start_time if stats.total.num_requests > 0 else 1
+            rps = endpoint_stats.num_requests / duration if duration > 0 else 0
             
             f.write(f"{endpoint},{method},{endpoint_stats.num_requests},{endpoint_stats.num_failures},")
             f.write(f"{endpoint_stats.fail_ratio * 100:.2f},{endpoint_stats.avg_response_time:.2f},")
             f.write(f"{endpoint_stats.min_response_time:.2f},{endpoint_stats.max_response_time:.2f},")
-            f.write(f"{endpoint_stats.median_response_time:.2f},{endpoint_stats.total_rps:.2f},")
+            f.write(f"{endpoint_stats.median_response_time:.2f},{rps:.2f},")
             p95 = endpoint_stats.get_response_time_percentile(0.95) if endpoint_stats.num_requests > 0 else 0
             p99 = endpoint_stats.get_response_time_percentile(0.99) if endpoint_stats.num_requests > 0 else 0
             f.write(f"{p95:.2f},{p99:.2f}\n")
