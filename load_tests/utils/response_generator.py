@@ -5,7 +5,6 @@ import random
 
 
 class ResponseGenerator:
-    """Generate realistic student responses based on pedagogical node context"""
     
     # Responses for each pedagogical node
     APK_RESPONSES = [
@@ -85,16 +84,7 @@ class ResponseGenerator:
     
     @classmethod
     def generate_response(cls, current_state: str, confused_probability: float = 0.1) -> str:
-        """
-        Generate a realistic student response based on current pedagogical node
-        
-        Args:
-            current_state: Current node (APK, CI, GE, AR, TC, RLC, etc.)
-            confused_probability: Chance of generating a confused response (0.0-1.0)
-        
-        Returns:
-            Student response string
-        """
+
         # Sometimes students are confused regardless of node
         if random.random() < confused_probability:
             return random.choice(cls.CONFUSED_RESPONSES)
@@ -112,7 +102,6 @@ class ResponseGenerator:
             return random.choice(cls.GE_RESPONSES)
         
         elif current_state == "AR":
-            # Mix of correct and incorrect responses (80% correct)
             if random.random() < 0.8:
                 return random.choice(cls.AR_CORRECT_RESPONSES)
             else:
@@ -139,16 +128,6 @@ class ResponseGenerator:
     
     @classmethod
     def generate_persona_response(cls, persona_name: str, current_state: str) -> str:
-        """
-        Generate response based on specific persona characteristics
-        
-        Args:
-            persona_name: Name of the persona (e.g., "Confused Student")
-            current_state: Current pedagogical node
-        
-        Returns:
-            Persona-appropriate response
-        """
         if "confused" in persona_name.lower():
             # Confused students ask more questions
             return cls.generate_response(current_state, confused_probability=0.4)

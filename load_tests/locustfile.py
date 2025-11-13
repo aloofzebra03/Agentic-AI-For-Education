@@ -1,29 +1,19 @@
-"""
-Main Locust Load Testing File for Educational Agent API
-Run with: locust -f locustfile.py --host=http://localhost:8000
-"""
 from locust import HttpUser, between, events
 from tasks.session_tasks import SessionTaskSet
 from utils.metrics_collector import global_metrics
 from config import MIN_WAIT_TIME, MAX_WAIT_TIME, REQUEST_TIMEOUT
 import sys
 import os
+import json
+from datetime import datetime
+from pathlib import Path
 
-# Add parent directory to path to ensure imports work
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# # Add parent directory to path to ensure imports work
+# sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 
 class EducationalAgentUser(HttpUser):
-    """
-    Simulates a student using the Educational Agent API
-    
-    Each user:
-    1. Starts a learning session
-    2. Has 5-10 conversation turns with the agent
-    3. Waits 1-3 seconds between requests (simulates thinking)
-    4. May check session status occasionally
-    """
-    
+
     # Task set defining user behavior
     tasks = [SessionTaskSet]
     
@@ -41,7 +31,6 @@ class EducationalAgentUser(HttpUser):
 
 @events.test_start.add_listener
 def on_test_start(environment, **kwargs):
-    """Called when load test starts"""
     print("\n" + "=" * 80)
     print("🚀 LOAD TEST STARTING")
     print("=" * 80)
@@ -54,7 +43,6 @@ def on_test_start(environment, **kwargs):
 
 @events.test_stop.add_listener
 def on_test_stop(environment, **kwargs):
-    """Called when load test stops - print custom metrics"""
     print("\n" + "=" * 80)
     print("🏁 LOAD TEST COMPLETED")
     print("=" * 80)
@@ -82,16 +70,219 @@ def on_test_stop(environment, **kwargs):
     # Print custom metrics
     global_metrics.print_summary()
     
+    # Export all reports
+    export_reports(environment)
+    
     print("\n" + "=" * 80)
-    print("💡 TIP: Open the Locust web UI for detailed graphs and charts")
+    print("💡 TIP: Check the reports/ directory for detailed analysis files")
     print("=" * 80 + "\n")
 
 
 @events.quitting.add_listener
 def on_quitting(environment, **kwargs):
-    """Called when Locust is quitting"""
-    # Could save metrics to file here if needed
-    pass
+    export_reports(environment)
+
+
+# ============================================================================
+# REPORT EXPORT FUNCTIONS
+# ============================================================================
+
+def export_reports(environment):
+
+    # Get stats
+    stats = environment.stats
+    
+    # Create reports directory if it doesn't exist
+    reports_dir = Path("reports")
+    reports_dir.mkdir(exist_ok=True)
+    
+    # Generate timestamp for unique filenames
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    user_count = getattr(environment.runner, 'user_count', 0)
+    
+    # 1. Export JSON report with all metrics
+    export_json_report(stats, timestamp, user_count, reports_dir)
+    
+    # 2. Export CSV report with request stats
+    export_csv_report(stats, timestamp, user_count, reports_dir)
+    
+    # 3. Export custom metrics to text file
+    export_custom_metrics(timestamp, user_count, reports_dir)
+    
+    # 4. Export summary report
+    export_summary_report(stats, timestamp, user_count, reports_dir)
+    
+    print(f"\n📁 Reports exported to: {reports_dir.absolute()}")
+    print(f"   - report_{user_count}users_{timestamp}.json")
+    print(f"   - report_{user_count}users_{timestamp}_stats.csv")
+    print(f"   - report_{user_count}users_{timestamp}_custom.txt")
+    print(f"   - report_{user_count}users_{timestamp}_summary.txt")
+
+
+def export_json_report(stats, timestamp, user_count, reports_dir):
+    report_data = {
+        "test_info": {
+            "timestamp": datetime.now().isoformat(),
+            "users": user_count,
+            "duration_seconds": stats.total.last_request_timestamp - stats.total.start_time if stats.total.num_requests > 0 else 0
+        },
+        "request_stats": {
+            "total_requests": stats.total.num_requests,
+            "total_failures": stats.total.num_failures,
+            "failure_rate": stats.total.fail_ratio,
+            "avg_response_time_ms": stats.total.avg_response_time,
+            "min_response_time_ms": stats.total.min_response_time,
+            "max_response_time_ms": stats.total.max_response_time,
+            "median_response_time_ms": stats.total.median_response_time,
+            "requests_per_second": stats.total.total_rps,
+            "percentiles": {
+                "p50": stats.total.get_response_time_percentile(0.5) if stats.total.num_requests > 0 else 0,
+                "p75": stats.total.get_response_time_percentile(0.75) if stats.total.num_requests > 0 else 0,
+                "p90": stats.total.get_response_time_percentile(0.90) if stats.total.num_requests > 0 else 0,
+                "p95": stats.total.get_response_time_percentile(0.95) if stats.total.num_requests > 0 else 0,
+                "p99": stats.total.get_response_time_percentile(0.99) if stats.total.num_requests > 0 else 0
+            }
+        },
+        "endpoint_stats": {},
+        "custom_metrics": global_metrics.get_summary()
+    }
+    
+    # Add per-endpoint stats
+    for name, endpoint_stats in stats.entries.items():
+        report_data["endpoint_stats"][str(name)] = {
+            "num_requests": endpoint_stats.num_requests,
+            "num_failures": endpoint_stats.num_failures,
+            "avg_response_time_ms": endpoint_stats.avg_response_time,
+            "min_response_time_ms": endpoint_stats.min_response_time,
+            "max_response_time_ms": endpoint_stats.max_response_time,
+            "requests_per_second": endpoint_stats.total_rps
+        }
+    
+    # Write JSON file
+    json_file = reports_dir / f"report_{user_count}users_{timestamp}.json"
+    with open(json_file, 'w', encoding='utf-8') as f:
+        json.dump(report_data, f, indent=2)
+
+
+def export_csv_report(stats, timestamp, user_count, reports_dir):
+    csv_file = reports_dir / f"report_{user_count}users_{timestamp}_stats.csv"
+    
+    with open(csv_file, 'w', encoding='utf-8') as f:
+        # Header
+        f.write("Endpoint,Method,Requests,Failures,Failure Rate (%),Avg (ms),Min (ms),Max (ms),Median (ms),RPS,P95 (ms),P99 (ms)\n")
+        
+        # Per-endpoint stats
+        for name, endpoint_stats in stats.entries.items():
+            method = str(name).split()[0] if ' ' in str(name) else "GET"
+            endpoint = str(name).split(' ', 1)[1] if ' ' in str(name) else str(name)
+            
+            f.write(f"{endpoint},{method},{endpoint_stats.num_requests},{endpoint_stats.num_failures},")
+            f.write(f"{endpoint_stats.fail_ratio * 100:.2f},{endpoint_stats.avg_response_time:.2f},")
+            f.write(f"{endpoint_stats.min_response_time:.2f},{endpoint_stats.max_response_time:.2f},")
+            f.write(f"{endpoint_stats.median_response_time:.2f},{endpoint_stats.total_rps:.2f},")
+            p95 = endpoint_stats.get_response_time_percentile(0.95) if endpoint_stats.num_requests > 0 else 0
+            p99 = endpoint_stats.get_response_time_percentile(0.99) if endpoint_stats.num_requests > 0 else 0
+            f.write(f"{p95:.2f},{p99:.2f}\n")
+        
+        # Total/Aggregated stats
+        f.write(f"\nAggregated,ALL,{stats.total.num_requests},{stats.total.num_failures},")
+        f.write(f"{stats.total.fail_ratio * 100:.2f},{stats.total.avg_response_time:.2f},")
+        f.write(f"{stats.total.min_response_time:.2f},{stats.total.max_response_time:.2f},")
+        f.write(f"{stats.total.median_response_time:.2f},{stats.total.total_rps:.2f},")
+        p95 = stats.total.get_response_time_percentile(0.95) if stats.total.num_requests > 0 else 0
+        p99 = stats.total.get_response_time_percentile(0.99) if stats.total.num_requests > 0 else 0
+        f.write(f"{p95:.2f},{p99:.2f}\n")
+
+
+def export_custom_metrics(timestamp, user_count, reports_dir):
+    txt_file = reports_dir / f"report_{user_count}users_{timestamp}_custom.txt"
+    
+    summary = global_metrics.get_summary()
+    
+    with open(txt_file, 'w', encoding='utf-8') as f:
+        f.write("=" * 80 + "\n")
+        f.write("CUSTOM LANGGRAPH METRICS REPORT\n")
+        f.write("=" * 80 + "\n")
+        f.write(f"Generated: {datetime.now().isoformat()}\n")
+        f.write(f"Users: {user_count}\n\n")
+        
+        # Node latencies
+        f.write("🔄 Node Transition Latencies:\n")
+        f.write("-" * 80 + "\n")
+        node_stats = summary.get("node_latencies", {})
+        if node_stats:
+            f.write(f"{'Node':<15} {'Count':<10} {'Avg (ms)':<12} {'Min (ms)':<12} {'Max (ms)':<12}\n")
+            for node, stats in sorted(node_stats.items()):
+                f.write(f"{node:<15} {stats['count']:<10} {stats['avg']:<12.2f} {stats['min']:<12.2f} {stats['max']:<12.2f}\n")
+        else:
+            f.write("No node transitions recorded\n")
+        
+        f.write("\n")
+        
+        # Checkpoint stats
+        f.write("💾 Checkpoint Operations:\n")
+        f.write("-" * 80 + "\n")
+        checkpoint_stats = summary.get("checkpoint_stats", {})
+        if checkpoint_stats:
+            f.write(f"Total Operations: {checkpoint_stats.get('total_operations', 0)}\n")
+            if "save_avg_ms" in checkpoint_stats:
+                f.write(f"Save - Count: {checkpoint_stats['save_count']}, Avg: {checkpoint_stats['save_avg_ms']:.2f}ms, Max: {checkpoint_stats['save_max_ms']:.2f}ms\n")
+            if "load_avg_ms" in checkpoint_stats:
+                f.write(f"Load - Count: {checkpoint_stats['load_count']}, Avg: {checkpoint_stats['load_avg_ms']:.2f}ms, Max: {checkpoint_stats['load_max_ms']:.2f}ms\n")
+        else:
+            f.write("No checkpoint operations recorded\n")
+        
+        f.write("\n")
+        
+        # LangGraph-specific metrics
+        f.write("🎯 LangGraph-Specific Metrics:\n")
+        f.write("-" * 80 + "\n")
+        f.write(f"Total Transitions: {summary.get('total_transitions', 0)}\n")
+        f.write(f"Simulations Triggered: {summary.get('total_simulations', 0)}\n")
+        f.write(f"Images Loaded: {summary.get('total_images', 0)}\n")
+        f.write(f"Videos Loaded: {summary.get('total_videos', 0)}\n")
+        f.write(f"Misconceptions Detected: {summary.get('total_misconceptions', 0)}\n")
+        f.write(f"Average Quiz Score: {summary.get('avg_quiz_score', 0):.2f}\n")
+        f.write(f"Completed Sessions: {summary.get('completed_sessions', 0)}\n")
+        
+        f.write("\n" + "=" * 80 + "\n")
+
+
+def export_summary_report(stats, timestamp, user_count, reports_dir):
+    txt_file = reports_dir / f"report_{user_count}users_{timestamp}_summary.txt"
+    
+    with open(txt_file, 'w', encoding='utf-8') as f:
+        f.write("=" * 80 + "\n")
+        f.write("LOAD TEST SUMMARY REPORT\n")
+        f.write("=" * 80 + "\n")
+        f.write(f"Generated: {datetime.now().isoformat()}\n")
+        f.write(f"Target: {user_count} concurrent users\n")
+        duration = stats.total.last_request_timestamp - stats.total.start_time if stats.total.num_requests > 0 else 0
+        f.write(f"Duration: {duration:.2f} seconds\n\n")
+        
+        f.write("📊 OVERALL PERFORMANCE:\n")
+        f.write("-" * 80 + "\n")
+        f.write(f"Total Requests: {stats.total.num_requests}\n")
+        f.write(f"Total Failures: {stats.total.num_failures}\n")
+        f.write(f"Failure Rate: {stats.total.fail_ratio * 100:.2f}%\n")
+        f.write(f"Requests per Second: {stats.total.total_rps:.2f}\n\n")
+        
+        f.write("⏱️  RESPONSE TIMES:\n")
+        f.write("-" * 80 + "\n")
+        f.write(f"Average: {stats.total.avg_response_time:.2f}ms\n")
+        f.write(f"Minimum: {stats.total.min_response_time:.2f}ms\n")
+        f.write(f"Maximum: {stats.total.max_response_time:.2f}ms\n")
+        f.write(f"Median: {stats.total.median_response_time:.2f}ms\n")
+        
+        if stats.total.num_requests > 0:
+            f.write(f"\nPercentiles:\n")
+            f.write(f"  P50: {stats.total.get_response_time_percentile(0.5):.2f}ms\n")
+            f.write(f"  P75: {stats.total.get_response_time_percentile(0.75):.2f}ms\n")
+            f.write(f"  P90: {stats.total.get_response_time_percentile(0.90):.2f}ms\n")
+            f.write(f"  P95: {stats.total.get_response_time_percentile(0.95):.2f}ms\n")
+            f.write(f"  P99: {stats.total.get_response_time_percentile(0.99):.2f}ms\n")
+        
+        f.write("\n" + "=" * 80 + "\n")
 
 
 # ============================================================================
@@ -99,10 +290,6 @@ def on_quitting(environment, **kwargs):
 # ============================================================================
 
 def validate_thresholds(environment):
-    """
-    Validate if test meets performance thresholds
-    Called manually or via CI/CD
-    """
     from config import PERFORMANCE_THRESHOLDS
     
     stats = environment.stats.total
@@ -143,26 +330,3 @@ def validate_thresholds(environment):
     
     return passed
 
-
-# ============================================================================
-# MAIN ENTRY POINT (for direct execution)
-# ============================================================================
-
-if __name__ == "__main__":
-    """
-    This allows running the test directly with Python (though Locust CLI is preferred)
-    """
-    print("=" * 80)
-    print("📚 Educational Agent Load Testing")
-    print("=" * 80)
-    print("\n✨ To run the load test, use one of these commands:\n")
-    print("1. Basic test (10 users):")
-    print("   locust -f locustfile.py --host=http://localhost:8000 --users=10 --spawn-rate=1 --run-time=5m --headless\n")
-    print("2. With Web UI (interactive):")
-    print("   locust -f locustfile.py --host=http://localhost:8000\n")
-    print("   Then open: http://localhost:8089\n")
-    print("3. Baseline scenario:")
-    print("   locust -f locustfile.py --host=http://localhost:8000 --users=10 --spawn-rate=1 --run-time=5m --headless --html=reports/report_baseline.html\n")
-    print("4. Light load scenario:")
-    print("   locust -f locustfile.py --host=http://localhost:8000 --users=100 --spawn-rate=10 --run-time=10m --headless --html=reports/report_light.html\n")
-    print("=" * 80)
