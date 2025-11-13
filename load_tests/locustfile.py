@@ -93,12 +93,14 @@ def export_reports(environment):
     stats = environment.stats
     
     # Create reports directory if it doesn't exist
-    reports_dir = Path("reports")
+    reports_dir = Path("load_tests/reports")
     reports_dir.mkdir(exist_ok=True)
     
     # Generate timestamp for unique filenames
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    user_count = getattr(environment.runner, 'user_count', 0)
+    # Use target_user_count as it persists during shutdown, user_count may be 0
+    user_count = getattr(environment.runner, 'target_user_count', 
+                         getattr(environment.runner, 'user_count', 0))
     
     # 1. Export JSON report with all metrics
     export_json_report(stats, timestamp, user_count, reports_dir)
