@@ -69,8 +69,8 @@ ENABLE_LANGSMITH_TRACING = os.getenv("ENABLE_LANGSMITH_TRACING", "false").lower(
 REQUEST_TIMEOUT = 60  # seconds (LLM calls can be slow)
 
 # Think time between requests (simulates real users)
-MIN_WAIT_TIME = 1  # seconds
-MAX_WAIT_TIME = 3  # seconds
+MIN_WAIT_TIME = 10  # seconds
+MAX_WAIT_TIME = 20 # seconds
 
 print("=" * 80)
 print("🔬 Load Testing Configuration Loaded")

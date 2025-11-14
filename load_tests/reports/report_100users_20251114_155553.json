@@ -1,0 +1,112 @@
+{
+  "test_info": {
+    "timestamp": "2025-11-14T15:55:53.375455",
+    "users": 100,
+    "duration_seconds": 596.5516974925995
+  },
+  "request_stats": {
+    "total_requests": 605,
+    "total_failures": 183,
+    "failure_rate": 0.30247933884297523,
+    "avg_response_time_ms": 7799.423960500112,
+    "min_response_time_ms": 50.70099979639053,
+    "max_response_time_ms": 34082.9747999087,
+    "median_response_time_ms": 2400.0,
+    "requests_per_second": 1.0141618950091167,
+    "percentiles": {
+      "p50": 2400.0,
+      "p75": 13000.0,
+      "p90": 24000.0,
+      "p95": 26000.0,
+      "p99": 32000.0
+    }
+  },
+  "endpoint_stats": {
+    "('/session/start', 'POST')": {
+      "num_requests": 100,
+      "num_failures": 85,
+      "avg_response_time_ms": 21045.18528402783,
+      "min_response_time_ms": 2116.48719990626,
+      "max_response_time_ms": 34082.9747999087,
+      "requests_per_second": 0.16763006529076308
+    },
+    "('/session/continue', 'POST')": {
+      "num_requests": 220,
+      "num_failures": 98,
+      "avg_response_time_ms": 9641.498492277142,
+      "min_response_time_ms": 177.43270006030798,
+      "max_response_time_ms": 27963.91490008682,
+      "requests_per_second": 0.36878614363967877
+    },
+    "('/session/status/{thread_id}', 'GET')": {
+      "num_requests": 285,
+      "num_failures": 0,
+      "avg_response_time_ms": 1729.8361382414505,
+      "min_response_time_ms": 50.70099979639053,
+      "max_response_time_ms": 3798.9595998078585,
+      "requests_per_second": 0.4777456860786748
+    }
+  },
+  "custom_metrics": {
+    "node_latencies": {
+      "APK": {
+        "count": 15,
+        "total": 252503.1225681305,
+        "min": 5482.172250747681,
+        "max": 29925.803899765015,
+        "avg": 16833.541504542034
+      },
+      "CI": {
+        "count": 15,
+        "total": 52864.996671676636,
+        "min": 1883.8448524475098,
+        "max": 6093.634128570557,
+        "avg": 3524.333111445109
+      },
+      "SIM_CC": {
+        "count": 7,
+        "total": 62116.82915687561,
+        "min": 2402.4927616119385,
+        "max": 15120.687484741211,
+        "avg": 8873.832736696515
+      },
+      "GE": {
+        "count": 15,
+        "total": 136672.28841781616,
+        "min": 3761.533737182617,
+        "max": 22892.010927200317,
+        "avg": 9111.485894521078
+      },
+      "SIM_VARS": {
+        "count": 10,
+        "total": 58220.50094604492,
+        "min": 1647.0420360565186,
+        "max": 8297.244310379028,
+        "avg": 5822.050094604492
+      },
+      "SIM_ACTION": {
+        "count": 13,
+        "total": 135224.5135307312,
+        "min": 472.18918800354004,
+        "max": 21461.23170852661,
+        "avg": 10401.885656210092
+      }
+    },
+    "checkpoint_stats": {
+      "total_operations": 137,
+      "save_count": 137,
+      "load_count": 0,
+      "save_avg_ms": 2307.1780735558837,
+      "save_max_ms": 29925.803899765015
+    },
+    "total_transitions": 75,
+    "total_checkpoint_ops": 137,
+    "total_llm_calls": 0,
+    "total_simulations": 0,
+    "total_images": 0,
+    "total_videos": 0,
+    "total_misconceptions": 0,
+    "avg_quiz_score": 0,
+    "completed_sessions": 0
+  }
+}
