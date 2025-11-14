@@ -7,6 +7,7 @@ Contains common helper functions used by both traditional nodes and simulation n
 import os
 import json
 import re
+import random
 from typing import Dict, List, Optional, Any
 import dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -81,11 +82,28 @@ def extract_json_block(text: str) -> str:
     return s
 
 
-def get_llm():
-    """Get configured LLM instance."""
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        raise RuntimeError("Please set GOOGLE_API_KEY")
+def get_available_api_keys():
+    """Get all available Google API keys from environment."""
+    api_keys = []
+    for i in range(1, 6):  # Check for GOOGLE_API_KEY1 through GOOGLE_API_KEY5
+        key = os.getenv(f"GOOGLE_API_KEY_{i}")
+        if key:
+            api_keys.append(key)
+    
+    if not api_keys:
+        raise RuntimeError("No Google API keys found. Please set GOOGLE_API_KEY1, GOOGLE_API_KEY2, etc. in .env file")
+    
+    return api_keys
+
+
+def get_llm(api_key: Optional[str] = None):
+    """Get configured LLM instance with specified or random API key."""
+    if api_key is None:
+        # Randomly select an API key from available keys
+        available_keys = get_available_api_keys()
+        api_key = random.choice(available_keys)
+        print(f"🔑 Selected random API key (ending with ...{api_key[-6:]})")
+    
     return ChatGoogleGenerativeAI(
         model="gemini-2.0-flash",
         api_key=api_key,
@@ -97,6 +115,47 @@ def get_llm():
     #     max_tokens=None,
     # )
     # return llm
+
+
+def invoke_llm_with_fallback(messages: List, operation_name: str = "LLM call"):
+    """
+    Invoke LLM with automatic API key fallback on failure.
+    
+    Args:
+        messages: List of messages to send to the LLM
+        operation_name: Name of the operation for logging purposes
+    
+    Returns:
+        LLM response object
+    
+    Raises:
+        RuntimeError: If all API keys fail
+    """
+    available_keys = get_available_api_keys()
+    random.shuffle(available_keys)
+    
+    last_error = None
+    
+    # Try each API key until one succeeds
+    for attempt, api_key in enumerate(available_keys, 1):
+        try:
+            print(f"🔑 {operation_name} - Attempt {attempt}/{len(available_keys)} with API key ending ...{api_key[-6:]}")
+            llm = get_llm(api_key=api_key)
+            response = llm.invoke(messages)
+            print(f"✅ {operation_name} - Success with attempt {attempt}")
+            return response
+            
+        except Exception as e:
+            last_error = e
+            print(f"❌ {operation_name} - API key attempt {attempt} failed: {str(e)}")
+            if attempt < len(available_keys):
+                print(f"🔄 Retrying with next API key...")
+            continue
+    
+    # If all keys failed, raise the last error
+    print(f"❌ {operation_name} - All {len(available_keys)} API keys failed!")
+    raise RuntimeError(f"All API keys exhausted for {operation_name}. Last error: {str(last_error)}") from last_error
+
 
 def add_ai_message_to_conversation(state: AgentState, content: str):
     """Add AI message to conversation after successful processing."""
@@ -111,7 +170,6 @@ def add_system_message_to_conversation(state: AgentState, content: str):
 
 
 def llm_with_history(state: AgentState, final_prompt: str):
-    """Invoke LLM with history context and return response."""
     # 🔍 LLM INVOCATION - INPUT 🔍
     print("=" * 70)
     print("🤖 LLM INVOCATION - STARTED")
@@ -124,7 +182,8 @@ def llm_with_history(state: AgentState, final_prompt: str):
     # Note: The final_prompt already contains conversation history via build_prompt_from_template
     request_msgs = [HumanMessage(content=final_prompt)]
     
-    resp = get_llm().invoke(request_msgs)
+    # Use the centralized invoke function with fallback
+    resp = invoke_llm_with_fallback(request_msgs, operation_name="LLM with history")
     
     # 🔍 LLM INVOCATION - OUTPUT 🔍
     print("🤖 LLM INVOCATION - COMPLETED")
@@ -138,7 +197,6 @@ def llm_with_history(state: AgentState, final_prompt: str):
 
 
 def build_conversation_history(state: AgentState) -> str:
-    """Build formatted conversation history from messages for prompt inclusion."""
     conversation = state.get("messages", [])
     history_text = ""
     
@@ -159,7 +217,6 @@ def build_prompt_from_template(system_prompt: str, state: AgentState,
                              include_last_message: bool = False, 
                              include_instructions: bool = False,
                              parser=None) -> str:
-    """Build a comprehensive prompt from template with optional components."""
     
     # Build the template string based on what we need
     template_parts = ["{system_prompt}"]
@@ -208,10 +265,6 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
                                        include_last_message: bool = False, 
                                        include_instructions: bool = False,
                                        parser=None, current_node: str = None) -> str:
-    """
-    Build a comprehensive prompt from template with memory optimization.
-    This is the optimized version that uses node-aware conversation history.
-    """
     
     # Build the template string based on what we need
     template_parts = ["{system_prompt}"]
@@ -539,9 +592,11 @@ Respond with JSON only:
     "relevance_reason": "<2-3 sentences explaining why this image is best for concept introduction>"
 }}"""
         
-        # Get LLM response
-        llm = get_llm()
-        response = llm.invoke([HumanMessage(content=selection_prompt)])
+        # Get LLM response with fallback
+        response = invoke_llm_with_fallback(
+            [HumanMessage(content=selection_prompt)],
+            operation_name="Image selection"
+        )
         
         # Parse response
         json_text = extract_json_block(response.content)
@@ -643,7 +698,10 @@ Conversation:
 Summary:"""
     
     try:
-        summary_response = get_llm().invoke([HumanMessage(content=summary_prompt)])
+        summary_response = invoke_llm_with_fallback(
+            [HumanMessage(content=summary_prompt)],
+            operation_name="Educational summary"
+        )
         return summary_response.content.strip()
     except Exception as e:
         print(f"❌ Error creating LLM summary: {e}")
@@ -673,7 +731,10 @@ Conversation:
 
 Summary:"""
         
-        summary_response = get_llm().invoke([HumanMessage(content=summary_prompt)])
+        summary_response = invoke_llm_with_fallback(
+            [HumanMessage(content=summary_prompt)],
+            operation_name="Summary from text"
+        )
         return summary_response.content.strip()
     except Exception as e:
         print(f"❌ Error creating LLM summary: {e}")
