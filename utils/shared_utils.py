@@ -85,7 +85,7 @@ def extract_json_block(text: str) -> str:
 def get_available_api_keys():
     """Get all available Google API keys from environment."""
     api_keys = []
-    for i in range(1, 6):  # Check for GOOGLE_API_KEY1 through GOOGLE_API_KEY5
+    for i in range(1, 8):  # Check for GOOGLE_API_KEY1 through GOOGLE_API_KEY7
         key = os.getenv(f"GOOGLE_API_KEY_{i}")
         if key:
             api_keys.append(key)

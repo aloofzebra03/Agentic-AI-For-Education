@@ -63,7 +63,7 @@ PERFORMANCE_THRESHOLDS = {
 }
 
 # LangSmith tracing (disable during high load)
-ENABLE_LANGSMITH_TRACING = os.getenv("ENABLE_LANGSMITH_TRACING", "false").lower() == "true"
+# ENABLE_LANGSMITH_TRACING = os.getenv("ENABLE_LANGSMITH_TRACING", "false").lower() == "true"
 
 # Request timeouts
 REQUEST_TIMEOUT = 60  # seconds (LLM calls can be slow)
@@ -79,5 +79,5 @@ print(f"Base URL: {BASE_URL}")
 print(f"Default Concept: {DEFAULT_CONCEPT}")
 print(f"Request Timeout: {REQUEST_TIMEOUT}s")
 print(f"Think Time: {MIN_WAIT_TIME}-{MAX_WAIT_TIME}s")
-print(f"LangSmith Tracing: {'Enabled' if ENABLE_LANGSMITH_TRACING else 'Disabled (recommended for load tests)'}")
+# print(f"LangSmith Tracing: {'Enabled' if ENABLE_LANGSMITH_TRACING else 'Disabled (recommended for load tests)'}")
 print("=" * 80)
