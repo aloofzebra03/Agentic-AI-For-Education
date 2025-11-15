@@ -148,6 +148,7 @@ def invoke_llm_with_fallback(messages: List, operation_name: str = "LLM call"):
         except Exception as e:
             last_error = e
             print(f"❌ {operation_name} - API key attempt {attempt} failed: {str(e)}")
+            print(f"API Key ending ...{api_key[-6:]} failed.")
             if attempt < len(available_keys):
                 print(f"🔄 Retrying with next API key...")
             continue
