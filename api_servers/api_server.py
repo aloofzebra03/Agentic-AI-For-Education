@@ -443,38 +443,43 @@ def delete_session(thread_id: str):
             
             # Get the connection pool from the checkpointer
             if hasattr(checkpointer, 'conn'):
-                with checkpointer.conn.cursor() as cur:
-                    # Delete from checkpoints table where thread_id matches
-                    cur.execute(
-                        "DELETE FROM checkpoints WHERE thread_id = %s",
-                        (thread_id,)
-                    )
-                    deleted_checkpoints = cur.rowcount
-                    
-                    # Delete from checkpoint_writes table where thread_id matches
-                    cur.execute(
-                        "DELETE FROM checkpoint_writes WHERE thread_id = %s",
-                        (thread_id,)
-                    )
-                    deleted_writes = cur.rowcount
-                    
-                    # Delete from checkpoint_blobs table if it exists
-                    try:
+                # For ConnectionPool, we need to get a connection first
+                with checkpointer.conn.connection() as conn:
+                    with conn.cursor() as cur:
+                        # Delete from checkpoints table where thread_id matches
                         cur.execute(
-                            "DELETE FROM checkpoint_blobs WHERE thread_id = %s",
+                            "DELETE FROM checkpoints WHERE thread_id = %s",
                             (thread_id,)
                         )
-                        deleted_blobs = cur.rowcount
-                    except:
-                        deleted_blobs = 0
-                    
-                    print(f"🗑️ Deleted {deleted_checkpoints} checkpoints, {deleted_writes} writes, {deleted_blobs} blobs for thread {thread_id}")
-                    
-                    return {
-                        "success": True,
-                        "thread_id": thread_id,
-                        "message": f"Session deleted successfully from Postgres (removed {deleted_checkpoints} checkpoint records)"
-                    }
+                        deleted_checkpoints = cur.rowcount
+                        
+                        # Delete from checkpoint_writes table where thread_id matches
+                        cur.execute(
+                            "DELETE FROM checkpoint_writes WHERE thread_id = %s",
+                            (thread_id,)
+                        )
+                        deleted_writes = cur.rowcount
+                        
+                        # Delete from checkpoint_blobs table if it exists
+                        try:
+                            cur.execute(
+                                "DELETE FROM checkpoint_blobs WHERE thread_id = %s",
+                                (thread_id,)
+                            )
+                            deleted_blobs = cur.rowcount
+                        except:
+                            deleted_blobs = 0
+                        
+                        # Commit the transaction (required for autocommit=True in pool)
+                        conn.commit()
+                        
+                        print(f"🗑️ Deleted {deleted_checkpoints} checkpoints, {deleted_writes} writes, {deleted_blobs} blobs for thread {thread_id}")
+                        
+                        return {
+                            "success": True,
+                            "thread_id": thread_id,
+                            "message": f"Session deleted successfully from Postgres (removed {deleted_checkpoints} checkpoint records)"
+                        }
             else:
                 # Fallback for non-Postgres checkpointers (InMemorySaver)
                 return {
