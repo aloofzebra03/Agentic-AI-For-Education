@@ -181,7 +181,7 @@ def health_check():
     return HealthResponse(
         status="healthy",
         version="1.0.0",
-        persistence="InMemorySaver (LangGraph)",
+        persistence="Postgres (Supabase))",
         agent_type="educational_agent_optimized_langsmith",
         available_endpoints=[
             "/",

@@ -10,7 +10,7 @@ class TesterAgent:
         self.persona = persona
         self.llm = ChatGoogleGenerativeAI(
             model="gemini-2.0-flash",
-            api_key=os.getenv("GOOGLE_API_KEY"),
+            api_key=os.getenv("GOOGLE_API_KEY_1"),
             temperature=0.7,
         )
     #     self.llm = ChatGroq(

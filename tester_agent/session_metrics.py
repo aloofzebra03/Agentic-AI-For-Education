@@ -273,7 +273,7 @@ def compute_and_upload_session_metrics(session_id: str,
         metrics = computer.compute_metrics(session_id, history, session_state, persona_name)
         
         # Upload to Langfuse
-        computer.upload_to_langfuse(metrics)
+        # computer.upload_to_langfuse(metrics)
         
         print(f"📊 Session metrics computed and uploaded successfully!")
         print(f"   - Concepts covered: {metrics.num_concepts_covered}")
