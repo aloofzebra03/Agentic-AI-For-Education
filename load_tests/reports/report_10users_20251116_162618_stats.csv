@@ -1,0 +1,6 @@
+Endpoint,Method,Requests,Failures,Failure Rate (%),Avg (ms),Min (ms),Max (ms),Median (ms),RPS,P95 (ms),P99 (ms)
+'POST'),('/session/start',,10,0,0.00,3794.24,3082.80,6409.86,3200.00,0.08,6400.00,6400.00
+'POST'),('/session/continue',,51,10,19.61,4073.06,1322.64,7983.94,3800.00,0.43,7600.00,8000.00
+'GET'),('/session/status/{thread_id}',,10,0,0.00,1930.79,41.99,2484.18,2100.00,0.08,2500.00,2500.00
+
+Aggregated,ALL,71,10,14.08,3732.06,41.99,7983.94,3700.00,0.60,6400.00,8000.00

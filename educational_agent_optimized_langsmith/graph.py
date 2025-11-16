@@ -255,7 +255,9 @@ try:
     
     pool = ConnectionPool(
         conninfo=postgres_url,
-        max_size=20,
+        max_size=100,  # Increased for load testing (was 20)
+        min_size=10,   # Keep minimum connections open
+        timeout=30,    # Wait up to 30s for available connection
         kwargs=connection_kwargs,
     )
     checkpointer = PostgresSaver(pool)
