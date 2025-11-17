@@ -245,7 +245,7 @@ checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")
 # Initialize PostgreSQL checkpointer
 try:
     connection_kwargs = {
-        "autocommit": True,
+        # autocommit removed - Transaction Mode (port 6543) requires explicit transactions
         "prepare_threshold": None,  # None = Never use prepared statements (required for Transaction Mode port 6543)
     }
     
@@ -255,7 +255,7 @@ try:
     
     pool = ConnectionPool(
         conninfo=postgres_url,
-        max_size=100,  # Increased for load testing (was 20)
+        max_size=40,  # Reduced to stay within Supabase Transaction Mode limits.Set to 42 on dashboard
         min_size=5,   # Reduced for Transaction Mode efficiency
         timeout=30,    # Wait up to 30s for available connection
         kwargs=connection_kwargs,

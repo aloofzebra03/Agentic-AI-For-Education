@@ -205,7 +205,8 @@ Keep it concise and age-appropriate. Address the student directly in your prompt
 
     add_ai_message_to_conversation(state, msg)
     state["agent_output"] = msg
-    state["current_state"] = "SIM_ACTION"
+    # state["current_state"] = "SIM_ACTION"
+    state["current_state"] = "AR" #No simulation agent for now
     return state
 
 

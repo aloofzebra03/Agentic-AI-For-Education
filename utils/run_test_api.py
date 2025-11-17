@@ -271,8 +271,8 @@ def run_test_api():
             
             # Save the session summary
             summary_filename = f"session_summary_{session_id}_api.json"
-            os.makedirs("reports", exist_ok=True)
-            summary_path = os.path.join("reports", summary_filename)
+            os.makedirs("test_reports", exist_ok=True)
+            summary_path = os.path.join("test_reports", summary_filename)
             with open(summary_path, "w") as f:
                 json.dump(session_summary, f, indent=2)
             print(f"\n✅ Session summary exported to {summary_path}")
@@ -323,7 +323,7 @@ def run_test_api():
             
             # Save metrics locally
             metrics_filename = f"session_metrics_{session_id}_api.json"
-            metrics_path = os.path.join("reports", metrics_filename)
+            metrics_path = os.path.join("test_reports", metrics_filename)
             with open(metrics_path, "w") as f:
                 json.dump(session_metrics.model_dump(), f, indent=2)
             print(f"✅ Session metrics saved to {metrics_path}")
@@ -370,8 +370,8 @@ def run_test_api():
         if session_metrics:
             report["session_metrics"] = session_metrics.model_dump()
         
-        report_path = f"reports/evaluation_{session_id}_api.json"
-        os.makedirs("reports", exist_ok=True)
+        report_path = f"test_reports/evaluation_{session_id}_api.json"
+        os.makedirs("test_reports", exist_ok=True)
         with open(report_path, "w") as f:
             json.dump(report, f, indent=2)
         print(f"\n✅ Evaluation report saved to {report_path}")

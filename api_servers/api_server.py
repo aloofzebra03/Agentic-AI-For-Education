@@ -83,6 +83,7 @@ def extract_metadata_from_state(state: Dict[str, Any]):
     
     # Extract image metadata (only image URL and node)
     image_url = None
+    image_description = None
     image_node = None
     video_url = None
     video_node = None
@@ -90,6 +91,8 @@ def extract_metadata_from_state(state: Dict[str, Any]):
     enhanced_meta = state.get("enhanced_message_metadata")
     if enhanced_meta:
         image_url = enhanced_meta.get("image")
+        image_description = image_url.get("description")
+        image_url = image_url.get("url")
         image_node = enhanced_meta.get("node")
         video_url = enhanced_meta.get("video")
         video_node = enhanced_meta.get("video_node")
@@ -102,6 +105,7 @@ def extract_metadata_from_state(state: Dict[str, Any]):
         
         # Image metadata
         image_url=image_url,
+        image_description=image_description,
         image_node=image_node,
 
         # Video metadata
@@ -249,7 +253,9 @@ def start_session(request: StartSessionRequest):
         )
         
     except Exception as e:
+        import traceback
         print(f"API error in /session/start: {str(e)}")
+        print(f"Full traceback:\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Error starting session: {str(e)}")
 
 
@@ -280,6 +286,11 @@ def continue_session(request: ContinueSessionRequest):
             config={"configurable": {"thread_id": request.thread_id}},
         )
         
+        # Debug: Print result keys to understand structure
+        print(f"🔍 DEBUG - Result keys: {list(result.keys())}")
+        print(f"🔍 DEBUG - current_state value: {result.get('current_state')}")
+        print(f"🔍 DEBUG - current_state type: {type(result.get('current_state'))}")
+        
         # Extract agent response
         agent_response = result.get("agent_output", "")
         if not agent_response and result.get("messages"):
@@ -305,7 +316,9 @@ def continue_session(request: ContinueSessionRequest):
     except HTTPException:
         raise
     except Exception as e:
+        import traceback
         print(f"API error in /session/continue: {str(e)}")
+        print(f"Full traceback:\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Error continuing session: {str(e)}")
 
 

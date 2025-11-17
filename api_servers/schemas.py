@@ -79,6 +79,10 @@ class SessionMetadata(BaseModel):
         default=None,
         description="Base64-encoded image URL (e.g., 'data:image/png;base64,...'). None if no image is present."
     )
+    image_description: Optional[str] = Field(
+        default=None,
+        description="Description of the image. None if no image is present."
+    )
     image_node: Optional[str] = Field(
         default=None,
         description="The pedagogical node where the image was generated (e.g., 'CI', 'GE', 'APK'). None if no image."
