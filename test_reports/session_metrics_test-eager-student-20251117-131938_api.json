@@ -1,0 +1,26 @@
+{
+  "concepts_covered": [
+    "Simple Pendulum",
+    "Time Period",
+    "Oscillation",
+    "Length and Time Period Relationship",
+    "Mass and Time Period Relationship",
+    "Amplitude and Time Period Relationship",
+    "Independent, Dependent, and Control Variables",
+    "Newton's Second Law (F=ma)",
+    "Small Angle Approximation",
+    "Metronomes"
+  ],
+  "num_concepts_covered": 10,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "High",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.95,
+  "quiz_score": 0.0,
+  "error_handling_count": 2,
+  "adaptability": true,
+  "session_id": "test-eager-student-20251117-131938",
+  "total_interactions": 23,
+  "persona_name": "Eager Student"
+}

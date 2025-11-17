@@ -467,6 +467,8 @@ def ge_node(state: AgentState) -> AgentState:
                 f"Generate one 'why' or 'how' question to explore the mechanism of this specific concept within '{concept_pkg.title}'."
             )
         else:
+            print("List of concepts:", concepts)
+            print("No concepts available for GE node.")
             raise IndexError("No concepts available for exploration.")
 
         # Build final prompt using optimized template
@@ -957,6 +959,7 @@ def tc_node(state: AgentState) -> AgentState:
         print("=" * 80)
         
         state["agent_output"] = content
+        state["asked_tc"] = True
         return state
 
     # Second pass: evaluate & either affirm or explain
