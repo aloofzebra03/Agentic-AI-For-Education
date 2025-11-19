@@ -187,13 +187,13 @@ def apk_node(state: AgentState) -> AgentState:
     # Handle student's response after hook question
     state["apk_tries"] = state.get("apk_tries", 0) + 1
     
-    # Check if we've reached max tries (2) - provide answer and move to CI
-    if state["apk_tries"] >= 2:
+    # Check if we've reached max tries (5) - provide answer and move to CI
+    if state["apk_tries"] >= 5:
         gt = get_ground_truth_from_json(concept_pkg.title, "Concept Definition")
         final_system_prompt = f"""Current node: APK (Activate Prior Knowledge) - FINAL ATTEMPT
 This is the final attempt to help the student identify the concept.
 
-The student has had 2 attempts to identify '{concept_pkg.title}' but hasn't gotten it right.
+The student has had 5 attempts to identify '{concept_pkg.title}' but hasn't gotten it right.
 
 Ground truth (Concept Definition): {gt}
 
