@@ -845,19 +845,18 @@ Task: Grade this answer on a scale from 0 to 1 and determine next state. Respond
 
     
     raw = llm_with_history(state, final_prompt).content
-    if(current_idx==len(concepts)-1):
-        print("#############LAST CONCEPT REACHED#############")
-        parsed['next_state']="TC"
-    else:
-        print("#############MORE CONCEPTS TO GO#############")
-        parsed['next_state']="GE"
 
-        
     json_text = extract_json_block(raw)
     try:
         print("#############JSON TEXT HERE",json_text)
         parsed_obj: ArResponse = ar_parser.parse(json_text)
         parsed = parsed_obj.model_dump()
+        if(current_idx==len(concepts)-1):
+            print("#############LAST CONCEPT REACHED#############")
+            parsed['next_state']="TC"
+        else:
+            print("#############MORE CONCEPTS TO GO#############")
+            parsed['next_state']="GE"
 
         # 🔍 AR PARSING OUTPUT - MAIN CONTENT 🔍
         print("=" * 80)

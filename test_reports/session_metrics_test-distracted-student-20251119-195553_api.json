@@ -1,0 +1,25 @@
+{
+  "concepts_covered": [
+    "Pendulum",
+    "Time Period",
+    "Pivot Point",
+    "Weight (Mass)",
+    "String Length",
+    "Amplitude",
+    "Independent Variable",
+    "Dependent Variable",
+    "Control Variable"
+  ],
+  "num_concepts_covered": 9,
+  "clarity_conciseness_score": 3.0,
+  "user_type": "Dull",
+  "user_interest_rating": 1.0,
+  "user_engagement_rating": 1.0,
+  "enjoyment_probability": 0.1,
+  "quiz_score": 0.0,
+  "error_handling_count": 15,
+  "adaptability": true,
+  "session_id": "test-distracted-student-20251119-195553",
+  "total_interactions": 25,
+  "persona_name": "Distracted Student"
+}
