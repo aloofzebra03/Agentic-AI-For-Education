@@ -153,6 +153,7 @@ def apk_node(state: AgentState) -> AgentState:
         system_prompt = (
             f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
             f"Ground truth (Concept Definition):\n{gt}\nGenerate one hook question that activates prior knowledge for '{concept_pkg.title}'.",
+            f"Remember you are talking directly to the students so only output the hook question and nothing else."
         )
         
         # Build final prompt using optimized template
@@ -815,6 +816,8 @@ def ar_node(state: AgentState) -> AgentState:
     concepts = state.get("sim_concepts", [])
     
     context = json.dumps(PEDAGOGICAL_MOVES["AR"], indent=2)
+
+
     system_prompt = f"""Current node: AR (Application & Retrieval)
 
 Current status:
@@ -839,8 +842,17 @@ Task: Grade this answer on a scale from 0 to 1 and determine next state. Respond
         parser=ar_parser,
         current_node="AR"
     )
+
     
     raw = llm_with_history(state, final_prompt).content
+    if(current_idx==len(concepts)-1):
+        print("#############LAST CONCEPT REACHED#############")
+        parsed['next_state']="TC"
+    else:
+        print("#############MORE CONCEPTS TO GO#############")
+        parsed['next_state']="GE"
+
+        
     json_text = extract_json_block(raw)
     try:
         print("#############JSON TEXT HERE",json_text)
@@ -1188,6 +1200,7 @@ def end_node(state: AgentState) -> AgentState:
         "misconception_detected": state.get("misconception_detected"),
         "last_user_msg":          state.get("last_user_msg"),
         "history":                state.get("history"),
+        "status":                 "completed"  # Mark summary as final
     }
 
     # 🔍 END NODE - SESSION SUMMARY 🔍

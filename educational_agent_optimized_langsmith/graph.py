@@ -96,7 +96,17 @@ def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
     # state.setdefault("transfer_success", False)
     state.setdefault("last_correction", "")
     # state.setdefault("quiz_score", 0.0)
-    # state.setdefault("session_summary", {})
+    
+    # Initialize session_summary with default values (will be updated throughout session)
+    state.setdefault("session_summary", {
+        "quiz_score": None,
+        "transfer_success": False,
+        "definition_echoed": False,
+        "misconception_detected": False,
+        "last_user_msg": "",
+        "history": None,
+        "status": "in_progress"  # Track if session reached END
+    })
     
     # # Simulation state - use dictionaries instead of Pydantic objects for serialization
     # state.setdefault("sim_variables", [])  # List of dict with keys: name, role, note
@@ -152,6 +162,17 @@ def _wrap(fn):
                 "transition_after_message_index": final_message_count,
             })
             print(f"🔄 NODE TRANSITION: {old_state} -> {new_state} after message {final_message_count}")
+        
+        # UPDATE SESSION SUMMARY (continuous throughout session)
+        if "session_summary" in st:
+            st["session_summary"].update({
+                "quiz_score": st.get("retrieval_score"),
+                "transfer_success": st.get("transfer_success", False),
+                "definition_echoed": st.get("definition_echoed", False),
+                "misconception_detected": st.get("misconception_detected", False),
+                "last_user_msg": st.get("last_user_msg", ""),
+                "current_state": new_state,
+            })
         
         print(f"🏁 _WRAP DEBUG - Node processing completed")
         print(f"📊 Final messages count: {final_message_count}")

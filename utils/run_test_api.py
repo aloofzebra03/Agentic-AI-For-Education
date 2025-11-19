@@ -267,7 +267,10 @@ def run_test_api():
             session_summary = summary_response.get("summary", {})
             
             print("\n📋 Session Summary:")
-            pprint(session_summary)
+            if session_summary:
+                pprint(session_summary)
+            else:
+                print("⚠️  Session summary exists but is empty (session may not have reached END node yet)")
             
             # Save the session summary
             summary_filename = f"session_summary_{session_id}_api.json"

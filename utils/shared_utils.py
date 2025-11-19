@@ -271,18 +271,17 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
     template_parts = ["{system_prompt}"]
     template_vars = ["system_prompt"]
     
-    # Add optimized history if available
+    # Call history building functions once and reuse the result
     if current_node:
-        optimized_history = build_node_aware_conversation_history(state, current_node)
-        if optimized_history:
-            template_parts.append("\n\nConversation History:\n{history}")
-            template_vars.append("history")
+        history = build_node_aware_conversation_history(state, current_node)
     else:
         # Fall back to regular history if no current_node provided
         history = build_conversation_history(state)
-        if history:
-            template_parts.append("\n\nConversation History:\n{history}")
-            template_vars.append("history")
+    
+    # Add history to template if available
+    if history:
+        template_parts.append("\n\nConversation History:\n{history}")
+        template_vars.append("history")
     
     # Add last user message if requested
     if include_last_message and state.get("last_user_msg"):
@@ -304,15 +303,9 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
     # Prepare the values
     template_values = {"system_prompt": system_prompt}
     
-    # Add history (optimized or regular)
-    if current_node:
-        optimized_history = build_node_aware_conversation_history(state, current_node)
-        if optimized_history:
-            template_values["history"] = optimized_history
-    else:
-        history = build_conversation_history(state)
-        if history:
-            template_values["history"] = history
+    # Add history if available (already computed above)
+    if history:
+        template_values["history"] = history
     
     if include_last_message and state.get("last_user_msg"):
         template_values["last_user_message"] = state["last_user_msg"]

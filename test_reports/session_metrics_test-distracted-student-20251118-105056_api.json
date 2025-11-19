@@ -1,0 +1,24 @@
+{
+  "concepts_covered": [
+    "Pendulum",
+    "Time Period",
+    "Relationship between string length and swing time",
+    "Relationship between weight/mass of bob and swing time",
+    "Relationship between starting height/amplitude and swing time",
+    "Independent Variables",
+    "Dependent Variables",
+    "Control Variables"
+  ],
+  "num_concepts_covered": 8,
+  "clarity_conciseness_score": 3.0,
+  "user_type": "Dull",
+  "user_interest_rating": 2.0,
+  "user_engagement_rating": 2.0,
+  "enjoyment_probability": 0.3,
+  "quiz_score": 0.0,
+  "error_handling_count": 15,
+  "adaptability": true,
+  "session_id": "test-distracted-student-20251118-105056",
+  "total_interactions": 21,
+  "persona_name": "Distracted Student"
+}
