@@ -222,8 +222,12 @@ def start_session(request: StartSessionRequest):
         user_id = request.student_id or "anonymous"
         
         # Start the conversation by invoking the graph with __start__ message
+        # Include is_kannada in the initial state
         result = graph.invoke(
-            {"messages": [HumanMessage(content="__start__")]},
+            {
+                "messages": [HumanMessage(content="__start__")],
+                "is_kannada": request.is_kannada
+            },
             config={"configurable": {"thread_id": thread_id}},
         )
         

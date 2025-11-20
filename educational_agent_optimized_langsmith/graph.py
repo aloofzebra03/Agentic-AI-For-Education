@@ -77,6 +77,8 @@ class AgentState(TypedDict, total=False):
     summary: str
     summary_last_index: int
     enhanced_message_metadata: Dict[str, Any]
+    # NEW: Language preference
+    is_kannada: bool
 
 # -----------------------------------------------------------------------------
 # // 4. Initialize state and wrap helper
@@ -117,6 +119,8 @@ def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
     # state.setdefault("node_transitions", [])
     state.setdefault("summary", "")
     state.setdefault("summary_last_index", 0)
+    # Initialize language preference - default to False
+    state.setdefault("is_kannada", False)
     return state
 
 def _wrap(fn):
@@ -239,7 +243,8 @@ g.add_edge("START","APK")
 g.add_conditional_edges("APK", _route, {"APK": "APK", "CI": "CI"})
 g.add_conditional_edges("CI",  _route, {"CI": "CI","SIM_CC":"SIM_CC"})
 # g.add_conditional_edges("GE",  _route, {"MH": "MH", "AR": "AR","GE": "GE"})
-g.add_conditional_edges("GE",  _route, {"GE": "GE","SIM_VARS":"SIM_VARS"})
+# g.add_conditional_edges("GE",  _route, {"GE": "GE","SIM_VARS":"SIM_VARS"})
+g.add_conditional_edges("GE",  _route, {"GE": "GE","AR": "AR"}) #Completely removing the simulation from this point
 # g.add_conditional_edges("MH", _route,{"MH": "MH", "SIM_VARS": "SIM_VARS", "AR": "AR"})
 # g.add_conditional_edges("MH", _route,{"MH": "MH", "SIM_VARS": "SIM_VARS"})
 g.add_conditional_edges("AR", _route, {"AR": "AR","TC": "TC", "GE": "GE"})

@@ -1,0 +1,24 @@
+{
+  "concepts_covered": [
+    "Pendulum",
+    "Time Period",
+    "Length and Period Relationship",
+    "Mass and Period Relationship",
+    "Amplitude and Period Relationship",
+    "Restoring Force",
+    "Inertia",
+    "Pendulum Clocks"
+  ],
+  "num_concepts_covered": 8,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "High",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.95,
+  "quiz_score": 0.0,
+  "error_handling_count": 4,
+  "adaptability": true,
+  "session_id": "test-eager-student-20251120-194355",
+  "total_interactions": 22,
+  "persona_name": "Eager Student"
+}

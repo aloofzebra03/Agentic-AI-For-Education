@@ -71,8 +71,8 @@ class CiResponse(BaseModel):
 
 class GeResponse(BaseModel):
     feedback: str
-    next_state: Literal["SIM_VARS", "GE"]
-    correction: Optional[str] = None
+    next_state: Literal["AR", "GE"]
+    # correction: Optional[str] = None  # OLD: Used when routing to SIM_VARS/MH
 
 class MhResponse(BaseModel):
     feedback: str
@@ -106,12 +106,16 @@ rlc_parser = PydanticOutputParser(pydantic_object=RlcResponse)
 # ─── Node definitions ───────────────────────────────────────────────────────────
 
 def start_node(state: AgentState) -> AgentState:
+    # Base system prompt
     system_prompt = (
         f"You are an educational agent helping a learner understand '{concept_pkg.title}'. The learner is a student of class 7. Remember that you are interacting directly with the learner.\n"
         "Greet the learner and ask if they are ready to begin."
         "DONT use emojis as a TTS to speech model will break because of that."
-        # "Also Remember that the student is of Kannada origin and understands olny kannada.So speak to the student in kannada.The script has to be kannada and not english.\n"
     )
+    
+    # Conditionally add Kannada instruction if is_kannada is True
+    if state.get("is_kannada", False):
+        system_prompt += "\nAlso Remember that the student is of Kannada origin and understands only kannada. So speak to the student in kannada. The script has to be kannada and not english."
     
     # Build final prompt using optimized template
     final_prompt = build_prompt_from_template_optimized(
@@ -508,9 +512,9 @@ def ge_node(state: AgentState) -> AgentState:
     # Handle tries for GE node - increment counter
     state["ge_tries"] = state.get("ge_tries",0) + 1
     
-    # Check if we've reached max tries (1) - transition smoothly to MH
+    # Check if we've reached max tries (1) - transition smoothly to AR
     if state["ge_tries"] >= 1:
-        # Let LLM generate a natural transition to MH with gentle correction
+        # NEW: Let LLM generate a natural transition to AR with gentle clarification
         current_idx = state.get("sim_current_idx", 0)
         concepts = state.get("sim_concepts", [])
         
@@ -521,14 +525,18 @@ def ge_node(state: AgentState) -> AgentState:
             
 Based on their response, provide a gentle clarification or correction to help them understand better. Use this ground truth as reference: {gt_context[:200]}...
 
-Keep your response conversational and supportive. Address any confusion while guiding them toward the correct understanding."""
+Keep your response conversational and supportive. Address any confusion while guiding them toward the correct understanding.
+
+Then transition to testing their understanding by saying something like: 'Now let's see how well you understand this concept with a quick question.'"""
         else:
             gt_context = get_ground_truth_from_json(concept_pkg.title, "Details (facts, sub-concepts)")
             transition_prompt = f"""The student has tried once to explore '{concept_pkg.title}'. 
             
 Based on their response, provide a gentle clarification or correction to help them understand better. Use this ground truth as reference: {gt_context[:200]}...
 
-Keep your response conversational and supportive. Address any confusion while guiding them toward the correct understanding."""
+Keep your response conversational and supportive. Address any confusion while guiding them toward the correct understanding.
+
+Then transition to testing their understanding by saying something like: 'Now let's see how well you understand this concept with a quick question.'"""
         
         final_prompt = build_prompt_from_template_optimized(
             system_prompt=transition_prompt,
@@ -545,8 +553,14 @@ Keep your response conversational and supportive. Address any confusion while gu
         # Return only the changed keys following LangGraph best practices
         return {
             "agent_output": content,
-            "current_state": "SIM_VARS"  # Transition to SIM_VARS for proper misconception handling
+            "current_state": "AR"  # NEW: Transition directly to AR for assessment
         }
+        
+        # OLD: Transition to SIM_VARS for simulation-based misconception handling
+        # return {
+        #     "agent_output": content,
+        #     "current_state": "SIM_VARS"  # OLD: Transition to SIM_VARS for proper misconception handling
+        # }
 
     context = json.dumps(PEDAGOGICAL_MOVES["GE"], indent=2)
     current_idx = state.get("sim_current_idx", 0)
@@ -559,7 +573,7 @@ Current status:
 - Concept name: {concepts[current_idx] if concepts and current_idx < len(concepts) else 'Unknown'}
 
 Possible next_state values:
-- "SIM_VARS": if you detect a misconception in the student's reasoning (must include a non-empty "correction" ≤2 sentences).
+- "AR": if the student shows understanding and is ready to be assessed on this concept.
 - "GE": if you need to ask another question about the same concept.
 
 Choose ONLY from these options
@@ -567,7 +581,11 @@ Choose ONLY from these options
 Pedagogical context:
 {context}
 
-Task: Detect misconception, correct reasoning, or need for further exploration. RESPOND ONLY WITH JSON matching the schema above."""
+Task: Evaluate student understanding and decide if they're ready for assessment (AR) or need more exploration (GE). RESPOND ONLY WITH JSON matching the schema above.
+
+OLD OPTIONS (commented out):
+# - "SIM_VARS": if you detect a misconception in the student's reasoning (must include a non-empty "correction" ≤2 sentences).
+# Task: Detect misconception, correct reasoning, or need for further exploration."""
 
     # Build final prompt using optimized template with instructions at the end
     final_prompt = build_prompt_from_template_optimized(
@@ -604,10 +622,14 @@ Task: Detect misconception, correct reasoning, or need for further exploration. 
             "current_state": parsed['next_state']
         }
 
-        if parsed['next_state'] == "MH":
-            update["last_correction"] = parsed.get('correction') or "Let me clarify that for you."
-        elif parsed['next_state'] == "SIM_VARS":
-            update["in_simulation"] = True
+        # NEW: Since GE now only goes to AR or GE, no special handling needed
+        # Just return the update with the next_state as determined by the LLM
+        
+        # OLD: Special handling for MH and SIM_VARS transitions
+        # if parsed['next_state'] == "MH":
+        #     update["last_correction"] = parsed.get('correction') or "Let me clarify that for you."
+        # elif parsed['next_state'] == "SIM_VARS":
+        #     update["in_simulation"] = True
 
         return update
     except Exception as e:

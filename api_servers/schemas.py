@@ -24,6 +24,10 @@ class StartSessionRequest(BaseModel):
         None, 
         description="Optional custom label for this session (used in thread_id generation)"
     )
+    is_kannada: bool = Field(
+        default=False,
+        description="Whether to conduct the session in Kannada language. Default is False (English)."
+    )
 
 
 class ContinueSessionRequest(BaseModel):

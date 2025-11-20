@@ -1,0 +1,24 @@
+{
+  "concepts_covered": [
+    "Pendulum",
+    "Time Period (Period)",
+    "Oscillation",
+    "Gravity",
+    "Inertia",
+    "Relationship between Pendulum Length and Period",
+    "Relationship between Gravity and Period",
+    "Factors Affecting Pendulum Period"
+  ],
+  "num_concepts_covered": 8,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "Medium",
+  "user_interest_rating": 3.0,
+  "user_engagement_rating": 4.0,
+  "enjoyment_probability": 0.75,
+  "quiz_score": 0.0,
+  "error_handling_count": 8,
+  "adaptability": true,
+  "session_id": "test-confused-student-20251120-194716",
+  "total_interactions": 22,
+  "persona_name": "Confused Student"
+}
