@@ -1,0 +1,21 @@
+{
+  "concepts_covered": [
+    "Pendulum",
+    "Time Period",
+    "Factors affecting the time period of a pendulum (length, weight, amplitude, material)",
+    "Simple Harmonic Motion (implied)",
+    "Inertia (implied)"
+  ],
+  "num_concepts_covered": 5,
+  "clarity_conciseness_score": 3.0,
+  "user_type": "Dull",
+  "user_interest_rating": 1.0,
+  "user_engagement_rating": 1.0,
+  "enjoyment_probability": 0.2,
+  "quiz_score": 0.0,
+  "error_handling_count": 15,
+  "adaptability": true,
+  "session_id": "test-distracted-student-20251120-195156",
+  "total_interactions": 30,
+  "persona_name": "Distracted Student"
+}

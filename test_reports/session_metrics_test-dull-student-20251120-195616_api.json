@@ -1,0 +1,25 @@
+{
+  "concepts_covered": [
+    "Pendulum",
+    "Time Period",
+    "Pivot Point",
+    "String Length",
+    "Weight (Mass)",
+    "Amplitude",
+    "Gravity",
+    "Oscillation",
+    "Frequency"
+  ],
+  "num_concepts_covered": 9,
+  "clarity_conciseness_score": 3.0,
+  "user_type": "Dull",
+  "user_interest_rating": 2.0,
+  "user_engagement_rating": 2.0,
+  "enjoyment_probability": 0.4,
+  "quiz_score": 0.0,
+  "error_handling_count": 8,
+  "adaptability": true,
+  "session_id": "test-dull-student-20251120-195616",
+  "total_interactions": 22,
+  "persona_name": "Dull Student"
+}
