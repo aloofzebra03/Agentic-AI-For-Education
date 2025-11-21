@@ -18,16 +18,16 @@ class Evaluator:
     Note: For quantitative metrics (engagement, clarity scores, etc.), use session_metrics.py
     """
     def __init__(self):
-        # self.llm = ChatGoogleGenerativeAI(
-        #     model="gemini-2.0-flash",
-        #     api_key=os.getenv("GOOGLE_API_KEY"),
-        #     temperature=0.2,
-        # )
-        self.llm = ChatGroq(
-        model="llama-3.1-8b-instant",
-        temperature=0.5,
-        max_tokens=None,
-    )
+        self.llm = ChatGoogleGenerativeAI(
+            model="gemini-2.0-flash",
+            api_key=os.getenv("GOOGLE_API_KEY_5"),
+            temperature=0.2,
+        )
+    #     self.llm = ChatGroq(
+    #     model="llama-3.1-8b-instant",
+    #     temperature=0.5,
+    #     max_tokens=None,
+    # )
 
     def evaluate(self, persona: Persona, history: list) -> str:
         """

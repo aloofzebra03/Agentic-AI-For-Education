@@ -6,8 +6,9 @@ from langchain_core.messages import HumanMessage, AIMessage,SystemMessage
 from langchain_groq import ChatGroq
 
 class TesterAgent:
-    def __init__(self, persona: Persona):
+    def __init__(self, persona: Persona, is_kannada: bool = False):
         self.persona = persona
+        self.is_kannada = is_kannada
         self.llm = ChatGoogleGenerativeAI(
             model="gemini-2.0-flash",
             api_key=os.getenv("GOOGLE_API_KEY_1"),
@@ -19,8 +20,14 @@ class TesterAgent:
     #     max_tokens=None,
     # )
         # Initialize history with the persona's description as a system prompt
+        base_prompt = f"You are a student with the persona of a '{self.persona.name}'. Your characteristics are: {self.persona.description}. You must consistently act according to this persona."
+        
+        # Add Kannada instruction if is_kannada is True
+        if self.is_kannada:
+            base_prompt += " You are a student of Kannada origin and understand only Kannada. You must respond ONLY in Kannada language. All your responses must be in Kannada script, not English."
+        
         self.history = [
-            SystemMessage(content=f"You are a student with the persona of a '{self.persona.name}'. Your characteristics are: {self.persona.description}. You must consistently act according to this persona.")
+            SystemMessage(content=base_prompt)
         ]
 
     def respond(self, agent_msg: str) -> str:
@@ -29,16 +36,19 @@ class TesterAgent:
 
         formatted_history = self.history
 
-        prompt = f"""
+        base_prompt = f"""
 {formatted_history}
 
 Your task is to provide the next response as the "User", staying true to your persona.
 Your response should be on a single line.
 
 User: """
+        
+        if self.is_kannada:
+            base_prompt += " You are a student of Kannada origin and understand only Kannada. You must respond ONLY in Kannada language. All your responses must be in Kannada script, not English."
 
         # Generate response using the context-rich prompt
-        response = self.llm.invoke(prompt)
+        response = self.llm.invoke(base_prompt)
         user_response = response.content.strip()
 
         # Add your own response to the history

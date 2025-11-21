@@ -219,6 +219,10 @@ def build_prompt_from_template(system_prompt: str, state: AgentState,
                              include_instructions: bool = False,
                              parser=None) -> str:
     
+    # Add Kannada instruction if needed
+    if state.get("is_kannada", False):
+        system_prompt += "\n\nIMPORTANT: You must respond ONLY in Kannada language. All your responses must be in Kannada script, not English."
+    
     # Build the template string based on what we need
     template_parts = ["{system_prompt}"]
     template_vars = ["system_prompt"]
@@ -266,6 +270,10 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
                                        include_last_message: bool = False, 
                                        include_instructions: bool = False,
                                        parser=None, current_node: str = None) -> str:
+    
+    # Add Kannada instruction if needed
+    if state.get("is_kannada", False):
+        system_prompt += "\n\nIMPORTANT: You must respond ONLY in Kannada language. All your responses must be in Kannada script, not English."
     
     # Build the template string based on what we need
     template_parts = ["{system_prompt}"]
@@ -691,6 +699,7 @@ Conversation:
 
 Summary:"""
     
+    
     try:
         summary_response = invoke_llm_with_fallback(
             [HumanMessage(content=summary_prompt)],
@@ -724,7 +733,7 @@ Conversation:
 {conversation_text}
 
 Summary:"""
-        
+
         summary_response = invoke_llm_with_fallback(
             [HumanMessage(content=summary_prompt)],
             operation_name="Summary from text"

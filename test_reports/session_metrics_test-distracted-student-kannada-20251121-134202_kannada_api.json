@@ -1,0 +1,21 @@
+{
+  "concepts_covered": [
+    "Pendulum",
+    "Period",
+    "Oscillation",
+    "Length of Pendulum and its effect on Period",
+    "Weight of Pendulum and its effect on Period"
+  ],
+  "num_concepts_covered": 5,
+  "clarity_conciseness_score": 3.0,
+  "user_type": "Dull",
+  "user_interest_rating": 1.0,
+  "user_engagement_rating": 1.0,
+  "enjoyment_probability": 0.1,
+  "quiz_score": 0.0,
+  "error_handling_count": 15,
+  "adaptability": true,
+  "session_id": "test-distracted-student-kannada-20251121-134202",
+  "total_interactions": 17,
+  "persona_name": "Distracted Student"
+}

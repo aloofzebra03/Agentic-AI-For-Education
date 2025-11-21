@@ -1,0 +1,24 @@
+{
+  "concepts_covered": [
+    "Simple pendulum",
+    "Oscillation",
+    "Period",
+    "Length and period relationship",
+    "Mass and period relationship",
+    "Amplitude and period relationship",
+    "Effect of gravity on pendulum period",
+    "Grandfather clock application"
+  ],
+  "num_concepts_covered": 8,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "High",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.95,
+  "quiz_score": 0.0,
+  "error_handling_count": 3,
+  "adaptability": true,
+  "session_id": "test-eager-student-kannada-20251120-214848",
+  "total_interactions": 25,
+  "persona_name": "Eager Student"
+}

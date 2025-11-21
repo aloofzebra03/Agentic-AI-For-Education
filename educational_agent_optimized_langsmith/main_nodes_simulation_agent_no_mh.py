@@ -107,15 +107,15 @@ rlc_parser = PydanticOutputParser(pydantic_object=RlcResponse)
 
 def start_node(state: AgentState) -> AgentState:
     # Base system prompt
-    system_prompt = (
-        f"You are an educational agent helping a learner understand '{concept_pkg.title}'. The learner is a student of class 7. Remember that you are interacting directly with the learner.\n"
+    system_prompt = f"""
+        You are an educational agent helping a learner understand '{concept_pkg.title}'. The learner is a student of class 7. Remember that you are interacting directly with the learner.\n"
         "Greet the learner and ask if they are ready to begin."
         "DONT use emojis as a TTS to speech model will break because of that."
-    )
+    """
     
     # Conditionally add Kannada instruction if is_kannada is True
     if state.get("is_kannada", False):
-        system_prompt += "\nAlso Remember that the student is of Kannada origin and understands only kannada. So speak to the student in kannada. The script has to be kannada and not english."
+        system_prompt += "\nAlso Remember that the student is of Kannada origin and understands only kannada. So speak to the student in kannada. The script has to be kannada and not english.Show text in kannada only."
     
     # Build final prompt using optimized template
     final_prompt = build_prompt_from_template_optimized(
@@ -154,11 +154,11 @@ def apk_node(state: AgentState) -> AgentState:
         state["apk_tries"] = 0
         # Include ground truth for Concept Definition
         gt = get_ground_truth_from_json(concept_pkg.title, "Concept Definition")
-        system_prompt = (
-            f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
-            f"Ground truth (Concept Definition):\n{gt}\nGenerate one hook question that activates prior knowledge for '{concept_pkg.title}'.",
-            f"Remember you are talking directly to the students so only output the hook question and nothing else."
-        )
+        system_prompt = f"""
+            Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n
+            Ground truth (Concept Definition):\n{gt}\nGenerate one hook question that activates prior knowledge for '{concept_pkg.title}'.,
+            Remember you are talking directly to the students so only output the hook question and nothing else.
+        """
         
         # Build final prompt using optimized template
         final_prompt = build_prompt_from_template_optimized(
@@ -292,11 +292,12 @@ def ci_node(state: AgentState) -> dict:
     if not state.get("asked_ci", False):
         # Include ground truth for Explanation (with analogies)
         gt = get_ground_truth_from_json(concept_pkg.title, "Explanation (with analogies)")
-        system_prompt = (
-            f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
-            f"Ground truth (Explanation):\n{gt}\nProvide a concise definition (≤30 words) of '{concept_pkg.title}', "
-            "then ask the learner to restate it."
-        )
+        system_prompt = f"""
+            Please use the following ground truth as a baseline and build upon it, but do not deviate too much.
+            Ground truth (Explanation):
+{gt}
+Provide a concise definition (≤30 words) of '{concept_pkg.title}', then ask the learner to restate it.
+        """
         
         # Build final prompt using optimized template
         final_prompt = build_prompt_from_template_optimized(
@@ -352,11 +353,11 @@ def ci_node(state: AgentState) -> dict:
     # Check if we've reached 2 attempts - if so, provide definition and move on
     if ci_tries >= 2:
         # gt = get_ground_truth_from_json(concept_pkg.title, "Explanation (with analogies)")
-        system_prompt = (
-            f"The student has struggled with restating the definition. Provide the correct definition of '{concept_pkg.title}' "
-            f"clearly and encourage them that it's okay to struggle with new concepts. "
-            "Then say 'Now let's explore this concept deeper with a question.'"
-        )
+        system_prompt = f"""
+            The student has struggled with restating the definition. Provide the correct definition of '{concept_pkg.title}' 
+            clearly and encourage them that it's okay to struggle with new concepts. 
+            Then say 'Now let's explore this concept deeper with a question.'
+        """
         
         # Build final prompt using optimized template
         final_prompt = build_prompt_from_template_optimized(
@@ -465,12 +466,13 @@ def ge_node(state: AgentState) -> AgentState:
             current_concept = concepts[current_idx]
             # Include ground truth for Details (facts, sub-concepts)
             gt = get_ground_truth_from_json(concept_pkg.title, "Details (facts, sub-concepts)")
-            system_prompt = (
-                f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
-                f"Ground truth (Details):\n{gt}\n\n"
-                f"We are now exploring concept {current_idx + 1} of {len(concepts)}: '{current_concept}'.\n"
-                f"Generate one 'why' or 'how' question to explore the mechanism of this specific concept within '{concept_pkg.title}'."
-            )
+            system_prompt = f"""
+                Please use the following ground truth as a baseline and build upon it, but do not deviate too much.
+                Ground truth (Details):
+                {gt}
+                We are now exploring concept {current_idx + 1} of {len(concepts)}: '{current_concept}'.
+                Generate one 'why' or 'how' question to explore the mechanism of this specific concept within '{concept_pkg.title}'.
+            """
         else:
             print("List of concepts:", concepts)
             print("No concepts available for GE node.")
@@ -795,17 +797,20 @@ def ar_node(state: AgentState) -> AgentState:
         
         if concepts and current_idx < len(concepts):
             current_concept = concepts[current_idx]
-            system_prompt = (
-                f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
-                f"Ground truth (MCQs):\n{gt}\n\n"
-                f"Generate a short quiz question (T/F, MCQ, or short answer) specifically about concept {current_idx + 1}: '{current_concept}' "
-                f"within the topic '{concept_pkg.title}'. Focus the question on this specific concept."
-            )
+            system_prompt = f"""
+                Please use the following ground truth as a baseline and build upon it, but do not deviate too much.
+                Ground truth (MCQs):
+            {gt}
+
+                Generate a short quiz question (T/F, MCQ, or short answer) specifically about concept {current_idx + 1}: '{current_concept}' 
+                within the topic '{concept_pkg.title}'. Focus the question on this specific concept.
+            """
         else:
-            system_prompt = (
-                f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
-            f"Ground truth (MCQs):\n{gt}\nGenerate a short quiz question (T/F, MCQ, or short answer) on '{concept_pkg.title}' and prompt the learner."
-        )
+            system_prompt = f"""
+                Please use the following ground truth as a baseline and build upon it, but do not deviate too much.
+                Ground truth (MCQs):
+{gt}
+                Generate a short quiz question (T/F, MCQ, or short answer) on '{concept_pkg.title}' and prompt the learner."""
         
         # Build final prompt using optimized template
         final_prompt = build_prompt_from_template_optimized(
@@ -962,10 +967,11 @@ def tc_node(state: AgentState) -> AgentState:
         # state["asked_tc"] = True
         # Include ground truth for What-if Scenarios
         gt = get_ground_truth_from_json(concept_pkg.title, "What-if Scenarios")
-        system_prompt = (
-            f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
-            f"Ground truth (What-if Scenarios):\n{gt}\nGenerate a 'what-if' or transfer question to apply '{concept_pkg.title}' in a new context."
-        )
+        system_prompt = f"""
+            Please use the following ground truth as a baseline and build upon it, but do not deviate too much.
+            Ground truth (What-if Scenarios): {gt}
+            Generate a 'what-if' or transfer question to apply '{concept_pkg.title}' in a new context.
+        """
         
         # Build final prompt using template
         final_prompt = build_prompt_from_template_optimized(
@@ -1088,10 +1094,11 @@ def rlc_node(state: AgentState) -> AgentState:
         state["rlc_tries"] = 0  # Initialize attempt counter
         # Include ground truth for Real-Life Application
         gt = get_ground_truth_from_json(concept_pkg.title, "Real-Life Application")
-        system_prompt = (
-            f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
-            f"Ground truth (Real-Life Application):\n{gt}\nProvide a real-life application for '{concept_pkg.title}', then ask if the learner has seen or used it themselves."
-        )
+        system_prompt = f"""
+            Please use the following ground truth as a baseline and build upon it, but do not deviate too much.
+            Ground truth (Real-Life Application): {gt}
+            Provide a real-life application for '{concept_pkg.title}', then ask if the learner has seen or used it themselves.
+        """
         
         # Build final prompt using template
         final_prompt = build_prompt_from_template_optimized(
@@ -1126,12 +1133,12 @@ def rlc_node(state: AgentState) -> AgentState:
     if state["rlc_tries"] >= 2:
         # Include ground truth for Real-Life Application to help answer any final questions
         # gt = get_ground_truth_from_json(concept_pkg.title, "Real-Life Application")
-        system_prompt = (
-            f"The student has been discussing real-life applications of '{concept_pkg.title}' and this is their final interaction in this section. "
-            f"Answer any remaining questions or doubts they might have about the real-life application thoroughly and helpfully. "
-            "After addressing their question/doubt, conclude by saying: "
-            "'Great! As a quick creative task, try drawing or explaining this idea to a friend and share what you notice. You've learned a lot today!'"
-        )
+        system_prompt = f"""
+            The student has been discussing real-life applications of '{concept_pkg.title}' and this is their final interaction in this section. 
+            Answer any remaining questions or doubts they might have about the real-life application thoroughly and helpfully. 
+            After addressing their question/doubt, conclude by saying: 
+            'Great! As a quick creative task, try drawing or explaining this idea to a friend and share what you notice. You've learned a lot today!'
+        """
         
         # Build final prompt using template
         final_prompt = build_prompt_from_template_optimized(

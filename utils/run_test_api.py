@@ -48,12 +48,13 @@ class EducationalAgentAPIClient:
         self.base_url = base_url
         self.session = requests.Session()
     
-    def start_session(self, concept_title: str, persona_name: str, session_label: Optional[str] = None) -> Dict[str, Any]:
+    def start_session(self, concept_title: str, persona_name: str, session_label: Optional[str] = None, is_kannada: bool = False) -> Dict[str, Any]:
         url = f"{self.base_url}/session/start"
         payload = {
             "concept_title": concept_title,
             "persona_name": persona_name,
-            "session_label": session_label
+            "session_label": session_label,
+            "is_kannada": is_kannada
         }
         response = self.session.post(url, json=payload)
         response.raise_for_status()
@@ -153,12 +154,27 @@ def run_test_api():
     
     print(f"\n✅ Selected persona: {persona.name}")
     
+    # 1.5 Select Language
+    print("\n" + "="*80)
+    print("🌐 Select language for the session:")
+    print("="*80)
+    print("1. English (default)")
+    print("2. Kannada (ಕನ್ನಡ)")
+    
+    language_choice = input("\nEnter language number (default is 1): ").strip()
+    is_kannada = (language_choice == "2")
+    
+    if is_kannada:
+        print(f"\n✅ Selected language: Kannada (ಕನ್ನಡ)")
+    else:
+        print(f"\n✅ Selected language: English")
+    
     # Get concept title (you can modify this to be dynamic if needed)
     concept_title = "Pendulum and its Time Period"
     print(f"📚 Teaching concept: {concept_title}")
     
-    # 2. Initialize Tester Agent (client-side only)
-    tester_agent = TesterAgent(persona)
+    # 2. Initialize Tester Agent (client-side only) with language preference
+    tester_agent = TesterAgent(persona, is_kannada=is_kannada)
     
     # 3. Start Conversation via API
     print("\n" + "="*80)
@@ -166,10 +182,12 @@ def run_test_api():
     print("="*80)
     
     try:
+        language_suffix = "kannada" if is_kannada else "english"
         start_response = api_client.start_session(
             concept_title=concept_title,
             persona_name=persona.name,
-            session_label=f"test-{persona.name.lower().replace(' ', '-')}"
+            session_label=f"test-{persona.name.lower().replace(' ', '-')}-{language_suffix}",
+            is_kannada=is_kannada
         )
     except requests.exceptions.RequestException as e:
         print(f"❌ Error starting session: {e}")
@@ -273,7 +291,8 @@ def run_test_api():
                 print("⚠️  Session summary exists but is empty (session may not have reached END node yet)")
             
             # Save the session summary
-            summary_filename = f"session_summary_{session_id}_api.json"
+            language_suffix = "kannada" if is_kannada else "english"
+            summary_filename = f"session_summary_{session_id}_{language_suffix}_api.json"
             os.makedirs("test_reports", exist_ok=True)
             summary_path = os.path.join("test_reports", summary_filename)
             with open(summary_path, "w") as f:
@@ -325,7 +344,8 @@ def run_test_api():
             )
             
             # Save metrics locally
-            metrics_filename = f"session_metrics_{session_id}_api.json"
+            language_suffix = "kannada" if is_kannada else "english"
+            metrics_filename = f"session_metrics_{session_id}_{language_suffix}_api.json"
             metrics_path = os.path.join("test_reports", metrics_filename)
             with open(metrics_path, "w") as f:
                 json.dump(session_metrics.model_dump(), f, indent=2)
@@ -373,7 +393,8 @@ def run_test_api():
         if session_metrics:
             report["session_metrics"] = session_metrics.model_dump()
         
-        report_path = f"test_reports/evaluation_{session_id}_api.json"
+        language_suffix = "kannada" if is_kannada else "english"
+        report_path = f"test_reports/evaluation_{session_id}_{language_suffix}_api.json"
         os.makedirs("test_reports", exist_ok=True)
         with open(report_path, "w") as f:
             json.dump(report, f, indent=2)
