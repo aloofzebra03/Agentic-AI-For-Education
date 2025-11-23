@@ -222,11 +222,12 @@ def start_session(request: StartSessionRequest):
         user_id = request.student_id or "anonymous"
         
         # Start the conversation by invoking the graph with __start__ message
-        # Include is_kannada in the initial state
+        # Include is_kannada and concept_title in the initial state
         result = graph.invoke(
             {
                 "messages": [HumanMessage(content="__start__")],
-                "is_kannada": request.is_kannada
+                "is_kannada": request.is_kannada,
+                "concept_title": request.concept_title
             },
             config={"configurable": {"thread_id": thread_id}},
         )
@@ -362,7 +363,7 @@ def get_session_status(thread_id: str):
             exists=True,
             current_state=state.get("current_state", "UNKNOWN"),
             progress=progress,
-            concept_title=concept_pkg.title,
+            concept_title=state.get("concept_title", "Unknown Concept"),
             message="Status retrieved successfully"
         )
         
@@ -398,7 +399,7 @@ def get_session_history(thread_id: str):
             exists=True,
             messages=history,
             node_transitions=node_transitions,
-            concept_title=concept_pkg.title,
+            concept_title=state.get("concept_title", "Unknown Concept"),
             message="History retrieved successfully"
         )
         
@@ -631,7 +632,7 @@ print("=" * 80)
 print("🎓 Educational Agent API Server Starting...")
 print("=" * 80)
 print(f"Agent Type: educational_agent_optimized_langsmith")
-print(f"Default Concept: {concept_pkg.title}")
+print(f"Concept: Dynamic (passed via API request)")
 print(f"Persistence: InMemorySaver (LangGraph)")
 print("=" * 80)
 print("Available Endpoints:")

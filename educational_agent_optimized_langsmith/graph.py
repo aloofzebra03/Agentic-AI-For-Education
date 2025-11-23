@@ -79,6 +79,8 @@ class AgentState(TypedDict, total=False):
     enhanced_message_metadata: Dict[str, Any]
     # NEW: Language preference
     is_kannada: bool
+    # NEW: Concept title
+    concept_title: str
 
 # -----------------------------------------------------------------------------
 # // 4. Initialize state and wrap helper
@@ -121,6 +123,8 @@ def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
     state.setdefault("summary_last_index", 0)
     # Initialize language preference - default to False
     state.setdefault("is_kannada", False)
+    # Initialize concept_title with default value
+    state.setdefault("concept_title", "Pendulum and its Time Period")
     return state
 
 def _wrap(fn):

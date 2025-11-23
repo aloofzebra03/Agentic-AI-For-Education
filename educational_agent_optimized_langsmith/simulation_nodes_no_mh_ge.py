@@ -6,7 +6,6 @@ from pydantic import BaseModel, Field
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.messages import HumanMessage, AIMessage
 
-from educational_agent_optimized_langsmith.config import concept_pkg
 from utils.shared_utils import (
     AgentState,
     add_ai_message_to_conversation,
