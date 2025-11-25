@@ -1,0 +1,24 @@
+{
+  "concepts_covered": [
+    "Convection",
+    "Heat transfer",
+    "Density",
+    "Heat source temperature",
+    "Fluid type",
+    "Fluid viscosity",
+    "Container size",
+    "Distance from heat source"
+  ],
+  "num_concepts_covered": 8,
+  "clarity_conciseness_score": 5.0,
+  "user_type": "High",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.95,
+  "quiz_score": 0.0,
+  "error_handling_count": 0,
+  "adaptability": true,
+  "session_id": "test-eager-student-20251125-185650",
+  "total_interactions": 27,
+  "persona_name": "Eager Student"
+}

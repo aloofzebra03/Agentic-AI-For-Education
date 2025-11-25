@@ -1,0 +1,19 @@
+{
+  "concepts_covered": [
+    "Luminous vs. Non-luminous objects",
+    "Reflection of light",
+    "Factors affecting visibility (color, size, light intensity, surface texture)"
+  ],
+  "num_concepts_covered": 3,
+  "clarity_conciseness_score": 3.0,
+  "user_type": "Dull",
+  "user_interest_rating": 2.0,
+  "user_engagement_rating": 2.0,
+  "enjoyment_probability": 0.6,
+  "quiz_score": 0.0,
+  "error_handling_count": 12,
+  "adaptability": true,
+  "session_id": "test-confused-student-20251125-191458",
+  "total_interactions": 25,
+  "persona_name": "Confused Student"
+}

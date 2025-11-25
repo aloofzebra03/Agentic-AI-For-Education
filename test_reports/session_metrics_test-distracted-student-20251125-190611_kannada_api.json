@@ -1,0 +1,22 @@
+{
+  "concepts_covered": [
+    "Reflection",
+    "Smooth vs. Rough Surfaces",
+    "Intensity of Light Source",
+    "Size of Mirror",
+    "Shape of Mirror",
+    "Application of Reflection"
+  ],
+  "num_concepts_covered": 6,
+  "clarity_conciseness_score": 3.0,
+  "user_type": "Dull",
+  "user_interest_rating": 1.0,
+  "user_engagement_rating": 1.0,
+  "enjoyment_probability": 0.2,
+  "quiz_score": 0.0,
+  "error_handling_count": 12,
+  "adaptability": true,
+  "session_id": "test-distracted-student-20251125-190611",
+  "total_interactions": 28,
+  "persona_name": "Distracted Student"
+}

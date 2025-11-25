@@ -20,7 +20,7 @@ class Evaluator:
     def __init__(self):
         self.llm = ChatGoogleGenerativeAI(
             model="gemini-2.0-flash",
-            api_key=os.getenv("GOOGLE_API_KEY_5"),
+            api_key=os.getenv("GOOGLE_API_KEY_4"),
             temperature=0.2,
         )
     #     self.llm = ChatGroq(

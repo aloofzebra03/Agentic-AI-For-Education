@@ -11,9 +11,10 @@ class TesterAgent:
         self.is_kannada = is_kannada
         self.llm = ChatGoogleGenerativeAI(
             model="gemini-2.0-flash",
-            api_key=os.getenv("GOOGLE_API_KEY_1"),
+            api_key=os.getenv("GOOGLE_API_KEY_2"),
             temperature=0.7,
         )
+    
     #     self.llm = ChatGroq(
     #     model="llama-3.1-8b-instant",
     #     temperature=0.5,

@@ -1,0 +1,24 @@
+{
+  "concepts_covered": [
+    "Sundial",
+    "Shadows",
+    "Timekeeping",
+    "Gnomon angle and its relation to latitude",
+    "Gnomon height and its effect on shadow clarity",
+    "Dial plate angle and its effect on accuracy",
+    "Effect of location (latitude) on sundial readings",
+    "Effect of time of year on sundial readings"
+  ],
+  "num_concepts_covered": 8,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "Dull",
+  "user_interest_rating": 2.0,
+  "user_engagement_rating": 2.0,
+  "enjoyment_probability": 0.4,
+  "quiz_score": 0.0,
+  "error_handling_count": 10,
+  "adaptability": true,
+  "session_id": "test-dull-student-20251125-192032",
+  "total_interactions": 31,
+  "persona_name": "Dull Student"
+}
