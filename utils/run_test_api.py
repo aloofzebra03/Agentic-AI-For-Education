@@ -99,6 +99,12 @@ class EducationalAgentAPIClient:
         response = self.session.get(url)
         response.raise_for_status()
         return response.json()
+    
+    def list_concepts(self) -> Dict[str, Any]:
+        url = f"{self.base_url}/concepts"
+        response = self.session.get(url)
+        response.raise_for_status()
+        return response.json()
 
 
 def format_simulation_from_metadata(metadata: Dict[str, Any]) -> Optional[str]:
@@ -154,7 +160,44 @@ def run_test_api():
     
     print(f"\n✅ Selected persona: {persona.name}")
     
-    # 1.5 Select Language
+    # 1.5 Select Concept
+    print("\n" + "="*80)
+    print("📚 Select a concept to teach:")
+    print("="*80)
+    
+    try:
+        concepts_response = api_client.list_concepts()
+        if concepts_response.get("success"):
+            concepts = concepts_response.get("concepts", [])
+            print(f"Found {len(concepts)} available concepts:\n")
+            
+            # Display concepts (already in title case from API)
+            for i, concept in enumerate(concepts):
+                print(f"{i+1}. {concept}")
+            
+            concept_choice = input("\nEnter concept number (or press Enter for default 'Pendulum And Its Time Period'): ").strip()
+            
+            if concept_choice and concept_choice.isdigit():
+                concept_idx = int(concept_choice) - 1
+                if 0 <= concept_idx < len(concepts):
+                    # Use the concept from the list (already title cased)
+                    concept_title = concepts[concept_idx]
+                else:
+                    print("Invalid choice, using default")
+                    concept_title = "Pendulum And Its Time Period"
+            else:
+                concept_title = "Pendulum And Its Time Period"
+        else:
+            print("Could not retrieve concepts list, using default")
+            concept_title = "Pendulum And Its Time Period"
+    except Exception as e:
+        print(f"Error retrieving concepts: {e}")
+        print("Using default concept")
+        concept_title = "Pendulum And Its Time Period"
+    
+    print(f"\n✅ Selected concept: {concept_title}")
+    
+    # 1.6 Select Language
     print("\n" + "="*80)
     print("🌐 Select language for the session:")
     print("="*80)
@@ -170,7 +213,7 @@ def run_test_api():
         print(f"\n✅ Selected language: English")
     
     # Get concept title (you can modify this to be dynamic if needed)
-    concept_title = "Pendulum and its Time Period"
+    # concept_title = "Pendulum and its Time Period"
     print(f"📚 Teaching concept: {concept_title}")
     
     # 2. Initialize Tester Agent (client-side only) with language preference

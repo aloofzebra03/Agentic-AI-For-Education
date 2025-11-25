@@ -406,3 +406,20 @@ class TestSimulationResponse(BaseModel):
     message: str = Field(
         description="Status message about the retrieval"
     )
+
+
+class ConceptsListResponse(BaseModel):
+    success: bool = Field(
+        default=True,
+        description="Whether the concepts were retrieved successfully"
+    )
+    concepts: List[str] = Field(
+        description="List of all available concepts (title case)"
+    )
+    total: int = Field(
+        description="Total number of available concepts"
+    )
+    message: str = Field(
+        default="Available concepts retrieved successfully",
+        description="Status message about the retrieval"
+    )

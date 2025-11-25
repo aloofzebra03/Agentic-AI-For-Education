@@ -24,7 +24,8 @@ from api_servers.schemas import (
     TestPersonaRequest, HealthResponse, ErrorResponse,
     PersonaInfo, PersonasListResponse,
     TestImageRequest, TestImageResponse,
-    TestSimulationRequest, TestSimulationResponse
+    TestSimulationRequest, TestSimulationResponse,
+    ConceptsListResponse
 )
 
 # Import personas from tester_agent
@@ -33,7 +34,8 @@ from tester_agent.personas import personas
 # Import utility functions for testing
 from utils.shared_utils import (
     select_most_relevant_image_for_concept_introduction,
-    create_simulation_config
+    create_simulation_config,
+    get_all_available_concepts
 )
 
 # ============================================================================
@@ -166,6 +168,7 @@ def read_root():
         "agent_type": "educational_agent_optimized_langsmith",
         "endpoints": [
             "GET  /health - Health check",
+            "GET  /concepts - List all available concepts",
             "POST /session/start - Start new learning session",
             "POST /session/continue - Continue existing session",
             "GET  /session/status/{thread_id} - Get session status",
@@ -190,6 +193,7 @@ def health_check():
         available_endpoints=[
             "/",
             "/health",
+            "/concepts",
             "/session/start",
             "/session/continue",
             "/session/status/{thread_id}",
@@ -202,6 +206,29 @@ def health_check():
             "/test/simulation"
         ]
     )
+
+
+@app.get("/concepts", response_model=ConceptsListResponse)
+def list_available_concepts():
+    """List all available concepts that can be taught by the educational agent."""
+    try:
+        print("API /concepts - Retrieving all available concepts")
+        
+        concepts = get_all_available_concepts()
+        
+        # Convert concepts to proper title case for display
+        concepts_title_case = [' '.join(word.capitalize() for word in concept.split()) for concept in concepts]
+        
+        return ConceptsListResponse(
+            success=True,
+            concepts=concepts_title_case,
+            total=len(concepts_title_case),
+            message=f"Retrieved {len(concepts_title_case)} available concepts"
+        )
+        
+    except Exception as e:
+        print(f"API error in /concepts: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving concepts: {str(e)}")
 
 
 @app.post("/session/start", response_model=StartSessionResponse)
@@ -638,6 +665,7 @@ print("=" * 80)
 print("Available Endpoints:")
 print("  GET  / - API information")
 print("  GET  /health - Health check")
+print("  GET  /concepts - List all available concepts")
 print("  POST /session/start - Start new learning session")
 print("  POST /session/continue - Continue existing session")
 print("  GET  /session/status/{thread_id} - Get session status")

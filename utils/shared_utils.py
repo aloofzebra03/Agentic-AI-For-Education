@@ -369,10 +369,230 @@ def get_ground_truth(concept: str, section_name: str) -> str:
     return ""
 
 
+# ─────────────────────────────────────────────────────────────────────
+# Concept-to-JSON mapping cache
+# ─────────────────────────────────────────────────────────────────────
+
+_CONCEPT_TO_FILE_MAP = None  # Cache for concept-to-file mapping
+
+# Concept alias mapping - maps display names to actual JSON concept names
+# This handles cases where the user-facing name differs from the JSON key
+_CONCEPT_ALIAS_MAP = {
+    "pendulum and its time period": "measurement of time",
+    # Add more aliases as needed
+}
+
+# Hardcoded section key mapping - covers all possible variations across JSON files
+_SECTION_KEY_MAPPING = {
+    # Concept definition/description
+    "concept definition": ["description", "Description", "desc"],
+    
+    # Explanation with analogies/intuition
+    "explanation (with analogies)": [
+        "intuition_logical_flow", 
+        "Intuition_Logical_Flow", 
+        "Intuition / Logical Flow",
+        "intuition / logical flow",
+        "Intuition/Logical Flow"
+    ],
+    
+    # Detailed information
+    "details (facts, sub-concepts)": ["detail", "Detail", "details", "Details"],
+    
+    # MCQs - multiple choice questions
+    "mcqs": [
+        "open_ended_mcqs", 
+        "Open-Ended_MCQs", 
+        "Open-Ended MCQs",
+        "open-ended mcqs",
+        "Open Ended MCQs",
+        "mcqs",
+        "MCQs"
+    ],
+    
+    # Real-life applications
+    "real-life application": [
+        "real_life_applications", 
+        "Real-Life_Applications", 
+        "Real-Life Applications",
+        "real life applications",
+        "Real Life Applications",
+        "real-life applications"
+    ],
+    
+    # # Working/how it works
+    # "working": ["working", "Working", "how_it_works", "How_It_Works"],
+    
+    # # Critical thinking
+    # "critical thinking": [
+    #     "critical_thinking", 
+    #     "Critical_Thinking",
+    #     "critical thinking",
+    #     "Critical Thinking"
+    # ],
+    
+    # # Key topics from textbook
+    # "key topics": [
+    #     "key_topics_from_the_textbook",
+    #     "Key_Topics_from_the_Textbook",
+    #     "Key Topics from the Textbook",
+    #     "key topics from the textbook",
+    #     "key_topics",
+    #     "Key_Topics",
+    #     "Key Topics from Textbook"
+    # ],
+    
+    # # Exam-oriented questions
+    # "exam questions": [
+    #     "exam_oriented_questions",
+    #     "Exam-Oriented_Questions",
+    #     "Exam-Oriented Questions",
+    #     "exam oriented questions",
+    #     "Exam Oriented Questions"
+    # ],
+    
+    # # Cross-concept critical thinking
+    # "cross-concept thinking": [
+    #     "cross_concept_critical_thinking",
+    #     "Cross-Concept_Critical_Thinking",
+    #     "Cross-Concept Critical Thinking",
+    #     "cross concept critical thinking"
+    # ],
+    
+    # # Relation between sub-concepts
+    # "relations": [
+    #     "relation_between_sub_concepts",
+    #     "Relation_Between_Sub-Concepts",
+    #     "Relation Between Sub-Concepts",
+    #     "relation between sub-concepts"
+    # ],
+    
+    # What-if scenarios
+    "what-if scenarios": [
+        "what_if_scenarios",
+        "What-if_Scenarios",
+        "What-If Scenarios",
+        "what if scenarios"
+    ],
+}
+
+def _build_concept_to_file_mapping() -> Dict[str, str]:
+    """
+    Hardcoded mapping of concept names (lowercase) to their JSON file paths.
+    This eliminates the need to scan files on every import, providing instant lookups.
+    
+    Returns:
+        Dict mapping concept names to file paths
+    """
+    global _CONCEPT_TO_FILE_MAP
+    
+    if _CONCEPT_TO_FILE_MAP is not None:
+        return _CONCEPT_TO_FILE_MAP
+    
+    # Hardcoded mapping - add new concepts here as needed
+    mapping = {
+        # 8.json concepts
+        "conduction": "NCERT/8.json",
+        "convection": "NCERT/8.json",
+        "radiation": "NCERT/8.json",
+        "good conductors of heat": "NCERT/8.json",
+        "poor conductors (insulators) of heat": "NCERT/8.json",
+        "land breeze": "NCERT/8.json",
+        "sea breeze": "NCERT/8.json",
+        "water cycle": "NCERT/8.json",
+        "infiltration": "NCERT/8.json",
+        "groundwater": "NCERT/8.json",
+        
+        # 11.json concepts
+        "photosynthesis": "NCERT/11.json",
+        "chlorophyll": "NCERT/11.json",
+        "stomata": "NCERT/11.json",
+        "xylem": "NCERT/11.json",
+        "phloem": "NCERT/11.json",
+        "respiration": "NCERT/11.json",
+        "carbon dioxide": "NCERT/11.json",
+        "oxygen": "NCERT/11.json",
+        "water": "NCERT/11.json",
+        "sunlight": "NCERT/11.json",
+        
+        # 12.json concepts
+        "light": "NCERT/12.json",
+        "shadows": "NCERT/12.json",
+        "reflection": "NCERT/12.json",
+        "luminous objects": "NCERT/12.json",
+        "non-luminous objects": "NCERT/12.json",
+        "transparent materials": "NCERT/12.json",
+        "translucent materials": "NCERT/12.json",
+        "opaque materials": "NCERT/12.json",
+        "image formation": "NCERT/12.json",
+        "pinhole camera": "NCERT/12.json",
+        
+        # NCERT Class 7.json concepts
+        "measurement of time": "NCERT/NCERT Class 7.json",
+        "history of timekeeping devices": "NCERT/NCERT Class 7.json",
+        "sundial": "NCERT/NCERT Class 7.json",
+        "water clock": "NCERT/NCERT Class 7.json",
+        "hourglass": "NCERT/NCERT Class 7.json",
+        "candle clock": "NCERT/NCERT Class 7.json",
+        "pendulum and its time period": "NCERT/NCERT Class 7.json",
+        "speed": "NCERT/NCERT Class 7.json",
+        "uniform motion": "NCERT/NCERT Class 7.json",
+        "non-uniform motion": "NCERT/NCERT Class 7.json",
+        "si unit of time": "NCERT/NCERT Class 7.json",
+        
+        "_default": "NCERT/8.json",
+    }
+    
+    _CONCEPT_TO_FILE_MAP = mapping
+    print(f"✅ Loaded hardcoded mapping for {len(mapping)-1} concepts")
+    return mapping
+
+
+def get_all_available_concepts() -> List[str]:
+    """
+    Get list of all available concepts from the mapping.
+    
+    Returns:
+        List of concept names (properly capitalized for display)
+    """
+    mapping = _build_concept_to_file_mapping()
+    
+    # Get all concept keys except the default
+    concepts = [key for key in mapping.keys() if key != "_default"]
+    
+    # Sort alphabetically for better UX
+    concepts.sort()
+    
+    return concepts
+
+
+def _extract_concept_data_from_json(data: dict, concept: str) -> Optional[dict]:
+    """
+    Extract concept data from JSON with structure: {"concepts": [{...}, ...]}.
+    
+    Args:
+        data: The loaded JSON data
+        concept: The concept name to find
+    
+    Returns:
+        The concept data dict or None if not found
+    """
+    concept_lower = concept.lower().strip()
+    
+    # Structure: {"concepts": [{...}, ...]}
+    if "concepts" in data and isinstance(data["concepts"], list):
+        for concept_data in data["concepts"]:
+            concept_name = concept_data.get("concept", concept_data.get("Concept", ""))
+            if concept_name.lower().strip() == concept_lower:
+                return concept_data
+    
+    return None
+
+
 def get_ground_truth_from_json(concept: str, section_name: str) -> str:
     """
     Retrieve ground truth content from JSON file for a given concept and section.
-    No formatting - returns raw content for LLM consumption.
+    Uses cached mapping for fast lookup. No formatting - returns raw content for LLM consumption.
     
     Args:
         concept: The concept name to find
@@ -390,72 +610,78 @@ def get_ground_truth_from_json(concept: str, section_name: str) -> str:
         print(f"📋 SECTION_NAME: {section_name}")
         print("=" * 70)
         
-        # Load JSON file - adjust path based on your file structure
-        json_file_path = "utils/NCERT Class 7.json"
+        # Get concept-to-file mapping
+        mapping = _build_concept_to_file_mapping()
+        concept_key = concept.lower().strip()
+        
+        print(f"✅ Loaded hardcoded mapping for {len(mapping)} concepts")
+        
+        # Find the JSON file for this concept
+        json_file_path = mapping.get(concept_key)
+        
+        if not json_file_path:
+            # Return empty string if concept not found in mapping
+            print(f"⚠️ Concept '{concept}' not in mapping, returning empty string")
+            print("=" * 70)
+            return ""
+        
+        print(f"📂 Found concept in: {json_file_path}")
             
+        # Load the JSON file
         with open(json_file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
-        # Find matching concept
-        for concept_data in data["concepts"]:
-            if concept_data['concept'].lower().strip() == concept.lower().strip():
-                
-                # Enhanced section key mapping covering ALL your node needs
-                section_key_mapping = {
-                    # Basic content - for teaching/explanation nodes
-                    "Concept Definition": "description",
-                    "Explanation (with analogies)":"intuition_logical_flow",
-                    "Details (facts, sub-concepts)":"detail",
-                    "MCQS":"open_ended_mcqs",
-                    # "What-if Scenarios":,
-                    "Real-Life Application":"real_life_applications",
-                }
-                
-                # Handle special case for full content
-                if section_name.lower() == "full":
-                    # Return formatted string of all key content
-                    full_content = []
-                    for key in ["description", "detail", "working", "intuition_logical_flow", 
-                              "real_life_applications", "critical_thinking"]:
-                        if concept_data.get(key):
-                            full_content.append(f"{key.upper()}:\n{concept_data[key]}")
-                    result = "\n\n".join(full_content)
-                else:
-                    # Get mapped key
-                    json_key = section_key_mapping.get(section_name.lower(), None)
-
-                    if json_key is not None:
-                        # Return raw content - no formatting since LLM handles it
-                        content = concept_data.get(json_key, "")
-                    else:
-                        content = ""
-
-                    # Handle different data types but keep minimal processing
-                    if isinstance(content, list):
-                        result = "\n".join([str(item) for item in content]) if content else ""
-                    elif isinstance(content, dict):
-                        result = str(content)  # Let LLM parse the dict structure
-                    else:
-                        result = str(content) if content else ""
-                
-                # 🔍 GROUND TRUTH JSON RETRIEVAL - OUTPUT 🔍
-                print("📚 GROUND TRUTH JSON RETRIEVAL - COMPLETED")
-                print(f"📋 JSON_KEY_USED: {section_key_mapping.get(section_name.lower(), section_name)}")
-                print(f"📏 RESULT_LENGTH: {len(result)} characters")
-                print(f"📄 RESULT_PREVIEW: {result[:200]}...")
-                print("=" * 70)
-                
-                return result
+        # Extract concept data using the concept name
+        concept_data = _extract_concept_data_from_json(data, concept)
         
-        # Concept not found
-        result = f"Concept '{concept}' not found in JSON data"
-        print(f"❌ {result}")
+        if not concept_data:
+            result = f"Concept '{concept}' not found in JSON data"
+            print(f"❌ {result}")
+            print("=" * 70)
+            return ""
+        
+        # Use the hardcoded section key mapping
+        section_key_mapping = _SECTION_KEY_MAPPING
+        
+        # Get mapped keys (try multiple possible keys)
+        possible_keys = section_key_mapping.get(section_name.lower(), [section_name])
+        if not isinstance(possible_keys, list):
+            possible_keys = [possible_keys]
+        
+        # Try each possible key until we find content
+        content = None
+        used_key = None
+        for key in possible_keys:
+            if key in concept_data:
+                content = concept_data[key]
+                used_key = key
+                break
+        
+        if content is None:
+            result = f"Section '{section_name}' not found for concept '{concept}'"
+        else:
+            # Handle different data types but keep minimal processing
+            if isinstance(content, list):
+                result = "\n".join([str(item) for item in content]) if content else ""
+            elif isinstance(content, dict):
+                result = json.dumps(content, indent=2)  # Pretty print for better LLM parsing
+            else:
+                result = str(content) if content else ""
+        
+        # 🔍 GROUND TRUTH JSON RETRIEVAL - OUTPUT 🔍
+        print("📚 GROUND TRUTH JSON RETRIEVAL - COMPLETED")
+        print(f"📋 SECTION_KEY_USED: {section_name}")
+        print(f"📏 RESULT_LENGTH: {len(result)} characters")
+        print(f"📄 RESULT_PREVIEW: {result[:200]}...")
         print("=" * 70)
+        
         return result
         
     except Exception as e:
-        print(e)
-        raise e
+        error_msg = f"Error retrieving ground truth for {concept} - {section_name}: Error: {e}, Used JSON file: {json_file_path if 'json_file_path' in locals() else 'N/A'}"
+        print(f"❌ {error_msg}")
+        print("=" * 70)
+        raise RuntimeError(error_msg) from e
 
 # ─────────────────────────────────────────────────────────────────────
 # Simulation configuration helpers
@@ -541,27 +767,47 @@ def create_simulation_config(variables: List, concept: str, action_config: Optio
 
 
 def select_most_relevant_image_for_concept_introduction(concept: str, definition_context: str) -> Optional[Dict]:
+    """
+    Select the most pedagogically relevant image for introducing a concept.
+    Uses the concept-to-file mapping to find the correct JSON file.
+    
+    Args:
+        concept: The concept name (can be in any case)
+        definition_context: The context/definition being provided to the student
+    
+    Returns:
+        Dict with url, description, and relevance_reason, or None if no images found
+    """
     try:
-        import json
+        # Get concept-to-file mapping
+        mapping = _build_concept_to_file_mapping()
+        concept_key = concept.lower().strip()
         
-        # Load JSON file - adjust path based on your file structure
-        json_file_path = "utils/NCERT Class 7.json"
-
+        # Find the JSON file for this concept
+        json_file_path = mapping.get(concept_key)
+        
+        if not json_file_path:
+            print(f"⚠️ Concept '{concept}' not in mapping, cannot retrieve images")
+            return None
+        
+        print(f"📂 Looking for images in: {json_file_path}")
+        
+        # Load the JSON file
         with open(json_file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
-        # Find the concept and its images
-        concept_data = None
-        for concept_item in data.get("concepts", []):
-            if concept_item.get("concept", "").lower().strip() == concept.lower().strip():
-                concept_data = concept_item
-                break
+        # Extract concept data
+        concept_data = _extract_concept_data_from_json(data, concept)
         
         if not concept_data:
-            print(f"Concept '{concept}' not found in JSON")
+            print(f"Concept '{concept}' not found in JSON data")
             return None
         
-        available_images = concept_data.get("images", [])
+        # Get images from concept data (handle different key variations)
+        # 8.json and NCERT Class 7.json use "images" (plural)
+        # 11.json and 12.json use "image" (singular)
+        available_images = concept_data.get("images", concept_data.get("image", concept_data.get("Images", [])))
+        
         if not available_images:
             print(f"No images found for concept '{concept}'")
             return None
@@ -619,7 +865,8 @@ Respond with JSON only:
             
     except Exception as e:
         print(f"Error selecting image for concept '{concept}': {e}")
-        raise e
+        import traceback
+        traceback.print_exc()
         return None
 
 
