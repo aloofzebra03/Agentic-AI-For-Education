@@ -225,11 +225,11 @@ def run_test_api():
     print("="*80)
     
     try:
-        language_suffix = "kannada" if is_kannada else "english"
+        # API server will automatically include language and concept in thread_id
         start_response = api_client.start_session(
             concept_title=concept_title,
             persona_name=persona.name,
-            session_label=f"test-{persona.name.lower().replace(' ', '-')}-{language_suffix}",
+            session_label=f"test-{persona.name.lower().replace(' ', '-')}",
             is_kannada=is_kannada
         )
     except requests.exceptions.RequestException as e:

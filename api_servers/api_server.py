@@ -12,7 +12,6 @@ from datetime import datetime
 # sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from educational_agent_optimized_langsmith.graph import graph
-from educational_agent_optimized_langsmith.config import concept_pkg
 from langchain_core.messages import HumanMessage
 from langgraph.types import Command
 
@@ -60,10 +59,36 @@ app.add_middleware(
 # HELPER FUNCTIONS
 # ============================================================================
 
-def generate_thread_id(label: Optional[str] = None, user_id: Optional[str] = None) -> str:
+def generate_thread_id(concept_title: str, is_kannada: bool = False, label: Optional[str] = None, user_id: Optional[str] = None) -> str:
+    """
+    Generate a unique thread ID that includes concept name and language.
+    
+    Args:
+        concept_title: The concept being taught
+        is_kannada: Whether the session is in Kannada
+        label: Optional custom session label
+        user_id: Optional user/student ID
+    
+    Returns:
+        Formatted thread ID: <concept>-<lang>-<label-user_id>-thread-<timestamp>
+    """
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    base = label or user_id or "session"
-    return f"{base}-thread-{timestamp}"
+    
+    # Clean concept title for use in thread_id (remove spaces, special chars, lowercase)
+    concept_slug = concept_title.lower().replace(" ", "-").replace("'", "").replace(",", "")
+    
+    # Language indicator
+    lang = "kannada" if is_kannada else "english"
+    
+    # Base label - include both label and user_id if present
+    parts = []
+    if label:
+        parts.append(label)
+    if user_id:
+        parts.append(user_id)
+    base = "-".join(parts) if parts else "session"
+    
+    return f"{concept_slug}-{lang}-{base}-thread-{timestamp}"
 
 
 def get_state_from_checkpoint(thread_id: str) -> Optional[Dict[str, Any]]:
@@ -234,10 +259,12 @@ def list_available_concepts():
 @app.post("/session/start", response_model=StartSessionResponse)
 def start_session(request: StartSessionRequest):
     try:
-        print(f"API /session/start - concept: {request.concept_title}, student: {request.student_id}")
+        print(f"API /session/start - concept: {request.concept_title}, student: {request.student_id}, language: {'Kannada' if request.is_kannada else 'English'}")
         
-        # Generate unique thread_id
+        # Generate unique thread_id with concept and language info
         thread_id = generate_thread_id(
+            concept_title=request.concept_title,
+            is_kannada=request.is_kannada,
             label=request.session_label,
             user_id=request.student_id
         )
@@ -247,6 +274,8 @@ def start_session(request: StartSessionRequest):
         base = request.session_label or request.persona_name or "session"
         session_id = f"{base}-{timestamp}"
         user_id = request.student_id or "anonymous"
+        
+        print(f"📌 Generated thread_id: {thread_id}")
         
         # Start the conversation by invoking the graph with __start__ message
         # Include is_kannada and concept_title in the initial state
