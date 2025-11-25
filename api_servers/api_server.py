@@ -61,7 +61,7 @@ app.add_middleware(
 
 def generate_thread_id(concept_title: str, is_kannada: bool = False, label: Optional[str] = None, user_id: Optional[str] = None) -> str:
     """
-    Generate a unique thread ID that includes concept name and language.
+    Generate a unique thread ID with ordered components for better organization.
     
     Args:
         concept_title: The concept being taught
@@ -70,25 +70,35 @@ def generate_thread_id(concept_title: str, is_kannada: bool = False, label: Opti
         user_id: Optional user/student ID
     
     Returns:
-        Formatted thread ID: <concept>-<lang>-<label-user_id>-thread-<timestamp>
+        Formatted thread ID: <user_id>-<label>-<concept>-<lang>-thread-<timestamp>
     """
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     
-    # Clean concept title for use in thread_id (remove spaces, special chars, lowercase)
-    concept_slug = concept_title.lower().replace(" ", "-").replace("'", "").replace(",", "")
-    
-    # Language indicator
-    lang = "kannada" if is_kannada else "english"
-    
-    # Base label - include both label and user_id if present
+    # Build parts in order: user_id, label, concept, language
     parts = []
-    if label:
-        parts.append(label)
+    
+    # 1. User ID (if present)
     if user_id:
         parts.append(user_id)
-    base = "-".join(parts) if parts else "session"
     
-    return f"{concept_slug}-{lang}-{base}-thread-{timestamp}"
+    # 2. Label (if present)
+    if label:
+        parts.append(label)
+    
+    # 3. Concept (always present, cleaned)
+    concept_slug = concept_title.lower().replace(" ", "-").replace("'", "").replace(",", "")
+    parts.append(concept_slug)
+    
+    # 4. Language indicator
+    lang = "kannada" if is_kannada else "english"
+    parts.append(lang)
+    
+    # If no user_id or label, add "session" at the beginning
+    if not user_id and not label:
+        parts.insert(0, "session")
+    
+    # Join all parts with thread indicator and timestamp
+    return f"{'-'.join(parts)}-thread-{timestamp}"
 
 
 def get_state_from_checkpoint(thread_id: str) -> Optional[Dict[str, Any]]:
