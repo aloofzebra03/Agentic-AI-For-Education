@@ -47,10 +47,6 @@ RUN pip install --no-cache-dir -e .
 # Expose API port (documentation only)
 EXPOSE 8000
 
-# Set environment variable to skip table setup (tables must already exist)
-ENV SKIP_POSTGRES_SETUP=true
-
 # Run FastAPI server
-# IMPORTANT: For Transaction Mode (port 6543), ensure tables are created beforehand
 # Environment variables will be passed at runtime via docker run -e or --env-file
 CMD ["uvicorn", "api_servers.api_server:app", "--host", "0.0.0.0", "--port", "8000"]
