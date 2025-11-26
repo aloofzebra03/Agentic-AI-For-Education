@@ -275,7 +275,7 @@ checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")
 # Initialize PostgreSQL checkpointer
 try:
     connection_kwargs = {
-        # autocommit removed - Transaction Mode (port 6543) requires explicit transactions
+        "autocommit": True,  # Required for Transaction Mode
         "prepare_threshold": None,  # None = Never use prepared statements (required for Transaction Mode port 6543)
     }
     
@@ -283,19 +283,30 @@ try:
     if not postgres_url:
         raise ValueError("POSTGRES_DATABASE_URL environment variable is not set")
     
+    # IMPORTANT: Assume tables are already created (skip setup for Transaction Mode compatibility)
+    # Tables must be created beforehand via Supabase dashboard or setup_postgres_tables.py
+    skip_setup = os.getenv('SKIP_POSTGRES_SETUP', 'true').lower() == 'true'  # Default to TRUE
+    
     pool = ConnectionPool(
         conninfo=postgres_url,
-        max_size=40,  # Reduced to stay within Supabase Transaction Mode limits.Set to 42 on dashboard
+        max_size=40,  # Stay within Supabase Transaction Mode limits (set to 42 on dashboard)
         min_size=5,   # Reduced for Transaction Mode efficiency
-        timeout=30,    # Wait up to 30s for available connection
+        timeout=30,   # Wait up to 30s for available connection
         kwargs=connection_kwargs,
-        # No reset needed - prepare_threshold=None disables prepared statements entirely
     )
     checkpointer = PostgresSaver(pool)
-    checkpointer.setup()  # Create tables if they don't exist
+    
+    if not skip_setup:
+        print("🔧 Running checkpointer.setup() to create tables...")
+        checkpointer.setup()  # Create tables if they don't exist
+        print("✅ Tables created/verified")
+    else:
+        print("⏭️  Skipping table setup (assuming tables exist)")
+    
     print("✅ Postgres checkpointer initialized successfully")
 except Exception as e:
     print(f"❌ Error initializing Postgres checkpointer: {e}")
+    print(f"💡 Ensure tables exist: checkpoints, checkpoint_writes, checkpoint_migrations")
     raise e
 
 def build_graph():
