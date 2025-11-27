@@ -280,6 +280,7 @@ try:
     }
     
     postgres_url = os.getenv('POSTGRES_DATABASE_URL')
+    print(f"🔍 Initializing Postgres checkpointer with URL: {postgres_url}")
     if not postgres_url:
         raise ValueError("POSTGRES_DATABASE_URL environment variable is not set")
     
@@ -287,7 +288,7 @@ try:
         conninfo=postgres_url,
         max_size=40,  # Reduced to stay within Supabase Transaction Mode limits.Set to 42 on dashboard
         min_size=5,   # Reduced for Transaction Mode efficiency
-        timeout=30,    # Wait up to 30s for available connection
+        timeout=60,    # Wait up to 30s for available connection
         kwargs=connection_kwargs,
         # No reset needed - prepare_threshold=None disables prepared statements entirely
     )
