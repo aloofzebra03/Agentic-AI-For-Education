@@ -1,0 +1,24 @@
+{
+  "concepts_covered": [
+    "Translucent materials",
+    "Light transmission",
+    "Light absorption",
+    "Light scattering",
+    "Relationship between thickness and translucency",
+    "Effect of color on translucency",
+    "Material type and translucency",
+    "Light source brightness and translucency"
+  ],
+  "num_concepts_covered": 8,
+  "clarity_conciseness_score": 3.0,
+  "user_type": "Dull",
+  "user_interest_rating": 1.0,
+  "user_engagement_rating": 1.0,
+  "enjoyment_probability": 0.2,
+  "quiz_score": 0.0,
+  "error_handling_count": 12,
+  "adaptability": true,
+  "session_id": "test-distracted-student-20251127-161707",
+  "total_interactions": 27,
+  "persona_name": "Distracted Student"
+}

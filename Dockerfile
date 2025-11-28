@@ -38,6 +38,7 @@ COPY utils/ /app/utils/
 COPY tester_agent/ /app/tester_agent/
 COPY educational_agent_optimized_langsmith/ /app/educational_agent_optimized_langsmith/
 COPY api_servers/ /app/api_servers/
+COPY NCERT/ /app/NCERT/
 
 # Install project in editable mode (makes all modules importable)
 RUN pip install --no-cache-dir -e .

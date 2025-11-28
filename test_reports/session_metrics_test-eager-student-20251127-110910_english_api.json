@@ -1,0 +1,27 @@
+{
+  "concepts_covered": [
+    "Xylem",
+    "Water transport in plants",
+    "Xylem structure and function",
+    "Xylem vessels",
+    "Diameter of xylem vessels and water flow",
+    "Number of xylem vessels and water flow",
+    "Root pressure",
+    "Transpiration rate and leaf surface area",
+    "Distance from roots to leaves",
+    "Cohesion and adhesion of water molecules",
+    "Xylem in wood"
+  ],
+  "num_concepts_covered": 11,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "High",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.95,
+  "quiz_score": 0.0,
+  "error_handling_count": 8,
+  "adaptability": true,
+  "session_id": "test-eager-student-20251127-110910",
+  "total_interactions": 26,
+  "persona_name": "Eager Student"
+}

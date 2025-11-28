@@ -1,0 +1,25 @@
+{
+  "concepts_covered": [
+    "Reflection",
+    "Angle of Incidence",
+    "Angle of Reflection",
+    "Law of Reflection",
+    "Surface Smoothness",
+    "Specular Reflection",
+    "Diffuse Reflection",
+    "Total Internal Reflection",
+    "Fiber Optic Cables"
+  ],
+  "num_concepts_covered": 9,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "High",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.95,
+  "quiz_score": 0.0,
+  "error_handling_count": 1,
+  "adaptability": true,
+  "session_id": "test-eager-student-20251128-065440",
+  "total_interactions": 24,
+  "persona_name": "Eager Student"
+}

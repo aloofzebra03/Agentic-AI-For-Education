@@ -1,0 +1,24 @@
+{
+  "concepts_covered": [
+    "Water clock: definition and function",
+    "Controlled water flow",
+    "Relationship between hole size and water flow rate",
+    "Effect of water level on flow rate",
+    "Effect of container shape on water level change",
+    "Effect of water viscosity on flow rate",
+    "Effect of water temperature on flow rate",
+    "Historical uses of water clocks in ancient Egypt"
+  ],
+  "num_concepts_covered": 8,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "High",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.95,
+  "quiz_score": 0.0,
+  "error_handling_count": 2,
+  "adaptability": true,
+  "session_id": "test-eager-student-20251127-154936",
+  "total_interactions": 29,
+  "persona_name": "Eager Student"
+}
