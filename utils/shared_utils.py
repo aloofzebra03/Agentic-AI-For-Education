@@ -420,52 +420,52 @@ _SECTION_KEY_MAPPING = {
         "real-life applications"
     ],
     
-    # # Working/how it works
-    # "working": ["working", "Working", "how_it_works", "How_It_Works"],
+    # Working/how it works
+    "working": ["working", "Working", "how_it_works", "How_It_Works"],
     
-    # # Critical thinking
-    # "critical thinking": [
-    #     "critical_thinking", 
-    #     "Critical_Thinking",
-    #     "critical thinking",
-    #     "Critical Thinking"
-    # ],
+    # Critical thinking
+    "critical thinking": [
+        "critical_thinking", 
+        "Critical_Thinking",
+        "critical thinking",
+        "Critical Thinking"
+    ],
     
-    # # Key topics from textbook
-    # "key topics": [
-    #     "key_topics_from_the_textbook",
-    #     "Key_Topics_from_the_Textbook",
-    #     "Key Topics from the Textbook",
-    #     "key topics from the textbook",
-    #     "key_topics",
-    #     "Key_Topics",
-    #     "Key Topics from Textbook"
-    # ],
+    # Key topics from textbook
+    "key topics": [
+        "key_topics_from_the_textbook",
+        "Key_Topics_from_the_Textbook",
+        "Key Topics from the Textbook",
+        "key topics from the textbook",
+        "key_topics",
+        "Key_Topics",
+        "Key Topics from Textbook"
+    ],
     
-    # # Exam-oriented questions
-    # "exam questions": [
-    #     "exam_oriented_questions",
-    #     "Exam-Oriented_Questions",
-    #     "Exam-Oriented Questions",
-    #     "exam oriented questions",
-    #     "Exam Oriented Questions"
-    # ],
+    # Exam-oriented questions
+    "exam questions": [
+        "exam_oriented_questions",
+        "Exam-Oriented_Questions",
+        "Exam-Oriented Questions",
+        "exam oriented questions",
+        "Exam Oriented Questions"
+    ],
     
-    # # Cross-concept critical thinking
-    # "cross-concept thinking": [
-    #     "cross_concept_critical_thinking",
-    #     "Cross-Concept_Critical_Thinking",
-    #     "Cross-Concept Critical Thinking",
-    #     "cross concept critical thinking"
-    # ],
+    # Cross-concept critical thinking
+    "cross-concept thinking": [
+        "cross_concept_critical_thinking",
+        "Cross-Concept_Critical_Thinking",
+        "Cross-Concept Critical Thinking",
+        "cross concept critical thinking"
+    ],
     
-    # # Relation between sub-concepts
-    # "relations": [
-    #     "relation_between_sub_concepts",
-    #     "Relation_Between_Sub-Concepts",
-    #     "Relation Between Sub-Concepts",
-    #     "relation between sub-concepts"
-    # ],
+    # Relation between sub-concepts
+    "relations": [
+        "relation_between_sub_concepts",
+        "Relation_Between_Sub-Concepts",
+        "Relation Between Sub-Concepts",
+        "relation between sub-concepts"
+    ],
     
     # What-if scenarios
     "what-if scenarios": [
@@ -539,6 +539,19 @@ def _build_concept_to_file_mapping() -> Dict[str, str]:
         "uniform motion": "NCERT/NCERT Class 7.json",
         "non-uniform motion": "NCERT/NCERT Class 7.json",
         "si unit of time": "NCERT/NCERT Class 7.json",
+
+        # Fractions.txt concepts
+        "fraction as equal share": "NCERT/Fractions.txt",
+        "fractional units": "NCERT/Fractions.txt",
+        "reading fractions": "NCERT/Fractions.txt",
+        "numerator": "NCERT/Fractions.txt",
+        "denominator": "NCERT/Fractions.txt",
+        "mixed fractions": "NCERT/Fractions.txt",
+        "number line": "NCERT/Fractions.txt",
+        "equivalent fractions": "NCERT/Fractions.txt",
+        "lowest terms": "NCERT/Fractions.txt",
+        "brahmagupta's method for adding fractions": "NCERT/Fractions.txt",
+        "brahmagupta's method for subtracting fractions": "NCERT/Fractions.txt",
         
         "_default": "NCERT/8.json",
     }
@@ -589,9 +602,57 @@ def _extract_concept_data_from_json(data: dict, concept: str) -> Optional[dict]:
     return None
 
 
+_TEXT_FILE_CACHE = {}
+
+def _parse_text_concept_file(file_path: str) -> Dict[str, Dict[str, str]]:
+    """
+    Parses a text file with ### Concept: structure into a dictionary.
+    Returns: {concept_name_lower: {section_header_lower: content}}
+    """
+    global _TEXT_FILE_CACHE
+    if file_path in _TEXT_FILE_CACHE:
+        return _TEXT_FILE_CACHE[file_path]
+
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            text = f.read()
+        
+        concepts = {}
+        # Split by "### Concept:"
+        parts = re.split(r'### Concept:\s*', text, flags=re.IGNORECASE)
+        
+        for part in parts[1:]: # Skip the first part
+            lines = part.split('\n')
+            concept_name = lines[0].strip().lower()
+            
+            # Split by "#### " to get sections
+            content_text = '\n'.join(lines[1:])
+            section_parts = re.split(r'####\s*', content_text)
+            
+            sections = {}
+            for section_part in section_parts:
+                if not section_part.strip():
+                    continue
+                
+                section_lines = section_part.split('\n')
+                section_header = section_lines[0].strip().lower()
+                section_content = '\n'.join(section_lines[1:]).strip()
+                
+                sections[section_header] = section_content
+                
+            concepts[concept_name] = sections
+            
+        _TEXT_FILE_CACHE[file_path] = concepts
+        print(f"✅ Parsed and cached text file: {file_path} ({len(concepts)} concepts)")
+        return concepts
+    except Exception as e:
+        print(f"❌ Error parsing text file {file_path}: {e}")
+        return {}
+
+
 def get_ground_truth_from_json(concept: str, section_name: str) -> str:
     """
-    Retrieve ground truth content from JSON file for a given concept and section.
+    Retrieve ground truth content from JSON or Text file for a given concept and section.
     Uses cached mapping for fast lookup. No formatting - returns raw content for LLM consumption.
     
     Args:
@@ -599,12 +660,12 @@ def get_ground_truth_from_json(concept: str, section_name: str) -> str:
         section_name: The section/key within the concept to retrieve
     
     Returns:
-        str: The relevant content from the JSON file
+        str: The relevant content from the file
     """
     try:        
-        # 🔍 GROUND TRUTH JSON RETRIEVAL - INPUT 🔍
+        # 🔍 GROUND TRUTH RETRIEVAL - INPUT 🔍
         print("=" * 70)
-        print("📚 GROUND TRUTH JSON RETRIEVAL - STARTED")
+        print("📚 GROUND TRUTH RETRIEVAL - STARTED")
         print("=" * 70)
         print(f"🎯 CONCEPT: {concept}")
         print(f"📋 SECTION_NAME: {section_name}")
@@ -616,61 +677,102 @@ def get_ground_truth_from_json(concept: str, section_name: str) -> str:
         
         print(f"✅ Loaded hardcoded mapping for {len(mapping)} concepts")
         
-        # Find the JSON file for this concept
-        json_file_path = mapping.get(concept_key)
+        # Find the file for this concept
+        file_path = mapping.get(concept_key)
         
-        if not json_file_path:
+        if not file_path:
             # Return empty string if concept not found in mapping
             print(f"⚠️ Concept '{concept}' not in mapping, returning empty string")
             print("=" * 70)
             return ""
         
-        print(f"📂 Found concept in: {json_file_path}")
+        print(f"📂 Found concept in: {file_path}")
+        
+        # Handle Text files
+        if file_path.endswith('.txt'):
+            parsed_data = _parse_text_concept_file(file_path)
             
-        # Load the JSON file
-        with open(json_file_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        
-        # Extract concept data using the concept name
-        concept_data = _extract_concept_data_from_json(data, concept)
-        
-        if not concept_data:
-            result = f"Concept '{concept}' not found in JSON data"
-            print(f"❌ {result}")
-            print("=" * 70)
-            return ""
-        
-        # Use the hardcoded section key mapping
-        section_key_mapping = _SECTION_KEY_MAPPING
-        
-        # Get mapped keys (try multiple possible keys)
-        possible_keys = section_key_mapping.get(section_name.lower(), [section_name])
-        if not isinstance(possible_keys, list):
-            possible_keys = [possible_keys]
-        
-        # Try each possible key until we find content
-        content = None
-        used_key = None
-        for key in possible_keys:
-            if key in concept_data:
-                content = concept_data[key]
-                used_key = key
-                break
-        
-        if content is None:
-            result = f"Section '{section_name}' not found for concept '{concept}'"
-        else:
-            # Handle different data types but keep minimal processing
-            if isinstance(content, list):
-                result = "\n".join([str(item) for item in content]) if content else ""
-            elif isinstance(content, dict):
-                result = json.dumps(content, indent=2)  # Pretty print for better LLM parsing
+            if concept_key not in parsed_data:
+                result = f"Concept '{concept}' not found in text file"
+                print(f"❌ {result}")
+                print("=" * 70)
+                return ""
+            
+            concept_sections = parsed_data[concept_key]
+            
+            # Use the hardcoded section key mapping
+            section_key_mapping = _SECTION_KEY_MAPPING
+            
+            # Get mapped keys (try multiple possible keys)
+            possible_keys = section_key_mapping.get(section_name.lower(), [section_name])
+            if not isinstance(possible_keys, list):
+                possible_keys = [possible_keys]
+            
+            # Try each possible key until we find content
+            content = None
+            used_key = None
+            
+            # Also try exact match with section_name
+            keys_to_try = possible_keys + [section_name]
+            
+            for key in keys_to_try:
+                key_lower = key.lower()
+                if key_lower in concept_sections:
+                    content = concept_sections[key_lower]
+                    used_key = key
+                    break
+            
+            if content is None:
+                result = f"Section '{section_name}' not found for concept '{concept}' in text file"
             else:
-                result = str(content) if content else ""
+                result = content
+                
+        # Handle JSON files
+        else:
+            # Load the JSON file
+            with open(file_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            # Extract concept data using the concept name
+            concept_data = _extract_concept_data_from_json(data, concept)
+            
+            if not concept_data:
+                result = f"Concept '{concept}' not found in JSON data"
+                print(f"❌ {result}")
+                print("=" * 70)
+                return ""
+            
+            # Use the hardcoded section key mapping
+            section_key_mapping = _SECTION_KEY_MAPPING
+            
+            # Get mapped keys (try multiple possible keys)
+            possible_keys = section_key_mapping.get(section_name.lower(), [section_name])
+            if not isinstance(possible_keys, list):
+                possible_keys = [possible_keys]
+            
+            # Try each possible key until we find content
+            content = None
+            used_key = None
+            for key in possible_keys:
+                if key in concept_data:
+                    content = concept_data[key]
+                    used_key = key
+                    break
+            
+            if content is None:
+                result = f"Section '{section_name}' not found for concept '{concept}'"
+            else:
+                # Handle different data types but keep minimal processing
+                if isinstance(content, list):
+                    result = "\n".join([str(item) for item in content]) if content else ""
+                elif isinstance(content, dict):
+                    result = json.dumps(content, indent=2)  # Pretty print for better LLM parsing
+                else:
+                    result = str(content) if content else ""
         
-        # 🔍 GROUND TRUTH JSON RETRIEVAL - OUTPUT 🔍
-        print("📚 GROUND TRUTH JSON RETRIEVAL - COMPLETED")
-        print(f"📋 SECTION_KEY_USED: {section_name}")
+        # 🔍 GROUND TRUTH RETRIEVAL - OUTPUT 🔍
+        print("📚 GROUND TRUTH RETRIEVAL - COMPLETED")
+        print(f"📋 SECTION_KEY_USED: {used_key if 'used_key' in locals() else section_name}")
         print(f"📏 RESULT_LENGTH: {len(result)} characters")
         print(f"📄 RESULT_PREVIEW: {result[:200]}...")
         print("=" * 70)
@@ -678,7 +780,7 @@ def get_ground_truth_from_json(concept: str, section_name: str) -> str:
         return result
         
     except Exception as e:
-        error_msg = f"Error retrieving ground truth for {concept} - {section_name}: Error: {e}, Used JSON file: {json_file_path if 'json_file_path' in locals() else 'N/A'}"
+        error_msg = f"Error retrieving ground truth for {concept} - {section_name}: Error: {e}, Used file: {file_path if 'file_path' in locals() else 'N/A'}"
         print(f"❌ {error_msg}")
         print("=" * 70)
         raise RuntimeError(error_msg) from e

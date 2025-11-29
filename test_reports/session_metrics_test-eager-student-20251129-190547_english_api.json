@@ -1,0 +1,20 @@
+{
+  "concepts_covered": [
+    "Brahmagupta's method for adding fractions",
+    "Common denominator",
+    "Fraction addition",
+    "Scaling fractions"
+  ],
+  "num_concepts_covered": 4,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "High",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.9,
+  "quiz_score": 0.0,
+  "error_handling_count": 0,
+  "adaptability": false,
+  "session_id": "test-eager-student-20251129-190547",
+  "total_interactions": 3,
+  "persona_name": "Eager Student"
+}

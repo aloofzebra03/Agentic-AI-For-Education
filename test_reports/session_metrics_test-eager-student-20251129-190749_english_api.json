@@ -1,0 +1,21 @@
+{
+  "concepts_covered": [
+    "Brahmagupta's method for adding fractions",
+    "Common Denominator",
+    "Numerator",
+    "Denominator",
+    "Effect of changing numerator and denominator on the sum of fractions"
+  ],
+  "num_concepts_covered": 5,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "High",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.9,
+  "quiz_score": 0.0,
+  "error_handling_count": 3,
+  "adaptability": true,
+  "session_id": "test-eager-student-20251129-190749",
+  "total_interactions": 23,
+  "persona_name": "Eager Student"
+}

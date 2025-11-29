@@ -1,0 +1,22 @@
+{
+  "concepts_covered": [
+    "Fractions",
+    "Adding fractions with common denominators",
+    "Adding fractions with different denominators",
+    "Denominators",
+    "Numerators",
+    "Brahmagupta's method (finding a common denominator)"
+  ],
+  "num_concepts_covered": 6,
+  "clarity_conciseness_score": 3.0,
+  "user_type": "Dull",
+  "user_interest_rating": 2.0,
+  "user_engagement_rating": 2.0,
+  "enjoyment_probability": 0.4,
+  "quiz_score": 0.0,
+  "error_handling_count": 5,
+  "adaptability": true,
+  "session_id": "test-dull-student-20251129-213043",
+  "total_interactions": 7,
+  "persona_name": "Dull Student"
+}

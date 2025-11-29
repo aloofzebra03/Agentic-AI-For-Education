@@ -1,0 +1,23 @@
+{
+  "concepts_covered": [
+    "Brahmagupta's method for subtracting fractions",
+    "Numerator of the first fraction (a)",
+    "Denominator of the first fraction (b)",
+    "Numerator of the second fraction (c)",
+    "Denominator of the second fraction (d)",
+    "Difference of the products (ad - bc)",
+    "Application of Brahmagupta's method in real-world scenarios"
+  ],
+  "num_concepts_covered": 7,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "Medium",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.9,
+  "quiz_score": 0.0,
+  "error_handling_count": 6,
+  "adaptability": true,
+  "session_id": "test-eager-student-20251129-191259",
+  "total_interactions": 29,
+  "persona_name": "Eager Student"
+}

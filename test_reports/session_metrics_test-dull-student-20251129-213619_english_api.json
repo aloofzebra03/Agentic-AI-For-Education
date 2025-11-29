@@ -1,0 +1,24 @@
+{
+  "concepts_covered": [
+    "Fractions",
+    "Adding fractions with same denominators",
+    "Adding fractions with different denominators",
+    "Brahmagupta's method for adding fractions",
+    "Numerators",
+    "Denominators",
+    "Effect of changing numerator on fraction value",
+    "Effect of changing denominator on fraction value"
+  ],
+  "num_concepts_covered": 8,
+  "clarity_conciseness_score": 3.0,
+  "user_type": "Dull",
+  "user_interest_rating": 2.0,
+  "user_engagement_rating": 2.0,
+  "enjoyment_probability": 0.4,
+  "quiz_score": 0.0,
+  "error_handling_count": 8,
+  "adaptability": true,
+  "session_id": "test-dull-student-20251129-213619",
+  "total_interactions": 18,
+  "persona_name": "Dull Student"
+}

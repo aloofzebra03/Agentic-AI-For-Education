@@ -1,0 +1,19 @@
+{
+  "concepts_covered": [
+    "Fractions",
+    "Adding fractions with different denominators",
+    "Comparing fractions"
+  ],
+  "num_concepts_covered": 3,
+  "clarity_conciseness_score": 3.0,
+  "user_type": "Dull",
+  "user_interest_rating": 1.0,
+  "user_engagement_rating": 1.0,
+  "enjoyment_probability": 0.2,
+  "quiz_score": 0.0,
+  "error_handling_count": 3,
+  "adaptability": true,
+  "session_id": "test-dull-student-20251129-220354",
+  "total_interactions": 3,
+  "persona_name": "Dull Student"
+}

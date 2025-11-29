@@ -293,6 +293,10 @@ try:
         max_size=40,  # Stay within Supabase Transaction Mode limits (set to 42 on dashboard)
         min_size=5,   # Reduced for Transaction Mode efficiency
         timeout=30,   # Wait up to 30s for available connection
+        # === CONNECTION LIFECYCLE MANAGEMENT (fixes SSL/DbHandler errors) ===
+        max_idle=300,        # Close connections idle > 5 min (before Supabase closes them)
+        max_lifetime=1800,   # Recycle ALL connections every 30 min (fresh SSL sessions)
+        reconnect_timeout=30,  # Retry failed connections for up to 30s
         kwargs=connection_kwargs,
     )
     checkpointer = PostgresSaver(pool)
@@ -304,7 +308,7 @@ try:
     else:
         print("⏭️  Skipping table setup (assuming tables exist)")
     
-    print("✅ Postgres checkpointer initialized successfully")
+    print("✅ Postgres checkpointer initialized successfully (with connection lifecycle management)")
 except Exception as e:
     print(f"❌ Error initializing Postgres checkpointer: {e}")
     print(f"💡 Ensure tables exist: checkpoints, checkpoint_writes, checkpoint_migrations")

@@ -1,0 +1,20 @@
+{
+  "concepts_covered": [
+    "Fractions",
+    "Adding Fractions",
+    "Common Denominator",
+    "Brahmagupta's Method"
+  ],
+  "num_concepts_covered": 4,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "Dull",
+  "user_interest_rating": 2.0,
+  "user_engagement_rating": 2.0,
+  "enjoyment_probability": 0.4,
+  "quiz_score": 0.0,
+  "error_handling_count": 0,
+  "adaptability": true,
+  "session_id": "test-dull-student-20251129-213350",
+  "total_interactions": 2,
+  "persona_name": "Dull Student"
+}
