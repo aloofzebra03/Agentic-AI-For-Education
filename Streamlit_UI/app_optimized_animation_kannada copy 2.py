@@ -163,8 +163,8 @@ load_dotenv(dotenv_path=".env", override=True)
 
 # Import the EducationalAgent class
 try:
-    from educational_agent_optimized_langsmith_kannada.agent import EducationalAgent
-    from educational_agent_optimized_langsmith_kannada.config import concept_pkg
+    from educational_agent_optimized_langsmith_kannada_v4.agent import EducationalAgent
+    from educational_agent_optimized_langsmith_kannada_v4.config import concept_pkg
     from tester_agent.session_metrics import compute_and_upload_session_metrics
 except ImportError as e:
     st.error(f"Could not import EducationalAgent: {e}")
