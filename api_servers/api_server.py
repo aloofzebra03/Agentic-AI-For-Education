@@ -34,7 +34,8 @@ from tester_agent.personas import personas
 from utils.shared_utils import (
     select_most_relevant_image_for_concept_introduction,
     create_simulation_config,
-    get_all_available_concepts
+    get_all_available_concepts,
+    AVAILABLE_GEMINI_MODELS
 )
 
 # ============================================================================
@@ -204,6 +205,7 @@ def read_root():
         "endpoints": [
             "GET  /health - Health check",
             "GET  /concepts - List all available concepts",
+            "GET  /available-models - List available Gemini models",
             "POST /session/start - Start new learning session",
             "POST /session/continue - Continue existing session",
             "GET  /session/status/{thread_id} - Get session status",
@@ -229,6 +231,7 @@ def health_check():
             "/",
             "/health",
             "/concepts",
+            "/available-models",
             "/session/start",
             "/session/continue",
             "/session/status/{thread_id}",
@@ -266,6 +269,25 @@ def list_available_concepts():
         raise HTTPException(status_code=500, detail=f"Error retrieving concepts: {str(e)}")
 
 
+@app.get("/available-models")
+def list_available_models():
+    """List all available Gemini models that can be used by the educational agent."""
+    try:
+        print("API /available-models - Retrieving available Gemini models")
+        
+        return {
+            "success": True,
+            "models": AVAILABLE_GEMINI_MODELS,
+            "total": len(AVAILABLE_GEMINI_MODELS),
+            "default_model": "gemma-3-27b-it",
+            "message": f"Retrieved {len(AVAILABLE_GEMINI_MODELS)} available models"
+        }
+        
+    except Exception as e:
+        print(f"API error in /available-models: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving models: {str(e)}")
+
+
 @app.post("/session/start", response_model=StartSessionResponse)
 def start_session(request: StartSessionRequest):
     try:
@@ -287,13 +309,23 @@ def start_session(request: StartSessionRequest):
         
         print(f"📌 Generated thread_id: {thread_id}")
         
+        # Validate model if provided
+        model = request.model or "gemma-3-27b-it"
+        if model not in AVAILABLE_GEMINI_MODELS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid model '{model}'. Available models: {AVAILABLE_GEMINI_MODELS}"
+            )
+        
         # Start the conversation by invoking the graph with __start__ message
-        # Include is_kannada and concept_title in the initial state
+        # Include is_kannada, concept_title, and model in the initial state
+        print("Invoking graph to start session with model:", model)
         result = graph.invoke(
             {
                 "messages": [HumanMessage(content="__start__")],
                 "is_kannada": request.is_kannada,
-                "concept_title": request.concept_title
+                "concept_title": request.concept_title,
+                "model": model
             },
             config={"configurable": {"thread_id": thread_id}},
         )
@@ -343,12 +375,21 @@ def continue_session(request: ContinueSessionRequest):
                 detail=f"Session not found for thread_id: {request.thread_id}. Please start a new session."
             )
         
+        # Validate model if provided
+        update_dict = {"messages": [HumanMessage(content=request.user_message)]}
+        
+        if request.model:
+            if request.model not in AVAILABLE_GEMINI_MODELS:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid model '{request.model}'. Available models: {AVAILABLE_GEMINI_MODELS}"
+                )
+            update_dict["model"] = request.model
+        
         # Continue the conversation using Command (resume)
         cmd = Command(
             resume=True,
-            update={
-                "messages": [HumanMessage(content=request.user_message)],
-            },
+            update=update_dict,
         )
         
         # Invoke graph with the user message

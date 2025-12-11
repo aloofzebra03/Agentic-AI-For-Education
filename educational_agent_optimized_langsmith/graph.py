@@ -81,6 +81,8 @@ class AgentState(TypedDict, total=False):
     is_kannada: bool
     # NEW: Concept title
     concept_title: str
+    # Model selection
+    model: str
 
 # -----------------------------------------------------------------------------
 # // 4. Initialize state and wrap helper
@@ -125,6 +127,8 @@ def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
     state.setdefault("is_kannada", False)
     # Initialize concept_title with default value
     state.setdefault("concept_title", "Pendulum and its Time Period")
+    # Initialize model with default value
+    state.setdefault("model", "gemma-3-27b-it")
     return state
 
 def _wrap(fn):

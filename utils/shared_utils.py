@@ -96,16 +96,26 @@ def get_available_api_keys():
     return api_keys
 
 
-def get_llm(api_key: Optional[str] = None):
-    """Get configured LLM instance with specified or random API key."""
+def get_llm(api_key: Optional[str] = None, model: str = "gemma-3-27b-it"):
+    """Get configured LLM instance with specified or random API key and model.
+    
+    Args:
+        api_key: Google API key. If None, randomly selects from available keys.
+        model: Model name to use. Defaults to gemma-3-27b-it.
+    
+    Returns:
+        Configured ChatGoogleGenerativeAI instance
+    """
     if api_key is None:
         # Randomly select an API key from available keys
         available_keys = get_available_api_keys()
         api_key = random.choice(available_keys)
         print(f"🔑 Selected random API key (ending with ...{api_key[-6:]})")
     
+    print(f"Model being used for LLM calls: {model}")
+    
     return ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
+        model=model,
         api_key=api_key,
         temperature=0.5,
     )
@@ -117,45 +127,74 @@ def get_llm(api_key: Optional[str] = None):
     # return llm
 
 
-def invoke_llm_with_fallback(messages: List, operation_name: str = "LLM call"):
+# Available models list for fallback
+AVAILABLE_GEMINI_MODELS = [
+    "gemma-3-27b-it",
+    "gemini-2.0-flash",
+    "gemini-2.5-flash",
+    "gemini-2.5-flash-lite",
+    "gemini-1.5-flash",
+]
+
+def invoke_llm_with_fallback(messages: List, operation_name: str = "LLM call", model: str = "gemma-3-27b-it"):
     """
-    Invoke LLM with automatic API key fallback on failure.
+    Invoke LLM with automatic API key and model fallback on failure.
+    
+    Strategy:
+    1. Try all API keys with the selected model
+    2. If all keys fail for selected model, try other models from AVAILABLE_GEMINI_MODELS
+    3. For each fallback model, try all API keys again
     
     Args:
         messages: List of messages to send to the LLM
         operation_name: Name of the operation for logging purposes
+        model: Model to use. Defaults to gemma-3-27b-it.
     
     Returns:
         LLM response object
     
     Raises:
-        RuntimeError: If all API keys fail
+        RuntimeError: If all API keys and models fail
     """
     available_keys = get_available_api_keys()
-    random.shuffle(available_keys)
+    
+    # Create model priority list: selected model first, then others
+    models_to_try = [model] + [m for m in AVAILABLE_GEMINI_MODELS if m != model]
     
     last_error = None
+    print("Starting LLM invocation with fallback mechanism with model:", models_to_try[0])
+    # Try each model
+    for model_idx, current_model in enumerate(models_to_try, 1):
+        print(f"🎯 {operation_name} - Trying model {model_idx}/{len(models_to_try)}: {current_model}")
+        
+        # Shuffle keys for this model to distribute load
+        keys_for_model = available_keys.copy()
+        random.shuffle(keys_for_model)
+        
+        # Try each API key for this model
+        for attempt, api_key in enumerate(keys_for_model, 1):
+            try:
+                print(f"🔑 {operation_name} - Model: {current_model}, API key attempt {attempt}/{len(keys_for_model)} (ending ...{api_key[-6:]})")
+                llm = get_llm(api_key=api_key, model=current_model)
+                response = llm.invoke(messages)
+                print(f"✅ {operation_name} - Success with model {current_model} on attempt {attempt}")
+                return response
+                
+            except Exception as e:
+                last_error = e
+                print(f"❌ {operation_name} - Failed: {str(e)[:100]}")
+                if attempt < len(keys_for_model):
+                    print(f"🔄 Retrying with next API key for model {current_model}...")
+                continue
+        
+        # All keys failed for this model
+        print(f"❌ {operation_name} - All API keys failed for model {current_model}")
+        if model_idx < len(models_to_try):
+            print(f"🔄 Falling back to next model: {models_to_try[model_idx]}")
     
-    # Try each API key until one succeeds
-    for attempt, api_key in enumerate(available_keys, 1):
-        try:
-            print(f"🔑 {operation_name} - Attempt {attempt}/{len(available_keys)} with API key ending ...{api_key[-6:]}")
-            llm = get_llm(api_key=api_key)
-            response = llm.invoke(messages)
-            print(f"✅ {operation_name} - Success with attempt {attempt}")
-            return response
-            
-        except Exception as e:
-            last_error = e
-            print(f"❌ {operation_name} - API key attempt {attempt} failed: {str(e)}")
-            print(f"API Key ending ...{api_key[-6:]} failed.")
-            if attempt < len(available_keys):
-                print(f"🔄 Retrying with next API key...")
-            continue
-    
-    # If all keys failed, raise the last error
-    print(f"❌ {operation_name} - All {len(available_keys)} API keys failed!")
-    raise RuntimeError(f"All API keys exhausted for {operation_name}. Last error: {str(last_error)}") from last_error
+    # If all keys and models failed, raise the last error
+    print(f"❌ {operation_name} - All {len(available_keys)} API keys and {len(models_to_try)} models failed!")
+    raise RuntimeError(f"All API keys and models exhausted for {operation_name}. Last error: {str(last_error)}") from last_error
 
 
 def add_ai_message_to_conversation(state: AgentState, content: str):
@@ -183,8 +222,11 @@ def llm_with_history(state: AgentState, final_prompt: str):
     # Note: The final_prompt already contains conversation history via build_prompt_from_template
     request_msgs = [HumanMessage(content=final_prompt)]
     
+    # Get model from state, default to gemma-3-27b-it
+    model = state.get("model", "gemma-3-27b-it")
+    
     # Use the centralized invoke function with fallback
-    resp = invoke_llm_with_fallback(request_msgs, operation_name="LLM with history")
+    resp = invoke_llm_with_fallback(request_msgs, operation_name="LLM with history", model=model)
     
     # 🔍 LLM INVOCATION - OUTPUT 🔍
     print("🤖 LLM INVOCATION - COMPLETED")
@@ -868,7 +910,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Optio
         raise ValueError(f"Unrecognized independent variable '{independent_var}' for concept: {concept}")
 
 
-def select_most_relevant_image_for_concept_introduction(concept: str, definition_context: str) -> Optional[Dict]:
+def select_most_relevant_image_for_concept_introduction(concept: str, definition_context: str, model: str = "gemma-3-27b-it") -> Optional[Dict]:
     """
     Select the most pedagogically relevant image for introducing a concept.
     Uses the concept-to-file mapping to find the correct JSON file.
@@ -876,6 +918,7 @@ def select_most_relevant_image_for_concept_introduction(concept: str, definition
     Args:
         concept: The concept name (can be in any case)
         definition_context: The context/definition being provided to the student
+        model: Model to use for image selection. Defaults to gemma-3-27b-it.
     
     Returns:
         Dict with url, description, and relevance_reason, or None if no images found
@@ -945,7 +988,8 @@ Respond with JSON only:
         # Get LLM response with fallback
         response = invoke_llm_with_fallback(
             [HumanMessage(content=selection_prompt)],
-            operation_name="Image selection"
+            operation_name="Image selection",
+            model=model
         )
         
         # Parse response
@@ -1011,9 +1055,13 @@ def identify_node_segments_from_transitions(messages: list, transitions: list) -
     
     return segments
 
-def create_educational_summary(messages: list) -> str:
+def create_educational_summary(messages: list, model: str = "gemma-3-27b-it") -> str:
     """
     Use LLM to create a proper educational summary of the conversation.
+    
+    Args:
+        messages: List of conversation messages
+        model: Model to use for summarization. Defaults to gemma-3-27b-it.
     """
     if not messages:
         return ""
@@ -1052,7 +1100,8 @@ Summary:"""
     try:
         summary_response = invoke_llm_with_fallback(
             [HumanMessage(content=summary_prompt)],
-            operation_name="Educational summary"
+            operation_name="Educational summary",
+            model=model
         )
         return summary_response.content.strip()
     except Exception as e:
@@ -1060,9 +1109,13 @@ Summary:"""
         # Fallback to simple summary if LLM fails
         return f"Educational discussion with {len(messages)} exchanges about the concept"
 
-def create_educational_summary_from_text(conversation_text: str) -> str:
+def create_educational_summary_from_text(conversation_text: str, model: str = "gemma-3-27b-it") -> str:
     """
     Create an LLM-generated summary from conversation text.
+    
+    Args:
+        conversation_text: Text of the conversation to summarize
+        model: Model to use for summarization. Defaults to gemma-3-27b-it.
     """
     try:
         if not conversation_text.strip():
@@ -1085,7 +1138,8 @@ Summary:"""
 
         summary_response = invoke_llm_with_fallback(
             [HumanMessage(content=summary_prompt)],
-            operation_name="Summary from text"
+            operation_name="Summary from text",
+            model=model
         )
         return summary_response.content.strip()
     except Exception as e:
@@ -1100,6 +1154,7 @@ def build_node_aware_conversation_history(state: AgentState, current_node: str) 
     """
     messages = state.get("messages", [])
     transitions = state.get("node_transitions", [])
+    model = state.get("model", "gemma-3-27b-it")
     
     # For short conversations, use full history
     if len(messages) <= 6:
@@ -1158,11 +1213,11 @@ def build_node_aware_conversation_history(state: AgentState, current_node: str) 
                             combined_content += f"Agent: {msg.content}\n"
                     
                     print(f"📊 🔄 Updating summary: old summary + {len(new_messages)} new messages...")
-                    summary = create_educational_summary_from_text(combined_content)
+                    summary = create_educational_summary_from_text(combined_content, model=model)
                 else:
                     # First time - just summarize the messages
                     print(f"📊 🔄 Creating first summary for {len(new_messages)} messages...")
-                    summary = create_educational_summary(new_messages)
+                    summary = create_educational_summary(new_messages, model=model)
                 
                 # Update summary state
                 state["summary"] = summary
