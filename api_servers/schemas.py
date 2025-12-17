@@ -48,6 +48,10 @@ class ContinueSessionRequest(BaseModel):
         default="gemma-3-27b-it",
         description="Optional: Override the model for this specific request. If not provided, uses the model from session start."
     )
+    clicked_autosuggestion: Optional[bool] = Field(
+        default=False,
+        description="True if user clicked an autosuggestion button, False if typed message"
+    )
 
 
 class SessionStatusRequest(BaseModel):
@@ -180,6 +184,10 @@ class StartSessionResponse(BaseModel):
         default_factory=SessionMetadata,
         description="Session metadata with scores, images, simulation status, etc."
     )
+    autosuggestions: List[str] = Field(
+        default_factory=list,
+        description="Contextually appropriate quick-reply suggestions for the user (translated if Kannada)"
+    )
 
 
 class ContinueSessionResponse(BaseModel):
@@ -202,6 +210,10 @@ class ContinueSessionResponse(BaseModel):
     message: str = Field(
         default="Response generated successfully",
         description="Status message about the response generation"
+    )
+    autosuggestions: List[str] = Field(
+        default_factory=list,
+        description="Contextually appropriate quick-reply suggestions for the user (translated if Kannada)"
     )
 
 

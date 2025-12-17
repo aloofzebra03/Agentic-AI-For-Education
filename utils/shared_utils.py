@@ -215,7 +215,7 @@ def llm_with_history(state: AgentState, final_prompt: str):
     print("🤖 LLM INVOCATION - STARTED")
     print("=" * 70)
     print(f"📝 PROMPT_LENGTH: {len(final_prompt)} characters")
-    print(f"📝 PROMPT_PREVIEW: {final_prompt[:200]}...")
+    print(f"📝 PROMPT_PREVIEW: {final_prompt}...")
     print("=" * 70)
     
     # Send the final prompt directly as a human message
@@ -335,8 +335,30 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
     
     # Add last user message if requested
     if include_last_message and state.get("last_user_msg"):
+        print("=====================================================")
+        print("Adding last user message to prompt template")
+        print("Last user message:", state["last_user_msg"])
+        print("=====================================================")
         template_parts.append("\n\nStudent's Latest Response: {last_user_message}")
         template_vars.append("last_user_message")
+    
+    # Add autosuggestion instructions BEFORE format instructions for pedagogical nodes
+    if parser and current_node in ["APK", "CI", "GE", "AR", "TC", "RLC"]:
+        autosuggestion_pool = [
+            "I'm not sure",
+            "Can you give me a hint?",
+            "Can you explain that simpler?",
+            "Give me an example",
+            "I don't know",
+            "Let me think about it",
+            "I understand, continue",
+            "Yes",
+            "No",
+            "Can you repeat that?",
+            "I'm confused",
+            "That makes sense"
+        ]
+        template_parts.append(f"\n\nIMPORTANT: Select 3-5 contextually appropriate quick-reply suggestions from this list based on your feedback: {autosuggestion_pool}. Include them in the `selected_autosuggestions` field.")
     
     # Add instructions at the end if requested
     if include_instructions and parser:
@@ -825,6 +847,7 @@ def get_ground_truth_from_json(concept: str, section_name: str) -> str:
         error_msg = f"Error retrieving ground truth for {concept} - {section_name}: Error: {e}, Used file: {file_path if 'file_path' in locals() else 'N/A'}"
         print(f"❌ {error_msg}")
         print("=" * 70)
+        # return result
         raise RuntimeError(error_msg) from e
 
 # ─────────────────────────────────────────────────────────────────────

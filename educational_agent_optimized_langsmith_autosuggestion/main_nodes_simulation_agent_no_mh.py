@@ -12,8 +12,6 @@ from utils.shared_utils import (
     AgentState,
     extract_json_block,
     get_llm,
-    add_ai_message_to_conversation,
-    add_system_message_to_conversation,
     llm_with_history,
     build_conversation_history,
     build_prompt_from_template,
@@ -57,20 +55,49 @@ PEDAGOGICAL_MOVES: Dict[str, Dict[str, str]] = {
     },
 }
 
+# ─── Autosuggestion system constants ───────────────────────────────────────────
+
+# Generic autosuggestion pool (context-neutral responses)
+AUTOSUGGESTION_POOL = [
+    "I'm not sure",
+    "Can you give me a hint?",
+    "Can you explain that simpler?",
+    "Give me an example",
+    "I don't know",
+    "Let me think about it",
+    "I understand, continue",
+    "Yes",
+    "No",
+    "Can you repeat that?",
+    "I'm confused",
+    "That makes sense"
+]
+
+# Suggestions that trigger special handler logic
+HANDLER_SUGGESTIONS = {
+    "Can you give me a hint?",
+    "Can you explain that simpler?",
+    "Give me an example",
+    # "Can you repeat that?"  # Commented out - will implement later
+}
+
 
 # ─── Pydantic response models ─────────────────────────────────────────────────
 
 class ApkResponse(BaseModel):
     feedback: str
     next_state: Literal["CI", "APK"]
+    selected_autosuggestions: list[str] = []
 
 class CiResponse(BaseModel):
     feedback: str
     next_state: Literal["CI","SIM_CC"]
+    selected_autosuggestions: list[str] = []
 
 class GeResponse(BaseModel):
     feedback: str
     next_state: Literal["AR", "GE"]
+    selected_autosuggestions: list[str] = []
     # correction: Optional[str] = None  # OLD: Used when routing to SIM_VARS/MH
 
 class MhResponse(BaseModel):
@@ -81,14 +108,17 @@ class ArResponse(BaseModel):
     score: float
     feedback: str
     next_state: Literal["GE", "TC"]
+    selected_autosuggestions: list[str] = []
 
 class TcResponse(BaseModel):
     correct: bool
     feedback: str
+    selected_autosuggestions: list[str] = []
 
 class RlcResponse(BaseModel):
     feedback: str
     next_state: Literal["RLC", "END"]
+    selected_autosuggestions: list[str] = []
 
 # ─── Parsers ───────────────────────────────────────────────────────────────────
 
@@ -100,6 +130,179 @@ ar_parser  = PydanticOutputParser(pydantic_object=ArResponse)
 tc_parser  = PydanticOutputParser(pydantic_object=TcResponse)
 rlc_parser = PydanticOutputParser(pydantic_object=RlcResponse)
 
+
+# ─── Handler functions for special autosuggestions ────────────────────────────────
+
+def handle_hint(state: AgentState) -> AgentState:
+    """Generate a contextual hint without revealing the answer"""
+    agent_output = state.get("agent_output", "")
+    
+    hint_prompt = f"""Based on this question/feedback to the student:
+{agent_output}
+
+Provide a subtle hint to help the student without revealing the answer. Keep it brief (1-2 sentences).
+Be supportive and encouraging."""
+    
+    # Build prompt for hint generation
+    final_prompt = build_prompt_from_template_optimized(
+        system_prompt=hint_prompt,
+        state=state,
+        include_last_message=False,
+        include_instructions=False,
+        current_node=state.get("current_state", "UNKNOWN")
+    )
+    
+    resp = llm_with_history(state, final_prompt)
+    hint_content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+    
+    # Update agent output with hint
+    state["agent_output"] = hint_content
+    
+    print("=" * 80)
+    print("🔍 HANDLER: HINT GENERATED")
+    print("=" * 80)
+    print(f"💡 HINT: {hint_content[:100]}...")
+    print("=" * 80)
+    
+    return state
+
+
+def handle_explain_simpler(state: AgentState) -> AgentState:
+    """Rephrase the last explanation in simpler language"""
+    agent_output = state.get("agent_output", "")
+    
+    simplify_prompt = f"""Rephrase this explanation using very simple words suitable for a class 7 student:
+
+{agent_output}
+
+Make it easier to understand while keeping the same meaning."""
+    
+    # Build prompt for simplification
+    final_prompt = build_prompt_from_template_optimized(
+        system_prompt=simplify_prompt,
+        state=state,
+        include_last_message=False,
+        include_instructions=False,
+        current_node=state.get("current_state", "UNKNOWN")
+    )
+    
+    resp = llm_with_history(state, final_prompt)
+    simple_content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+    
+    # Update agent output with simplified version
+    state["agent_output"] = simple_content
+    
+    print("=" * 80)
+    print("🔍 HANDLER: SIMPLIFIED EXPLANATION")
+    print("=" * 80)
+    print(f"📝 SIMPLIFIED: {simple_content[:100]}...")
+    print("=" * 80)
+    
+    return state
+
+
+def handle_example(state: AgentState) -> AgentState:
+    """Provide a concrete example to illustrate the concept"""
+    agent_output = state.get("agent_output", "")
+    concept_title = state.get("concept_title", "")
+    
+    example_prompt = f"""Based on this explanation:
+{agent_output}
+
+Provide a simple, concrete example to illustrate the concept of '{concept_title}'. 
+Keep it brief (2-3 sentences) and relatable to a class 7 student's everyday life."""
+    
+    # Build prompt for example generation
+    final_prompt = build_prompt_from_template_optimized(
+        system_prompt=example_prompt,
+        state=state,
+        include_last_message=False,
+        include_instructions=False,
+        current_node=state.get("current_state", "UNKNOWN")
+    )
+    
+    resp = llm_with_history(state, final_prompt)
+    example_content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+    
+    # Update agent output with example
+    state["agent_output"] = example_content
+    
+    print("=" * 80)
+    print("🔍 HANDLER: EXAMPLE PROVIDED")
+    print("=" * 80)
+    print(f"🎯 EXAMPLE: {example_content[:100]}...")
+    print("=" * 80)
+    
+    return state
+
+
+# def handle_repeat(state: AgentState) -> AgentState:
+#     """Repeat the last agent output (restore from backup)"""
+#     backup = state.get("last_agent_output_backup", "")
+#     
+#     if backup:
+#         state["agent_output"] = backup
+#         print("=" * 80)
+#         print("🔍 HANDLER: REPEATED LAST MESSAGE")
+#         print("=" * 80)
+#     else:
+#         # Fallback if no backup available
+#         state["agent_output"] = "I apologize, I don't have a previous message to repeat. Let's continue from here."
+#         print("=" * 80)
+#         print("🔍 HANDLER: NO BACKUP AVAILABLE FOR REPEAT")
+#         print("=" * 80)
+#     
+#     return state
+
+
+# ─── Autosuggestion Manager Node ──────────────────────────────────────────────
+
+def autosuggestion_manager_node(state: AgentState) -> AgentState:
+    """
+    Manager node that ONLY handles special handler suggestions.
+    Autosuggestions are already set by pedagogical nodes.
+    This node runs ONLY when user clicks an autosuggestion button.
+    
+    CRITICAL: Sets a flag to indicate if handler was triggered.
+    Graph routing will use this to decide whether to interrupt.
+    """
+    
+    print("=" * 80)
+    print("🎯 AUTOSUGGESTION MANAGER NODE - ENTRY")
+    print("=" * 80)
+    
+    last_user_msg = state.get("last_user_msg", "")
+    
+    # Check if user clicked a handler suggestion
+    if last_user_msg in HANDLER_SUGGESTIONS:
+        print(f"🔧 HANDLER DETECTED: {last_user_msg}")
+        
+        if last_user_msg == "Can you give me a hint?":
+            state = handle_hint(state)
+        elif last_user_msg == "Can you explain that simpler?":
+            state = handle_explain_simpler(state)
+        elif last_user_msg == "Give me an example":
+            state = handle_example(state)
+        # elif last_user_msg == "Can you repeat that?":
+        #     state = handle_repeat(state)
+        
+        # Mark that we need to show the handler output to user (interrupt)
+        state["handler_triggered"] = True
+    else:
+        print(f"📝 NON-HANDLER AUTOSUGGESTION: {last_user_msg}")
+        print("   (No special processing - flow will continue without pause)")
+        state["handler_triggered"] = False
+    
+    # Reset click flag for next interaction
+    state["clicked_autosuggestion"] = False
+    
+    print(f"🔄 PRESERVING current_state: {state.get('current_state', 'UNKNOWN')}")
+    print(f"📤 AUTOSUGGESTIONS ALREADY SET: {state.get('autosuggestions', [])}")
+    print(f"⏸️ HANDLER TRIGGERED: {state.get('handler_triggered', False)}")
+    print("=" * 80)
+    
+    # CRITICAL: Preserve current_state - do NOT modify pedagogical routing
+    return state
 
 
 # ─── Node definitions ───────────────────────────────────────────────────────────
@@ -130,9 +333,6 @@ def start_node(state: AgentState) -> AgentState:
     # Apply JSON extraction in case LLM wraps response in markdown
     content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
     
-    # Add System message to conversation after successful processing (for start node)
-    add_system_message_to_conversation(state, content)
-    
     # 🔍 START NODE - CONTENT PROCESSING 🔍
     print("=" * 80)
     print("🎯 START NODE - CONTENT OUTPUT 🎯")
@@ -145,6 +345,7 @@ def start_node(state: AgentState) -> AgentState:
     
     state["agent_output"]  = content
     state["current_state"] = "APK"
+    state["messages"] = [SystemMessage(content=content)]
     return state
 
 def apk_node(state: AgentState) -> AgentState:
@@ -172,9 +373,6 @@ def apk_node(state: AgentState) -> AgentState:
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
-        # Add AI message to conversation after successful processing
-        add_ai_message_to_conversation(state, content)
-        
         # 🔍 APK NODE - FIRST PASS CONTENT 🔍
         print("=" * 80)
         print("🎯 APK NODE - FIRST PASS CONTENT OUTPUT 🎯")
@@ -185,6 +383,7 @@ def apk_node(state: AgentState) -> AgentState:
         print("=" * 80)
         
         state["agent_output"] = content
+        state["messages"] = [AIMessage(content=content)]
         return state
 
     # Handle student's response after hook question
@@ -220,9 +419,6 @@ Respond ONLY with a clear, encouraging message (not JSON - just the message text
         
         final_response = llm_with_history(state, final_prompt).content.strip()
         
-        # Add AI message to conversation
-        add_ai_message_to_conversation(state, final_response)
-        
         # 🔍 APK NODE - MAX TRIES REACHED 🔍
         print("=" * 80)
         print("🎯 APK NODE - MAX TRIES REACHED, PROVIDING ANSWER 🎯")
@@ -233,6 +429,7 @@ Respond ONLY with a clear, encouraging message (not JSON - just the message text
         
         state["agent_output"] = final_response
         state["current_state"] = "CI"
+        state["messages"] = [AIMessage(content=final_response)]
         return state
 
     context = json.dumps(PEDAGOGICAL_MOVES["APK"], indent=2)
@@ -265,9 +462,6 @@ Remember to give feedback as mentioned in the required schema."""
         parsed_obj: ApkResponse = apk_parser.parse(json_text)
         parsed = parsed_obj.model_dump()
 
-        # Add AI message to conversation after successful parsing
-        add_ai_message_to_conversation(state, parsed['feedback'])
-
         # 🔍 APK PARSING OUTPUT - MAIN CONTENT 🔍
         print("=" * 80)
         print("🎯 APK NODE - PARSED OUTPUT CONTENTS 🎯")
@@ -279,6 +473,12 @@ Remember to give feedback as mentioned in the required schema."""
 
         state["agent_output"]  = parsed['feedback']
         state["current_state"] = parsed['next_state']
+        
+        # Set autosuggestions directly
+        selected = parsed.get('selected_autosuggestions', [])
+        state["autosuggestions"] = selected if selected else ["I understand, continue", "Can you give me a hint?", "I'm confused"]
+        
+        state["messages"] = [AIMessage(content=parsed['feedback'])]
     except Exception as e:
         print(f"Error parsing APK response: {e}")
         print(f"Raw response: {raw}")
@@ -311,9 +511,6 @@ Provide a concise definition (≤30 words) of '{state["concept_title"]}', then a
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
-        # Add AI message to conversation after successful processing
-        add_ai_message_to_conversation(state, content)
-        
         # NEW: Select most relevant image for concept introduction
         selected_image = select_most_relevant_image_for_concept_introduction(
             concept=state["concept_title"],
@@ -334,7 +531,8 @@ Provide a concise definition (≤30 words) of '{state["concept_title"]}', then a
         result = {
             "asked_ci": True,
             "ci_tries": 0,
-            "agent_output": content
+            "agent_output": content,
+            "messages": [AIMessage(content=content)]
         }
         
         # Add image metadata if image was selected
@@ -371,9 +569,6 @@ Provide a concise definition (≤30 words) of '{state["concept_title"]}', then a
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
-        # Add AI message to conversation after successful processing
-        add_ai_message_to_conversation(state, content)
-        
         # 🔍 CI NODE - AUTO-PROGRESS CONTENT 🔍
         print("=" * 80)
         print("🎯 CI NODE - AUTO-PROGRESS AFTER 2 TRIES 🎯")
@@ -388,7 +583,8 @@ Provide a concise definition (≤30 words) of '{state["concept_title"]}', then a
             "ci_tries": ci_tries,
             "agent_output": content,
             "current_state": "SIM_CC",
-            "enhanced_message_metadata": {}
+            "enhanced_message_metadata": {},
+            "messages": [AIMessage(content=content)]
         }
 
     context = json.dumps(PEDAGOGICAL_MOVES["CI"], indent=2)
@@ -420,9 +616,6 @@ Task: Determine if the restatement is accurate. If accurate, move to SIM_CC to i
         parsed_obj: CiResponse = ci_parser.parse(json_text)
         parsed = parsed_obj.model_dump()
 
-        # Add AI message to conversation after successful parsing
-        add_ai_message_to_conversation(state, parsed['feedback'])
-
         # 🔍 CI PARSING OUTPUT - MAIN CONTENT 🔍
         print("=" * 80)
         print("🎯 CI NODE - PARSED OUTPUT CONTENTS 🎯")
@@ -433,13 +626,18 @@ Task: Determine if the restatement is accurate. If accurate, move to SIM_CC to i
         print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
         print("=" * 80)
 
+        # Set autosuggestions directly
+        selected = parsed.get('selected_autosuggestions', [])
+        autosuggestions = selected if selected else ["I understand, continue", "Can you give me a hint?", "I'm confused"]
+        
         # Return only the changed keys following LangGraph best practices
         return {
             "ci_tries": ci_tries,
             "agent_output": parsed['feedback'],
             "current_state": parsed['next_state'],
-            "enhanced_message_metadata": {}
-
+            "enhanced_message_metadata": {},
+            "autosuggestions": autosuggestions,
+            "messages": [AIMessage(content=parsed['feedback'])]
         }
     except Exception as e:
         print(f"Error parsing CI response: {e}")
@@ -490,9 +688,6 @@ def ge_node(state: AgentState) -> AgentState:
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
-        # Add AI message to conversation after successful processing
-        add_ai_message_to_conversation(state, content)
-        
         # 🔍 GE NODE - FIRST PASS CONTENT 🔍
         print("=" * 80)
         print("🎯 GE NODE - FIRST PASS CONTENT OUTPUT 🎯")
@@ -508,6 +703,7 @@ def ge_node(state: AgentState) -> AgentState:
             "asked_ge": True,
             "ge_tries": 0,
             "agent_output": content,
+            "messages": [AIMessage(content=content)]
         }
 
     # Handle tries for GE node - increment counter
@@ -549,12 +745,11 @@ Then transition to testing their understanding by saying something like: 'Now le
         resp = llm_with_history(state, final_prompt)
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
-        add_ai_message_to_conversation(state, content)
-        
         # Return only the changed keys following LangGraph best practices
         return {
             "agent_output": content,
-            "current_state": "AR"  # NEW: Transition directly to AR for assessment
+            "current_state": "AR",  # NEW: Transition directly to AR for assessment
+            "messages": [AIMessage(content=content)]
         }
         
         # OLD: Transition to SIM_VARS for simulation-based misconception handling
@@ -604,9 +799,6 @@ OLD OPTIONS (commented out):
         parsed_obj: GeResponse = ge_parser.parse(json_text)
         parsed = parsed_obj.model_dump()  # Convert to dictionary for serialization safety
 
-        # Add AI message to conversation after successful parsing
-        add_ai_message_to_conversation(state, parsed['feedback'])
-
         # 🔍 GE PARSING OUTPUT - MAIN CONTENT 🔍
         print("=" * 80)
         print("🎯 GE NODE - PARSED OUTPUT CONTENTS 🎯")
@@ -618,9 +810,15 @@ OLD OPTIONS (commented out):
         print(f"🔢 CURRENT_CONCEPT_IDX: {current_idx}")
         print("=" * 80)
 
+        # Set autosuggestions directly
+        selected = parsed.get('selected_autosuggestions', [])
+        autosuggestions = selected if selected else ["I understand, continue", "Can you give me a hint?", "I'm confused"]
+        
         update = {
             "agent_output": parsed['feedback'],
-            "current_state": parsed['next_state']
+            "current_state": parsed['next_state'],
+            "autosuggestions": autosuggestions,
+            "messages": [AIMessage(content=parsed['feedback'])]
         }
 
         # NEW: Since GE now only goes to AR or GE, no special handling needed
@@ -653,9 +851,6 @@ def mh_node(state: AgentState) -> AgentState:
         # Provide the correction to the student
         correction_message = f"I understand your thinking, but let me clarify: {correction}"
         
-        # Add AI message to conversation
-        add_ai_message_to_conversation(state, correction_message)
-        
         # 🔍 MH NODE - FIRST PASS CORRECTION 🔍
         print("=" * 80)
         print("🎯 MH NODE - INITIAL CORRECTION PROVIDED 🎯")
@@ -665,6 +860,7 @@ def mh_node(state: AgentState) -> AgentState:
         print("=" * 80)
         
         state["agent_output"] = correction_message
+        state["messages"] = [AIMessage(content=correction_message)]
         return state
     
     # Handle student's response after correction
@@ -706,9 +902,6 @@ Respond ONLY with a clear, conclusive message (not JSON - just the message text)
         
         final_response = llm_with_history(state, final_prompt).content.strip()
         
-        # Add AI message to conversation
-        add_ai_message_to_conversation(state, final_response)
-        
         # 🔍 MH NODE - MAX TRIES REACHED 🔍
         print("=" * 80)
         print("🎯 MH NODE - MAX TRIES REACHED, LLM CONCLUSION 🎯")
@@ -719,6 +912,7 @@ Respond ONLY with a clear, conclusive message (not JSON - just the message text)
         
         state["agent_output"] = final_response
         state["current_state"] = "SIM_VARS"  # After max tries, show simulation to help convince student
+        state["messages"] = [AIMessage(content=final_response)]
         return state
     
     # Normal MH processing: evaluate student's response and decide next action
@@ -760,9 +954,6 @@ Task: Evaluate the student's response after receiving misconception correction. 
     try:
         parsed: MhResponse = mh_parser.parse(json_text)
         
-        # Add AI message to conversation after successful parsing
-        add_ai_message_to_conversation(state, parsed.feedback)
-        
         # 🔍 MH PARSING OUTPUT - MAIN CONTENT 🔍
         print("=" * 80)
         print("🎯 MH NODE - PARSED OUTPUT CONTENTS 🎯")
@@ -776,6 +967,7 @@ Task: Evaluate the student's response after receiving misconception correction. 
         state["agent_output"] = parsed.feedback
         # state["current_state"] = parsed.next_state
         state["current_state"] = "SIM_VARS"
+        state["messages"] = [AIMessage(content=parsed.feedback)]
     except Exception as e:
         print(f"Error parsing MH response: {e}")
         print(f"Raw response: {raw}")
@@ -822,7 +1014,6 @@ def ar_node(state: AgentState) -> AgentState:
         resp = llm_with_history(state, final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-        add_ai_message_to_conversation(state, content)
 
         # 🔍 AR NODE - FIRST PASS CONTENT 🔍
         print("=" * 80)
@@ -835,6 +1026,7 @@ def ar_node(state: AgentState) -> AgentState:
         print("=" * 80)
         
         state["agent_output"] = content
+        state["messages"] = [AIMessage(content=content)]
         return state
 
     # Second pass: grade & decide next step based on concept progress
@@ -900,6 +1092,10 @@ Task: Grade this answer on a scale from 0 to 1 and determine next state. Respond
 
         # Store the quiz score in the state for metrics
         state["quiz_score"] = score * 100  # Convert 0-1 score to 0-100 percentage
+        
+        # Set autosuggestions directly
+        selected = parsed.get('selected_autosuggestions', [])
+        state["autosuggestions"] = selected if selected else ["I understand, continue", "Can you give me a hint?", "I'm confused"]
     except Exception as e:
         print(f"Error parsing AR response: {e}")
         print(f"Raw response: {raw}")
@@ -956,8 +1152,8 @@ Task: Grade this answer on a scale from 0 to 1 and determine next state. Respond
         completion_msg = "\n\nExcellent! We've covered all the key concepts. Now let's see how you can apply this knowledge in a new context."
         state["agent_output"] += completion_msg
 
-    add_ai_message_to_conversation(state, state["agent_output"])
     state["current_state"] = next_state
+    state["messages"] = [AIMessage(content=state["agent_output"])]
     return state
 
 def tc_node(state: AgentState) -> AgentState:
@@ -985,8 +1181,6 @@ def tc_node(state: AgentState) -> AgentState:
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
 
-        add_ai_message_to_conversation(state, content)
-
         # 🔍 TC NODE - FIRST PASS CONTENT 🔍
         print("=" * 80)
         print("🎯 TC NODE - FIRST PASS CONTENT OUTPUT 🎯")
@@ -998,6 +1192,7 @@ def tc_node(state: AgentState) -> AgentState:
         
         state["agent_output"] = content
         state["asked_tc"] = True
+        state["messages"] = [AIMessage(content=content)]
         return state
 
     # Second pass: evaluate & either affirm or explain
@@ -1038,6 +1233,15 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
         print("=" * 80)
 
         correct, feedback = parsed['correct'], parsed['feedback']
+        
+        # Set autosuggestions directly
+        selected = parsed.get('selected_autosuggestions', [])
+        state["autosuggestions"] = selected if selected else ["I understand, continue", "Can you give me a hint?", "I'm confused"]
+        
+        # Save and convert autosuggestions
+        selected = parsed.get('selected_autosuggestions', [])
+        state["selected_autosuggestions_internal"] = selected
+        state["autosuggestions"] = selected if selected else ["I understand, continue", "Can you give me a hint?", "I'm confused"]
     except Exception as e:
         print(f"Error parsing TC response: {e}")
         print(f"Raw response: {raw}")
@@ -1046,7 +1250,7 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
 
     if correct:
         state["agent_output"] = feedback + "\nExcellent application! You've mastered this concept."
-        add_ai_message_to_conversation(state, state["agent_output"])
+        state["messages"] = [AIMessage(content=state["agent_output"])]
     else:
         # Student struggled: give correct transfer answer + explanation
         explain_system_prompt = (
@@ -1066,7 +1270,6 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
         resp = llm_with_history(state, explain_final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-        add_ai_message_to_conversation(state, content)
 
         # 🔍 TC NODE - EXPLANATION CONTENT 🔍
         print("=" * 80)
@@ -1078,6 +1281,7 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
         print("=" * 80)
         
         state["agent_output"] = content
+        state["messages"] = [AIMessage(content=content)]
 
     state["current_state"] = "RLC"
     return state
@@ -1111,7 +1315,6 @@ def rlc_node(state: AgentState) -> AgentState:
         resp = llm_with_history(state, final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-        add_ai_message_to_conversation(state, content)
 
         # 🔍 RLC NODE - FIRST PASS CONTENT 🔍
         print("=" * 80)
@@ -1123,6 +1326,7 @@ def rlc_node(state: AgentState) -> AgentState:
         print("=" * 80)
         
         state["agent_output"] = content
+        state["messages"] = [AIMessage(content=content)]
         return state
 
     # Increment attempt counter
@@ -1151,8 +1355,6 @@ def rlc_node(state: AgentState) -> AgentState:
         resp = llm_with_history(state, final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-
-        add_ai_message_to_conversation(state, content)
         
         # 🔍 RLC NODE - FINAL ANSWER AND CONCLUSION 🔍
         print("=" * 80)
@@ -1165,6 +1367,7 @@ def rlc_node(state: AgentState) -> AgentState:
         
         state["agent_output"] = content
         state["current_state"] = "END"
+        state["messages"] = [AIMessage(content=content)]
         return state
 
     context = json.dumps(PEDAGOGICAL_MOVES["RLC"], indent=2)
@@ -1196,9 +1399,6 @@ Task: Evaluate whether the student has more questions about the real-life applic
         parsed_obj: RlcResponse = rlc_parser.parse(json_text)
         parsed = parsed_obj.model_dump()
 
-        # Add AI message to conversation after successful parsing
-        add_ai_message_to_conversation(state, parsed['feedback'])
-
         # 🔍 RLC PARSING OUTPUT - MAIN CONTENT 🔍
         print("=" * 80)
         print("🎯 RLC NODE - PARSED OUTPUT CONTENTS 🎯")
@@ -1211,6 +1411,7 @@ Task: Evaluate whether the student has more questions about the real-life applic
 
         state["agent_output"]  = parsed['feedback']
         state["current_state"] = parsed['next_state']
+        state["messages"] = [AIMessage(content=parsed['feedback'])]
     except Exception as e:
         print(f"Error parsing RLC response: {e}")
         print(f"Raw response: {raw}")
