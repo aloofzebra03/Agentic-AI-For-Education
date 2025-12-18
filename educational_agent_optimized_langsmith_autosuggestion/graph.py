@@ -222,8 +222,13 @@ def _AUTOSUGGESTION_MANAGER(s): return _wrap(autosuggestion_manager_node)(s)
 
 # Pause node - just passes through to allow interrupt
 def pause_for_handler(state: AgentState) -> AgentState:
-    """Simple pass-through node that allows graph to interrupt after handler."""
+    """Simple pass-through node that allows graph to interrupt after handler.
+    
+    Clears autosuggestions so user sees only the handler output without
+    stale suggestions. Fresh autosuggestions will be generated when flow resumes.
+    """
     state["handler_triggered"] = False  # Reset flag
+    state["autosuggestions"] = []  # Clear autosuggestions during handler pause
     return state
 
 def _PAUSE(s): return _wrap(pause_for_handler)(s)
