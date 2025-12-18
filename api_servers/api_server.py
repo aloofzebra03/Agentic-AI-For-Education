@@ -102,6 +102,23 @@ def generate_thread_id(concept_title: str, is_kannada: bool = False, label: Opti
     return f"{'-'.join(parts)}-thread-{timestamp}"
 
 
+def validate_student_level(level: str) -> str:
+    """
+    Validate student level, default to medium if invalid.
+    
+    Args:
+        level: Student level string
+    
+    Returns:
+        Validated level: "low", "medium", or "advanced"
+    """
+    valid_levels = ["low", "medium", "advanced"]
+    if level not in valid_levels:
+        print(f"⚠️ Invalid student_level '{level}', defaulting to 'medium'")
+        return "medium"
+    return level
+
+
 def get_state_from_checkpoint(thread_id: str) -> Optional[Dict[str, Any]]:
     try:
         # Get the state snapshot from the graph using the thread_id
@@ -317,15 +334,20 @@ def start_session(request: StartSessionRequest):
                 detail=f"Invalid model '{model}'. Available models: {AVAILABLE_GEMINI_MODELS}"
             )
         
+        # Validate student level
+        student_level = validate_student_level(request.student_level)
+        print(f"📊 Student level: {student_level}")
+        
         # Start the conversation by invoking the graph with __start__ message
-        # Include is_kannada, concept_title, and model in the initial state
+        # Include is_kannada, concept_title, student_level, and model in the initial state
         print("Invoking graph to start session with model:", model)
         result = graph.invoke(
             {
                 "messages": [HumanMessage(content="__start__")],
                 "is_kannada": request.is_kannada,
                 "concept_title": request.concept_title,
-                "model": model
+                "model": model,
+                "student_level": student_level
             },
             config={"configurable": {"thread_id": thread_id}},
         )
@@ -393,6 +415,12 @@ def continue_session(request: ContinueSessionRequest):
                     detail=f"Invalid model '{request.model}'. Available models: {AVAILABLE_GEMINI_MODELS}"
                 )
             update_dict["model"] = request.model
+        
+        # Allow updating student level mid-session
+        if request.student_level:
+            validated_level = validate_student_level(request.student_level)
+            update_dict["student_level"] = validated_level
+            print(f"📊 Updated student level to: {validated_level}")
         
         # Continue the conversation using Command (resume)
         cmd = Command(

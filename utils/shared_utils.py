@@ -358,7 +358,35 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
             "I'm confused",
             "That makes sense",
         ]
-        template_parts.append(f"\n\nIMPORTANT: Select 3-5 contextually appropriate quick-reply suggestions from this list based on your feedback: {autosuggestion_pool}. Include them in the `selected_autosuggestions` field.")
+        
+        # Get student level and corresponding description
+        student_level = state.get("student_level", "medium")
+        level_descriptions = {
+            "low": "struggling student who needs extra scaffolding, simpler language, and encouragement",
+            "medium": "average student progressing normally who needs moderate guidance",
+            "advanced": "excelling student ready for deeper challenges and critical thinking"
+        }
+        level_desc = level_descriptions.get(student_level, level_descriptions["medium"])
+        
+        # Level-specific example suggestions
+        level_examples = {
+            "low": "'Can you break it down more?', 'I need more time', 'Show me step-by-step'",
+            "medium": "'What's the next step?', 'How does this connect?', 'Can you clarify that?'",
+            "advanced": "'Can I try a harder version?', 'What if we change X?', 'How does this relate to Y?'"
+        }
+        examples = level_examples.get(student_level, level_examples["medium"])
+        
+        template_parts.append(f"""\n\nIMPORTANT - Autosuggestion Generation:
+1. Select EXACTLY 1 to 3 (no more, no less) contextually appropriate quick-reply suggestions from this pool: {autosuggestion_pool}
+   - Include them in the `selected_autosuggestions` field
+   - Choose quality over quantity - select only the most relevant ones
+   - CRITICAL: You MUST select at least 1 and at most 3 suggestions
+   
+2. Generate 1 UNIQUE dynamic suggestion tailored for a {student_level}-level student ({level_desc})
+   - Include it in the `dynamic_autosuggestion` field
+   - Make it contextually relevant to your current feedback
+   - Ensure it is DIFFERENT from all pool suggestions above
+   - {student_level.capitalize()}-level examples: {examples}""")
     
     # Add instructions at the end if requested
     if include_instructions and parser:

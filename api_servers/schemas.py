@@ -32,6 +32,10 @@ class StartSessionRequest(BaseModel):
         default="gemma-3-27b-it",
         description="Gemini model to use for this session. Available: gemma-3-27b-it, gemini-2.0-flash-exp, gemini-1.5-flash, gemini-1.5-pro. Defaults to gemma-3-27b-it."
     )
+    student_level: str = Field(
+        default="medium",
+        description="Student ability level for dynamic autosuggestions. Options: 'low', 'medium', 'advanced'. Defaults to 'medium'."
+    )
 
 
 class ContinueSessionRequest(BaseModel):
@@ -51,6 +55,10 @@ class ContinueSessionRequest(BaseModel):
     clicked_autosuggestion: Optional[bool] = Field(
         default=False,
         description="True if user clicked an autosuggestion button, False if typed message"
+    )
+    student_level: Optional[str] = Field(
+        default=None,
+        description="Optional: Update student ability level mid-session. Options: 'low', 'medium', 'advanced'."
     )
 
 

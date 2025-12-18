@@ -1,7 +1,7 @@
 import json
 from typing import Literal, Optional, Dict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 # from langchain.output_parsers import PydanticOutputParser
 from langchain_core.output_parsers import PydanticOutputParser
 # from langchain_.output_parsers import PydanticOutputParser
@@ -82,43 +82,105 @@ HANDLER_SUGGESTIONS = {
 }
 
 
+# ─── Helper function for combining autosuggestions ────────────────────────────
+
+def combine_autosuggestions(parsed_response: dict, fallback_suggestions: list[str]) -> tuple[list[str], list[str], str]:
+    """
+    Combine pool-based and dynamic autosuggestions with safety checks.
+    
+    Args:
+        parsed_response: Parsed LLM response dict
+        fallback_suggestions: Default suggestions if LLM didn't provide any
+    
+    Returns:
+        Tuple of (final_suggestions, pool_selections, dynamic_suggestion)
+    """
+    # Extract both from LLM response
+    pool_selections = parsed_response.get('selected_autosuggestions', [])
+    dynamic_suggestion = parsed_response.get('dynamic_autosuggestion', "").strip()
+    
+    # SAFETY CHECK: Truncate pool selections if more than 3 (shouldn't happen with validator)
+    if len(pool_selections) > 3:
+        print(f"⚠️ WARNING: Got {len(pool_selections)} pool selections, truncating to 3")
+        pool_selections = pool_selections[:3]
+    
+    # SAFETY CHECK: Use fallback if no pool selections (shouldn't happen with validator)
+    if len(pool_selections) == 0:
+        print(f"⚠️ WARNING: No pool selections provided, using fallback")
+        final_suggestions = fallback_suggestions
+    else:
+        final_suggestions = pool_selections.copy()
+    
+    # Add dynamic suggestion if valid and not duplicate
+    if dynamic_suggestion:
+        # Check it's not already in final list or in the original pool
+        if (dynamic_suggestion not in final_suggestions and 
+            dynamic_suggestion not in AUTOSUGGESTION_POOL):
+            final_suggestions.append(dynamic_suggestion)
+            print(f"✅ Added dynamic suggestion: '{dynamic_suggestion}'")
+        else:
+            print(f"⚠️ Dynamic suggestion '{dynamic_suggestion}' is duplicate, skipping")
+    
+    return final_suggestions, pool_selections, dynamic_suggestion
+
+
 # ─── Pydantic response models ─────────────────────────────────────────────────
 
-class ApkResponse(BaseModel):
+class BaseAutosuggestionResponse(BaseModel):
+    """Base model with shared autosuggestion fields and validation.
+    
+    All pedagogical response models inherit from this to ensure consistent
+    autosuggestion behavior across the system.
+    """
+    selected_autosuggestions: list[str] = Field(
+        default_factory=list,
+        min_length=1,
+        max_length=3,
+        description="1-3 autosuggestions selected from the pool"
+    )
+    dynamic_autosuggestion: str = Field(
+        default="",
+        description="One contextual autosuggestion based on student level"
+    )
+    
+    @field_validator('dynamic_autosuggestion')
+    @classmethod
+    def validate_dynamic_not_empty(cls, v):
+        """Ensure dynamic autosuggestion is provided and not just whitespace."""
+        if not v or not v.strip():
+            raise ValueError("Dynamic autosuggestion must be provided and cannot be empty.")
+        return v.strip()
+
+
+class ApkResponse(BaseAutosuggestionResponse):
     feedback: str
     next_state: Literal["CI", "APK"]
-    selected_autosuggestions: list[str] = []
 
-class CiResponse(BaseModel):
+class CiResponse(BaseAutosuggestionResponse):
     feedback: str
     next_state: Literal["CI","SIM_CC"]
-    selected_autosuggestions: list[str] = []
 
-class GeResponse(BaseModel):
+class GeResponse(BaseAutosuggestionResponse):
     feedback: str
     next_state: Literal["AR", "GE"]
-    selected_autosuggestions: list[str] = []
     # correction: Optional[str] = None  # OLD: Used when routing to SIM_VARS/MH
 
 class MhResponse(BaseModel):
     feedback: str
     next_state: Literal["MH", "AR"]
 
-class ArResponse(BaseModel):
+class ArResponse(BaseAutosuggestionResponse):
     score: float
     feedback: str
     next_state: Literal["GE", "TC"]
-    selected_autosuggestions: list[str] = []
 
-class TcResponse(BaseModel):
+class TcResponse(BaseAutosuggestionResponse):
     correct: bool
     feedback: str
-    selected_autosuggestions: list[str] = []
 
-class RlcResponse(BaseModel):
+class RlcResponse(BaseAutosuggestionResponse):
     feedback: str
     next_state: Literal["RLC", "END"]
-    selected_autosuggestions: list[str] = []
 
 # ─── Parsers ───────────────────────────────────────────────────────────────────
 
@@ -474,9 +536,16 @@ Remember to give feedback as mentioned in the required schema."""
         state["agent_output"]  = parsed['feedback']
         state["current_state"] = parsed['next_state']
         
-        # Set autosuggestions directly
-        selected = parsed.get('selected_autosuggestions', [])
-        state["autosuggestions"] = selected if selected else ["I understand, continue", "Can you give me a hint?", "I'm confused"]
+        # Combine pool + dynamic autosuggestions
+        final_suggestions, pool_selections, dynamic = combine_autosuggestions(
+            parsed, 
+            ["I understand, continue", "Can you give me a hint?", "I'm confused"]
+        )
+        
+        # Store internal tracking
+        state["selected_autosuggestions_from_pool"] = pool_selections
+        state["dynamic_autosuggestion"] = dynamic
+        state["autosuggestions"] = final_suggestions
         
         state["messages"] = [AIMessage(content=parsed['feedback'])]
     except Exception as e:
@@ -626,9 +695,11 @@ Task: Determine if the restatement is accurate. If accurate, move to SIM_CC to i
         print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
         print("=" * 80)
 
-        # Set autosuggestions directly
-        selected = parsed.get('selected_autosuggestions', [])
-        autosuggestions = selected if selected else ["I understand, continue", "Can you give me a hint?", "I'm confused"]
+        # Combine pool + dynamic autosuggestions
+        final_suggestions, pool_selections, dynamic = combine_autosuggestions(
+            parsed,
+            ["I understand, continue", "Can you give me a hint?", "I'm confused"]
+        )
         
         # Return only the changed keys following LangGraph best practices
         return {
@@ -636,7 +707,9 @@ Task: Determine if the restatement is accurate. If accurate, move to SIM_CC to i
             "agent_output": parsed['feedback'],
             "current_state": parsed['next_state'],
             "enhanced_message_metadata": {},
-            "autosuggestions": autosuggestions,
+            "selected_autosuggestions_from_pool": pool_selections,
+            "dynamic_autosuggestion": dynamic,
+            "autosuggestions": final_suggestions,
             "messages": [AIMessage(content=parsed['feedback'])]
         }
     except Exception as e:
@@ -810,14 +883,18 @@ OLD OPTIONS (commented out):
         print(f"🔢 CURRENT_CONCEPT_IDX: {current_idx}")
         print("=" * 80)
 
-        # Set autosuggestions directly
-        selected = parsed.get('selected_autosuggestions', [])
-        autosuggestions = selected if selected else ["I understand, continue", "Can you give me a hint?", "I'm confused"]
+        # Combine pool + dynamic autosuggestions
+        final_suggestions, pool_selections, dynamic = combine_autosuggestions(
+            parsed,
+            ["I understand, continue", "Can you give me a hint?", "I'm confused"]
+        )
         
         update = {
             "agent_output": parsed['feedback'],
             "current_state": parsed['next_state'],
-            "autosuggestions": autosuggestions,
+            "selected_autosuggestions_from_pool": pool_selections,
+            "dynamic_autosuggestion": dynamic,
+            "autosuggestions": final_suggestions,
             "messages": [AIMessage(content=parsed['feedback'])]
         }
 
@@ -1093,9 +1170,15 @@ Task: Grade this answer on a scale from 0 to 1 and determine next state. Respond
         # Store the quiz score in the state for metrics
         state["quiz_score"] = score * 100  # Convert 0-1 score to 0-100 percentage
         
-        # Set autosuggestions directly
-        selected = parsed.get('selected_autosuggestions', [])
-        state["autosuggestions"] = selected if selected else ["I understand, continue", "Can you give me a hint?", "I'm confused"]
+        # Combine pool + dynamic autosuggestions
+        final_suggestions, pool_selections, dynamic = combine_autosuggestions(
+            parsed,
+            ["I understand, continue", "Can you give me a hint?", "I'm confused"]
+        )
+        
+        state["selected_autosuggestions_from_pool"] = pool_selections
+        state["dynamic_autosuggestion"] = dynamic
+        state["autosuggestions"] = final_suggestions
     except Exception as e:
         print(f"Error parsing AR response: {e}")
         print(f"Raw response: {raw}")
@@ -1234,14 +1317,16 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
 
         correct, feedback = parsed['correct'], parsed['feedback']
         
-        # Set autosuggestions directly
-        selected = parsed.get('selected_autosuggestions', [])
-        state["autosuggestions"] = selected if selected else ["I understand, continue", "Can you give me a hint?", "I'm confused"]
+        # Combine pool + dynamic autosuggestions
+        final_suggestions, pool_selections, dynamic = combine_autosuggestions(
+            parsed,
+            ["I understand, continue", "Can you give me a hint?", "I'm confused"]
+        )
         
-        # Save and convert autosuggestions
-        selected = parsed.get('selected_autosuggestions', [])
-        state["selected_autosuggestions_internal"] = selected
-        state["autosuggestions"] = selected if selected else ["I understand, continue", "Can you give me a hint?", "I'm confused"]
+        # Store autosuggestions
+        state["selected_autosuggestions_from_pool"] = pool_selections
+        state["dynamic_autosuggestion"] = dynamic
+        state["autosuggestions"] = final_suggestions
     except Exception as e:
         print(f"Error parsing TC response: {e}")
         print(f"Raw response: {raw}")
@@ -1409,8 +1494,17 @@ Task: Evaluate whether the student has more questions about the real-life applic
         print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
         print("=" * 80)
 
+        # Combine pool + dynamic autosuggestions
+        final_suggestions, pool_selections, dynamic = combine_autosuggestions(
+            parsed,
+            ["I understand, continue", "Can you give me a hint?", "I'm confused"]
+        )
+        
         state["agent_output"]  = parsed['feedback']
         state["current_state"] = parsed['next_state']
+        state["selected_autosuggestions_from_pool"] = pool_selections
+        state["dynamic_autosuggestion"] = dynamic
+        state["autosuggestions"] = final_suggestions
         state["messages"] = [AIMessage(content=parsed['feedback'])]
     except Exception as e:
         print(f"Error parsing RLC response: {e}")
