@@ -382,7 +382,7 @@ def continue_session(request: ContinueSessionRequest):
         # Validate model if provided
         update_dict = {
             "messages": [HumanMessage(content=request.user_message)],
-            # "last_user_msg": request.user_message,
+            "last_user_msg": request.user_message,
             "clicked_autosuggestion": request.clicked_autosuggestion
         }
         

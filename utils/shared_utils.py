@@ -356,7 +356,7 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
             "No",
             "Can you repeat that?",
             "I'm confused",
-            "That makes sense"
+            "That makes sense",
         ]
         template_parts.append(f"\n\nIMPORTANT: Select 3-5 contextually appropriate quick-reply suggestions from this list based on your feedback: {autosuggestion_pool}. Include them in the `selected_autosuggestions` field.")
     

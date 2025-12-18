@@ -88,6 +88,7 @@ class AgentState(TypedDict, total=False):
     autosuggestions: List[str]  # Final suggestions to display (translated if Kannada)
     last_agent_output_backup: str  # Backup for repeat handler
     clicked_autosuggestion: bool  # True if user clicked autosuggestion button, False if typed
+    handler_triggered: bool  # True if handler was triggered by autosuggestion manager
 
 # -----------------------------------------------------------------------------
 # // 4. Initialize state and wrap helper
@@ -149,13 +150,15 @@ def _wrap(fn):
             print(f"📝 Last message is HumanMessage")
             text = msgs[-1].content or ""
             print(msgs)
+            print(msgs[-1].content)
+            print(state.get("last_user_msg"))
             if text and text != state.get("last_user_msg"):
                 print(f"📝 Detected new user message: {text}...")
                 state["last_user_msg"] = text
                 print(f"📝 Updated last_user_msg: {text[:50]}...")
             else :
                 print(f"📝 No change in last_user_msg")
-                raise ValueError("No new user message detected in the last HumanMessage")
+                # raise ValueError("No new user message detected in the last HumanMessage")
         
         # CALL THE ORIGINAL NODE FUNCTION
         result = fn(state)
@@ -271,9 +274,11 @@ def _route_with_manager_check(state: AgentState) -> str:
     
     if clicked:
         # User clicked autosuggestion - route through manager
+        print(f"➡️ Routing to AUTOSUGGESTION_MANAGER from {current_state} due to clicked autosuggestion")
         return f"{current_state}_TO_MANAGER"
     else:
         # User typed - continue normal pedagogical flow
+        print(f"➡️ Continuing to {current_state} without AUTOSUGGESTION_MANAGER")
         return current_state
 
 def _route_after_manager(state: AgentState) -> str:
@@ -287,9 +292,11 @@ def _route_after_manager(state: AgentState) -> str:
     
     if handler_triggered:
         # Handler modified output - pause to show user
+        print(f"⏸️ Routing to PAUSE_FOR_HANDLER after AUTOSUGGESTION_MANAGER")
         return f"{current_state}_PAUSED"
     else:
         # Normal autosuggestion - continue flow
+        print(f"➡️ Continuing to {current_state} after AUTOSUGGESTION_MANAGER")
         return current_state
 
 # g.add_edge(START, "INIT")
@@ -406,7 +413,6 @@ except Exception as e:
 def build_graph():
     compiled = g.compile(
         # checkpointer=checkpointer,
-        # checkpointer=CHECKPOINTER,
         interrupt_after=[
             "START", "PAUSE_FOR_HANDLER",  # Interrupt after START and after handler output
             # ▶ NEW: pause points for simulation path
