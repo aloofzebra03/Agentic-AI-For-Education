@@ -93,53 +93,6 @@ class AgentState(TypedDict, total=False):
     handler_triggered: bool  # True if handler was triggered by autosuggestion manager
     student_level: str  # Student ability level: "low", "medium", or "advanced"
 
-# -----------------------------------------------------------------------------
-# // 4. Initialize state and wrap helper
-# -----------------------------------------------------------------------------
-def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
-    # state.setdefault("messages", [])
-    # state.setdefault("last_user_msg", "")
-    # state.setdefault("sim_concepts", [])
-    # state.setdefault("sim_total_concepts", 0)
-    # state.setdefault("sim_current_idx", 0)
-    # state.setdefault("concepts_completed", False)
-    # state.setdefault("in_simulation", False)
-    
-    # # Misconception and performance tracking
-    # state.setdefault("misconception_detected", False)
-    # state.setdefault("retrieval_score", 0.0)
-    # state.setdefault("transfer_success", False)
-    state.setdefault("last_correction", "")
-    # state.setdefault("quiz_score", 0.0)
-    
-    # Initialize session_summary with default values (will be updated throughout session)
-    state.setdefault("session_summary", {
-        "quiz_score": None,
-        "transfer_success": False,
-        "definition_echoed": False,
-        "misconception_detected": False,
-        "last_user_msg": "",
-        "history": None,
-        "status": "in_progress"  # Track if session reached END
-    })
-    
-    # # Simulation state - use dictionaries instead of Pydantic objects for serialization
-    # state.setdefault("sim_variables", [])  # List of dict with keys: name, role, note
-    state.setdefault("sim_action_config", {})
-    state.setdefault("show_simulation", False)
-    state.setdefault("simulation_config", {})
-    # # NEW: Initialize memory optimization state
-    # state.setdefault("node_transitions", [])
-    state.setdefault("summary", "")
-    state.setdefault("summary_last_index", 0)
-    # Initialize language preference - default to False
-    state.setdefault("is_kannada", False)
-    # Initialize concept_title with default value
-    state.setdefault("concept_title", "Pendulum and its Time Period")
-    # Initialize model with default value
-    state.setdefault("model", "gemma-3-27b-it")
-    return state
-
 def _wrap(fn):
     def inner(state: AgentState) -> AgentState:
         print(f"🔧 _WRAP DEBUG - Node processing started")
@@ -235,20 +188,20 @@ def _PAUSE(s): return _wrap(pause_for_handler)(s)
 
 # NEW: Node wrappers (simulation)
 def _SIM_CC(s):       return _wrap(sim_concept_creator_node)(s)
-def _SIM_VARS(s):     return _wrap(sim_vars_node)(s)
-def _SIM_ACTION(s):   return _wrap(sim_action_node)(s)
-def _SIM_EXPECT(s):   return _wrap(sim_expect_node)(s)
-def _SIM_EXECUTE(s):  return _wrap(sim_execute_node)(s)
-def _SIM_OBSERVE(s):  return _wrap(sim_observe_node)(s)
-def _SIM_INSIGHT(s):  return _wrap(sim_insight_node)(s)
-# def _SIM_NEXT(s):     return _wrap(sim_next_concept_node)(s)
-def _SIM_REFLECT(s):  return _wrap(sim_reflection_node)(s)
+# def _SIM_VARS(s):     return _wrap(sim_vars_node)(s)
+# def _SIM_ACTION(s):   return _wrap(sim_action_node)(s)
+# def _SIM_EXPECT(s):   return _wrap(sim_expect_node)(s)
+# def _SIM_EXECUTE(s):  return _wrap(sim_execute_node)(s)
+# def _SIM_OBSERVE(s):  return _wrap(sim_observe_node)(s)
+# def _SIM_INSIGHT(s):  return _wrap(sim_insight_node)(s)
+# # def _SIM_NEXT(s):     return _wrap(sim_next_concept_node)(s)
+# def _SIM_REFLECT(s):  return _wrap(sim_reflection_node)(s)
 
 # -----------------------------------------------------------------------------
 # // 5. Build the StateGraph
 # -----------------------------------------------------------------------------
 g = StateGraph(AgentState)
-g.add_node("INIT", _INIT)
+# g.add_node("INIT", _INIT)
 g.add_node("START", _START)
 g.add_node("APK", _APK)
 g.add_node("CI",  _CI)
@@ -263,14 +216,14 @@ g.add_node("PAUSE_FOR_HANDLER", _PAUSE)
 
 # ▶ NEW: Simulation nodes
 g.add_node("SIM_CC", _SIM_CC)
-g.add_node("SIM_VARS", _SIM_VARS)
-g.add_node("SIM_ACTION", _SIM_ACTION)
-g.add_node("SIM_EXPECT", _SIM_EXPECT)
-g.add_node("SIM_EXECUTE", _SIM_EXECUTE)
-g.add_node("SIM_OBSERVE", _SIM_OBSERVE)
-g.add_node("SIM_INSIGHT", _SIM_INSIGHT)
-# g.add_node("SIM_NEXT", _SIM_NEXT)
-g.add_node("SIM_REFLECT", _SIM_REFLECT)
+# g.add_node("SIM_VARS", _SIM_VARS)
+# g.add_node("SIM_ACTION", _SIM_ACTION)
+# g.add_node("SIM_EXPECT", _SIM_EXPECT)
+# g.add_node("SIM_EXECUTE", _SIM_EXECUTE)
+# g.add_node("SIM_OBSERVE", _SIM_OBSERVE)
+# g.add_node("SIM_INSIGHT", _SIM_INSIGHT)
+# # g.add_node("SIM_NEXT", _SIM_NEXT)
+# g.add_node("SIM_REFLECT", _SIM_REFLECT)
 
 def _route(state: AgentState) -> str:
     return state.get("current_state")
@@ -426,9 +379,7 @@ def build_graph():
             # ▶ NEW: pause points for simulation path
             "APK", "CI", "GE", "AR", "TC", "RLC",
             # ▶ NEW: interrupt points for simulation nodes
-            "SIM_CC", "SIM_VARS", "SIM_EXPECT",
-            "SIM_EXECUTE", "SIM_OBSERVE", "SIM_INSIGHT",
-            "SIM_REFLECT",
+            "SIM_CC",
         ],
     )
     return compiled
