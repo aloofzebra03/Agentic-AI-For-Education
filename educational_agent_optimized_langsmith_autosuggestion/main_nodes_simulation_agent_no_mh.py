@@ -78,7 +78,41 @@ HANDLER_SUGGESTIONS = {
     "Can you give me a hint?",
     "Can you explain that simpler?",
     "Give me an example",
-    # "Can you repeat that?"  # Commented out - will implement later
+    # "Can you repeat that?"  # will implement later if needed
+}
+
+# Handler continuity context - bridges handlers back to pedagogical flow
+HANDLER_CONTINUITY_CONTEXT = {
+    "APK": {
+        "task_description": "identify the concept we're discussing",
+        "continuation_prompt": "Now, based on this {handler_type}, can you tell me what concept you think we're exploring?",
+        "pedagogical_goal": "activate prior knowledge through hook question"
+    },
+    "CI": {
+        "task_description": "restate the definition in your own words",
+        "continuation_prompt": "Now, can you try restating the definition in your own words?",
+        "pedagogical_goal": "ensure student can paraphrase the concept"
+    },
+    "GE": {
+        "task_description": "answer the exploration question about how/why this works",
+        "continuation_prompt": "Now, with this {handler_type}, can you try answering the exploration question?",
+        "pedagogical_goal": "explore the mechanism through guided questioning"
+    },
+    "AR": {
+        "task_description": "answer the quiz question",
+        "continuation_prompt": "Now, try answering the quiz question with this understanding.",
+        "pedagogical_goal": "assess understanding through retrieval practice"
+    },
+    "TC": {
+        "task_description": "apply the concept to this new scenario",
+        "continuation_prompt": "Now, can you apply what you learned to answer the transfer question?",
+        "pedagogical_goal": "transfer knowledge to novel context"
+    },
+    "RLC": {
+        "task_description": "share your real-life connection or experience with this concept",
+        "continuation_prompt": "Now, can you think of how you've seen or used this in your own life?",
+        "pedagogical_goal": "connect abstract concept to lived experience"
+    }
 }
 
 
@@ -140,7 +174,15 @@ class BaseAutosuggestionResponse(BaseModel):
     )
     dynamic_autosuggestion: str = Field(
         default="",
-        description="One contextual autosuggestion based on student level"
+        description="""Generate ONE exploratory autosuggestion (12-15 words max) that:
+        - Points to a specific aspect of the concept (location, cause-effect, dependency, variation)
+        - Uses short noun-phrase or statement format
+        - Evokes curiosity through limitation, focus, or dependency
+        - Requires minimal cognitive effort to select
+        - Adjusts depth based on student_level:
+          * low: concrete, visible, location-based (where/what is used/made)
+          * medium: role-based, cause-effect, constraint-based (why needed/useful)
+          * advanced: dependency, variation, implication-based (how changes affect/limiting factors)"""
     )
     
     @field_validator('dynamic_autosuggestion')
@@ -198,12 +240,23 @@ rlc_parser = PydanticOutputParser(pydantic_object=RlcResponse)
 def handle_hint(state: AgentState) -> AgentState:
     """Generate a contextual hint without revealing the answer"""
     agent_output = state.get("agent_output", "")
+    current_node = state.get("current_state", "UNKNOWN")
     
-    hint_prompt = f"""Based on this question/feedback to the student:
+    # Retrieve continuity context for this pedagogical node
+    context = HANDLER_CONTINUITY_CONTEXT.get(current_node, {})
+    task_desc = context.get("task_description", "continue")
+    continuation = context.get("continuation_prompt", "Can you try again?").format(handler_type="hint")
+    
+    hint_prompt = f"""Based on the task: {task_desc}
+
+Previous question/feedback to student:
 {agent_output}
 
-Provide a subtle hint to help the student without revealing the answer. Keep it brief (1-2 sentences).
-Be supportive and encouraging."""
+Generate a supportive hint (1-2 sentences) that:
+1. Helps the student without revealing the full answer
+2. Ends naturally with: "{continuation}"
+
+Be encouraging and conversational."""
     
     # Build prompt for hint generation
     final_prompt = build_prompt_from_template_optimized(
@@ -211,7 +264,7 @@ Be supportive and encouraging."""
         state=state,
         include_last_message=False,
         include_instructions=False,
-        current_node=state.get("current_state", "UNKNOWN")
+        current_node=current_node
     )
     
     resp = llm_with_history(state, final_prompt)
@@ -232,12 +285,23 @@ Be supportive and encouraging."""
 def handle_explain_simpler(state: AgentState) -> AgentState:
     """Rephrase the last explanation in simpler language"""
     agent_output = state.get("agent_output", "")
+    current_node = state.get("current_state", "UNKNOWN")
     
-    simplify_prompt = f"""Rephrase this explanation using very simple words suitable for a class 7 student:
+    # Retrieve continuity context for this pedagogical node
+    context = HANDLER_CONTINUITY_CONTEXT.get(current_node, {})
+    task_desc = context.get("task_description", "continue")
+    continuation = context.get("continuation_prompt", "Can you try again?").format(handler_type="simpler explanation")
+    
+    simplify_prompt = f"""Based on the task: {task_desc}
 
+Previous explanation to student:
 {agent_output}
 
-Make it easier to understand while keeping the same meaning."""
+Generate a simpler version using very simple words suitable for a class 7 student that:
+1. Makes it easier to understand while keeping the same meaning
+2. Ends with: "{continuation}"
+
+Be encouraging and clear."""
     
     # Build prompt for simplification
     final_prompt = build_prompt_from_template_optimized(
@@ -245,7 +309,7 @@ Make it easier to understand while keeping the same meaning."""
         state=state,
         include_last_message=False,
         include_instructions=False,
-        current_node=state.get("current_state", "UNKNOWN")
+        current_node=current_node
     )
     
     resp = llm_with_history(state, final_prompt)
@@ -267,12 +331,23 @@ def handle_example(state: AgentState) -> AgentState:
     """Provide a concrete example to illustrate the concept"""
     agent_output = state.get("agent_output", "")
     concept_title = state.get("concept_title", "")
+    current_node = state.get("current_state", "UNKNOWN")
     
-    example_prompt = f"""Based on this explanation:
+    # Retrieve continuity context for this pedagogical node
+    context = HANDLER_CONTINUITY_CONTEXT.get(current_node, {})
+    task_desc = context.get("task_description", "continue")
+    continuation = context.get("continuation_prompt", "Can you try again?").format(handler_type="example")
+    
+    example_prompt = f"""Based on the task: {task_desc}
+
+Previous explanation to student:
 {agent_output}
 
-Provide a simple, concrete example to illustrate the concept of '{concept_title}'. 
-Keep it brief (2-3 sentences) and relatable to a class 7 student's everyday life."""
+Generate a simple, concrete example to illustrate the concept of '{concept_title}' that:
+1. Is brief (2-3 sentences) and relatable to a class 7 student's everyday life
+2. Ends with: "{continuation}"
+
+Be clear and encouraging."""
     
     # Build prompt for example generation
     final_prompt = build_prompt_from_template_optimized(
@@ -280,7 +355,7 @@ Keep it brief (2-3 sentences) and relatable to a class 7 student's everyday life
         state=state,
         include_last_message=False,
         include_instructions=False,
-        current_node=state.get("current_state", "UNKNOWN")
+        current_node=current_node
     )
     
     resp = llm_with_history(state, final_prompt)
@@ -293,6 +368,69 @@ Keep it brief (2-3 sentences) and relatable to a class 7 student's everyday life
     print("🔍 HANDLER: EXAMPLE PROVIDED")
     print("=" * 80)
     print(f"🎯 EXAMPLE: {example_content[:100]}...")
+    print("=" * 80)
+    
+    return state
+
+
+def handle_dynamic_suggestion(state: AgentState) -> AgentState:
+    """Process dynamic autosuggestion based on student level and their specific request."""
+    agent_output = state.get("agent_output", "")
+    student_level = state.get("student_level", "medium")
+    dynamic_request = state.get("last_user_msg", "")
+    current_node = state.get("current_state", "UNKNOWN")
+    
+    # Retrieve continuity context for this pedagogical node
+    context = HANDLER_CONTINUITY_CONTEXT.get(current_node, {})
+    task_desc = context.get("task_description", "continue")
+    continuation = context.get("continuation_prompt", "Can you try again?").format(handler_type="explanation")
+    
+    # Level-specific context for tailored responses
+    level_instructions = {
+        "low": "Use very simple language, short sentences, and provide step-by-step guidance. Avoid complex terminology.",
+        "medium": "Use clear explanations with moderate complexity. Balance detail with accessibility.",
+        "advanced": "Provide deeper insights, encourage critical thinking, and explore nuances of the concept."
+    }
+    
+    instruction = level_instructions.get(student_level, level_instructions["medium"])
+    
+    dynamic_prompt = f"""Based on the task: {task_desc}
+
+The student (ability level: {student_level}) asked: "{dynamic_request}"
+
+Previous agent output:
+{agent_output}
+
+Task: Respond to their specific request keeping in mind they are a {student_level}-level student.
+{instruction}
+
+Your response should:
+1. Be brief (2-3 sentences) and directly address what they asked
+2. End with: "{continuation}"
+
+Be encouraging and supportive."""
+    
+    # Build prompt for dynamic suggestion handling
+    final_prompt = build_prompt_from_template_optimized(
+        system_prompt=dynamic_prompt,
+        state=state,
+        include_last_message=False,
+        include_instructions=False,
+        current_node=current_node
+    )
+    
+    resp = llm_with_history(state, final_prompt)
+    dynamic_content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+    
+    # Update agent output with level-aware dynamic response
+    state["agent_output"] = dynamic_content
+    
+    print("=" * 80)
+    print("🔍 HANDLER: DYNAMIC SUGGESTION PROCESSED")
+    print("=" * 80)
+    print(f"🎯 STUDENT_LEVEL: {student_level}")
+    print(f"💬 REQUEST: {dynamic_request}")
+    print(f"📝 RESPONSE: {dynamic_content[:100]}...")
     print("=" * 80)
     
     return state
@@ -334,10 +472,11 @@ def autosuggestion_manager_node(state: AgentState) -> AgentState:
     print("=" * 80)
     
     last_user_msg = state.get("last_user_msg", "")
+    dynamic_suggestion = state.get("dynamic_autosuggestion", "")
     
-    # Check if user clicked a handler suggestion
+    # Check if user clicked a POOL handler suggestion
     if last_user_msg in HANDLER_SUGGESTIONS:
-        print(f"🔧 HANDLER DETECTED: {last_user_msg}")
+        print(f"🔧 POOL HANDLER DETECTED: {last_user_msg}")
         
         if last_user_msg == "Can you give me a hint?":
             state = handle_hint(state)
@@ -350,6 +489,14 @@ def autosuggestion_manager_node(state: AgentState) -> AgentState:
         
         # Mark that we need to show the handler output to user (interrupt)
         state["handler_triggered"] = True
+    
+    # Check if user clicked the DYNAMIC suggestion
+    elif last_user_msg == dynamic_suggestion and dynamic_suggestion:
+        print(f"🎯 DYNAMIC HANDLER DETECTED: {last_user_msg}")
+        state = handle_dynamic_suggestion(state)
+        # Mark that we need to show the handler output to user (interrupt)
+        state["handler_triggered"] = True
+    
     else:
         print(f"📝 NON-HANDLER AUTOSUGGESTION: {last_user_msg}")
         print("   (No special processing - flow will continue without pause)")

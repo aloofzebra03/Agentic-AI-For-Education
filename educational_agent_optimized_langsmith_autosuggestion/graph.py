@@ -324,7 +324,7 @@ g.add_conditional_edges("SIM_CC", _route, {"GE": "GE"})
 # g.add_edge("SIM_OBSERVE", "SIM_INSIGHT")
 # g.add_edge("SIM_INSIGHT", "SIM_REFLECT")
 # g.add_edge("SIM_REFLECT", "AR")   # After simulation, go to AR to ask question about the concept
-g.add_edge("SIM_VARS", "AR")
+# g.add_edge("SIM_VARS", "AR")
 
 # checkpointer = InMemorySaver()
 checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")

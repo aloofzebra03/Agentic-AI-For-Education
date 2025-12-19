@@ -382,11 +382,28 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
    - Choose quality over quantity - select only the most relevant ones
    - CRITICAL: You MUST select at least 1 and at most 3 suggestions
    
-2. Generate 1 UNIQUE dynamic suggestion tailored for a {student_level}-level student ({level_desc})
+2. Generate 1 UNIQUE exploratory dynamic suggestion (12-15 words MAX) tailored for {student_level}-level student:
    - Include it in the `dynamic_autosuggestion` field
-   - Make it contextually relevant to your current feedback
+   - Point to a DIFFERENT aspect of the concept than pool suggestions
+   - Use short noun-phrase or statement format that evokes curiosity
    - Ensure it is DIFFERENT from all pool suggestions above
-   - {student_level.capitalize()}-level examples: {examples}""")
+   
+   Adjust ONLY the depth of exploration based on student level:
+   
+   • low (concrete, visible aspects):
+     - Prefer: where it happens, what is used/made, which part does it
+     - Example: "Where this process happens inside a plant"
+     - Avoid: abstraction, variation, dependencies
+   
+   • medium (role-based, cause-effect):
+     - Prefer: why needed, what enables/prevents, usefulness, constraints
+     - Example: "Why only green parts of a plant can do this"
+     - Avoid: too simple or overly complex variations
+   
+   • advanced (dependency, variation, implications):
+     - Prefer: how changes affect outcomes, limiting factors, broader impact
+     - Example: "How changes in sunlight affect this process"
+     - Encourage: critical thinking about relationships and constraints""")
     
     # Add instructions at the end if requested
     if include_instructions and parser:
