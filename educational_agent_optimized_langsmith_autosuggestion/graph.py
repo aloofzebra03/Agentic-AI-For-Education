@@ -23,7 +23,7 @@ from educational_agent_optimized_langsmith_autosuggestion.main_nodes_simulation_
 )
 
 # ▶ NEW: import simulation agent nodes
-from educational_agent_optimized_langsmith.simulation_nodes_no_mh_ge import (
+from educational_agent_optimized_langsmith_autosuggestion.simulation_nodes_no_mh_ge import (
     sim_concept_creator_node,
     sim_vars_node,
     sim_action_node,
@@ -181,7 +181,9 @@ def pause_for_handler(state: AgentState) -> AgentState:
     stale suggestions. Fresh autosuggestions will be generated when flow resumes.
     """
     state["handler_triggered"] = False  # Reset flag
-    state["autosuggestions"] = []  # Clear autosuggestions during handler pause
+    state["autosuggestions"] = []  # Clear final autosuggestions
+    state["selected_autosuggestions_from_pool"] = []  # Clear pool selections
+    state["dynamic_autosuggestion"] = ""  # Clear dynamic suggestion
     return state
 
 def _PAUSE(s): return _wrap(pause_for_handler)(s)
@@ -373,7 +375,7 @@ except Exception as e:
 
 def build_graph():
     compiled = g.compile(
-        # checkpointer=checkpointer,
+        checkpointer=checkpointer,
         interrupt_after=[
             "START", "PAUSE_FOR_HANDLER",  # Interrupt after START and after handler output
             # ▶ NEW: pause points for simulation path

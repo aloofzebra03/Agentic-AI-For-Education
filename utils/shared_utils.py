@@ -311,7 +311,8 @@ def build_prompt_from_template(system_prompt: str, state: AgentState,
 def build_prompt_from_template_optimized(system_prompt: str, state: AgentState, 
                                        include_last_message: bool = False, 
                                        include_instructions: bool = False,
-                                       parser=None, current_node: str = None) -> str:
+                                       parser=None, current_node: str = None,
+                                       include_autosuggestions: bool = True) -> str:
     
     # Add Kannada instruction if needed
     if state.get("is_kannada", False):
@@ -343,7 +344,7 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
         template_vars.append("last_user_message")
     
     # Add autosuggestion instructions BEFORE format instructions for pedagogical nodes
-    if parser and current_node in ["APK", "CI", "GE", "AR", "TC", "RLC"]:
+    if include_autosuggestions and parser and current_node in ["APK", "CI", "GE", "AR", "TC", "RLC"]:
         autosuggestion_pool = [
             "I'm not sure",
             "Can you give me a hint?",
@@ -382,7 +383,7 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
    - Choose quality over quantity - select only the most relevant ones
    - CRITICAL: You MUST select at least 1 and at most 3 suggestions
    
-2. Generate 1 UNIQUE exploratory dynamic suggestion (12-15 words MAX) tailored for {student_level}-level student:
+2. Generate 1 UNIQUE exploratory dynamic suggestion (3-4 words MAX) tailored for {student_level}-level student:
    - Include it in the `dynamic_autosuggestion` field
    - Point to a DIFFERENT aspect of the concept than pool suggestions
    - Use short noun-phrase or statement format that evokes curiosity
@@ -403,7 +404,9 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
    • advanced (dependency, variation, implications):
      - Prefer: how changes affect outcomes, limiting factors, broader impact
      - Example: "How changes in sunlight affect this process"
-     - Encourage: critical thinking about relationships and constraints""")
+     - Encourage: critical thinking about relationships and constraints
+     
+     Make sure that the dynamic prompt you generate is in some way related to the conversation till now and nudges the student in a similar direction as is being done in the conversation.""")
     
     # Add instructions at the end if requested
     if include_instructions and parser:
