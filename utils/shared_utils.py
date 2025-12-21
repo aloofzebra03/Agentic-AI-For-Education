@@ -8,7 +8,10 @@ import os
 import json
 import re
 import random
+import time
 from typing import Dict, List, Optional, Any
+from datetime import datetime
+from collections import defaultdict
 import dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
@@ -25,6 +28,159 @@ dotenv.load_dotenv(dotenv_path=".env", override=True)
 
 # Type alias for AgentState - flexible to work with different state structures
 AgentState = Dict[str, Any]
+
+# ─────────────────────────────────────────────────────────────────────
+# API Key Performance Tracking
+# ─────────────────────────────────────────────────────────────────────
+
+class ApiKeyPerformanceTracker:
+    """Simple tracker for API key performance during load tests.
+    
+    Stores each call individually and aggregates at export time.
+    Thread-safe because list.append() is atomic in CPython.
+    """
+    
+    def __init__(self):
+        self._calls = []  # List of all API calls
+    
+    def record_call(self, api_key_suffix: str, latency_ms: float, success: bool, error_msg: str = None):
+        """Record a single API call.
+        
+        Args:
+            api_key_suffix: Last 6 characters of API key
+            latency_ms: Latency in milliseconds
+            success: Whether call succeeded
+            error_msg: Error message if failed
+        """
+        self._calls.append({
+            "api_key": api_key_suffix,
+            "latency_ms": latency_ms,
+            "success": success,
+            "error": error_msg if not success else None,
+            "timestamp": time.time()
+        })
+    
+    def get_all_calls(self) -> List[Dict]:
+        """Get all recorded calls."""
+        return self._calls.copy()
+    
+    def reset(self):
+        """Clear all metrics."""
+        self._calls.clear()
+        print("📊 API key tracker reset")
+
+# Global singleton instance
+_api_key_tracker = ApiKeyPerformanceTracker()
+
+def export_api_key_metrics_to_excel(output_dir: str = "load_tests/reports") -> Optional[str]:
+    """Aggregate all API call metrics and export to Excel.
+    
+    Args:
+        output_dir: Directory to save the Excel file
+    
+    Returns:
+        Path to the exported file, or None if no data
+    """
+    try:
+        import pandas as pd
+        import numpy as np
+        from pathlib import Path
+    except ImportError as e:
+        print(f"❌ Missing required package for Excel export: {e}")
+        print("💡 Install with: pip install pandas openpyxl numpy")
+        return None
+    
+    # Get all calls
+    all_calls = _api_key_tracker.get_all_calls()
+    
+    if not all_calls:
+        print("⚠️ No API key metrics to export")
+        return None
+    
+    print(f"📊 Aggregating metrics from {len(all_calls)} API calls...")
+    
+    # Aggregate by API key
+    aggregated = defaultdict(lambda: {
+        "total_calls": 0,
+        "successful_calls": 0,
+        "failed_calls": 0,
+        "latencies_ms": [],
+        "errors": []
+    })
+    
+    for call in all_calls:
+        key = call["api_key"]
+        aggregated[key]["total_calls"] += 1
+        
+        if call["success"]:
+            aggregated[key]["successful_calls"] += 1
+            aggregated[key]["latencies_ms"].append(call["latency_ms"])
+        else:
+            aggregated[key]["failed_calls"] += 1
+            if call["error"]:
+                aggregated[key]["errors"].append(call["error"])
+    
+    # Build DataFrame
+    rows = []
+    for api_key, data in aggregated.items():
+        row = {
+            "API Key": f"...{api_key}",
+            "Total Calls": data["total_calls"],
+            "Successful": data["successful_calls"],
+            "Failed": data["failed_calls"],
+            "Failure Rate %": round((data["failed_calls"] / data["total_calls"] * 100), 2) if data["total_calls"] > 0 else 0,
+        }
+        
+        # Latency stats (only for successful calls)
+        if data["latencies_ms"]:
+            latencies = data["latencies_ms"]
+            row.update({
+                "Min (ms)": round(min(latencies), 2),
+                "Max (ms)": round(max(latencies), 2),
+                "Avg (ms)": round(np.mean(latencies), 2),
+                "P50 (ms)": round(np.percentile(latencies, 50), 2),
+                "P95 (ms)": round(np.percentile(latencies, 95), 2),
+                "P99 (ms)": round(np.percentile(latencies, 99), 2),
+            })
+        else:
+            # No successful calls
+            row.update({
+                "Min (ms)": 0,
+                "Max (ms)": 0,
+                "Avg (ms)": 0,
+                "P50 (ms)": 0,
+                "P95 (ms)": 0,
+                "P99 (ms)": 0,
+            })
+        
+        # Most common error
+        if data["errors"]:
+            from collections import Counter
+            most_common = Counter(data["errors"]).most_common(1)[0][0]
+            row["Most Common Error"] = most_common[:50]  # Truncate long errors
+        else:
+            row["Most Common Error"] = "None"
+        
+        rows.append(row)
+    
+    # Create DataFrame and sort by total calls
+    df = pd.DataFrame(rows).sort_values("Total Calls", ascending=False)
+    
+    # Save to Excel
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"api_key_performance_{timestamp}.xlsx"
+    filepath = Path(output_dir) / filename
+    
+    df.to_excel(filepath, index=False, engine='openpyxl')
+    
+    print(f"\n📊 API Key Performance Metrics Exported")
+    print(f"📁 File: {filepath}")
+    print(f"📈 Summary: {len(aggregated)} API keys, {len(all_calls)} total calls")
+    print(f"✅ Successful: {sum(d['successful_calls'] for d in aggregated.values())}")
+    print(f"❌ Failed: {sum(d['failed_calls'] for d in aggregated.values())}")
+    
+    return str(filepath)
 
 def extract_json_block(text: str) -> str:
     """Extract JSON from text, handling various formats including markdown code blocks."""
@@ -129,10 +285,9 @@ def get_llm(api_key: Optional[str] = None, model: str = "gemini-2.5-flash-lite")
 
 # Available models list for fallback
 AVAILABLE_GEMINI_MODELS = [
-    # "gemini-2.5-flash-lite",
-    # "gemini-2.0-flash",
-    # "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
+    # "gemini-2.5-flash",
+    # "gemini-2.5-flash-lite",
     # "gemini-1.5-flash",
 ]
 
@@ -173,16 +328,32 @@ def invoke_llm_with_fallback(messages: List, operation_name: str = "LLM call", m
         
         # Try each API key for this model
         for attempt, api_key in enumerate(keys_for_model, 1):
+            # Get API key suffix for tracking
+            api_key_suffix = api_key[-6:]
+            
+            # Start timing
+            start_time = time.time()
+            
             try:
-                print(f"🔑 {operation_name} - Model: {current_model}, API key attempt {attempt}/{len(keys_for_model)} (ending ...{api_key[-6:]})")
+                print(f"🔑 {operation_name} - Model: {current_model}, API key attempt {attempt}/{len(keys_for_model)} (ending ...{api_key_suffix})")
                 llm = get_llm(api_key=api_key, model=current_model)
                 response = llm.invoke(messages)
-                print(f"✅ {operation_name} - Success with model {current_model} on attempt {attempt}")
+                
+                # Calculate latency and record success
+                latency_ms = (time.time() - start_time) * 1000
+                _api_key_tracker.record_call(api_key_suffix, latency_ms, True)
+                
+                print(f"✅ {operation_name} - Success with model {current_model} on attempt {attempt} ({latency_ms:.0f}ms)")
                 return response
                 
             except Exception as e:
+                # Calculate latency and record failure
+                latency_ms = (time.time() - start_time) * 1000
                 last_error = e
-                print(f"❌ {operation_name} - Failed: {str(e)[:100]}")
+                error_msg = str(e)[:100]
+                _api_key_tracker.record_call(api_key_suffix, latency_ms, False, error_msg)
+                
+                print(f"❌ {operation_name} - Failed: {error_msg}")
                 if attempt < len(keys_for_model):
                     print(f"🔄 Retrying with next API key for model {current_model}...")
                 continue
@@ -1265,18 +1436,19 @@ def build_node_aware_conversation_history(state: AgentState, current_node: str) 
                         break
             
             # Check if we need to update summary
-            if last_older_index <= state.get("summary_last_index", 0):
+            if last_older_index <= state.get("summary_last_index", -1):
                 # Use existing summary - no new messages to summarize
-                summary = state["summary"]
-                print(f"📊 ✅ Using existing summary (covers up to index {state['summary_last_index']})")
+                summary = state.get("summary", "")
+                print(f"📊 ✅ Using existing summary (covers up to index {state.get('summary_last_index', -1)})")
             else:
                 # Need to update summary with new messages
                 new_messages_start = state.get("summary_last_index", 0) + 1
                 new_messages = messages[new_messages_start:last_older_index + 1]
 
-                if state.get("summary"):
+                if state.get("summary", ""):
                     # Combine old summary with new messages
-                    combined_content = f"Previous summary: {state['summary']}\n\nNew messages:\n"
+                    print(f"Old Summary: {state.get('summary')}")
+                    combined_content = f"Previous summary: {state.get('summary')}\n\nNew messages:\n"
                     for msg in new_messages:
                         if isinstance(msg, HumanMessage):
                             combined_content += f"Student: {msg.content}\n"

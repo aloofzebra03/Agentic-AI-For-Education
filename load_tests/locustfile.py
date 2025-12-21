@@ -73,6 +73,26 @@ def on_test_stop(environment, **kwargs):
     # Export all reports
     export_reports(environment)
     
+    # Request API server to export its API key metrics
+    print("\n" + "=" * 80)
+    print("🔑 EXPORTING API KEY PERFORMANCE METRICS")
+    print("=" * 80)
+    try:
+        import requests
+        response = requests.get(f"{environment.host}/test/api-key-metrics", timeout=30)
+        
+        if response.status_code == 200:
+            data = response.json()
+            if data.get("success"):
+                print(f"✅ API key metrics exported by server")
+                print(f"📁 File: {data.get('filepath')}")
+            else:
+                print(f"⚠️ {data.get('message')}")
+        else:
+            print(f"❌ Server returned status {response.status_code}")
+    except Exception as e:
+        print(f"❌ Error requesting API key metrics from server: {e}")
+    
     print("\n" + "=" * 80)
     print("💡 TIP: Check the reports/ directory for detailed analysis files")
     print("=" * 80 + "\n")

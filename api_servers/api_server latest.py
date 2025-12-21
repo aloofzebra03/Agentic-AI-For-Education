@@ -35,7 +35,7 @@ from utils.shared_utils import (
     select_most_relevant_image_for_concept_introduction,
     create_simulation_config,
     get_all_available_concepts,
-    export_api_key_metrics_to_excel,
+    # export_api_key_metrics_to_excel,
     AVAILABLE_GEMINI_MODELS
 )
 
@@ -667,28 +667,28 @@ def delete_session(thread_id: str):
         raise HTTPException(status_code=500, detail=f"Error deleting session: {str(e)}")
 
 
-@app.get("/test/api-key-metrics")
-def export_api_key_metrics():
-    """Export API key performance metrics to Excel (for load testing)."""
-    try:
-        print("API /test/api-key-metrics - exporting API key performance metrics")
-        filepath = export_api_key_metrics_to_excel()
+# @app.get("/test/api-key-metrics")
+# def export_api_key_metrics():
+#     """Export API key performance metrics to Excel (for load testing)."""
+#     try:
+#         print("API /test/api-key-metrics - exporting API key performance metrics")
+#         filepath = export_api_key_metrics_to_excel()
         
-        if filepath:
-            return {
-                "success": True,
-                "filepath": filepath,
-                "message": "API key metrics exported successfully"
-            }
-        else:
-            return {
-                "success": False,
-                "filepath": None,
-                "message": "No API key metrics to export"
-            }
-    except Exception as e:
-        print(f"API error in /test/api-key-metrics: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error exporting API key metrics: {str(e)}")
+#         if filepath:
+#             return {
+#                 "success": True,
+#                 "filepath": filepath,
+#                 "message": "API key metrics exported successfully"
+#             }
+#         else:
+#             return {
+#                 "success": False,
+#                 "filepath": None,
+#                 "message": "No API key metrics to export"
+#             }
+#     except Exception as e:
+#         print(f"API error in /test/api-key-metrics: {str(e)}")
+#         raise HTTPException(status_code=500, detail=f"Error exporting API key metrics: {str(e)}")
 
 
 @app.get("/test/personas", response_model=PersonasListResponse)

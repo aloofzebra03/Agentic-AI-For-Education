@@ -1,0 +1,69 @@
+{
+  "test_info": {
+    "timestamp": "2025-12-21T14:23:06.459063",
+    "users": 5,
+    "duration_seconds": 8.407634258270264
+  },
+  "request_stats": {
+    "total_requests": 10,
+    "total_failures": 0,
+    "failure_rate": 0.0,
+    "avg_response_time_ms": 2186.475169984624,
+    "min_response_time_ms": 834.7116999793798,
+    "max_response_time_ms": 3424.56049984321,
+    "median_response_time_ms": 1400.0,
+    "requests_per_second": 1.1893952202028042,
+    "percentiles": {
+      "p50": 3100.0,
+      "p75": 3200.0,
+      "p90": 3400.0,
+      "p95": 3400.0,
+      "p99": 3400.0
+    }
+  },
+  "endpoint_stats": {
+    "('/session/start', 'POST')": {
+      "num_requests": 5,
+      "num_failures": 0,
+      "avg_response_time_ms": 3228.185039991513,
+      "min_response_time_ms": 3067.665899870917,
+      "max_response_time_ms": 3424.56049984321,
+      "requests_per_second": 0.5946976101014021
+    },
+    "('/session/continue', 'POST')": {
+      "num_requests": 5,
+      "num_failures": 0,
+      "avg_response_time_ms": 1144.7652999777347,
+      "min_response_time_ms": 834.7116999793798,
+      "max_response_time_ms": 1421.5385001152754,
+      "requests_per_second": 0.5946976101014021
+    }
+  },
+  "custom_metrics": {
+    "node_latencies": {
+      "APK": {
+        "count": 5,
+        "total": 16141.357898712158,
+        "min": 3068.244695663452,
+        "max": 3424.560785293579,
+        "avg": 3228.2715797424316
+      }
+    },
+    "checkpoint_stats": {
+      "total_operations": 10,
+      "save_count": 10,
+      "load_count": 0,
+      "save_avg_ms": 1671.3813877105713,
+      "save_max_ms": 3424.560785293579
+    },
+    "total_transitions": 5,
+    "total_checkpoint_ops": 10,
+    "total_llm_calls": 0,
+    "total_simulations": 0,
+    "total_images": 0,
+    "total_videos": 0,
+    "total_misconceptions": 0,
+    "avg_quiz_score": 0,
+    "completed_sessions": 0
+  }
+}
