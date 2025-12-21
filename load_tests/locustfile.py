@@ -100,7 +100,8 @@ def on_test_stop(environment, **kwargs):
 
 @events.quitting.add_listener
 def on_quitting(environment, **kwargs):
-    export_reports(environment)
+    """Final cleanup - reports already exported in on_test_stop"""
+    pass
 
 
 # ============================================================================

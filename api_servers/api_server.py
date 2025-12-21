@@ -328,7 +328,7 @@ def start_session(request: StartSessionRequest):
         print(f"📌 Generated thread_id: {thread_id}")
         
         # Validate model if provided
-        model = request.model or "gemini-2.5-flash-lite"
+        model = request.model or "gemini-2.5-flash"
         if model not in AVAILABLE_GEMINI_MODELS:
             raise HTTPException(
                 status_code=400,
