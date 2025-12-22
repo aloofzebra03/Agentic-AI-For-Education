@@ -598,6 +598,16 @@ File contents (corrupted):
 "Metrics for API Key 2...Metrics for API Key 1...latency: 180ms...latency: 250ms"
 ```
 
+**⚠️ FastAPI-Specific Context:**
+
+If your Python code performs file I/O operations (writes, reads, or both) **without proper thread safety**, and you serve this code via FastAPI with synchronous `def` endpoints:
+
+- **The problem WILL occur** - FastAPI's automatic thread pool means multiple concurrent requests will execute your file I/O code in parallel threads
+- **File corruption is likely** - Interleaved writes will produce corrupted/incomplete files
+- **Data loss can happen** - Lost updates, partial writes, or race conditions during read-modify-write cycles
+
+This is **guaranteed** when using `def` endpoints under concurrent load. The framework's threading model makes this inevitable without proper locking.
+
 **Solution:**
 
 ```python
