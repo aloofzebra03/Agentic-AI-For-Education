@@ -488,9 +488,12 @@ def start_node(state: AgentState) -> AgentState:
     print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
     print("=" * 80)
     
+    # Initialize state fields to prevent KeyErrors
     state["agent_output"]  = content
     state["current_state"] = "APK"
     state["messages"] = [SystemMessage(content=content)]
+    state["summary"] = ""  # Initialize summary
+    state["summary_last_index"] = 0  # Initialize summary index
     return state
 
 def apk_node(state: AgentState) -> AgentState:

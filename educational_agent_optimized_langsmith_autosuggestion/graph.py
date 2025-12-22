@@ -89,7 +89,7 @@ class AgentState(TypedDict, total=False):
     selected_autosuggestions_from_pool: List[str]  # Internal: LLM's pool selections
     dynamic_autosuggestion: str  # Internal: LLM's level-based generated suggestion
     last_agent_output_backup: str  # Backup for repeat handler
-    clicked_autosuggestion: bool  # True if user clicked autosuggestion button, False if typed
+    clicked_autosuggestion: Annotated[bool, lambda x, y: y if y is not None else x]  # True if user clicked autosuggestion button, False if typed
     handler_triggered: bool  # True if handler was triggered by autosuggestion manager
     student_level: str  # Student ability level: "low", "medium", or "advanced"
 
