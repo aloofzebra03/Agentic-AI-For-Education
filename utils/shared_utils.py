@@ -169,7 +169,7 @@ def export_api_key_metrics_to_excel(output_dir: str = "load_tests/reports") -> O
     # Save to Excel
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"api_key_performance_gemini_2.5_flash_{timestamp}.xlsx"
+    filename = f"api_key_performance_gemma_3_27b_it_{timestamp}.xlsx"
     filepath = Path(output_dir) / filename
     
     df.to_excel(filepath, index=False, engine='openpyxl')
@@ -252,12 +252,12 @@ def get_available_api_keys():
     return api_keys
 
 
-def get_llm(api_key: Optional[str] = None, model: str = "gemini-2.5-flash"):
+def get_llm(api_key: Optional[str] = None, model: str = "gemma-3-27b-it"):
     """Get configured LLM instance with specified or random API key and model.
     
     Args:
         api_key: Google API key. If None, randomly selects from available keys.
-        model: Model name to use. Defaults to gemini-2.5-flash.
+        model: Model name to use. Defaults to gemma-3-27b-it.
     
     Returns:
         Configured ChatGoogleGenerativeAI instance
@@ -285,13 +285,13 @@ def get_llm(api_key: Optional[str] = None, model: str = "gemini-2.5-flash"):
 
 # Available models list for fallback
 AVAILABLE_GEMINI_MODELS = [
-    "gemini-2.5-flash",
-    # "gemini-2.5-flash",
-    # "gemini-2.5-flash",
+    "gemma-3-27b-it",
+    # "gemma-3-27b-it",
+    # "gemma-3-27b-it",
     # "gemini-1.5-flash",
 ]
 
-def invoke_llm_with_fallback(messages: List, operation_name: str = "LLM call", model: str = "gemini-2.5-flash"):
+def invoke_llm_with_fallback(messages: List, operation_name: str = "LLM call", model: str = "gemma-3-27b-it"):
     """
     Invoke LLM with automatic API key and model fallback on failure.
     
@@ -303,7 +303,7 @@ def invoke_llm_with_fallback(messages: List, operation_name: str = "LLM call", m
     Args:
         messages: List of messages to send to the LLM
         operation_name: Name of the operation for logging purposes
-        model: Model to use. Defaults to gemini-2.5-flash.
+        model: Model to use. Defaults to gemma-3-27b-it.
     
     Returns:
         LLM response object
@@ -393,8 +393,8 @@ def llm_with_history(state: AgentState, final_prompt: str):
     # Note: The final_prompt already contains conversation history via build_prompt_from_template
     request_msgs = [HumanMessage(content=final_prompt)]
     
-    # Get model from state, default to gemini-2.5-flash
-    model = state.get("model", "gemini-2.5-flash")
+    # Get model from state, default to gemma-3-27b-it
+    model = state.get("model", "gemma-3-27b-it")
     
     # Use the centralized invoke function with fallback
     resp = invoke_llm_with_fallback(request_msgs, operation_name="LLM with history", model=model)
@@ -1152,7 +1152,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Optio
         raise ValueError(f"Unrecognized independent variable '{independent_var}' for concept: {concept}")
 
 
-def select_most_relevant_image_for_concept_introduction(concept: str, definition_context: str, model: str = "gemini-2.5-flash") -> Optional[Dict]:
+def select_most_relevant_image_for_concept_introduction(concept: str, definition_context: str, model: str = "gemma-3-27b-it") -> Optional[Dict]:
     """
     Select the most pedagogically relevant image for introducing a concept.
     Uses the concept-to-file mapping to find the correct JSON file.
@@ -1160,7 +1160,7 @@ def select_most_relevant_image_for_concept_introduction(concept: str, definition
     Args:
         concept: The concept name (can be in any case)
         definition_context: The context/definition being provided to the student
-        model: Model to use for image selection. Defaults to gemini-2.5-flash.
+        model: Model to use for image selection. Defaults to gemma-3-27b-it.
     
     Returns:
         Dict with url, description, and relevance_reason, or None if no images found
@@ -1297,13 +1297,13 @@ def identify_node_segments_from_transitions(messages: list, transitions: list) -
     
     return segments
 
-def create_educational_summary(messages: list, model: str = "gemini-2.5-flash") -> str:
+def create_educational_summary(messages: list, model: str = "gemma-3-27b-it") -> str:
     """
     Use LLM to create a proper educational summary of the conversation.
     
     Args:
         messages: List of conversation messages
-        model: Model to use for summarization. Defaults to gemini-2.5-flash.
+        model: Model to use for summarization. Defaults to gemma-3-27b-it.
     """
     if not messages:
         return ""
@@ -1351,13 +1351,13 @@ Summary:"""
         # Fallback to simple summary if LLM fails
         return f"Educational discussion with {len(messages)} exchanges about the concept"
 
-def create_educational_summary_from_text(conversation_text: str, model: str = "gemini-2.5-flash") -> str:
+def create_educational_summary_from_text(conversation_text: str, model: str = "gemma-3-27b-it") -> str:
     """
     Create an LLM-generated summary from conversation text.
     
     Args:
         conversation_text: Text of the conversation to summarize
-        model: Model to use for summarization. Defaults to gemini-2.5-flash.
+        model: Model to use for summarization. Defaults to gemma-3-27b-it.
     """
     try:
         if not conversation_text.strip():
@@ -1396,7 +1396,7 @@ def build_node_aware_conversation_history(state: AgentState, current_node: str) 
     """
     messages = state.get("messages", [])
     transitions = state.get("node_transitions", [])
-    model = state.get("model", "gemini-2.5-flash")
+    model = state.get("model", "gemma-3-27b-it")
     
     # For short conversations, use full history
     if len(messages) <= 6:

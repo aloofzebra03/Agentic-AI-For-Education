@@ -1,0 +1,28 @@
+================================================================================
+CUSTOM LANGGRAPH METRICS REPORT
+================================================================================
+Generated: 2025-12-21T21:22:16.674546
+Users: 5
+
+🔄 Node Transition Latencies:
+--------------------------------------------------------------------------------
+Node            Count      Avg (ms)     Min (ms)     Max (ms)    
+APK             5          4888.46      4799.19      5179.01     
+CI              5          6484.72      5841.82      7066.09     
+
+💾 Checkpoint Operations:
+--------------------------------------------------------------------------------
+Total Operations: 40
+Save - Count: 40, Avg: 1092.26ms, Max: 5179.01ms
+
+🎯 LangGraph-Specific Metrics:
+--------------------------------------------------------------------------------
+Total Transitions: 10
+Simulations Triggered: 0
+Images Loaded: 3
+Videos Loaded: 0
+Misconceptions Detected: 0
+Average Quiz Score: 0.00
+Completed Sessions: 0
+
+================================================================================
