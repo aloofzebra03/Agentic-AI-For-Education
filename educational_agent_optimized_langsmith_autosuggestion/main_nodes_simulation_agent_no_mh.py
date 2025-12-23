@@ -18,6 +18,8 @@ from utils.shared_utils import (
     build_prompt_from_template_optimized,
     get_ground_truth_from_json,
     select_most_relevant_image_for_concept_introduction,
+    add_ai_message_to_conversation,
+    add_system_message_to_conversation,
     # Import autosuggestion pool constants (single source of truth)
     POSITIVE_POOL,
     NEGATIVE_POOL,
@@ -534,7 +536,7 @@ def start_node(state: AgentState) -> AgentState:
     state["messages"] = []  # Initialize empty message list
     add_system_message_to_conversation(state, content)
     state["summary"] = ""  # Initialize summary
-    state["summary_last_index"] = 0  # Initialize summary index
+    state["summary_last_index"] = -1  # Initialize summary index
     return state
 
 def apk_node(state: AgentState) -> AgentState:
@@ -728,10 +730,7 @@ Provide a concise definition (≤30 words) of '{state["concept_title"]}', then a
         
         # Add AI message to conversation
         add_ai_message_to_conversation(state, content)
-        
-        # Return only the changed keys following LangGraph best practices
-        # Add AI message to conversation before returning
-        add_ai_message_to_conversation(state, content)
+    
         
         result = {
             "asked_ci": True,
@@ -782,13 +781,15 @@ Provide a concise definition (≤30 words) of '{state["concept_title"]}', then a
         print(f"🔢 CI_TRIES: {ci_tries}")
         print("=" * 80)
         
+        # Add AI message to conversation before returning
+        add_ai_message_to_conversation(state, content)
+        
         # Return only the changed keys following LangGraph best practices
         return {
             "ci_tries": ci_tries,
             "agent_output": content,
             "current_state": "SIM_CC",
-            "enhanced_message_metadata": {},
-            "messages": [AIMessage(content=content)]
+            "enhanced_message_metadata": {}
         }
 
     context = json.dumps(PEDAGOGICAL_MOVES["CI"], indent=2)
@@ -837,6 +838,9 @@ Task: Determine if the restatement is accurate. If accurate, move to SIM_CC to i
             ["I understand, continue", "I'm not sure", "Can you give me a hint?", "Continue exploring"]
         )
         
+        # Add AI message to conversation before returning
+        add_ai_message_to_conversation(state, parsed['feedback'])
+        
         # Return only the changed keys following LangGraph best practices
         return {
             "ci_tries": ci_tries,
@@ -847,8 +851,7 @@ Task: Determine if the restatement is accurate. If accurate, move to SIM_CC to i
             "negative_autosuggestion": selections['negative'],
             "special_handling_autosuggestion": selections['special'],
             "dynamic_autosuggestion": selections['dynamic'],
-            "autosuggestions": final_suggestions,
-            "messages": [AIMessage(content=parsed['feedback'])]
+            "autosuggestions": final_suggestions
         }
     except Exception as e:
         print(f"Error parsing CI response: {e}")
@@ -910,11 +913,13 @@ def ge_node(state: AgentState) -> AgentState:
         print(f"📋 CURRENT_CONCEPT: {concepts[current_idx] if concepts and current_idx < len(concepts) else 'None'}")
         print("=" * 80)
         
+        # Add AI message to conversation before returning
+        add_ai_message_to_conversation(state, content)
+        
         return {
             "asked_ge": True,
             "ge_tries": 0,
-            "agent_output": content,
-            "messages": [AIMessage(content=content)]
+            "agent_output": content
         }
 
     # Handle tries for GE node - increment counter
@@ -956,11 +961,13 @@ Then transition to testing their understanding by saying something like: 'Now le
         resp = llm_with_history(state, final_prompt)
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
+        # Add AI message to conversation before returning
+        add_ai_message_to_conversation(state, content)
+        
         # Return only the changed keys following LangGraph best practices
         return {
             "agent_output": content,
-            "current_state": "AR",  # NEW: Transition directly to AR for assessment
-            "messages": [AIMessage(content=content)]
+            "current_state": "AR"  # NEW: Transition directly to AR for assessment
         }
         
         # OLD: Transition to SIM_VARS for simulation-based misconception handling
@@ -1028,6 +1035,9 @@ OLD OPTIONS (commented out):
             ["I understand, continue", "I'm not sure", "Can you give me a hint?", "Continue exploring"]
         )
         
+        # Add AI message to conversation before returning
+        add_ai_message_to_conversation(state, parsed['feedback'])
+        
         update = {
             "agent_output": parsed['feedback'],
             "current_state": parsed['next_state'],
@@ -1035,8 +1045,7 @@ OLD OPTIONS (commented out):
             "negative_autosuggestion": selections['negative'],
             "special_handling_autosuggestion": selections['special'],
             "dynamic_autosuggestion": selections['dynamic'],
-            "autosuggestions": final_suggestions,
-            "messages": [AIMessage(content=parsed['feedback'])]
+            "autosuggestions": final_suggestions
         }
 
         # NEW: Since GE now only goes to AR or GE, no special handling needed
