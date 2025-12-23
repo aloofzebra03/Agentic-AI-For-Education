@@ -925,8 +925,8 @@ def ge_node(state: AgentState) -> AgentState:
     # Handle tries for GE node - increment counter
     state["ge_tries"] = state.get("ge_tries",0) + 1
     
-    # Check if we've reached max tries (1) - transition smoothly to AR
-    if state["ge_tries"] >= 1:
+    # Check if we've reached max tries (4) - transition smoothly to AR
+    if state["ge_tries"] >= 4:
         # NEW: Let LLM generate a natural transition to AR with gentle clarification
         current_idx = state.get("sim_current_idx", 0)
         concepts = state.get("sim_concepts", [])

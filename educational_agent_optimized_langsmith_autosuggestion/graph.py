@@ -83,7 +83,7 @@ class AgentState(TypedDict, total=False):
     # NEW: Concept title
     concept_title: str
     # Model selection
-    model: str
+    model: Annotated[str, lambda x, y: y if y is not None else x]
     # NEW: Restructured autosuggestion fields (4 distinct types)
     autosuggestions: List[str]  # Final combined suggestions to display [positive, negative, special, dynamic]
     positive_autosuggestion: str  # Selected positive/affirmative suggestion
@@ -133,7 +133,7 @@ def _wrap(fn):
         
         # CAPTURE NEW STATE AFTER PROCESSING
         new_state = st.get("current_state")
-        
+
         print(st.get("messages"))
         final_message_count = len(st.get("messages", []))
         
@@ -311,7 +311,7 @@ g.add_conditional_edges(
     "AUTOSUGGESTION_MANAGER", 
     _route_after_manager, 
     {
-        "APK": "APK", "CI": "CI", "GE": "GE", "AR": "AR", "TC": "TC", "RLC": "RLC",
+        "APK": "APK", "CI": "CI", "GE": "GE", "AR": "AR", "TC": "TC", "RLC": "RLC","SIM_CC": "SIM_CC",
         "APK_PAUSED": "PAUSE_FOR_HANDLER", "CI_PAUSED": "PAUSE_FOR_HANDLER", 
         "GE_PAUSED": "PAUSE_FOR_HANDLER", "AR_PAUSED": "PAUSE_FOR_HANDLER", 
         "TC_PAUSED": "PAUSE_FOR_HANDLER", "RLC_PAUSED": "PAUSE_FOR_HANDLER"
@@ -319,7 +319,7 @@ g.add_conditional_edges(
 )
 
 # Pause node routes back to the actual pedagogical node
-g.add_conditional_edges("PAUSE_FOR_HANDLER", _route, {"APK": "APK", "CI": "CI", "GE": "GE", "AR": "AR", "TC": "TC", "RLC": "RLC"})
+g.add_conditional_edges("PAUSE_FOR_HANDLER", _route, {"APK": "APK", "CI": "CI","SIM_CC": "SIM_CC", "GE": "GE", "AR": "AR", "TC": "TC", "RLC": "RLC"})
 
 # Simulation flow edges
 g.add_conditional_edges("SIM_CC", _route, {"GE": "GE"})
@@ -341,6 +341,7 @@ try:
     connection_kwargs = {
         "autocommit": True,  # Required for Transaction Mode
         "prepare_threshold": None,  # None = Never use prepared statements (required for Transaction Mode port 6543)
+        "gssencmode": "disable",  # Critical for Windows: prevents GSSAPI negotiation that Supabase doesn't support
     }
     
     postgres_url = os.getenv('POSTGRES_DATABASE_URL')
@@ -380,7 +381,7 @@ except Exception as e:
 
 def build_graph():
     compiled = g.compile(
-        # checkpointer=checkpointer,
+        checkpointer=checkpointer,
         interrupt_after=[
             "START", "PAUSE_FOR_HANDLER",  # Interrupt after START and after handler output
             # ▶ NEW: pause points for simulation path
