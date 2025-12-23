@@ -531,7 +531,8 @@ def start_node(state: AgentState) -> AgentState:
     # Initialize state fields to prevent KeyErrors
     state["agent_output"]  = content
     state["current_state"] = "APK"
-    state["messages"] = [SystemMessage(content=content)]
+    state["messages"] = []  # Initialize empty message list
+    add_system_message_to_conversation(state, content)
     state["summary"] = ""  # Initialize summary
     state["summary_last_index"] = 0  # Initialize summary index
     return state
@@ -571,7 +572,7 @@ def apk_node(state: AgentState) -> AgentState:
         print("=" * 80)
         
         state["agent_output"] = content
-        state["messages"] = [AIMessage(content=content)]
+        add_ai_message_to_conversation(state, content)
         return state
 
     # Handle student's response after hook question
@@ -617,7 +618,7 @@ Respond ONLY with a clear, encouraging message (not JSON - just the message text
         
         state["agent_output"] = final_response
         state["current_state"] = "CI"
-        state["messages"] = [AIMessage(content=final_response)]
+        add_ai_message_to_conversation(state, final_response)
         return state
 
     context = json.dumps(PEDAGOGICAL_MOVES["APK"], indent=2)
@@ -676,7 +677,7 @@ Remember to give feedback as mentioned in the required schema."""
         state["dynamic_autosuggestion"] = selections['dynamic']
         state["autosuggestions"] = final_suggestions
         
-        state["messages"] = [AIMessage(content=parsed['feedback'])]
+        add_ai_message_to_conversation(state, parsed['feedback'])
     except Exception as e:
         print(f"Error parsing APK response: {e}")
         print(f"Raw response: {raw}")
@@ -725,12 +726,17 @@ Provide a concise definition (≤30 words) of '{state["concept_title"]}', then a
         print(f"🖼️ SELECTED_IMAGE: {selected_image['url'] if selected_image else 'None'}")
         print("=" * 80)
         
+        # Add AI message to conversation
+        add_ai_message_to_conversation(state, content)
+        
         # Return only the changed keys following LangGraph best practices
+        # Add AI message to conversation before returning
+        add_ai_message_to_conversation(state, content)
+        
         result = {
             "asked_ci": True,
             "ci_tries": 0,
-            "agent_output": content,
-            "messages": [AIMessage(content=content)]
+            "agent_output": content
         }
         
         # Add image metadata if image was selected
@@ -1072,7 +1078,7 @@ def mh_node(state: AgentState) -> AgentState:
         print("=" * 80)
         
         state["agent_output"] = correction_message
-        state["messages"] = [AIMessage(content=correction_message)]
+        add_ai_message_to_conversation(state, correction_message)
         return state
     
     # Handle student's response after correction
@@ -1124,7 +1130,7 @@ Respond ONLY with a clear, conclusive message (not JSON - just the message text)
         
         state["agent_output"] = final_response
         state["current_state"] = "SIM_VARS"  # After max tries, show simulation to help convince student
-        state["messages"] = [AIMessage(content=final_response)]
+        add_ai_message_to_conversation(state, final_response)
         return state
     
     # Normal MH processing: evaluate student's response and decide next action
@@ -1179,7 +1185,7 @@ Task: Evaluate the student's response after receiving misconception correction. 
         state["agent_output"] = parsed.feedback
         # state["current_state"] = parsed.next_state
         state["current_state"] = "SIM_VARS"
-        state["messages"] = [AIMessage(content=parsed.feedback)]
+        add_ai_message_to_conversation(state, parsed.feedback)
     except Exception as e:
         print(f"Error parsing MH response: {e}")
         print(f"Raw response: {raw}")
@@ -1238,7 +1244,7 @@ def ar_node(state: AgentState) -> AgentState:
         print("=" * 80)
         
         state["agent_output"] = content
-        state["messages"] = [AIMessage(content=content)]
+        add_ai_message_to_conversation(state, content)
         return state
 
     # Second pass: grade & decide next step based on concept progress
@@ -1373,8 +1379,8 @@ Task: Grade this answer on a scale from 0 to 1 and determine next state. Respond
         completion_msg = "\n\nExcellent! We've covered all the key concepts. Now let's see how you can apply this knowledge in a new context."
         state["agent_output"] += completion_msg
 
+    add_ai_message_to_conversation(state, state["agent_output"])
     state["current_state"] = next_state
-    state["messages"] = [AIMessage(content=state["agent_output"])]
     return state
 
 def tc_node(state: AgentState) -> AgentState:
@@ -1413,7 +1419,7 @@ def tc_node(state: AgentState) -> AgentState:
         
         state["agent_output"] = content
         state["asked_tc"] = True
-        state["messages"] = [AIMessage(content=content)]
+        add_ai_message_to_conversation(state, content)
         return state
 
     # Second pass: evaluate & either affirm or explain
@@ -1476,7 +1482,7 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
 
     if correct:
         state["agent_output"] = feedback + "\nExcellent application! You've mastered this concept."
-        state["messages"] = [AIMessage(content=state["agent_output"])]
+        add_ai_message_to_conversation(state, state["agent_output"])
     else:
         # Student struggled: give correct transfer answer + explanation
         explain_system_prompt = (
@@ -1507,7 +1513,7 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
         print("=" * 80)
         
         state["agent_output"] = content
-        state["messages"] = [AIMessage(content=content)]
+        add_ai_message_to_conversation(state, content)
 
     state["current_state"] = "RLC"
     return state
@@ -1552,7 +1558,7 @@ def rlc_node(state: AgentState) -> AgentState:
         print("=" * 80)
         
         state["agent_output"] = content
-        state["messages"] = [AIMessage(content=content)]
+        add_ai_message_to_conversation(state, content)
         return state
 
     # Increment attempt counter
@@ -1593,7 +1599,7 @@ def rlc_node(state: AgentState) -> AgentState:
         
         state["agent_output"] = content
         state["current_state"] = "END"
-        state["messages"] = [AIMessage(content=content)]
+        add_ai_message_to_conversation(state, content)
         return state
 
     context = json.dumps(PEDAGOGICAL_MOVES["RLC"], indent=2)
@@ -1649,7 +1655,7 @@ Task: Evaluate whether the student has more questions about the real-life applic
         state["special_handling_autosuggestion"] = selections['special']
         state["dynamic_autosuggestion"] = selections['dynamic']
         state["autosuggestions"] = final_suggestions
-        state["messages"] = [AIMessage(content=parsed['feedback'])]
+        add_ai_message_to_conversation(state, parsed['feedback'])
     except Exception as e:
         print(f"Error parsing RLC response: {e}")
         print(f"Raw response: {raw}")
