@@ -570,14 +570,19 @@ ANALYZE THE CONVERSATION CONTEXT:
 SELECTION RULES (MANDATORY - All 4 fields required):
 
 1. **positive_autosuggestion** - Select EXACTLY ONE from positive pool: {positive_pool}
-   - Choose when student shows understanding or to encourage continuing
-   - Consider if your message warrants positive affirmation
+   ⚠️ WARNING: Only choose from the positive pool above, even if student is confused!
+   - Pick the most contextually appropriate positive/affirmative option from the list
+   - These represent what a student COULD say if they understand/agree
    
 2. **negative_autosuggestion** - Select EXACTLY ONE from negative pool: {negative_pool}
-   - Choose when you anticipate student might be confused or uncertain
-   - Consider complexity of what you just explained
+   ⚠️ WARNING: Only choose from the positive pool above, even if student is confused!
+   - Pick the most contextually appropriate positive/affirmative option from the list
+   - These represent what a student COULD say if they understand/agree
    
 3. **special_handling_autosuggestion** - Select EXACTLY ONE from special handling pool: {special_handling_pool}
+⚠️ WARNING: Only choose from the positive pool above, even if student is confused!
+   - Pick the most contextually appropriate positive/affirmative option from the list
+   - These represent what a student COULD say if they understand/agree
    - This will trigger special pedagogical intervention (hints, examples, simpler explanation)
    - Choose based on what type of help would be most useful given your current message
    - "Can you give me a hint?" - for nudging without revealing answer

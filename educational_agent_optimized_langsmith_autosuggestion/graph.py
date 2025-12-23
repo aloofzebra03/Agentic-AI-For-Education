@@ -82,8 +82,8 @@ class AgentState(TypedDict, total=False):
     is_kannada: bool
     # NEW: Concept title
     concept_title: str
-    # Model selection
-    model: Annotated[str, lambda x, y: y if y is not None else x]
+    # Model selection - accepts updates, uses last non-None value
+    model: Annotated[str, lambda old, new: new if new is not None else old]
     # NEW: Restructured autosuggestion fields (4 distinct types)
     autosuggestions: List[str]  # Final combined suggestions to display [positive, negative, special, dynamic]
     positive_autosuggestion: str  # Selected positive/affirmative suggestion
@@ -92,7 +92,7 @@ class AgentState(TypedDict, total=False):
     dynamic_autosuggestion: str  # Generated exploratory suggestion
     clicked_autosuggestion: Annotated[bool, lambda x, y: y if y is not None else x]  # True if user clicked autosuggestion button, False if typed
     handler_triggered: bool  # True if handler was triggered by autosuggestion manager
-    student_level: str  # Student ability level: "low", "medium", or "advanced"
+    student_level: Annotated[str, lambda x, y: y if y is not None else x]  # Student ability level: "low", "medium", or "advanced"
 
 def _wrap(fn):
     def inner(state: AgentState) -> AgentState:
