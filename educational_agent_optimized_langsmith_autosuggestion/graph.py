@@ -84,11 +84,12 @@ class AgentState(TypedDict, total=False):
     concept_title: str
     # Model selection
     model: str
-    # NEW: Autosuggestion fields
-    autosuggestions: List[str]  # Final suggestions to display (translated if Kannada)
-    selected_autosuggestions_from_pool: List[str]  # Internal: LLM's pool selections
-    dynamic_autosuggestion: str  # Internal: LLM's level-based generated suggestion
-    last_agent_output_backup: str  # Backup for repeat handler
+    # NEW: Restructured autosuggestion fields (4 distinct types)
+    autosuggestions: List[str]  # Final combined suggestions to display [positive, negative, special, dynamic]
+    positive_autosuggestion: str  # Selected positive/affirmative suggestion
+    negative_autosuggestion: str  # Selected negative/uncertain suggestion
+    special_handling_autosuggestion: str  # Selected special handling suggestion (triggers handlers)
+    dynamic_autosuggestion: str  # Generated exploratory suggestion
     clicked_autosuggestion: Annotated[bool, lambda x, y: y if y is not None else x]  # True if user clicked autosuggestion button, False if typed
     handler_triggered: bool  # True if handler was triggered by autosuggestion manager
     student_level: str  # Student ability level: "low", "medium", or "advanced"
@@ -132,6 +133,8 @@ def _wrap(fn):
         
         # CAPTURE NEW STATE AFTER PROCESSING
         new_state = st.get("current_state")
+        
+        print(st.get("messages"))
         final_message_count = len(st.get("messages", []))
         
         # TRACK TRANSITION IF STATE CHANGED
@@ -182,7 +185,9 @@ def pause_for_handler(state: AgentState) -> AgentState:
     """
     state["handler_triggered"] = False  # Reset flag
     state["autosuggestions"] = []  # Clear final autosuggestions
-    state["selected_autosuggestions_from_pool"] = []  # Clear pool selections
+    state["positive_autosuggestion"] = ""  # Clear positive selection
+    state["negative_autosuggestion"] = ""  # Clear negative selection
+    state["special_handling_autosuggestion"] = ""  # Clear special handling selection
     state["dynamic_autosuggestion"] = ""  # Clear dynamic suggestion
     return state
 
@@ -375,12 +380,11 @@ except Exception as e:
 
 def build_graph():
     compiled = g.compile(
-        checkpointer=checkpointer,
+        # checkpointer=checkpointer,
         interrupt_after=[
             "START", "PAUSE_FOR_HANDLER",  # Interrupt after START and after handler output
             # ▶ NEW: pause points for simulation path
             "APK", "CI", "GE", "AR", "TC", "RLC",
-            # ▶ NEW: interrupt points for simulation nodes
             "SIM_CC",
         ],
     )

@@ -182,6 +182,35 @@ def export_api_key_metrics_to_excel(output_dir: str = "load_tests/reports") -> O
     
     return str(filepath)
 
+# ─── Autosuggestion Pool Constants (Single Source of Truth) ──────────────────
+
+# Positive affirmations - student understands/agrees
+POSITIVE_POOL = [
+    "I understand, continue",
+    "Yes, got it",
+    "That makes sense",
+    "Let's proceed further",
+    "I'm following along"
+]
+
+# Negative/uncertainty - student confused/needs help
+NEGATIVE_POOL = [
+    "I'm not sure",
+    "I don't know",
+    "I'm confused",
+    "Not very clear",
+    "Can you explain differently?"
+]
+
+# Special handling - triggers handler logic
+SPECIAL_HANDLING_POOL = [
+    "Can you give me a hint?",
+    "Can you explain that simpler?",
+    "Give me an example"
+]
+
+# ─────────────────────────────────────────────────────────────────────
+
 def extract_json_block(text: str) -> str:
     """Extract JSON from text, handling various formats including markdown code blocks."""
     s = text.strip()
@@ -516,20 +545,10 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
     
     # Add autosuggestion instructions BEFORE format instructions for pedagogical nodes
     if include_autosuggestions and parser and current_node in ["APK", "CI", "GE", "AR", "TC", "RLC"]:
-        autosuggestion_pool = [
-            "I'm not sure",
-            "Can you give me a hint?",
-            "Can you explain that simpler?",
-            "Give me an example",
-            "I don't know",
-            "Let me think about it",
-            "I understand, continue",
-            "Yes",
-            "No",
-            "Can you repeat that?",
-            "I'm confused",
-            "That makes sense",
-        ]
+        # Use imported pool constants for prompt generation
+        positive_pool = POSITIVE_POOL
+        negative_pool = NEGATIVE_POOL
+        special_handling_pool = SPECIAL_HANDLING_POOL
         
         # Get student level and corresponding description
         student_level = state.get("student_level", "medium")
@@ -540,44 +559,66 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
         }
         level_desc = level_descriptions.get(student_level, level_descriptions["medium"])
         
-        # Level-specific example suggestions
-        level_examples = {
-            "low": "'Can you break it down more?', 'I need more time', 'Show me step-by-step'",
-            "medium": "'What's the next step?', 'How does this connect?', 'Can you clarify that?'",
-            "advanced": "'Can I try a harder version?', 'What if we change X?', 'How does this relate to Y?'"
-        }
-        examples = level_examples.get(student_level, level_examples["medium"])
-        
-        template_parts.append(f"""\n\nIMPORTANT - Autosuggestion Generation:
-1. Select EXACTLY 1 to 3 (no more, no less) contextually appropriate quick-reply suggestions from this pool: {autosuggestion_pool}
-   - Include them in the `selected_autosuggestions` field
-   - Choose quality over quantity - select only the most relevant ones
-   - CRITICAL: You MUST select at least 1 and at most 3 suggestions
+        template_parts.append(f"""\n\nIMPORTANT - Autosuggestion Generation (EXACTLY 4 total suggestions required):
+
+ANALYZE THE CONVERSATION CONTEXT:
+- Review the conversation history above carefully
+- Consider your current feedback/message that you're about to send
+- Select autosuggestions that make sense given where the student is in their learning journey
+- Make suggestions relevant to what you just explained or asked
+
+SELECTION RULES (MANDATORY - All 4 fields required):
+
+1. **positive_autosuggestion** - Select EXACTLY ONE from positive pool: {positive_pool}
+   - Choose when student shows understanding or to encourage continuing
+   - Consider if your message warrants positive affirmation
    
-2. Generate 1 UNIQUE exploratory dynamic suggestion (3-4 words MAX) tailored for {student_level}-level student:
-   - Include it in the `dynamic_autosuggestion` field
-   - Point to a DIFFERENT aspect of the concept than pool suggestions
-   - Use short noun-phrase or statement format that evokes curiosity
-   - Ensure it is DIFFERENT from all pool suggestions above
+2. **negative_autosuggestion** - Select EXACTLY ONE from negative pool: {negative_pool}
+   - Choose when you anticipate student might be confused or uncertain
+   - Consider complexity of what you just explained
    
-   Adjust ONLY the depth of exploration based on student level:
+3. **special_handling_autosuggestion** - Select EXACTLY ONE from special handling pool: {special_handling_pool}
+   - This will trigger special pedagogical intervention (hints, examples, simpler explanation)
+   - Choose based on what type of help would be most useful given your current message
+   - "Can you give me a hint?" - for nudging without revealing answer
+   - "Can you explain that simpler?" - for complex explanations
+   - "Give me an example" - for abstract concepts
    
-   • low (concrete, visible aspects):
-     - Prefer: where it happens, what is used/made, which part does it
-     - Example: "Where this process happens inside a plant"
-     - Avoid: abstraction, variation, dependencies
+4. **dynamic_autosuggestion** - Generate EXACTLY ONE unique exploratory suggestion (12-15 words max):
+   - Must be contextually relevant to the CURRENT conversation and your message
+   - Should point to a specific unexplored aspect related to what you just explained
+   - Should nudge student to think about a related concept/application/implication
+   - Must be DIFFERENT from all pool suggestions above
+   - Use noun-phrase or question format that evokes curiosity
    
-   • medium (role-based, cause-effect):
-     - Prefer: why needed, what enables/prevents, usefulness, constraints
+   Adjust depth based on student level ({student_level} - {level_desc}):
+   
+   • low: Concrete, visible aspects
+     - Focus on: where it happens, what is used/made, which part does it
+     - Example: "Where exactly in the leaf does this happen?"
+     - Avoid: abstraction, complex variations, dependencies
+   
+   • medium: Cause-effect, constraints
+     - Focus on: why needed, what enables/prevents, usefulness, limitations
      - Example: "Why only green parts of a plant can do this"
-     - Avoid: too simple or overly complex variations
+     - Balance: not too simple, not overly complex
    
-   • advanced (dependency, variation, implications):
-     - Prefer: how changes affect outcomes, limiting factors, broader impact
-     - Example: "How changes in sunlight affect this process"
+   • advanced: Dependencies, variations, implications
+     - Focus on: how changes affect outcomes, limiting factors, broader impact
+     - Example: "How changes in sunlight intensity affect the rate"
      - Encourage: critical thinking about relationships and constraints
-     
-     Make sure that the dynamic prompt you generate is in some way related to the conversation till now and nudges the student in a similar direction as is being done in the conversation.""")
+
+CRITICAL CONTEXT AWARENESS:
+- If you just explained something complex → lean towards selecting confused/uncertain options
+- If student just answered correctly → lean towards selecting positive/affirmative options  
+- If you're asking a challenging question → choose appropriate negative option
+- If you're providing encouragement → choose appropriate positive option
+- Make the dynamic suggestion relate to the CURRENT pedagogical moment in the conversation
+- Consider what the student might naturally wonder about next based on your specific message
+- The dynamic suggestion should feel like a natural extension of your current explanation/question
+
+Remember: All 4 fields are REQUIRED. The LLM must select one from each pool + generate one dynamic.""")
+
     
     # Add instructions at the end if requested
     if include_instructions and parser:
@@ -1426,14 +1467,8 @@ def build_node_aware_conversation_history(state: AgentState, current_node: str) 
             for segment in older_segments:
                 older_messages.extend(segment["messages"])
             
-            # Find the highest index in older_messages in the original messages list
-            last_older_index = -1
-            if older_messages:
-                last_older_msg = older_messages[-1]
-                for i, msg in enumerate(messages):
-                    if msg == last_older_msg:
-                        last_older_index = i
-                        break
+            # Get last older index directly from segment metadata (O(1) operation)
+            last_older_index = older_segments[-1]["end_idx"] - 1 if older_segments else -1
             
             # Check if we need to update summary
             if last_older_index <= state.get("summary_last_index", -1):
