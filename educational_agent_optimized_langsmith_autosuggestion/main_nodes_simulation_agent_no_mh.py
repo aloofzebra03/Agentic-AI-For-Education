@@ -68,6 +68,7 @@ PEDAGOGICAL_MOVES: Dict[str, Dict[str, str]] = {
 def combine_autosuggestions(parsed_response: dict, fallback_suggestions: list[str]) -> tuple[list[str], dict]:
     """
     Combine all 4 autosuggestion types (positive, negative, special, dynamic) into final list.
+    Handles None values when agent asks questions or says "let me think".
     
     Args:
         parsed_response: Parsed LLM response dict
@@ -76,18 +77,33 @@ def combine_autosuggestions(parsed_response: dict, fallback_suggestions: list[st
     Returns:
         Tuple of (final_suggestions_list, selections_dict)
     """
-    # Extract all four autosuggestions
-    positive = parsed_response.get('positive_autosuggestion', "").strip()
+    # Extract all four autosuggestions (handle None values)
+    positive = parsed_response.get('positive_autosuggestion')
+    if positive and isinstance(positive, str):
+        positive = positive.strip()
+    
     negative = parsed_response.get('negative_autosuggestion', "").strip()
     special = parsed_response.get('special_handling_autosuggestion', "").strip()
-    dynamic = parsed_response.get('dynamic_autosuggestion', "").strip()
     
-    # Combine into ordered list [positive, negative, special, dynamic]
+    dynamic = parsed_response.get('dynamic_autosuggestion')
+    if dynamic and isinstance(dynamic, str):
+        dynamic = dynamic.strip()
+    
+    # Combine into ordered list, filtering out None and empty strings
+    print("Positive:", positive)
+    print("Negative:", negative)
+    print("Special:", special)
+    print("Dynamic:", dynamic)
     final_suggestions = [s for s in [positive, negative, special, dynamic] if s]
+    print("Final Suggestions before validation:", final_suggestions)
     
-    # Safety check - should have exactly 4
-    if len(final_suggestions) != 4:
-        print(f"⚠️ WARNING: Expected 4 suggestions, got {len(final_suggestions)}. Using fallback.")
+    # Check if we have at least negative and special (minimum required when asking questions)
+    # When positive/dynamic are None (question scenario), we should have 2 suggestions
+    is_question_scenario = positive is None or dynamic is None
+    expected_count = 2 if is_question_scenario else 4
+    
+    if len(final_suggestions) < expected_count:
+        print(f"⚠️ WARNING: Expected {expected_count} suggestions, got {len(final_suggestions)}. Using fallback.")
         final_suggestions = fallback_suggestions
         # Create fallback dict
         selections_dict = {
@@ -97,14 +113,14 @@ def combine_autosuggestions(parsed_response: dict, fallback_suggestions: list[st
             'dynamic': fallback_suggestions[3] if len(fallback_suggestions) > 3 else ""
         }
     else:
-        # Create selections dict for state storage
+        # Create selections dict for state storage (preserve None values)
         selections_dict = {
             'positive': positive,
             'negative': negative,
             'special': special,
             'dynamic': dynamic
         }
-        print(f"✅ Combined 4 autosuggestions: positive='{positive}', negative='{negative}', special='{special}', dynamic='{dynamic[:30]}...'")
+        print(f"✅ Combined 4 autosuggestions: positive='{positive}', negative='{negative}', special='{special}', dynamic='{dynamic[:30] if dynamic else 'None'}...'")
     
     return final_suggestions, selections_dict
 
@@ -125,14 +141,17 @@ class BaseAutosuggestionResponse(BaseModel):
     """
     
     # Positive pool selection using Literal - synced with POSITIVE_POOL
+    # None allowed when agent asks a question
     positive_autosuggestion: Literal[
         "I understand, continue",
         "Yes, got it",
         "That makes sense",
         "Let's proceed further",
-        "I'm following along"
+        "I'm following along",
+        None
     ] = Field(
-        description="Select EXACTLY ONE positive/affirmative suggestion that shows understanding or agreement"
+        default=None,
+        description="Select EXACTLY ONE positive/affirmative suggestion that shows understanding or agreement. Use None (null in JSON) if your feedback contains a direct question to the student."
     )
     
     # Negative pool selection using Literal - synced with NEGATIVE_POOL
@@ -155,9 +174,9 @@ class BaseAutosuggestionResponse(BaseModel):
         description="Select EXACTLY ONE special handling suggestion that will trigger pedagogical intervention"
     )
     
-    # Dynamic suggestion - stays as str with validator
-    dynamic_autosuggestion: str = Field(
-        default="",
+    # Dynamic suggestion - str or None (can't use Literal for open string values)
+    dynamic_autosuggestion: str | None = Field(
+        default=None,
         description="""Generate ONE unique exploratory autosuggestion (12-15 words max) that:
         - Is contextually relevant to the current conversation and your message
         - Points to a specific unexplored aspect related to what you just explained
@@ -167,23 +186,28 @@ class BaseAutosuggestionResponse(BaseModel):
           * low: concrete, visible aspects (where it happens, what is used/made)
           * medium: cause-effect, constraints (why needed, what enables/prevents)
           * advanced: dependencies, variations, implications (how changes affect, limiting factors)
-        - Must be DIFFERENT from all pool suggestions above"""
+        - Must be DIFFERENT from all pool suggestions above
+        - Use None (null in JSON) if your feedback contains a direct question to the student or if you say 'let me think'"""
     )
     
     @field_validator('dynamic_autosuggestion')
     @classmethod
     def validate_dynamic_not_empty(cls, v):
-        """Ensure dynamic autosuggestion is provided and not just whitespace."""
-        if not v or not v.strip():
-            raise ValueError("Dynamic autosuggestion must be provided and cannot be empty.")
+        """Ensure dynamic autosuggestion is provided and not just whitespace, or is None."""
+        if v is None:
+            return None
+        if not v.strip():
+            raise ValueError("Dynamic autosuggestion must be provided and cannot be empty (or use None if asking a question).")
         return v.strip()
     
     @field_validator('positive_autosuggestion')
     @classmethod
     def validate_positive_in_pool(cls, v):
         """Validate positive selection matches pool (runtime check for sync)."""
+        if v is None:
+            return None
         if v not in POSITIVE_POOL:
-            raise ValueError(f"positive_autosuggestion must be from POSITIVE_POOL. Got: {v}")
+            raise ValueError(f"positive_autosuggestion must be from POSITIVE_POOL or None. Got: {v}")
         return v
     
     @field_validator('negative_autosuggestion')

@@ -190,7 +190,8 @@ POSITIVE_POOL = [
     "Yes, got it",
     "That makes sense",
     "Let's proceed further",
-    "I'm following along"
+    "I'm following along",
+    None
 ]
 
 # Negative/uncertainty - student confused/needs help
@@ -559,70 +560,100 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
         }
         level_desc = level_descriptions.get(student_level, level_descriptions["medium"])
         
-        template_parts.append(f"""\n\nIMPORTANT - Autosuggestion Generation (EXACTLY 4 total suggestions required):
+        template_parts.append(f"""\n\nIMPORTANT - Autosuggestion Generation:
 
 ANALYZE THE CONVERSATION CONTEXT:
 - Review the conversation history above carefully
 - Consider your current feedback/message that you're about to send
+- Determine if your message is a QUESTION or contains "let me think"
 - Select autosuggestions that make sense given where the student is in their learning journey
 - Make suggestions relevant to what you just explained or asked
 
-SELECTION RULES (MANDATORY - All 4 fields required):
+🚨 CRITICAL: QUESTION/THINKING DETECTION 🚨
+IF your feedback contains ANY of the following:
+  • A direct question to the student (e.g., "Can you tell me..?", "What do you think..?", "Why does..?")
+  • The phrase "let me think"
+  • Asking student to explain, describe, or answer something
 
-1. **positive_autosuggestion** - Select EXACTLY ONE from positive pool: {positive_pool}
-   ⚠️ WARNING: Only choose from the positive pool above, even if student is confused!
-   - Pick the most contextually appropriate positive/affirmative option from the list
-   - These represent what a student COULD say if they understand/agree
+THEN you MUST:
+  • Set positive_autosuggestion = null/None (not a string, use JSON null)
+  • Set dynamic_autosuggestion = null/None (not a string, use JSON null)
+  • Only provide negative_autosuggestion and special_handling_autosuggestion
+
+Reason: When asking questions, we don't want suggestions like "I understand" or exploratory prompts that might distract from answering the question.
+
+SELECTION RULES:
+
+1. **positive_autosuggestion** - CONDITIONAL:
    
-2. **negative_autosuggestion** - Select EXACTLY ONE from negative pool: {negative_pool}
-   ⚠️ WARNING: Only choose from the positive pool above, even if student is confused!
-   - Pick the most contextually appropriate positive/affirmative option from the list
-   - These represent what a student COULD say if they understand/agree
+   IF your message is NOT a question and does NOT contain "let me think":
+       
+   - Pick the most contextually appropriate positive/affirmative option from the list below:
+     → Select EXACTLY ONE from positive pool: {positive_pool}
+     ⚠️ WARNING: Only choose from the positive pool above, even if student is confused!
+     → Pick the most contextually appropriate positive/affirmative option
+     → These represent what a student COULD say if they understand/agree
    
-3. **special_handling_autosuggestion** - Select EXACTLY ONE from special handling pool: {special_handling_pool}
-⚠️ WARNING: Only choose from the positive pool above, even if student is confused!
-   - Pick the most contextually appropriate positive/affirmative option from the list
-   - These represent what a student COULD say if they understand/agree
-   - This will trigger special pedagogical intervention (hints, examples, simpler explanation)
-   - Choose based on what type of help would be most useful given your current message
-   - "Can you give me a hint?" - for nudging without revealing answer
-   - "Can you explain that simpler?" - for complex explanations
-   - "Give me an example" - for abstract concepts
+   IF your message IS a question OR contains "let me think":
+     → Set to null/Select None (JSON null, not string "null")
    
-4. **dynamic_autosuggestion** - Generate EXACTLY ONE unique exploratory suggestion (12-15 words max):
-   - Must be contextually relevant to the CURRENT conversation and your message
-   - Should point to a specific unexplored aspect related to what you just explained
-   - Should nudge student to think about a related concept/application/implication
-   - Must be DIFFERENT from all pool suggestions above
-   - Use noun-phrase or question format that evokes curiosity
+2. **negative_autosuggestion** - ALWAYS REQUIRED:
+   - Pick the most contextually appropriate negative/uncertain option from the list below:
+   → Select EXACTLY ONE from negative pool: {negative_pool}
+       ⚠️ WARNING: Only choose from the negative pool above, even if student is confused!
+   → Pick the most contextually appropriate negative/uncertain option
+   → These represent what a student COULD say if they're confused or need help
    
-   Adjust depth based on student level ({student_level} - {level_desc}):
+3. **special_handling_autosuggestion** - ALWAYS REQUIRED:
+   → Select EXACTLY ONE from special handling pool: {special_handling_pool}
+   → This will trigger special pedagogical intervention (hints, examples, simpler explanation)
+   → Choose based on what type of help would be most useful given your current message:
+     • "Can you give me a hint?" - for nudging without revealing answer
+     • "Can you explain that simpler?" - for complex explanations
+     • "Give me an example" - for abstract concepts
    
-   • low: Concrete, visible aspects
-     - Focus on: where it happens, what is used/made, which part does it
-     - Example: "Where exactly in the leaf does this happen?"
-     - Avoid: abstraction, complex variations, dependencies
+4. **dynamic_autosuggestion** - CONDITIONAL:
    
-   • medium: Cause-effect, constraints
-     - Focus on: why needed, what enables/prevents, usefulness, limitations
-     - Example: "Why only green parts of a plant can do this"
-     - Balance: not too simple, not overly complex
+   IF your message is NOT a question and does NOT contain "let me think":
+     → Generate EXACTLY ONE unique exploratory suggestion (12-15 words max):
+       • Must be contextually relevant to the CURRENT conversation and your message
+       • Should point to a specific unexplored aspect related to what you just explained
+       • Should nudge student to think about a related concept/application/implication
+       • Must be DIFFERENT from all pool suggestions above
+       • Use noun-phrase or question format that evokes curiosity
+       
+       Adjust depth based on student level ({student_level} - {level_desc}):
+       
+       • low: Concrete, visible aspects
+         - Focus on: where it happens, what is used/made, which part does it
+         - Example: "Where exactly in the leaf does this happen?"
+         - Avoid: abstraction, complex variations, dependencies
+       
+       • medium: Cause-effect, constraints
+         - Focus on: why needed, what enables/prevents, usefulness, limitations
+         - Example: "Why only green parts of a plant can do this"
+         - Balance: not too simple, not overly complex
+       
+       • advanced: Dependencies, variations, implications
+         - Focus on: how changes affect outcomes, limiting factors, broader impact
+         - Example: "How changes in sunlight intensity affect the rate"
+         - Encourage: critical thinking about relationships and constraints
    
-   • advanced: Dependencies, variations, implications
-     - Focus on: how changes affect outcomes, limiting factors, broader impact
-     - Example: "How changes in sunlight intensity affect the rate"
-     - Encourage: critical thinking about relationships and constraints
+   IF your message IS a question OR contains "let me think":
+     → Set to null/None (JSON null, not string "null")
 
 CRITICAL CONTEXT AWARENESS:
-- If you just explained something complex → lean towards selecting confused/uncertain options
-- If student just answered correctly → lean towards selecting positive/affirmative options  
-- If you're asking a challenging question → choose appropriate negative option
-- If you're providing encouragement → choose appropriate positive option
-- Make the dynamic suggestion relate to the CURRENT pedagogical moment in the conversation
-- Consider what the student might naturally wonder about next based on your specific message
-- The dynamic suggestion should feel like a natural extension of your current explanation/question
+- First, check if your feedback is a question → if yes, set positive and dynamic to null
+- If you just explained something complex → lean towards selecting confused/uncertain options for negative
+- If student just answered correctly → this is explanatory feedback, provide all 4 suggestions
+- If you're asking a challenging question → positive and dynamic must be null, only negative and special
+- If you're providing encouragement → this is feedback, provide all 4 suggestions
+- Make suggestions relate to the CURRENT pedagogical moment in the conversation
 
-Remember: All 4 fields are REQUIRED. The LLM must select one from each pool + generate one dynamic.""")
+REMEMBER:
+- Questions/"let me think" → 2 suggestions (negative + special), positive and dynamic are null
+- Explanations/Feedback → 4 suggestions (positive + negative + special + dynamic)
+- Set as None""")
 
     
     # Add instructions at the end if requested
