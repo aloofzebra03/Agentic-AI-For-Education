@@ -83,7 +83,7 @@ class AgentState(TypedDict, total=False):
     # NEW: Concept title
     concept_title: str
     # Model selection - accepts updates, uses last non-None value
-    model: Annotated[str, lambda old, new: new if new is not None else old]
+    # model: Annotated[str, lambda old, new: new if new is not None else old]
     # NEW: Restructured autosuggestion fields (4 distinct types)
     autosuggestions: List[str]  # Final combined suggestions to display [positive, negative, special, dynamic]
     positive_autosuggestion: str  # Selected positive/affirmative suggestion

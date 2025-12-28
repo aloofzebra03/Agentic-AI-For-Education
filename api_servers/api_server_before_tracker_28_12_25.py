@@ -5,7 +5,6 @@ import uvicorn
 from typing import Dict, Optional, Any
 import sys
 import os
-import traceback
 from pathlib import Path
 from datetime import datetime
 
@@ -36,9 +35,9 @@ from utils.shared_utils import (
     select_most_relevant_image_for_concept_introduction,
     create_simulation_config,
     get_all_available_concepts,
+    export_api_key_metrics_to_excel,
+    AVAILABLE_GEMINI_MODELS
 )
-
-from api_tracker_utils.error import MinuteLimitExhaustedError, DayLimitExhaustedError
 
 # ============================================================================
 # FASTAPI APP INITIALIZATION
@@ -224,6 +223,7 @@ def read_root():
         "endpoints": [
             "GET  /health - Health check",
             "GET  /concepts - List all available concepts",
+            "GET  /available-models - List available Gemini models",
             "POST /session/start - Start new learning session",
             "POST /session/continue - Continue existing session",
             "GET  /session/status/{thread_id} - Get session status",
@@ -249,6 +249,7 @@ def health_check():
             "/",
             "/health",
             "/concepts",
+            "/available-models",
             "/session/start",
             "/session/continue",
             "/session/status/{thread_id}",
@@ -286,6 +287,25 @@ def list_available_concepts():
         raise HTTPException(status_code=500, detail=f"Error retrieving concepts: {str(e)}")
 
 
+@app.get("/available-models")
+def list_available_models():
+    """List all available Gemini models that can be used by the educational agent."""
+    try:
+        print("API /available-models - Retrieving available Gemini models")
+        
+        return {
+            "success": True,
+            "models": AVAILABLE_GEMINI_MODELS,
+            "total": len(AVAILABLE_GEMINI_MODELS),
+            "default_model": "gemma-3-27b-it",
+            "message": f"Retrieved {len(AVAILABLE_GEMINI_MODELS)} available models"
+        }
+        
+    except Exception as e:
+        print(f"API error in /available-models: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving models: {str(e)}")
+
+
 @app.post("/session/start", response_model=StartSessionResponse)
 def start_session(request: StartSessionRequest):
     try:
@@ -307,26 +327,27 @@ def start_session(request: StartSessionRequest):
         
         print(f"📌 Generated thread_id: {thread_id}")
         
-        # # Validate model if provided
-        # model = request.model or "gemma-3-27b-it"
-        # if model not in AVAILABLE_GEMINI_MODELS:
-        #     raise HTTPException(
-        #         status_code=400,
-        #         detail=f"Invalid model '{model}'. Available models: {AVAILABLE_GEMINI_MODELS}"
-        #     )
+        # Validate model if provided
+        model = request.model or "gemma-3-27b-it"
+        if model not in AVAILABLE_GEMINI_MODELS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid model '{model}'. Available models: {AVAILABLE_GEMINI_MODELS}"
+            )
         
         # Validate student level
         student_level = validate_student_level(request.student_level)
         print(f"📊 Student level: {student_level}")
         
         # Start the conversation by invoking the graph with __start__ message
-        # Tracker will automatically select the best API key and model based on rate limits
-        print("Invoking graph to start session (tracker will select optimal model)")
+        # Include is_kannada, concept_title, student_level, and model in the initial state
+        print("Invoking graph to start session with model:", model)
         result = graph.invoke(
             {
                 "messages": [HumanMessage(content="__start__")],
                 "is_kannada": request.is_kannada,
                 "concept_title": request.concept_title,
+                "model": model,
                 "student_level": student_level,
                 "summary": "",  # Initialize summary field
                 "summary_last_index": -1,  # Initialize summary tracking
@@ -362,24 +383,9 @@ def start_session(request: StartSessionRequest):
             metadata=metadata,
             autosuggestions=autosuggestions
         )
-
-    except MinuteLimitExhaustedError as e:
-        print(f"[API] Error processing query: {e}")
-        print(f"Full traceback:\n{traceback.format_exc()}")
-        raise HTTPException(
-            status_code = 501,
-            detail=f"Error processing query: {e}"
-        ) 
-    
-    except DayLimitExhaustedError as e:
-        print(f"[API] Error processing query: {e}")
-        print(f"Full traceback:\n{traceback.format_exc()}")
-        raise HTTPException(
-            status_code = 502,
-            detail=f"Error processing query: {e}"
-        )
-    
+        
     except Exception as e:
+        import traceback
         print(f"API error in /session/start: {str(e)}")
         print(f"Full traceback:\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Error starting session: {str(e)}")
@@ -404,6 +410,14 @@ def continue_session(request: ContinueSessionRequest):
             # "last_user_msg": request.user_message,
             "clicked_autosuggestion": request.clicked_autosuggestion
         }
+        
+        if request.model:
+            if request.model not in AVAILABLE_GEMINI_MODELS:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid model '{request.model}'. Available models: {AVAILABLE_GEMINI_MODELS}"
+                )
+            update_dict["model"] = request.model
         
         # Allow updating student level mid-session
         if request.student_level:
@@ -453,27 +467,11 @@ def continue_session(request: ContinueSessionRequest):
             message="Response generated successfully",
             autosuggestions=autosuggestions
         )
-    
-    except MinuteLimitExhaustedError as e:
-        print(f"[API] Error processing query: {e}")
-        print(f"Full traceback:\n{traceback.format_exc()}")
-        raise HTTPException(
-            status_code = 501,
-            detail=f"Error processing query: {e}"
-        ) 
-    
-    except DayLimitExhaustedError as e:
-        print(f"[API] Error processing query: {e}")
-        print(f"Full traceback:\n{traceback.format_exc()}")
-        raise HTTPException(
-            status_code = 502,
-            detail=f"Error processing query: {e}"
-        )
         
     except HTTPException:
         raise
-
     except Exception as e:
+        import traceback
         print(f"API error in /session/continue: {str(e)}")
         print(f"Full traceback:\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Error continuing session: {str(e)}")
@@ -667,6 +665,30 @@ def delete_session(thread_id: str):
     except Exception as e:
         print(f"API error in DELETE /session: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error deleting session: {str(e)}")
+
+
+@app.get("/test/api-key-metrics")
+def export_api_key_metrics():
+    """Export API key performance metrics to Excel (for load testing)."""
+    try:
+        print("API /test/api-key-metrics - exporting API key performance metrics")
+        filepath = export_api_key_metrics_to_excel()
+        
+        if filepath:
+            return {
+                "success": True,
+                "filepath": filepath,
+                "message": "API key metrics exported successfully"
+            }
+        else:
+            return {
+                "success": False,
+                "filepath": None,
+                "message": "No API key metrics to export"
+            }
+    except Exception as e:
+        print(f"API error in /test/api-key-metrics: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error exporting API key metrics: {str(e)}")
 
 
 @app.get("/test/personas", response_model=PersonasListResponse)

@@ -28,10 +28,10 @@ class StartSessionRequest(BaseModel):
         default=False,
         description="Whether to conduct the session in Kannada language. Default is False (English)."
     )
-    model: Optional[str] = Field(
-        default="gemma-3-27b-it",
-        description="Gemini model to use for this session. Available: gemma-3-27b-it, gemma-3-27b-it-exp, gemini-1.5-flash, gemini-1.5-pro. Defaults to gemma-3-27b-it."
-    )
+    # model: Optional[str] = Field(
+    #     default="gemma-3-27b-it",
+    #     description="Gemini model to use for this session. Available: gemma-3-27b-it, gemma-3-27b-it-exp, gemini-1.5-flash, gemini-1.5-pro. Defaults to gemma-3-27b-it."
+    # )
     student_level: str = Field(
         default="medium",
         description="Student ability level for dynamic autosuggestions. Options: 'low', 'medium', 'advanced'. Defaults to 'medium'."
@@ -48,10 +48,10 @@ class ContinueSessionRequest(BaseModel):
         ..., 
         description="The student's message or response to the agent's previous question"
     )
-    model: Optional[str] = Field(
-        default="gemma-3-27b-it",
-        description="Optional: Override the model for this specific request. If not provided, uses the model from session start."
-    )
+    # model: Optional[str] = Field(
+    #     default="gemma-3-27b-it",
+    #     description="Optional: Override the model for this specific request. If not provided, uses the model from session start."
+    # )
     clicked_autosuggestion: Optional[bool] = Field(
         default=False,
         description="True if user clicked an autosuggestion button, False if typed message"

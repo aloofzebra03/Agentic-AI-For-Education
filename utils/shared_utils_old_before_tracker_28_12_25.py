@@ -23,13 +23,164 @@ from langchain_groq import ChatGroq
 # from educational_agent_v1.Filtering_GT.filter_utils import filter_relevant_section
 # from educational_agent_v1.Creating_Section_Text.schema import NextSectionChoice
 
-from api_tracker_utils.tracker import track_model_call,get_next_available_api_model_pair
-from api_tracker_utils.config import AVAILABLE_MODELS, DEFAULT_MODEL
 
 dotenv.load_dotenv(dotenv_path=".env", override=True)
 
 # Type alias for AgentState - flexible to work with different state structures
 AgentState = Dict[str, Any]
+
+# ─────────────────────────────────────────────────────────────────────
+# API Key Performance Tracking
+# ─────────────────────────────────────────────────────────────────────
+
+class ApiKeyPerformanceTracker:
+    """Simple tracker for API key performance during load tests.
+    
+    Stores each call individually and aggregates at export time.
+    Thread-safe because list.append() is atomic in CPython.
+    """
+    
+    def __init__(self):
+        self._calls = []  # List of all API calls
+    
+    def record_call(self, api_key_suffix: str, latency_ms: float, success: bool, error_msg: str = None):
+        """Record a single API call.
+        
+        Args:
+            api_key_suffix: Last 6 characters of API key
+            latency_ms: Latency in milliseconds
+            success: Whether call succeeded
+            error_msg: Error message if failed
+        """
+        self._calls.append({
+            "api_key": api_key_suffix,
+            "latency_ms": latency_ms,
+            "success": success,
+            "error": error_msg if not success else None,
+            "timestamp": time.time()
+        })
+    
+    def get_all_calls(self) -> List[Dict]:
+        """Get all recorded calls."""
+        return self._calls.copy()
+    
+    def reset(self):
+        """Clear all metrics."""
+        self._calls.clear()
+        print("📊 API key tracker reset")
+
+# Global singleton instance
+_api_key_tracker = ApiKeyPerformanceTracker()
+
+def export_api_key_metrics_to_excel(output_dir: str = "load_tests/reports") -> Optional[str]:
+    """Aggregate all API call metrics and export to Excel.
+    
+    Args:
+        output_dir: Directory to save the Excel file
+    
+    Returns:
+        Path to the exported file, or None if no data
+    """
+    try:
+        import pandas as pd
+        import numpy as np
+        from pathlib import Path
+    except ImportError as e:
+        print(f"❌ Missing required package for Excel export: {e}")
+        print("💡 Install with: pip install pandas openpyxl numpy")
+        return None
+    
+    # Get all calls
+    all_calls = _api_key_tracker.get_all_calls()
+    
+    if not all_calls:
+        print("⚠️ No API key metrics to export")
+        return None
+    
+    print(f"📊 Aggregating metrics from {len(all_calls)} API calls...")
+    
+    # Aggregate by API key
+    aggregated = defaultdict(lambda: {
+        "total_calls": 0,
+        "successful_calls": 0,
+        "failed_calls": 0,
+        "latencies_ms": [],
+        "errors": []
+    })
+    
+    for call in all_calls:
+        key = call["api_key"]
+        aggregated[key]["total_calls"] += 1
+        
+        if call["success"]:
+            aggregated[key]["successful_calls"] += 1
+            aggregated[key]["latencies_ms"].append(call["latency_ms"])
+        else:
+            aggregated[key]["failed_calls"] += 1
+            if call["error"]:
+                aggregated[key]["errors"].append(call["error"])
+    
+    # Build DataFrame
+    rows = []
+    for api_key, data in aggregated.items():
+        row = {
+            "API Key": f"...{api_key}",
+            "Total Calls": data["total_calls"],
+            "Successful": data["successful_calls"],
+            "Failed": data["failed_calls"],
+            "Failure Rate %": round((data["failed_calls"] / data["total_calls"] * 100), 2) if data["total_calls"] > 0 else 0,
+        }
+        
+        # Latency stats (only for successful calls)
+        if data["latencies_ms"]:
+            latencies = data["latencies_ms"]
+            row.update({
+                "Min (ms)": round(min(latencies), 2),
+                "Max (ms)": round(max(latencies), 2),
+                "Avg (ms)": round(np.mean(latencies), 2),
+                "P50 (ms)": round(np.percentile(latencies, 50), 2),
+                "P95 (ms)": round(np.percentile(latencies, 95), 2),
+                "P99 (ms)": round(np.percentile(latencies, 99), 2),
+            })
+        else:
+            # No successful calls
+            row.update({
+                "Min (ms)": 0,
+                "Max (ms)": 0,
+                "Avg (ms)": 0,
+                "P50 (ms)": 0,
+                "P95 (ms)": 0,
+                "P99 (ms)": 0,
+            })
+        
+        # Most common error
+        if data["errors"]:
+            from collections import Counter
+            most_common = Counter(data["errors"]).most_common(1)[0][0]
+            row["Most Common Error"] = most_common[:50]  # Truncate long errors
+        else:
+            row["Most Common Error"] = "None"
+        
+        rows.append(row)
+    
+    # Create DataFrame and sort by total calls
+    df = pd.DataFrame(rows).sort_values("Total Calls", ascending=False)
+    
+    # Save to Excel
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"api_key_performance_gemma_3_27b_it_{timestamp}.xlsx"
+    filepath = Path(output_dir) / filename
+    
+    df.to_excel(filepath, index=False, engine='openpyxl')
+    
+    print(f"\n📊 API Key Performance Metrics Exported")
+    print(f"📁 File: {filepath}")
+    print(f"📈 Summary: {len(aggregated)} API keys, {len(all_calls)} total calls")
+    print(f"✅ Successful: {sum(d['successful_calls'] for d in aggregated.values())}")
+    print(f"❌ Failed: {sum(d['failed_calls'] for d in aggregated.values())}")
+    
+    return str(filepath)
 
 # ─── Autosuggestion Pool Constants (Single Source of Truth) ──────────────────
 
@@ -117,8 +268,22 @@ def extract_json_block(text: str) -> str:
     return s
 
 
+def get_available_api_keys():
+    """Get all available Google API keys from environment."""
+    api_keys = []
+    for i in range(1, 8):  # Check for GOOGLE_API_KEY1 through GOOGLE_API_KEY7
+        key = os.getenv(f"GOOGLE_API_KEY_{i}")
+        if key:
+            api_keys.append(key)
+    
+    if not api_keys:
+        raise RuntimeError("No Google API keys found. Please set GOOGLE_API_KEY1, GOOGLE_API_KEY2, etc. in .env file")
+    
+    return api_keys
+
+
 def get_llm(api_key: Optional[str] = None, model: str = "gemma-3-27b-it"):
-    """Get configured LLM instance with specified or chosen API key and model.
+    """Get configured LLM instance with specified or random API key and model.
     
     Args:
         api_key: Google API key. If None, randomly selects from available keys.
@@ -127,6 +292,13 @@ def get_llm(api_key: Optional[str] = None, model: str = "gemma-3-27b-it"):
     Returns:
         Configured ChatGoogleGenerativeAI instance
     """
+    if api_key is None:
+        # Randomly select an API key from available keys
+        available_keys = get_available_api_keys()
+        api_key = random.choice(available_keys)
+        print(f"🔑 Selected random API key (ending with ...{api_key[-6:]})")
+    
+    print(f"Model being used for LLM calls: {model}")
     
     return ChatGoogleGenerativeAI(
         model=model,
@@ -141,48 +313,89 @@ def get_llm(api_key: Optional[str] = None, model: str = "gemma-3-27b-it"):
     # return llm
 
 
-def invoke_llm_with_fallback(messages: List, operation_name: str = "LLM call"):
+# Available models list for fallback
+AVAILABLE_GEMINI_MODELS = [
+    "gemma-3-27b-it",
+    # "gemma-3-27b-it",
+    # "gemma-3-27b-it",
+    # "gemini-1.5-flash",
+]
+
+def invoke_llm_with_fallback(messages: List, operation_name: str = "LLM call", model: str = "gemma-3-27b-it"):
     """
-    Invoke LLM using tracker-selected API key and model pair.
-    
-    The tracker automatically selects the optimal API key and model combination
-    based on rate limits and load balancing. No manual model selection is supported.
+    Invoke LLM with automatic API key and model fallback on failure.
     
     Strategy:
-    1. Get optimal API key and model from tracker (respects rate limits)
-    2. Track the call BEFORE invocation (for rate limiting)
-    3. Invoke LLM with selected pair
-    4. Let errors bubble up (MinuteLimitExhaustedError, DayLimitExhaustedError, etc.)
+    1. Try all API keys with the selected model
+    2. If all keys fail for selected model, try other models from AVAILABLE_GEMINI_MODELS
+    3. For each fallback model, try all API keys again
     
     Args:
         messages: List of messages to send to the LLM
         operation_name: Name of the operation for logging purposes
+        model: Model to use. Defaults to gemma-3-27b-it.
     
     Returns:
         LLM response object
     
     Raises:
-        MinuteLimitExhaustedError: When all API-model pairs hit per-minute limits
-        DayLimitExhaustedError: When all API-model pairs hit daily limits
-        Exception: Any other LLM invocation errors
+        RuntimeError: If all API keys and models fail
     """
-    # Get optimal pair from tracker (may raise rate limit errors)
-    selected_api_key, selected_model = get_next_available_api_model_pair()
-    print(f"🔑 Using tracked API key (ending with ...{selected_api_key[-6:]}) for model: {selected_model}")
-
-    # Track BEFORE invocation for accurate rate limiting
-    track_model_call(selected_api_key, selected_model)
+    available_keys = get_available_api_keys()
     
-    # Create LLM instance and invoke
-    llm = get_llm(api_key=selected_api_key, model=selected_model)
+    # Create model priority list: selected model first, then others
+    models_to_try = [model] + [m for m in AVAILABLE_GEMINI_MODELS if m != model]
     
-    try:
-        response = llm.invoke(messages)
-        print(f"✅ {operation_name} - Success with tracked key and model: {selected_model}")
-        return response
-    except Exception as e:
-        print(f"❌ {operation_name} - Failed with tracked key/model: {selected_model}. Error: {str(e)}")
-        raise
+    last_error = None
+    print("Starting LLM invocation with fallback mechanism with model:", models_to_try[0])
+    # Try each model
+    for model_idx, current_model in enumerate(models_to_try, 1):
+        print(f"🎯 {operation_name} - Trying model {model_idx}/{len(models_to_try)}: {current_model}")
+        
+        # Shuffle keys for this model to distribute load
+        keys_for_model = available_keys.copy()
+        random.shuffle(keys_for_model)
+        
+        # Try each API key for this model
+        for attempt, api_key in enumerate(keys_for_model, 1):
+            # Get API key suffix for tracking
+            api_key_suffix = api_key[-6:]
+            
+            # Start timing
+            start_time = time.time()
+            
+            try:
+                print(f"🔑 {operation_name} - Model: {current_model}, API key attempt {attempt}/{len(keys_for_model)} (ending ...{api_key_suffix})")
+                llm = get_llm(api_key=api_key, model=current_model)
+                response = llm.invoke(messages)
+                
+                # Calculate latency and record success
+                latency_ms = (time.time() - start_time) * 1000
+                _api_key_tracker.record_call(api_key_suffix, latency_ms, True)
+                
+                print(f"✅ {operation_name} - Success with model {current_model} on attempt {attempt} ({latency_ms:.0f}ms)")
+                return response
+                
+            except Exception as e:
+                # Calculate latency and record failure
+                latency_ms = (time.time() - start_time) * 1000
+                last_error = e
+                error_msg = str(e)[:100]
+                _api_key_tracker.record_call(api_key_suffix, latency_ms, False, error_msg)
+                
+                print(f"❌ {operation_name} - Failed: {error_msg}")
+                if attempt < len(keys_for_model):
+                    print(f"🔄 Retrying with next API key for model {current_model}...")
+                continue
+        
+        # All keys failed for this model
+        print(f"❌ {operation_name} - All API keys failed for model {current_model}")
+        if model_idx < len(models_to_try):
+            print(f"🔄 Falling back to next model: {models_to_try[model_idx]}")
+    
+    # If all keys and models failed, raise the last error
+    print(f"❌ {operation_name} - All {len(available_keys)} API keys and {len(models_to_try)} models failed!")
+    raise RuntimeError(f"All API keys and models exhausted for {operation_name}. Last error: {str(last_error)}") from last_error
 
 
 def add_ai_message_to_conversation(state: AgentState, content: str):
@@ -210,8 +423,11 @@ def llm_with_history(state: AgentState, final_prompt: str):
     # Note: The final_prompt already contains conversation history via build_prompt_from_template
     request_msgs = [HumanMessage(content=final_prompt)]
     
-    # Use the centralized invoke function - tracker will select optimal model
-    resp = invoke_llm_with_fallback(request_msgs, operation_name="LLM with history")
+    # Get model from state, default to gemma-3-27b-it
+    model = state.get("model", "gemma-3-27b-it")
+    
+    # Use the centralized invoke function with fallback
+    resp = invoke_llm_with_fallback(request_msgs, operation_name="LLM with history", model=model)
     
     # 🔍 LLM INVOCATION - OUTPUT 🔍
     print("🤖 LLM INVOCATION - COMPLETED")
