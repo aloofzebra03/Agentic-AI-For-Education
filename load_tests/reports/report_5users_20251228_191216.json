@@ -1,0 +1,47 @@
+{
+  "test_info": {
+    "timestamp": "2025-12-28T19:12:16.845607",
+    "users": 5,
+    "duration_seconds": 25.19472646713257
+  },
+  "request_stats": {
+    "total_requests": 5,
+    "total_failures": 5,
+    "failure_rate": 1.0,
+    "avg_response_time_ms": 23217.605939973146,
+    "min_response_time_ms": 23134.97699983418,
+    "max_response_time_ms": 23325.371799990535,
+    "median_response_time_ms": 23134.97699983418,
+    "requests_per_second": 0.19845422836888826,
+    "percentiles": {
+      "p50": 23000.0,
+      "p75": 23000.0,
+      "p90": 23000.0,
+      "p95": 23000.0,
+      "p99": 23000.0
+    }
+  },
+  "endpoint_stats": {
+    "('/session/start', 'POST')": {
+      "num_requests": 5,
+      "num_failures": 5,
+      "avg_response_time_ms": 23217.605939973146,
+      "min_response_time_ms": 23134.97699983418,
+      "max_response_time_ms": 23325.371799990535,
+      "requests_per_second": 0.19845422836888826
+    }
+  },
+  "custom_metrics": {
+    "node_latencies": {},
+    "checkpoint_stats": {},
+    "total_transitions": 0,
+    "total_checkpoint_ops": 0,
+    "total_llm_calls": 0,
+    "total_simulations": 0,
+    "total_images": 0,
+    "total_videos": 0,
+    "total_misconceptions": 0,
+    "avg_quiz_score": 0,
+    "completed_sessions": 0
+  }
+}

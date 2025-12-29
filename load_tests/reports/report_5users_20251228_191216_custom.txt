@@ -1,0 +1,25 @@
+================================================================================
+CUSTOM LANGGRAPH METRICS REPORT
+================================================================================
+Generated: 2025-12-28T19:12:16.850619
+Users: 5
+
+🔄 Node Transition Latencies:
+--------------------------------------------------------------------------------
+No node transitions recorded
+
+💾 Checkpoint Operations:
+--------------------------------------------------------------------------------
+No checkpoint operations recorded
+
+🎯 LangGraph-Specific Metrics:
+--------------------------------------------------------------------------------
+Total Transitions: 0
+Simulations Triggered: 0
+Images Loaded: 0
+Videos Loaded: 0
+Misconceptions Detected: 0
+Average Quiz Score: 0.00
+Completed Sessions: 0
+
+================================================================================

@@ -15,16 +15,16 @@ DEFAULT_MODEL = "gemma-3-27b-it"
 # Rate limits per model (requests per minute and per day)
 RATE_LIMITS = {
     "gemini-2.5-flash": {
-        "per_minute": 3,
-        "per_day": 200
+        "per_minute": 300,
+        "per_day": 2
     },
     "gemini-2.5-flash-lite": {
-        "per_minute": 3,
-        "per_day": 200
+        "per_minute": 300,
+        "per_day": 2
     },  
     "gemma-3-27b-it": {
-        "per_minute": 3,
-        "per_day": 200
+        "per_minute": 300,
+        "per_day": 2
     }
 }
 

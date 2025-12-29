@@ -1,0 +1,47 @@
+{
+  "test_info": {
+    "timestamp": "2025-12-28T19:31:17.656082",
+    "users": 5,
+    "duration_seconds": 6.088001489639282
+  },
+  "request_stats": {
+    "total_requests": 5,
+    "total_failures": 5,
+    "failure_rate": 1.0,
+    "avg_response_time_ms": 4104.442560020834,
+    "min_response_time_ms": 4070.3575001098216,
+    "max_response_time_ms": 4195.625500287861,
+    "median_response_time_ms": 4100.0,
+    "requests_per_second": 0.8212875782814982,
+    "percentiles": {
+      "p50": 4100.0,
+      "p75": 4100.0,
+      "p90": 4200.0,
+      "p95": 4200.0,
+      "p99": 4200.0
+    }
+  },
+  "endpoint_stats": {
+    "('/session/start', 'POST')": {
+      "num_requests": 5,
+      "num_failures": 5,
+      "avg_response_time_ms": 4104.442560020834,
+      "min_response_time_ms": 4070.3575001098216,
+      "max_response_time_ms": 4195.625500287861,
+      "requests_per_second": 0.8212875782814982
+    }
+  },
+  "custom_metrics": {
+    "node_latencies": {},
+    "checkpoint_stats": {},
+    "total_transitions": 0,
+    "total_checkpoint_ops": 0,
+    "total_llm_calls": 0,
+    "total_simulations": 0,
+    "total_images": 0,
+    "total_videos": 0,
+    "total_misconceptions": 0,
+    "avg_quiz_score": 0,
+    "completed_sessions": 0
+  }
+}

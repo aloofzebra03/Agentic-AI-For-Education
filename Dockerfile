@@ -37,6 +37,7 @@ RUN python -m pip install --upgrade pip setuptools wheel && \
 COPY utils/ /app/utils/
 COPY tester_agent/ /app/tester_agent/
 COPY educational_agent_optimized_langsmith_autosuggestion/ /app/educational_agent_optimized_langsmith_autosuggestion/
+COPY api_tracker_utils/ /app/api_tracker_utils/ 
 COPY api_servers/ /app/api_servers/
 COPY NCERT/ /app/NCERT/
 

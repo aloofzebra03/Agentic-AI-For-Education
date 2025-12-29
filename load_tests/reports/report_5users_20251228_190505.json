@@ -1,0 +1,77 @@
+{
+  "test_info": {
+    "timestamp": "2025-12-28T19:05:05.777584",
+    "users": 5,
+    "duration_seconds": 55.27841591835022
+  },
+  "request_stats": {
+    "total_requests": 15,
+    "total_failures": 8,
+    "failure_rate": 0.5333333333333333,
+    "avg_response_time_ms": 7553.622740010421,
+    "min_response_time_ms": 2051.260100211948,
+    "max_response_time_ms": 21736.865299753845,
+    "median_response_time_ms": 4300.0,
+    "requests_per_second": 0.2713536513447847,
+    "percentiles": {
+      "p50": 4300.0,
+      "p75": 14000.0,
+      "p90": 14000.0,
+      "p95": 22000.0,
+      "p99": 22000.0
+    }
+  },
+  "endpoint_stats": {
+    "('/session/start', 'POST')": {
+      "num_requests": 5,
+      "num_failures": 0,
+      "avg_response_time_ms": 5147.492540068924,
+      "min_response_time_ms": 3258.685300126672,
+      "max_response_time_ms": 10287.487699650228,
+      "requests_per_second": 0.09045121711492822
+    },
+    "('/session/continue', 'POST')": {
+      "num_requests": 9,
+      "num_failures": 8,
+      "avg_response_time_ms": 9501.735366622193,
+      "min_response_time_ms": 3587.7100001089275,
+      "max_response_time_ms": 21736.865299753845,
+      "requests_per_second": 0.1628121908068708
+    },
+    "('/session/status/{thread_id}', 'GET')": {
+      "num_requests": 1,
+      "num_failures": 0,
+      "avg_response_time_ms": 2051.260100211948,
+      "min_response_time_ms": 2051.260100211948,
+      "max_response_time_ms": 2051.260100211948,
+      "requests_per_second": 0.018090243422985645
+    }
+  },
+  "custom_metrics": {
+    "node_latencies": {
+      "APK": {
+        "count": 5,
+        "total": 25736.01984977722,
+        "min": 3259.3395709991455,
+        "max": 10287.164688110352,
+        "avg": 5147.203969955444
+      }
+    },
+    "checkpoint_stats": {
+      "total_operations": 6,
+      "save_count": 6,
+      "load_count": 0,
+      "save_avg_ms": 4397.264341513316,
+      "save_max_ms": 10287.164688110352
+    },
+    "total_transitions": 5,
+    "total_checkpoint_ops": 6,
+    "total_llm_calls": 0,
+    "total_simulations": 0,
+    "total_images": 0,
+    "total_videos": 0,
+    "total_misconceptions": 0,
+    "avg_quiz_score": 0,
+    "completed_sessions": 0
+  }
+}

@@ -34,7 +34,7 @@ from email.mime.multipart import MIMEMultipart
 def get_available_api_keys() -> List[str]:
     """Get all 7 available Google API keys from environment."""
     api_keys = []
-    for i in range(6, 8):  # GOOGLE_API_KEY_1 through GOOGLE_API_KEY_7
+    for i in range(7, 8):  # GOOGLE_API_KEY_1 through GOOGLE_API_KEY_7
         key = os.getenv(f"GOOGLE_API_KEY_{i}")
         if key:
             api_keys.append(key)
