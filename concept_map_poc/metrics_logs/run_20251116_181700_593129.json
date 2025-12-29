@@ -1,0 +1,97 @@
+{
+  "timestamp": "2025-11-16T18:17:00.593129",
+  "input": {
+    "description_preview": "Photosynthesis is the process by which green plants, algae, and some bacteria convert light energy into chemical energy. It occurs mainly in the chloroplasts of plant cells using a green pigment calle...",
+    "description_length": 503,
+    "word_count": 82,
+    "educational_level": "high school"
+  },
+  "tokens": {
+    "prompt_tokens": 320,
+    "completion_tokens": 592,
+    "total_tokens": 912
+  },
+  "timing": {
+    "api_duration_seconds": 2.809,
+    "parse_duration_seconds": 0.0,
+    "total_duration_seconds": 3.109
+  },
+  "output": {
+    "concepts_count": 6,
+    "relationships_count": 6,
+    "concepts": [
+      {
+        "name": "Photosynthesis",
+        "type": "process",
+        "importance": "high",
+        "importance_rank": 1
+      },
+      {
+        "name": "Chlorophyll",
+        "type": "pigment",
+        "importance": "high",
+        "importance_rank": 2
+      },
+      {
+        "name": "Chloroplasts",
+        "type": "organelle",
+        "importance": "high",
+        "importance_rank": 3
+      },
+      {
+        "name": "Light Energy",
+        "type": "energy",
+        "importance": "medium",
+        "importance_rank": 4
+      },
+      {
+        "name": "Glucose",
+        "type": "molecule",
+        "importance": "medium",
+        "importance_rank": 5
+      },
+      {
+        "name": "Oxygen",
+        "type": "molecule",
+        "importance": "medium",
+        "importance_rank": 6
+      }
+    ],
+    "relationships": [
+      {
+        "from": "Photosynthesis",
+        "to": "Chlorophyll",
+        "relationship": "uses"
+      },
+      {
+        "from": "Chlorophyll",
+        "to": "Light Energy",
+        "relationship": "absorbs"
+      },
+      {
+        "from": "Photosynthesis",
+        "to": "Chloroplasts",
+        "relationship": "occurs in"
+      },
+      {
+        "from": "Photosynthesis",
+        "to": "Glucose",
+        "relationship": "produces"
+      },
+      {
+        "from": "Photosynthesis",
+        "to": "Oxygen",
+        "relationship": "releases"
+      },
+      {
+        "from": "Light Energy",
+        "to": "Photosynthesis",
+        "relationship": "powers"
+      }
+    ]
+  },
+  "status": {
+    "success": true,
+    "error": null
+  }
+}

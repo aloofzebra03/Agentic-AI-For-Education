@@ -1,0 +1,624 @@
+{
+  "metadata": {
+    "topic_name": null,
+    "educational_level": "high school",
+    "total_duration": 35.89999999999998,
+    "total_concepts": 6,
+    "word_count": 82,
+    "processing_time": 2.511039972305298,
+    "extraction_time": 2.5098330974578857,
+    "timing_calculation_time": 0.0001819133758544922,
+    "audio_file": "/var/folders/dv/_t8zxwtd0tq5k52mjcg978n00000gn/T/concept_map_audio_axpdf5b6/audio_0.mp3"
+  },
+  "full_text": "Photosynthesis is the process by which green plants, algae, and some bacteria convert light energy into chemical energy. It occurs mainly in the chloroplasts of plant cells using a green pigment called chlorophyll. During photosynthesis, plants take in carbon dioxide from the air and water from the soil. With the help of sunlight, they produce glucose for energy and release oxygen as a by-product. This process is essential for life on Earth as it provides food and oxygen for most living organisms.",
+  "word_timings": [
+    {
+      "word": "Photosynthesis",
+      "start_time": 0.0,
+      "end_time": 1.12
+    },
+    {
+      "word": "is",
+      "start_time": 1.12,
+      "end_time": 1.28
+    },
+    {
+      "word": "the",
+      "start_time": 1.28,
+      "end_time": 1.52
+    },
+    {
+      "word": "process",
+      "start_time": 1.52,
+      "end_time": 2.08
+    },
+    {
+      "word": "by",
+      "start_time": 2.08,
+      "end_time": 2.24
+    },
+    {
+      "word": "which",
+      "start_time": 2.24,
+      "end_time": 2.64
+    },
+    {
+      "word": "green",
+      "start_time": 2.64,
+      "end_time": 3.04
+    },
+    {
+      "word": "plants,",
+      "start_time": 3.04,
+      "end_time": 3.7199999999999998
+    },
+    {
+      "word": "algae,",
+      "start_time": 3.7199999999999998,
+      "end_time": 4.32
+    },
+    {
+      "word": "and",
+      "start_time": 4.32,
+      "end_time": 4.5600000000000005
+    },
+    {
+      "word": "some",
+      "start_time": 4.5600000000000005,
+      "end_time": 4.880000000000001
+    },
+    {
+      "word": "bacteria",
+      "start_time": 4.880000000000001,
+      "end_time": 5.5200000000000005
+    },
+    {
+      "word": "convert",
+      "start_time": 5.5200000000000005,
+      "end_time": 6.08
+    },
+    {
+      "word": "light",
+      "start_time": 6.08,
+      "end_time": 6.48
+    },
+    {
+      "word": "energy",
+      "start_time": 6.48,
+      "end_time": 6.960000000000001
+    },
+    {
+      "word": "into",
+      "start_time": 6.960000000000001,
+      "end_time": 7.280000000000001
+    },
+    {
+      "word": "chemical",
+      "start_time": 7.280000000000001,
+      "end_time": 7.920000000000001
+    },
+    {
+      "word": "energy.",
+      "start_time": 7.920000000000001,
+      "end_time": 8.8
+    },
+    {
+      "word": "It",
+      "start_time": 8.8,
+      "end_time": 8.96
+    },
+    {
+      "word": "occurs",
+      "start_time": 8.96,
+      "end_time": 9.440000000000001
+    },
+    {
+      "word": "mainly",
+      "start_time": 9.440000000000001,
+      "end_time": 9.920000000000002
+    },
+    {
+      "word": "in",
+      "start_time": 9.920000000000002,
+      "end_time": 10.080000000000002
+    },
+    {
+      "word": "the",
+      "start_time": 10.080000000000002,
+      "end_time": 10.320000000000002
+    },
+    {
+      "word": "chloroplasts",
+      "start_time": 10.320000000000002,
+      "end_time": 11.280000000000001
+    },
+    {
+      "word": "of",
+      "start_time": 11.280000000000001,
+      "end_time": 11.440000000000001
+    },
+    {
+      "word": "plant",
+      "start_time": 11.440000000000001,
+      "end_time": 11.840000000000002
+    },
+    {
+      "word": "cells",
+      "start_time": 11.840000000000002,
+      "end_time": 12.240000000000002
+    },
+    {
+      "word": "using",
+      "start_time": 12.240000000000002,
+      "end_time": 12.640000000000002
+    },
+    {
+      "word": "a",
+      "start_time": 12.640000000000002,
+      "end_time": 12.790000000000003
+    },
+    {
+      "word": "green",
+      "start_time": 12.790000000000003,
+      "end_time": 13.190000000000003
+    },
+    {
+      "word": "pigment",
+      "start_time": 13.190000000000003,
+      "end_time": 13.750000000000004
+    },
+    {
+      "word": "called",
+      "start_time": 13.750000000000004,
+      "end_time": 14.230000000000004
+    },
+    {
+      "word": "chlorophyll.",
+      "start_time": 14.230000000000004,
+      "end_time": 15.510000000000003
+    },
+    {
+      "word": "During",
+      "start_time": 15.510000000000003,
+      "end_time": 15.990000000000004
+    },
+    {
+      "word": "photosynthesis,",
+      "start_time": 15.990000000000004,
+      "end_time": 17.310000000000002
+    },
+    {
+      "word": "plants",
+      "start_time": 17.310000000000002,
+      "end_time": 17.790000000000003
+    },
+    {
+      "word": "take",
+      "start_time": 17.790000000000003,
+      "end_time": 18.110000000000003
+    },
+    {
+      "word": "in",
+      "start_time": 18.110000000000003,
+      "end_time": 18.270000000000003
+    },
+    {
+      "word": "carbon",
+      "start_time": 18.270000000000003,
+      "end_time": 18.750000000000004
+    },
+    {
+      "word": "dioxide",
+      "start_time": 18.750000000000004,
+      "end_time": 19.310000000000002
+    },
+    {
+      "word": "from",
+      "start_time": 19.310000000000002,
+      "end_time": 19.630000000000003
+    },
+    {
+      "word": "the",
+      "start_time": 19.630000000000003,
+      "end_time": 19.87
+    },
+    {
+      "word": "air",
+      "start_time": 19.87,
+      "end_time": 20.11
+    },
+    {
+      "word": "and",
+      "start_time": 20.11,
+      "end_time": 20.349999999999998
+    },
+    {
+      "word": "water",
+      "start_time": 20.349999999999998,
+      "end_time": 20.749999999999996
+    },
+    {
+      "word": "from",
+      "start_time": 20.749999999999996,
+      "end_time": 21.069999999999997
+    },
+    {
+      "word": "the",
+      "start_time": 21.069999999999997,
+      "end_time": 21.309999999999995
+    },
+    {
+      "word": "soil.",
+      "start_time": 21.309999999999995,
+      "end_time": 22.029999999999994
+    },
+    {
+      "word": "With",
+      "start_time": 22.029999999999994,
+      "end_time": 22.349999999999994
+    },
+    {
+      "word": "the",
+      "start_time": 22.349999999999994,
+      "end_time": 22.589999999999993
+    },
+    {
+      "word": "help",
+      "start_time": 22.589999999999993,
+      "end_time": 22.909999999999993
+    },
+    {
+      "word": "of",
+      "start_time": 22.909999999999993,
+      "end_time": 23.069999999999993
+    },
+    {
+      "word": "sunlight,",
+      "start_time": 23.069999999999993,
+      "end_time": 23.909999999999993
+    },
+    {
+      "word": "they",
+      "start_time": 23.909999999999993,
+      "end_time": 24.229999999999993
+    },
+    {
+      "word": "produce",
+      "start_time": 24.229999999999993,
+      "end_time": 24.789999999999992
+    },
+    {
+      "word": "glucose",
+      "start_time": 24.789999999999992,
+      "end_time": 25.34999999999999
+    },
+    {
+      "word": "for",
+      "start_time": 25.34999999999999,
+      "end_time": 25.58999999999999
+    },
+    {
+      "word": "energy",
+      "start_time": 25.58999999999999,
+      "end_time": 26.06999999999999
+    },
+    {
+      "word": "and",
+      "start_time": 26.06999999999999,
+      "end_time": 26.309999999999988
+    },
+    {
+      "word": "release",
+      "start_time": 26.309999999999988,
+      "end_time": 26.869999999999987
+    },
+    {
+      "word": "oxygen",
+      "start_time": 26.869999999999987,
+      "end_time": 27.349999999999987
+    },
+    {
+      "word": "as",
+      "start_time": 27.349999999999987,
+      "end_time": 27.509999999999987
+    },
+    {
+      "word": "a",
+      "start_time": 27.509999999999987,
+      "end_time": 27.659999999999986
+    },
+    {
+      "word": "by-product.",
+      "start_time": 27.659999999999986,
+      "end_time": 28.859999999999985
+    },
+    {
+      "word": "This",
+      "start_time": 28.859999999999985,
+      "end_time": 29.179999999999986
+    },
+    {
+      "word": "process",
+      "start_time": 29.179999999999986,
+      "end_time": 29.739999999999984
+    },
+    {
+      "word": "is",
+      "start_time": 29.739999999999984,
+      "end_time": 29.899999999999984
+    },
+    {
+      "word": "essential",
+      "start_time": 29.899999999999984,
+      "end_time": 30.619999999999983
+    },
+    {
+      "word": "for",
+      "start_time": 30.619999999999983,
+      "end_time": 30.85999999999998
+    },
+    {
+      "word": "life",
+      "start_time": 30.85999999999998,
+      "end_time": 31.179999999999982
+    },
+    {
+      "word": "on",
+      "start_time": 31.179999999999982,
+      "end_time": 31.339999999999982
+    },
+    {
+      "word": "Earth",
+      "start_time": 31.339999999999982,
+      "end_time": 31.73999999999998
+    },
+    {
+      "word": "as",
+      "start_time": 31.73999999999998,
+      "end_time": 31.89999999999998
+    },
+    {
+      "word": "it",
+      "start_time": 31.89999999999998,
+      "end_time": 32.05999999999998
+    },
+    {
+      "word": "provides",
+      "start_time": 32.05999999999998,
+      "end_time": 32.69999999999998
+    },
+    {
+      "word": "food",
+      "start_time": 32.69999999999998,
+      "end_time": 33.01999999999998
+    },
+    {
+      "word": "and",
+      "start_time": 33.01999999999998,
+      "end_time": 33.259999999999984
+    },
+    {
+      "word": "oxygen",
+      "start_time": 33.259999999999984,
+      "end_time": 33.73999999999998
+    },
+    {
+      "word": "for",
+      "start_time": 33.73999999999998,
+      "end_time": 33.97999999999998
+    },
+    {
+      "word": "most",
+      "start_time": 33.97999999999998,
+      "end_time": 34.29999999999998
+    },
+    {
+      "word": "living",
+      "start_time": 34.29999999999998,
+      "end_time": 34.77999999999998
+    },
+    {
+      "word": "organisms.",
+      "start_time": 34.77999999999998,
+      "end_time": 35.89999999999998
+    }
+  ],
+  "concepts": [
+    {
+      "name": "Photosynthesis",
+      "type": "process",
+      "importance": "high",
+      "importance_rank": 1,
+      "definition": "The process where light energy is converted into chemical energy by plants, algae, and some bacteria.",
+      "reveal_time": 0.0
+    },
+    {
+      "name": "Chlorophyll",
+      "type": "pigment",
+      "importance": "high",
+      "importance_rank": 2,
+      "definition": "A green pigment found in chloroplasts that absorbs light energy for photosynthesis.",
+      "reveal_time": 15.510000000000003
+    },
+    {
+      "name": "Chloroplasts",
+      "type": "organelle",
+      "importance": "high",
+      "importance_rank": 3,
+      "definition": "The cellular organelles within plant cells where photosynthesis takes place.",
+      "reveal_time": 11.280000000000001
+    },
+    {
+      "name": "Light Energy",
+      "type": "energy",
+      "importance": "medium",
+      "importance_rank": 4,
+      "definition": "Energy from sunlight that is captured and converted during photosynthesis.",
+      "reveal_time": 6.960000000000001
+    },
+    {
+      "name": "Glucose",
+      "type": "molecule",
+      "importance": "medium",
+      "importance_rank": 5,
+      "definition": "A sugar molecule produced during photosynthesis, serving as chemical energy for the organism.",
+      "reveal_time": 25.34999999999999
+    },
+    {
+      "name": "Oxygen",
+      "type": "molecule",
+      "importance": "medium",
+      "importance_rank": 6,
+      "definition": "A gas released as a by-product of photosynthesis, essential for respiration in many organisms.",
+      "reveal_time": 27.349999999999987
+    }
+  ],
+  "relationships": [
+    {
+      "from": "Photosynthesis",
+      "to": "Chlorophyll",
+      "relationship": "uses"
+    },
+    {
+      "from": "Chlorophyll",
+      "to": "Light Energy",
+      "relationship": "absorbs"
+    },
+    {
+      "from": "Photosynthesis",
+      "to": "Chloroplasts",
+      "relationship": "occurs in"
+    },
+    {
+      "from": "Photosynthesis",
+      "to": "Glucose",
+      "relationship": "produces"
+    },
+    {
+      "from": "Photosynthesis",
+      "to": "Oxygen",
+      "relationship": "releases"
+    },
+    {
+      "from": "Light Energy",
+      "to": "Photosynthesis",
+      "relationship": "powers"
+    }
+  ],
+  "sentences": [
+    {
+      "index": 0,
+      "text": "Photosynthesis is the process by which green plants, algae, and some bacteria convert light energy into chemical energy. It occurs mainly in the chloroplasts of plant cells using a green pigment called chlorophyll. During photosynthesis, plants take in carbon dioxide from the air and water from the soil. With the help of sunlight, they produce glucose for energy and release oxygen as a by-product. This process is essential for life on Earth as it provides food and oxygen for most living organisms.",
+      "concepts": [
+        {
+          "name": "Photosynthesis",
+          "type": "process",
+          "importance": "high",
+          "importance_rank": 1,
+          "definition": "The process where light energy is converted into chemical energy by plants, algae, and some bacteria.",
+          "reveal_time": 0.0
+        },
+        {
+          "name": "Chlorophyll",
+          "type": "pigment",
+          "importance": "high",
+          "importance_rank": 2,
+          "definition": "A green pigment found in chloroplasts that absorbs light energy for photosynthesis.",
+          "reveal_time": 15.510000000000003
+        },
+        {
+          "name": "Chloroplasts",
+          "type": "organelle",
+          "importance": "high",
+          "importance_rank": 3,
+          "definition": "The cellular organelles within plant cells where photosynthesis takes place.",
+          "reveal_time": 11.280000000000001
+        },
+        {
+          "name": "Light Energy",
+          "type": "energy",
+          "importance": "medium",
+          "importance_rank": 4,
+          "definition": "Energy from sunlight that is captured and converted during photosynthesis.",
+          "reveal_time": 6.960000000000001
+        },
+        {
+          "name": "Glucose",
+          "type": "molecule",
+          "importance": "medium",
+          "importance_rank": 5,
+          "definition": "A sugar molecule produced during photosynthesis, serving as chemical energy for the organism.",
+          "reveal_time": 25.34999999999999
+        },
+        {
+          "name": "Oxygen",
+          "type": "molecule",
+          "importance": "medium",
+          "importance_rank": 6,
+          "definition": "A gas released as a by-product of photosynthesis, essential for respiration in many organisms.",
+          "reveal_time": 27.349999999999987
+        }
+      ],
+      "relationships": [
+        {
+          "from": "Photosynthesis",
+          "to": "Chlorophyll",
+          "relationship": "uses"
+        },
+        {
+          "from": "Chlorophyll",
+          "to": "Light Energy",
+          "relationship": "absorbs"
+        },
+        {
+          "from": "Photosynthesis",
+          "to": "Chloroplasts",
+          "relationship": "occurs in"
+        },
+        {
+          "from": "Photosynthesis",
+          "to": "Glucose",
+          "relationship": "produces"
+        },
+        {
+          "from": "Photosynthesis",
+          "to": "Oxygen",
+          "relationship": "releases"
+        },
+        {
+          "from": "Light Energy",
+          "to": "Photosynthesis",
+          "relationship": "powers"
+        }
+      ],
+      "estimated_tts_duration": 35.89999999999998
+    }
+  ],
+  "audio_file": "/var/folders/dv/_t8zxwtd0tq5k52mjcg978n00000gn/T/concept_map_audio_axpdf5b6/audio_0.mp3",
+  "pre_calculated_layout": {
+    "Photosynthesis": [
+      0.0,
+      0.0
+    ],
+    "Light Energy": [
+      -8.0,
+      -7.0
+    ],
+    "Glucose": [
+      0.0,
+      -7.0
+    ],
+    "Oxygen": [
+      8.0,
+      -7.0
+    ],
+    "Chlorophyll": [
+      -8.0,
+      -14.0
+    ],
+    "Chloroplasts": [
+      0.0,
+      -14.0
+    ]
+  }
+}

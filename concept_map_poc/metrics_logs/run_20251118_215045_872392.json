@@ -1,0 +1,113 @@
+{
+  "timestamp": "2025-11-18T21:50:45.872392",
+  "input": {
+    "description_preview": "A simple pendulum is a device that consists of a small, heavy object called a bob attached to the end of a light, inextensible string. The other end of the string is fixed at a point, allowing the bob...",
+    "description_length": 881,
+    "word_count": 166,
+    "educational_level": "high school"
+  },
+  "tokens": {
+    "prompt_tokens": 410,
+    "completion_tokens": 768,
+    "total_tokens": 1178
+  },
+  "timing": {
+    "api_duration_seconds": 4.167,
+    "parse_duration_seconds": 0.0,
+    "total_duration_seconds": 4.479
+  },
+  "output": {
+    "concepts_count": 7,
+    "relationships_count": 8,
+    "concepts": [
+      {
+        "name": "Simple Pendulum",
+        "type": "device",
+        "importance": "high",
+        "importance_rank": 1
+      },
+      {
+        "name": "Oscillatory Motion",
+        "type": "motion",
+        "importance": "high",
+        "importance_rank": 2
+      },
+      {
+        "name": "Time Period",
+        "type": "measurement",
+        "importance": "high",
+        "importance_rank": 3
+      },
+      {
+        "name": "Gravity",
+        "type": "force",
+        "importance": "high",
+        "importance_rank": 4
+      },
+      {
+        "name": "String Length",
+        "type": "property",
+        "importance": "medium",
+        "importance_rank": 5
+      },
+      {
+        "name": "Acceleration Due to Gravity",
+        "type": "property",
+        "importance": "medium",
+        "importance_rank": 6
+      },
+      {
+        "name": "Bob",
+        "type": "component",
+        "importance": "low",
+        "importance_rank": 7
+      }
+    ],
+    "relationships": [
+      {
+        "from": "Simple Pendulum",
+        "to": "Oscillatory Motion",
+        "relationship": "exhibits"
+      },
+      {
+        "from": "Oscillatory Motion",
+        "to": "Time Period",
+        "relationship": "is characterized by"
+      },
+      {
+        "from": "Simple Pendulum",
+        "to": "Gravity",
+        "relationship": "is influenced by"
+      },
+      {
+        "from": "Gravity",
+        "to": "Oscillatory Motion",
+        "relationship": "drives"
+      },
+      {
+        "from": "Time Period",
+        "to": "String Length",
+        "relationship": "depends on"
+      },
+      {
+        "from": "Time Period",
+        "to": "Acceleration Due to Gravity",
+        "relationship": "depends on"
+      },
+      {
+        "from": "Simple Pendulum",
+        "to": "Bob",
+        "relationship": "consists of"
+      },
+      {
+        "from": "Simple Pendulum",
+        "to": "String Length",
+        "relationship": "has a"
+      }
+    ]
+  },
+  "status": {
+    "success": true,
+    "error": null
+  }
+}

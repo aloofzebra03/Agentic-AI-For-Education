@@ -1,0 +1,1084 @@
+{
+  "metadata": {
+    "topic_name": null,
+    "educational_level": "high school",
+    "total_duration": 61.159999999999975,
+    "total_concepts": 7,
+    "word_count": 166,
+    "processing_time": 4.483951807022095,
+    "extraction_time": 4.482233762741089,
+    "timing_calculation_time": 0.0003509521484375,
+    "audio_file": "/var/folders/dv/_t8zxwtd0tq5k52mjcg978n00000gn/T/concept_map_audio_2vr3tjmt/audio_0.mp3"
+  },
+  "full_text": "A simple pendulum is a device that consists of a small, heavy object called a bob attached to the end of a light, inextensible string. The other end of the string is fixed at a point, allowing the bob to swing freely back and forth in a regular path. When the bob is pulled to one side and released, it moves under the influence of gravity, swinging to the opposite side and then back again. This motion repeats over and over, creating what is called oscillatory motion. The time it takes for the pendulum to complete one full swing, from one side to the other and back, is called its time period. The time period depends mainly on the length of the string and the acceleration due to gravity, but not on the mass of the bob or the amplitude of the swing (if the swing is small). A simple pendulum is often used in clocks and experiments to study motion and the effects of gravity.",
+  "word_timings": [
+    {
+      "word": "A",
+      "start_time": 0.0,
+      "end_time": 0.15
+    },
+    {
+      "word": "simple",
+      "start_time": 0.15,
+      "end_time": 0.63
+    },
+    {
+      "word": "pendulum",
+      "start_time": 0.63,
+      "end_time": 1.27
+    },
+    {
+      "word": "is",
+      "start_time": 1.27,
+      "end_time": 1.43
+    },
+    {
+      "word": "a",
+      "start_time": 1.43,
+      "end_time": 1.5799999999999998
+    },
+    {
+      "word": "device",
+      "start_time": 1.5799999999999998,
+      "end_time": 2.0599999999999996
+    },
+    {
+      "word": "that",
+      "start_time": 2.0599999999999996,
+      "end_time": 2.3799999999999994
+    },
+    {
+      "word": "consists",
+      "start_time": 2.3799999999999994,
+      "end_time": 3.0199999999999996
+    },
+    {
+      "word": "of",
+      "start_time": 3.0199999999999996,
+      "end_time": 3.1799999999999997
+    },
+    {
+      "word": "a",
+      "start_time": 3.1799999999999997,
+      "end_time": 3.3299999999999996
+    },
+    {
+      "word": "small,",
+      "start_time": 3.3299999999999996,
+      "end_time": 3.9299999999999997
+    },
+    {
+      "word": "heavy",
+      "start_time": 3.9299999999999997,
+      "end_time": 4.33
+    },
+    {
+      "word": "object",
+      "start_time": 4.33,
+      "end_time": 4.8100000000000005
+    },
+    {
+      "word": "called",
+      "start_time": 4.8100000000000005,
+      "end_time": 5.290000000000001
+    },
+    {
+      "word": "a",
+      "start_time": 5.290000000000001,
+      "end_time": 5.440000000000001
+    },
+    {
+      "word": "bob",
+      "start_time": 5.440000000000001,
+      "end_time": 5.6800000000000015
+    },
+    {
+      "word": "attached",
+      "start_time": 5.6800000000000015,
+      "end_time": 6.320000000000001
+    },
+    {
+      "word": "to",
+      "start_time": 6.320000000000001,
+      "end_time": 6.480000000000001
+    },
+    {
+      "word": "the",
+      "start_time": 6.480000000000001,
+      "end_time": 6.7200000000000015
+    },
+    {
+      "word": "end",
+      "start_time": 6.7200000000000015,
+      "end_time": 6.960000000000002
+    },
+    {
+      "word": "of",
+      "start_time": 6.960000000000002,
+      "end_time": 7.120000000000002
+    },
+    {
+      "word": "a",
+      "start_time": 7.120000000000002,
+      "end_time": 7.270000000000002
+    },
+    {
+      "word": "light,",
+      "start_time": 7.270000000000002,
+      "end_time": 7.870000000000003
+    },
+    {
+      "word": "inextensible",
+      "start_time": 7.870000000000003,
+      "end_time": 8.830000000000002
+    },
+    {
+      "word": "string.",
+      "start_time": 8.830000000000002,
+      "end_time": 9.710000000000003
+    },
+    {
+      "word": "The",
+      "start_time": 9.710000000000003,
+      "end_time": 9.950000000000003
+    },
+    {
+      "word": "other",
+      "start_time": 9.950000000000003,
+      "end_time": 10.350000000000003
+    },
+    {
+      "word": "end",
+      "start_time": 10.350000000000003,
+      "end_time": 10.590000000000003
+    },
+    {
+      "word": "of",
+      "start_time": 10.590000000000003,
+      "end_time": 10.750000000000004
+    },
+    {
+      "word": "the",
+      "start_time": 10.750000000000004,
+      "end_time": 10.990000000000004
+    },
+    {
+      "word": "string",
+      "start_time": 10.990000000000004,
+      "end_time": 11.470000000000004
+    },
+    {
+      "word": "is",
+      "start_time": 11.470000000000004,
+      "end_time": 11.630000000000004
+    },
+    {
+      "word": "fixed",
+      "start_time": 11.630000000000004,
+      "end_time": 12.030000000000005
+    },
+    {
+      "word": "at",
+      "start_time": 12.030000000000005,
+      "end_time": 12.190000000000005
+    },
+    {
+      "word": "a",
+      "start_time": 12.190000000000005,
+      "end_time": 12.340000000000005
+    },
+    {
+      "word": "point,",
+      "start_time": 12.340000000000005,
+      "end_time": 12.940000000000005
+    },
+    {
+      "word": "allowing",
+      "start_time": 12.940000000000005,
+      "end_time": 13.580000000000005
+    },
+    {
+      "word": "the",
+      "start_time": 13.580000000000005,
+      "end_time": 13.820000000000006
+    },
+    {
+      "word": "bob",
+      "start_time": 13.820000000000006,
+      "end_time": 14.060000000000006
+    },
+    {
+      "word": "to",
+      "start_time": 14.060000000000006,
+      "end_time": 14.220000000000006
+    },
+    {
+      "word": "swing",
+      "start_time": 14.220000000000006,
+      "end_time": 14.620000000000006
+    },
+    {
+      "word": "freely",
+      "start_time": 14.620000000000006,
+      "end_time": 15.100000000000007
+    },
+    {
+      "word": "back",
+      "start_time": 15.100000000000007,
+      "end_time": 15.420000000000007
+    },
+    {
+      "word": "and",
+      "start_time": 15.420000000000007,
+      "end_time": 15.660000000000007
+    },
+    {
+      "word": "forth",
+      "start_time": 15.660000000000007,
+      "end_time": 16.060000000000006
+    },
+    {
+      "word": "in",
+      "start_time": 16.060000000000006,
+      "end_time": 16.220000000000006
+    },
+    {
+      "word": "a",
+      "start_time": 16.220000000000006,
+      "end_time": 16.370000000000005
+    },
+    {
+      "word": "regular",
+      "start_time": 16.370000000000005,
+      "end_time": 16.930000000000003
+    },
+    {
+      "word": "path.",
+      "start_time": 16.930000000000003,
+      "end_time": 17.650000000000002
+    },
+    {
+      "word": "When",
+      "start_time": 17.650000000000002,
+      "end_time": 17.970000000000002
+    },
+    {
+      "word": "the",
+      "start_time": 17.970000000000002,
+      "end_time": 18.21
+    },
+    {
+      "word": "bob",
+      "start_time": 18.21,
+      "end_time": 18.45
+    },
+    {
+      "word": "is",
+      "start_time": 18.45,
+      "end_time": 18.61
+    },
+    {
+      "word": "pulled",
+      "start_time": 18.61,
+      "end_time": 19.09
+    },
+    {
+      "word": "to",
+      "start_time": 19.09,
+      "end_time": 19.25
+    },
+    {
+      "word": "one",
+      "start_time": 19.25,
+      "end_time": 19.49
+    },
+    {
+      "word": "side",
+      "start_time": 19.49,
+      "end_time": 19.81
+    },
+    {
+      "word": "and",
+      "start_time": 19.81,
+      "end_time": 20.049999999999997
+    },
+    {
+      "word": "released,",
+      "start_time": 20.049999999999997,
+      "end_time": 20.889999999999997
+    },
+    {
+      "word": "it",
+      "start_time": 20.889999999999997,
+      "end_time": 21.049999999999997
+    },
+    {
+      "word": "moves",
+      "start_time": 21.049999999999997,
+      "end_time": 21.449999999999996
+    },
+    {
+      "word": "under",
+      "start_time": 21.449999999999996,
+      "end_time": 21.849999999999994
+    },
+    {
+      "word": "the",
+      "start_time": 21.849999999999994,
+      "end_time": 22.089999999999993
+    },
+    {
+      "word": "influence",
+      "start_time": 22.089999999999993,
+      "end_time": 22.80999999999999
+    },
+    {
+      "word": "of",
+      "start_time": 22.80999999999999,
+      "end_time": 22.96999999999999
+    },
+    {
+      "word": "gravity,",
+      "start_time": 22.96999999999999,
+      "end_time": 23.729999999999993
+    },
+    {
+      "word": "swinging",
+      "start_time": 23.729999999999993,
+      "end_time": 24.369999999999994
+    },
+    {
+      "word": "to",
+      "start_time": 24.369999999999994,
+      "end_time": 24.529999999999994
+    },
+    {
+      "word": "the",
+      "start_time": 24.529999999999994,
+      "end_time": 24.769999999999992
+    },
+    {
+      "word": "opposite",
+      "start_time": 24.769999999999992,
+      "end_time": 25.409999999999993
+    },
+    {
+      "word": "side",
+      "start_time": 25.409999999999993,
+      "end_time": 25.729999999999993
+    },
+    {
+      "word": "and",
+      "start_time": 25.729999999999993,
+      "end_time": 25.96999999999999
+    },
+    {
+      "word": "then",
+      "start_time": 25.96999999999999,
+      "end_time": 26.289999999999992
+    },
+    {
+      "word": "back",
+      "start_time": 26.289999999999992,
+      "end_time": 26.609999999999992
+    },
+    {
+      "word": "again.",
+      "start_time": 26.609999999999992,
+      "end_time": 27.409999999999993
+    },
+    {
+      "word": "This",
+      "start_time": 27.409999999999993,
+      "end_time": 27.729999999999993
+    },
+    {
+      "word": "motion",
+      "start_time": 27.729999999999993,
+      "end_time": 28.209999999999994
+    },
+    {
+      "word": "repeats",
+      "start_time": 28.209999999999994,
+      "end_time": 28.769999999999992
+    },
+    {
+      "word": "over",
+      "start_time": 28.769999999999992,
+      "end_time": 29.089999999999993
+    },
+    {
+      "word": "and",
+      "start_time": 29.089999999999993,
+      "end_time": 29.32999999999999
+    },
+    {
+      "word": "over,",
+      "start_time": 29.32999999999999,
+      "end_time": 29.84999999999999
+    },
+    {
+      "word": "creating",
+      "start_time": 29.84999999999999,
+      "end_time": 30.48999999999999
+    },
+    {
+      "word": "what",
+      "start_time": 30.48999999999999,
+      "end_time": 30.80999999999999
+    },
+    {
+      "word": "is",
+      "start_time": 30.80999999999999,
+      "end_time": 30.96999999999999
+    },
+    {
+      "word": "called",
+      "start_time": 30.96999999999999,
+      "end_time": 31.449999999999992
+    },
+    {
+      "word": "oscillatory",
+      "start_time": 31.449999999999992,
+      "end_time": 32.32999999999999
+    },
+    {
+      "word": "motion.",
+      "start_time": 32.32999999999999,
+      "end_time": 33.209999999999994
+    },
+    {
+      "word": "The",
+      "start_time": 33.209999999999994,
+      "end_time": 33.449999999999996
+    },
+    {
+      "word": "time",
+      "start_time": 33.449999999999996,
+      "end_time": 33.769999999999996
+    },
+    {
+      "word": "it",
+      "start_time": 33.769999999999996,
+      "end_time": 33.92999999999999
+    },
+    {
+      "word": "takes",
+      "start_time": 33.92999999999999,
+      "end_time": 34.32999999999999
+    },
+    {
+      "word": "for",
+      "start_time": 34.32999999999999,
+      "end_time": 34.56999999999999
+    },
+    {
+      "word": "the",
+      "start_time": 34.56999999999999,
+      "end_time": 34.809999999999995
+    },
+    {
+      "word": "pendulum",
+      "start_time": 34.809999999999995,
+      "end_time": 35.449999999999996
+    },
+    {
+      "word": "to",
+      "start_time": 35.449999999999996,
+      "end_time": 35.60999999999999
+    },
+    {
+      "word": "complete",
+      "start_time": 35.60999999999999,
+      "end_time": 36.24999999999999
+    },
+    {
+      "word": "one",
+      "start_time": 36.24999999999999,
+      "end_time": 36.489999999999995
+    },
+    {
+      "word": "full",
+      "start_time": 36.489999999999995,
+      "end_time": 36.809999999999995
+    },
+    {
+      "word": "swing,",
+      "start_time": 36.809999999999995,
+      "end_time": 37.41
+    },
+    {
+      "word": "from",
+      "start_time": 37.41,
+      "end_time": 37.73
+    },
+    {
+      "word": "one",
+      "start_time": 37.73,
+      "end_time": 37.97
+    },
+    {
+      "word": "side",
+      "start_time": 37.97,
+      "end_time": 38.29
+    },
+    {
+      "word": "to",
+      "start_time": 38.29,
+      "end_time": 38.449999999999996
+    },
+    {
+      "word": "the",
+      "start_time": 38.449999999999996,
+      "end_time": 38.69
+    },
+    {
+      "word": "other",
+      "start_time": 38.69,
+      "end_time": 39.089999999999996
+    },
+    {
+      "word": "and",
+      "start_time": 39.089999999999996,
+      "end_time": 39.33
+    },
+    {
+      "word": "back,",
+      "start_time": 39.33,
+      "end_time": 39.85
+    },
+    {
+      "word": "is",
+      "start_time": 39.85,
+      "end_time": 40.01
+    },
+    {
+      "word": "called",
+      "start_time": 40.01,
+      "end_time": 40.489999999999995
+    },
+    {
+      "word": "its",
+      "start_time": 40.489999999999995,
+      "end_time": 40.73
+    },
+    {
+      "word": "time",
+      "start_time": 40.73,
+      "end_time": 41.05
+    },
+    {
+      "word": "period.",
+      "start_time": 41.05,
+      "end_time": 41.93
+    },
+    {
+      "word": "The",
+      "start_time": 41.93,
+      "end_time": 42.17
+    },
+    {
+      "word": "time",
+      "start_time": 42.17,
+      "end_time": 42.49
+    },
+    {
+      "word": "period",
+      "start_time": 42.49,
+      "end_time": 42.97
+    },
+    {
+      "word": "depends",
+      "start_time": 42.97,
+      "end_time": 43.53
+    },
+    {
+      "word": "mainly",
+      "start_time": 43.53,
+      "end_time": 44.01
+    },
+    {
+      "word": "on",
+      "start_time": 44.01,
+      "end_time": 44.169999999999995
+    },
+    {
+      "word": "the",
+      "start_time": 44.169999999999995,
+      "end_time": 44.41
+    },
+    {
+      "word": "length",
+      "start_time": 44.41,
+      "end_time": 44.88999999999999
+    },
+    {
+      "word": "of",
+      "start_time": 44.88999999999999,
+      "end_time": 45.04999999999999
+    },
+    {
+      "word": "the",
+      "start_time": 45.04999999999999,
+      "end_time": 45.28999999999999
+    },
+    {
+      "word": "string",
+      "start_time": 45.28999999999999,
+      "end_time": 45.76999999999999
+    },
+    {
+      "word": "and",
+      "start_time": 45.76999999999999,
+      "end_time": 46.00999999999999
+    },
+    {
+      "word": "the",
+      "start_time": 46.00999999999999,
+      "end_time": 46.24999999999999
+    },
+    {
+      "word": "acceleration",
+      "start_time": 46.24999999999999,
+      "end_time": 47.209999999999994
+    },
+    {
+      "word": "due",
+      "start_time": 47.209999999999994,
+      "end_time": 47.449999999999996
+    },
+    {
+      "word": "to",
+      "start_time": 47.449999999999996,
+      "end_time": 47.60999999999999
+    },
+    {
+      "word": "gravity,",
+      "start_time": 47.60999999999999,
+      "end_time": 48.36999999999999
+    },
+    {
+      "word": "but",
+      "start_time": 48.36999999999999,
+      "end_time": 48.60999999999999
+    },
+    {
+      "word": "not",
+      "start_time": 48.60999999999999,
+      "end_time": 48.849999999999994
+    },
+    {
+      "word": "on",
+      "start_time": 48.849999999999994,
+      "end_time": 49.00999999999999
+    },
+    {
+      "word": "the",
+      "start_time": 49.00999999999999,
+      "end_time": 49.24999999999999
+    },
+    {
+      "word": "mass",
+      "start_time": 49.24999999999999,
+      "end_time": 49.56999999999999
+    },
+    {
+      "word": "of",
+      "start_time": 49.56999999999999,
+      "end_time": 49.72999999999999
+    },
+    {
+      "word": "the",
+      "start_time": 49.72999999999999,
+      "end_time": 49.96999999999999
+    },
+    {
+      "word": "bob",
+      "start_time": 49.96999999999999,
+      "end_time": 50.209999999999994
+    },
+    {
+      "word": "or",
+      "start_time": 50.209999999999994,
+      "end_time": 50.36999999999999
+    },
+    {
+      "word": "the",
+      "start_time": 50.36999999999999,
+      "end_time": 50.60999999999999
+    },
+    {
+      "word": "amplitude",
+      "start_time": 50.60999999999999,
+      "end_time": 51.32999999999999
+    },
+    {
+      "word": "of",
+      "start_time": 51.32999999999999,
+      "end_time": 51.48999999999999
+    },
+    {
+      "word": "the",
+      "start_time": 51.48999999999999,
+      "end_time": 51.72999999999999
+    },
+    {
+      "word": "swing",
+      "start_time": 51.72999999999999,
+      "end_time": 52.12999999999999
+    },
+    {
+      "word": "(if",
+      "start_time": 52.12999999999999,
+      "end_time": 52.36999999999999
+    },
+    {
+      "word": "the",
+      "start_time": 52.36999999999999,
+      "end_time": 52.60999999999999
+    },
+    {
+      "word": "swing",
+      "start_time": 52.60999999999999,
+      "end_time": 53.00999999999999
+    },
+    {
+      "word": "is",
+      "start_time": 53.00999999999999,
+      "end_time": 53.16999999999999
+    },
+    {
+      "word": "small).",
+      "start_time": 53.16999999999999,
+      "end_time": 54.04999999999999
+    },
+    {
+      "word": "A",
+      "start_time": 54.04999999999999,
+      "end_time": 54.19999999999999
+    },
+    {
+      "word": "simple",
+      "start_time": 54.19999999999999,
+      "end_time": 54.679999999999986
+    },
+    {
+      "word": "pendulum",
+      "start_time": 54.679999999999986,
+      "end_time": 55.319999999999986
+    },
+    {
+      "word": "is",
+      "start_time": 55.319999999999986,
+      "end_time": 55.47999999999998
+    },
+    {
+      "word": "often",
+      "start_time": 55.47999999999998,
+      "end_time": 55.87999999999998
+    },
+    {
+      "word": "used",
+      "start_time": 55.87999999999998,
+      "end_time": 56.19999999999998
+    },
+    {
+      "word": "in",
+      "start_time": 56.19999999999998,
+      "end_time": 56.35999999999998
+    },
+    {
+      "word": "clocks",
+      "start_time": 56.35999999999998,
+      "end_time": 56.839999999999975
+    },
+    {
+      "word": "and",
+      "start_time": 56.839999999999975,
+      "end_time": 57.07999999999998
+    },
+    {
+      "word": "experiments",
+      "start_time": 57.07999999999998,
+      "end_time": 57.95999999999998
+    },
+    {
+      "word": "to",
+      "start_time": 57.95999999999998,
+      "end_time": 58.119999999999976
+    },
+    {
+      "word": "study",
+      "start_time": 58.119999999999976,
+      "end_time": 58.519999999999975
+    },
+    {
+      "word": "motion",
+      "start_time": 58.519999999999975,
+      "end_time": 58.99999999999997
+    },
+    {
+      "word": "and",
+      "start_time": 58.99999999999997,
+      "end_time": 59.239999999999974
+    },
+    {
+      "word": "the",
+      "start_time": 59.239999999999974,
+      "end_time": 59.479999999999976
+    },
+    {
+      "word": "effects",
+      "start_time": 59.479999999999976,
+      "end_time": 60.03999999999998
+    },
+    {
+      "word": "of",
+      "start_time": 60.03999999999998,
+      "end_time": 60.199999999999974
+    },
+    {
+      "word": "gravity.",
+      "start_time": 60.199999999999974,
+      "end_time": 61.159999999999975
+    }
+  ],
+  "concepts": [
+    {
+      "name": "Simple Pendulum",
+      "type": "device",
+      "importance": "high",
+      "importance_rank": 1,
+      "definition": "A system consisting of a bob suspended by a light, inextensible string from a fixed point, designed to swing freely.",
+      "reveal_time": 0.0
+    },
+    {
+      "name": "Oscillatory Motion",
+      "type": "motion",
+      "importance": "high",
+      "importance_rank": 2,
+      "definition": "A repetitive back-and-forth movement of an object around a central equilibrium position.",
+      "reveal_time": 33.209999999999994
+    },
+    {
+      "name": "Time Period",
+      "type": "measurement",
+      "importance": "high",
+      "importance_rank": 3,
+      "definition": "The time taken for a pendulum to complete one full cycle of its oscillatory motion.",
+      "reveal_time": 41.93
+    },
+    {
+      "name": "Gravity",
+      "type": "force",
+      "importance": "high",
+      "importance_rank": 4,
+      "definition": "The fundamental force that attracts any two objects with mass, responsible for pulling the pendulum bob downwards.",
+      "reveal_time": 23.729999999999993
+    },
+    {
+      "name": "String Length",
+      "type": "property",
+      "importance": "medium",
+      "importance_rank": 5,
+      "definition": "The length of the string connecting the bob to the fixed point, a key factor influencing the time period.",
+      "reveal_time": 44.88999999999999
+    },
+    {
+      "name": "Acceleration Due to Gravity",
+      "type": "property",
+      "importance": "medium",
+      "importance_rank": 6,
+      "definition": "The constant rate at which objects accelerate towards the Earth due to gravity, affecting the pendulum's swing.",
+      "reveal_time": 48.36999999999999
+    },
+    {
+      "name": "Bob",
+      "type": "component",
+      "importance": "low",
+      "importance_rank": 7,
+      "definition": "The heavy object attached to the end of the string in a simple pendulum.",
+      "reveal_time": 5.6800000000000015
+    }
+  ],
+  "relationships": [
+    {
+      "from": "Simple Pendulum",
+      "to": "Oscillatory Motion",
+      "relationship": "exhibits"
+    },
+    {
+      "from": "Oscillatory Motion",
+      "to": "Time Period",
+      "relationship": "is characterized by"
+    },
+    {
+      "from": "Simple Pendulum",
+      "to": "Gravity",
+      "relationship": "is influenced by"
+    },
+    {
+      "from": "Gravity",
+      "to": "Oscillatory Motion",
+      "relationship": "drives"
+    },
+    {
+      "from": "Time Period",
+      "to": "String Length",
+      "relationship": "depends on"
+    },
+    {
+      "from": "Time Period",
+      "to": "Acceleration Due to Gravity",
+      "relationship": "depends on"
+    },
+    {
+      "from": "Simple Pendulum",
+      "to": "Bob",
+      "relationship": "consists of"
+    },
+    {
+      "from": "Simple Pendulum",
+      "to": "String Length",
+      "relationship": "has a"
+    }
+  ],
+  "sentences": [
+    {
+      "index": 0,
+      "text": "A simple pendulum is a device that consists of a small, heavy object called a bob attached to the end of a light, inextensible string. The other end of the string is fixed at a point, allowing the bob to swing freely back and forth in a regular path. When the bob is pulled to one side and released, it moves under the influence of gravity, swinging to the opposite side and then back again. This motion repeats over and over, creating what is called oscillatory motion. The time it takes for the pendulum to complete one full swing, from one side to the other and back, is called its time period. The time period depends mainly on the length of the string and the acceleration due to gravity, but not on the mass of the bob or the amplitude of the swing (if the swing is small). A simple pendulum is often used in clocks and experiments to study motion and the effects of gravity.",
+      "concepts": [
+        {
+          "name": "Simple Pendulum",
+          "type": "device",
+          "importance": "high",
+          "importance_rank": 1,
+          "definition": "A system consisting of a bob suspended by a light, inextensible string from a fixed point, designed to swing freely.",
+          "reveal_time": 0.0
+        },
+        {
+          "name": "Oscillatory Motion",
+          "type": "motion",
+          "importance": "high",
+          "importance_rank": 2,
+          "definition": "A repetitive back-and-forth movement of an object around a central equilibrium position.",
+          "reveal_time": 33.209999999999994
+        },
+        {
+          "name": "Time Period",
+          "type": "measurement",
+          "importance": "high",
+          "importance_rank": 3,
+          "definition": "The time taken for a pendulum to complete one full cycle of its oscillatory motion.",
+          "reveal_time": 41.93
+        },
+        {
+          "name": "Gravity",
+          "type": "force",
+          "importance": "high",
+          "importance_rank": 4,
+          "definition": "The fundamental force that attracts any two objects with mass, responsible for pulling the pendulum bob downwards.",
+          "reveal_time": 23.729999999999993
+        },
+        {
+          "name": "String Length",
+          "type": "property",
+          "importance": "medium",
+          "importance_rank": 5,
+          "definition": "The length of the string connecting the bob to the fixed point, a key factor influencing the time period.",
+          "reveal_time": 44.88999999999999
+        },
+        {
+          "name": "Acceleration Due to Gravity",
+          "type": "property",
+          "importance": "medium",
+          "importance_rank": 6,
+          "definition": "The constant rate at which objects accelerate towards the Earth due to gravity, affecting the pendulum's swing.",
+          "reveal_time": 48.36999999999999
+        },
+        {
+          "name": "Bob",
+          "type": "component",
+          "importance": "low",
+          "importance_rank": 7,
+          "definition": "The heavy object attached to the end of the string in a simple pendulum.",
+          "reveal_time": 5.6800000000000015
+        }
+      ],
+      "relationships": [
+        {
+          "from": "Simple Pendulum",
+          "to": "Oscillatory Motion",
+          "relationship": "exhibits"
+        },
+        {
+          "from": "Oscillatory Motion",
+          "to": "Time Period",
+          "relationship": "is characterized by"
+        },
+        {
+          "from": "Simple Pendulum",
+          "to": "Gravity",
+          "relationship": "is influenced by"
+        },
+        {
+          "from": "Gravity",
+          "to": "Oscillatory Motion",
+          "relationship": "drives"
+        },
+        {
+          "from": "Time Period",
+          "to": "String Length",
+          "relationship": "depends on"
+        },
+        {
+          "from": "Time Period",
+          "to": "Acceleration Due to Gravity",
+          "relationship": "depends on"
+        },
+        {
+          "from": "Simple Pendulum",
+          "to": "Bob",
+          "relationship": "consists of"
+        },
+        {
+          "from": "Simple Pendulum",
+          "to": "String Length",
+          "relationship": "has a"
+        }
+      ],
+      "estimated_tts_duration": 61.159999999999975
+    }
+  ],
+  "audio_file": "/var/folders/dv/_t8zxwtd0tq5k52mjcg978n00000gn/T/concept_map_audio_2vr3tjmt/audio_0.mp3",
+  "pre_calculated_layout": {
+    "Simple Pendulum": [
+      0.0,
+      0.0
+    ],
+    "String Length": [
+      -8.0,
+      -7.0
+    ],
+    "Acceleration Due to Gravity": [
+      0.0,
+      -7.0
+    ],
+    "Bob": [
+      8.0,
+      -7.0
+    ],
+    "Oscillatory Motion": [
+      -8.0,
+      -14.0
+    ],
+    "Time Period": [
+      0.0,
+      -14.0
+    ],
+    "Gravity": [
+      8.0,
+      -14.0
+    ]
+  }
+}
