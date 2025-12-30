@@ -6,8 +6,8 @@ that extracts concepts directly from user descriptions (1 word to 3000+ words).
 """
 
 from langgraph.graph import StateGraph, END
-from states import ConceptMapState
-from nodes import (
+from concept_map_poc.states import ConceptMapState
+from concept_map_poc.nodes import (
     extract_concepts_from_description,
     analyze_concept_relationships,
     build_concept_hierarchy,

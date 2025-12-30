@@ -134,7 +134,7 @@ import tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Import the enhanced visualizer with animations and pre-computed assets
-from streamlit_visualizer_enhanced import run_enhanced_visualization
+from concept_map_poc.streamlit_visualizer_enhanced import run_enhanced_visualization
 
 # Load timeline from temp file
 timeline_file = os.path.join(tempfile.gettempdir(), "concept_map_timeline.json")

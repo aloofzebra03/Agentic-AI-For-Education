@@ -451,3 +451,72 @@ class ConceptsListResponse(BaseModel):
         default="Available concepts retrieved successfully",
         description="Status message about the retrieval"
     )
+
+
+# ============================================================================
+# CONCEPT MAP SCHEMAS (from concept_map_poc integration)
+# ============================================================================
+
+class ConceptMapRequest(BaseModel):
+    """Request model for concept map timeline generation."""
+    description: str = Field(
+        ...,
+        min_length=1,
+        description="Educational description text to analyze (1 word to 3000+ words)",
+        example="Photosynthesis is the process by which plants convert light energy into chemical energy."
+    )
+    educational_level: str = Field(
+        default="high school",
+        description="Target educational level for concept extraction",
+        example="high school"
+    )
+    topic_name: Optional[str] = Field(
+        default=None,
+        description="Optional topic name (auto-extracted if not provided)",
+        example="Photosynthesis"
+    )
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "description": "Photosynthesis is the process by which green plants convert light energy into chemical energy using chlorophyll in chloroplasts.",
+                "educational_level": "high school",
+                "topic_name": "Photosynthesis"
+            }
+        }
+
+
+class ConceptMapResponse(BaseModel):
+    """Response model for concept map timeline generation."""
+    success: bool = Field(
+        description="Whether the operation was successful"
+    )
+    filepath: str = Field(
+        description="Path to the saved JSON file in concept_json_timings/ folder"
+    )
+    timeline: Dict[str, Any] = Field(
+        description="Complete timeline data with concepts and reveal times"
+    )
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "success": True,
+                "filepath": "concept_json_timings/photosynthesis_20251221_143022.json",
+                "timeline": {
+                    "metadata": {
+                        "topic_name": "Photosynthesis",
+                        "educational_level": "high school",
+                        "total_duration": 25.5,
+                        "total_concepts": 6
+                    },
+                    "concepts": [
+                        {
+                            "name": "Photosynthesis",
+                            "reveal_time": 0.0,
+                            "importance_rank": 1
+                        }
+                    ]
+                }
+            }
+        }

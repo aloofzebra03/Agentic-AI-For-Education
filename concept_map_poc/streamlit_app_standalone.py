@@ -39,8 +39,8 @@ if not os.getenv('GOOGLE_API_KEY'):
     st.stop()
 
 # Import required modules
-from timeline_mapper import create_timeline
-from precompute_engine import PrecomputeEngine
+from concept_map_poc.timeline_mapper import create_timeline
+from concept_map_poc.precompute_engine import PrecomputeEngine
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib

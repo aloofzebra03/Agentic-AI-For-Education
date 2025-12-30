@@ -21,8 +21,8 @@ from pydantic import BaseModel, Field
 load_dotenv()
 
 # Import core functions (no UI dependencies)
-from timeline_mapper import create_timeline
-from streamlit_app_standalone import save_timeline_json_to_disk
+from concept_map_poc.timeline_mapper import create_timeline
+from concept_map_poc.streamlit_app_standalone import save_timeline_json_to_disk
 
 # Configure logging
 logging.basicConfig(

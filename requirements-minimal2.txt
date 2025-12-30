@@ -5,6 +5,15 @@ pydantic
 pydantic-settings
 python-dotenv
 
+#Concept Map Extras
+google-generativeai
+streamlit
+networkx
+matplotlib
+plotly
+gTTS
+pygame
+
 # LangChain Core
 langchain
 langchain-core

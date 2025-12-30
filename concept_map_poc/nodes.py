@@ -19,13 +19,13 @@ import google.generativeai as genai
 import os
 import re
 from dotenv import load_dotenv
-from states import ConceptMapState
-from description_analyzer import (
+from concept_map_poc.states import ConceptMapState
+from concept_map_poc.description_analyzer import (
     analyze_description_complexity, 
     adjust_complexity_for_educational_level, 
     extract_topic_name_from_description
 )
-from token_tracker import log_token_usage, get_tracker
+from concept_map_poc.token_tracker import log_token_usage, get_tracker
 
 # Load environment variables
 load_dotenv()

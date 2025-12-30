@@ -25,8 +25,7 @@ from api_servers.schemas import (
     PersonaInfo, PersonasListResponse,
     TestImageRequest, TestImageResponse,
     TestSimulationRequest, TestSimulationResponse,
-    ConceptsListResponse,
-    ConceptMapRequest, ConceptMapResponse
+    ConceptsListResponse
 )
 
 # Import personas from tester_agent
@@ -40,14 +39,6 @@ from utils.shared_utils import (
 )
 
 from api_tracker_utils.error import MinuteLimitExhaustedError, DayLimitExhaustedError
-from api_tracker_utils.tracker import track_model_call
-
-# Import concept map functions from external repo
-from concept_map_poc.timeline_mapper import create_timeline
-from concept_map_poc.streamlit_app_standalone import save_timeline_json_to_disk
-
-# Import for wrapper function
-from contextlib import contextmanager
 
 # ============================================================================
 # FASTAPI APP INITIALIZATION
@@ -70,29 +61,6 @@ app.add_middleware(
 # ============================================================================
 # HELPER FUNCTIONS
 # ============================================================================
-
-@contextmanager
-def use_google_api_key():
-    """
-    Context manager to temporarily set GOOGLE_API_KEY from GOOGLE_API_KEY_1
-    for concept map functions that expect GOOGLE_API_KEY.
-    
-    This allows integration with external concept_map_poc code without modifying it.
-    """
-    original = os.environ.get('GOOGLE_API_KEY')
-    try:
-        # Set GOOGLE_API_KEY to your key for the duration of the context
-        api_key = os.getenv('GOOGLE_API_KEY_1')
-        if api_key:
-            os.environ['GOOGLE_API_KEY'] = api_key
-        yield
-    finally:
-        # Restore original value after context exits
-        if original:
-            os.environ['GOOGLE_API_KEY'] = original
-        else:
-            os.environ.pop('GOOGLE_API_KEY', None)
-
 
 def generate_thread_id(concept_title: str, is_kannada: bool = False, label: Optional[str] = None, user_id: Optional[str] = None) -> str:
     """
@@ -265,8 +233,7 @@ def read_root():
             "GET  /test/personas - List available test personas",
             "POST /test/persona - Test with predefined persona",
             "POST /test/images - Get image for a concept",
-            "POST /test/simulation - Get simulation config for a concept",
-            "POST /concept-map/generate - Generate concept map timeline from description"
+            "POST /test/simulation - Get simulation config for a concept"
         ]
     }
 
@@ -277,7 +244,7 @@ def health_check():
         status="healthy",
         version="1.0.0",
         persistence="Postgres (Supabase))",
-        agent_type="educational_agent_optimized_langsmith_autosuggestion",
+        agent_type="educational_agent_optimized_langsmith",
         available_endpoints=[
             "/",
             "/health",
@@ -291,8 +258,7 @@ def health_check():
             "/test/personas",
             "/test/persona",
             "/test/images",
-            "/test/simulation",
-            "/concept-map/generate"
+            "/test/simulation"
         ]
     )
 
@@ -643,7 +609,7 @@ def delete_session(thread_id: str):
             }
         
         try:
-            from educational_agent_optimized_langsmith_autosuggestion.graph import checkpointer
+            from educational_agent_optimized_langsmith.graph import checkpointer
             
             # Get the connection pool from the checkpointer
             if hasattr(checkpointer, 'conn'):
@@ -814,92 +780,6 @@ def get_test_simulation(request: TestSimulationRequest):
         raise HTTPException(status_code=500, detail=f"Error retrieving simulation config: {str(e)}")
 
 
-@app.post("/concept-map/generate", response_model=ConceptMapResponse)
-def generate_concept_map(request: ConceptMapRequest):
-    """
-    Generate concept map timeline from educational description.
-    
-    This endpoint:
-    1. Accepts educational text description
-    2. Extracts key concepts using Google Gemini AI
-    3. Calculates character-based reveal times for each concept (0.08s per character)
-    4. Saves complete timeline JSON to concept_json_timings/ folder
-    5. Returns both the filepath and complete timeline data
-    
-    The generated JSON includes:
-    - Concepts with reveal_time values (when to show each concept)
-    - Relationships between concepts
-    - Word-level timings (character-based)
-    - Metadata (duration, concept count, etc.)
-    """
-    try:
-        print(f"API /concept-map/generate - {len(request.description)} chars, level: {request.educational_level}")
-        
-        # Validate description is not empty
-        if len(request.description.strip()) == 0:
-            raise HTTPException(
-                status_code=400,
-                detail="Description cannot be empty"
-            )
-        
-        # Use wrapper to set GOOGLE_API_KEY from GOOGLE_API_KEY_1
-        with use_google_api_key():
-            # Track API usage for concept map generation
-            api_key_1 = os.getenv('GOOGLE_API_KEY_1')
-            if api_key_1:
-                # Concept map uses gemini-2.0-flash-lite model (hardcoded in timeline_mapper.py)
-                track_model_call(api_key_1, "gemini-2.0-flash-lite")
-                print(f"🔑 Tracked API usage for GOOGLE_API_KEY_1 (model: gemini-2.0-flash-exp)")
-            
-            # Step 1: Create timeline using concept_map_poc function
-            # This calls Gemini API, calculates timings, and assigns reveal times
-            print("🔄 Creating timeline with concept_map_poc...")
-            timeline = create_timeline(
-                description=request.description,
-                educational_level=request.educational_level,
-                topic_name=request.topic_name or ""
-            )
-        
-        if not timeline:
-            raise HTTPException(
-                status_code=500,
-                detail="Failed to create timeline. Check logs for details."
-            )
-        
-        concepts_count = len(timeline.get('concepts', []))
-        duration = timeline.get('metadata', {}).get('total_duration', 0.0)
-        print(f"✅ Timeline created: {concepts_count} concepts, {duration:.1f}s duration")
-        
-        filepath = "Not Saved"
-
-        # Step 2: Save JSON to disk (concept_json_timings/ folder)
-        # print("💾 Saving timeline to disk...")
-        # filepath = save_timeline_json_to_disk(timeline)
-        
-        # if not filepath:
-        #     raise HTTPException(
-        #         status_code=500,
-        #         detail="Failed to save timeline JSON to disk"
-        #     )
-        
-        # print(f"✅ Saved to: {filepath}")
-        
-        # Return success response with filepath and timeline data
-        return ConceptMapResponse(
-            success=True,
-            filepath=filepath,
-            timeline=timeline
-        )
-        
-    except HTTPException:
-        # Re-raise HTTP exceptions as-is
-        raise
-    except Exception as e:
-        print(f"API error in /concept-map/generate: {str(e)}")
-        print(f"Full traceback:\n{traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=f"Error generating concept map: {str(e)}")
-
-
 print("=" * 80)
 print("🎓 Educational Agent API Server Starting...")
 print("=" * 80)
@@ -921,7 +801,6 @@ print("  GET  /test/personas - List available test personas")
 print("  POST /test/persona - Test with predefined persona")
 print("  POST /test/images - Get image for a concept")
 print("  POST /test/simulation - Get simulation config for a concept")
-print("  POST /concept-map/generate - Generate concept map timeline (character-based timing)")
 print("=" * 80)
 print(f"Available Test Personas: {len(personas)}")
 for p in personas:

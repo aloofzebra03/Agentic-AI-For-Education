@@ -15,11 +15,11 @@ import time
 from typing import Dict, List, Tuple
 import google.generativeai as genai
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
-from description_analyzer import (
+from concept_map_poc.description_analyzer import (
     analyze_description_complexity,
     adjust_complexity_for_educational_level
 )
-from metrics_logger import log_metrics
+from concept_map_poc.metrics_logger import log_metrics
 
 
 logger = logging.getLogger(__name__)

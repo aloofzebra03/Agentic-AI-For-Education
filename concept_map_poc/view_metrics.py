@@ -10,7 +10,7 @@ Usage:
 """
 
 import argparse
-from metrics_logger import get_summary_stats, get_recent_metrics, load_all_metrics
+from concept_map_poc.metrics_logger import get_summary_stats, get_recent_metrics, load_all_metrics
 from datetime import datetime
 import json
 
