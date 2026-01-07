@@ -79,17 +79,23 @@ def use_google_api_key():
     
     This allows integration with external concept_map_poc code without modifying it.
     """
+    import google.generativeai as genai
+    
     original = os.environ.get('GOOGLE_API_KEY')
     try:
         # Set GOOGLE_API_KEY to your key for the duration of the context
         api_key = os.getenv('GOOGLE_API_KEY_1')
         if api_key:
             os.environ['GOOGLE_API_KEY'] = api_key
+            # Reconfigure genai with the new API key
+            genai.configure(api_key=api_key)
+            print(f"🔑 Configured Google Generative AI with GOOGLE_API_KEY_1")
         yield
     finally:
         # Restore original value after context exits
         if original:
             os.environ['GOOGLE_API_KEY'] = original
+            genai.configure(api_key=original)
         else:
             os.environ.pop('GOOGLE_API_KEY', None)
 
