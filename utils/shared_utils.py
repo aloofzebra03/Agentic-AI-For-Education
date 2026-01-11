@@ -27,6 +27,7 @@ from api_tracker_utils.tracker import track_model_call,get_next_available_api_mo
 from api_tracker_utils.config import AVAILABLE_MODELS, DEFAULT_MODEL
 
 dotenv.load_dotenv(dotenv_path=".env", override=True)
+print(os.getenv("LANGCHAIN_PROJECT"))
 
 # Type alias for AgentState - flexible to work with different state structures
 AgentState = Dict[str, Any]
