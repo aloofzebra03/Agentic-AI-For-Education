@@ -38,6 +38,7 @@ COPY utils/ /app/utils/
 COPY tester_agent/ /app/tester_agent/
 COPY educational_agent_optimized_langsmith_autosuggestion/ /app/educational_agent_optimized_langsmith_autosuggestion/
 COPY concept_map_poc/ /app/concept_map_poc/
+COPY simulation_to_concept/ /app/simulation_to_concept/
 COPY api_tracker_utils/ /app/api_tracker_utils/ 
 COPY api_servers/ /app/api_servers/
 COPY NCERT/ /app/NCERT/
