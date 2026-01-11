@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
@@ -31,6 +31,24 @@ from api_servers.schemas import (
 
 # Import personas from tester_agent
 from tester_agent.personas import personas
+
+# Import simulation-to-concept modules with aliases to avoid conflicts
+from simulation_to_concept.api_models import (
+    StartSessionRequest as SimStartSessionRequest,
+    StudentResponseRequest as SimStudentResponseRequest,
+    SessionResponse as SimSessionResponse,
+    HealthCheckResponse as SimHealthCheckResponse,
+    QuizSubmissionRequest as SimQuizSubmissionRequest,
+    QuizEvaluationResponse as SimQuizEvaluationResponse
+)
+from simulation_to_concept.api_integration import (
+    create_teaching_session,
+    process_student_input,
+    get_session_info,
+    get_available_simulations,
+    validate_simulation_id,
+    submit_quiz_answer
+)
 
 # Import utility functions for testing
 from utils.shared_utils import (
@@ -272,9 +290,16 @@ def read_root():
             "POST /test/persona - Test with predefined persona",
             "POST /test/images - Get image for a concept",
             "POST /test/simulation - Get simulation config for a concept",
-            "POST /concept-map/generate - Generate concept map timeline from description"
+            "POST /concept-map/generate - Generate concept map timeline from description",
+            "GET  /simulation - Simulation health check",
+            "POST /simulation/session/start - Start simulation teaching session",
+            "POST /simulation/session/{session_id}/respond - Send student response",
+            "POST /simulation/session/{session_id}/submit-quiz - Submit quiz answer",
+            "GET  /simulation/session/{session_id} - Get simulation session state",
+            "GET  /simulation/simulations - List available simulations"
         ]
     }
+
 
 
 @app.get("/health", response_model=HealthResponse)
@@ -855,7 +880,7 @@ def generate_concept_map(request: ConceptMapRequest):
             if api_key_1:
                 # Concept map uses gemini-2.0-flash-lite model (hardcoded in timeline_mapper.py)
                 track_model_call(api_key_1, "gemini-2.0-flash-lite")
-                print(f"🔑 Tracked API usage for GOOGLE_API_KEY_1 (model: gemini-2.0-flash-exp)")
+                print(f"🔑 Tracked API usage for GOOGLE_API_KEY_1 (model: gemini-2.0-flash-lite)")
             
             # Step 1: Create timeline using concept_map_poc function
             # This calls Gemini API, calculates timings, and assigns reveal times
@@ -904,6 +929,353 @@ def generate_concept_map(request: ConceptMapRequest):
         print(f"API error in /concept-map/generate: {str(e)}")
         print(f"Full traceback:\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Error generating concept map: {str(e)}")
+
+
+# ============================================================================
+# SIMULATION ENDPOINTS
+# ============================================================================
+
+@app.get(
+    "/simulation",
+    response_model=SimHealthCheckResponse,
+    tags=["Simulation"],
+    summary="Simulation Health Check"
+)
+def simulation_root():
+    """
+    Health check endpoint for simulation teaching system.
+    
+    Returns basic information about the service and available simulations.
+    """
+    return {
+        "status": "online",
+        "service": "Teaching Agent API - Simulation Module",
+        "version": "1.0.0",
+        "available_simulations": get_available_simulations()
+    }
+
+
+@app.post(
+    "/simulation/session/start",
+    response_model=SimSessionResponse,
+    status_code=status.HTTP_201_CREATED,
+    tags=["Simulation"],
+    summary="Start New Simulation Teaching Session"
+)
+def start_simulation_session(request: SimStartSessionRequest):
+    """
+    Start a new teaching session for a specific simulation.
+    
+    ## Process
+    1. Validates the simulation_id
+    2. Creates a new session with unique session_id
+    3. Loads concepts for the simulation
+    4. Generates initial teacher message
+    5. Returns session state with simulation URL
+    
+    ## Response
+    Returns complete session state including:
+    - Unique session_id for subsequent requests
+    - Initial simulation URL with parameters
+    - First teacher message
+    - All concepts for the simulation
+    - Initial learning state
+    
+    ## Example
+    ```json
+    {
+      "simulation_id": "simple_pendulum",
+      "student_id": "student_12345"
+    }
+    ```
+    """
+    try:
+        # Validate simulation ID
+        if not validate_simulation_id(request.simulation_id):
+            available = get_available_simulations()
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "error": "Invalid Simulation",
+                    "message": f"Simulation '{request.simulation_id}' not found",
+                    "available_simulations": available
+                }
+            )
+        
+        # Create session
+        session_id, response = create_teaching_session(
+            simulation_id=request.simulation_id,
+            student_id=request.student_id
+        )
+        
+        return response
+        
+    except ValueError as e:
+        # Invalid simulation or configuration error
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error": "Invalid Request",
+                "message": str(e)
+            }
+        )
+    except Exception as e:
+        # Unexpected error
+        print(f"\n❌ Error creating simulation session:")
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": "Internal Server Error",
+                "message": "Failed to create teaching session",
+                "detail": str(e)
+            }
+        )
+
+
+@app.post(
+    "/simulation/session/{session_id}/respond",
+    response_model=SimSessionResponse,
+    tags=["Simulation"],
+    summary="Send Student Response to Simulation Session"
+)
+def send_simulation_response(session_id: str, request: SimStudentResponseRequest):
+    """
+    Send a student's response and receive teacher's reply.
+    
+    ## Process
+    1. Validates session exists
+    2. Processes student response through teaching agent
+    3. Evaluates understanding level
+    4. Generates teacher response
+    5. May change simulation parameters for demonstration
+    6. Returns updated session state
+    
+    ## Response
+    Returns updated session state including:
+    - Teacher's response message
+    - Updated simulation URL (if parameters changed)
+    - Parameter change details (before/after comparison)
+    - Updated understanding level and learning state
+    - Concept progression information
+    
+    ## Example
+    ```json
+    {
+      "student_response": "I think it swings faster?"
+    }
+    ```
+    """
+    try:
+        # Process student input
+        response = process_student_input(
+            session_id=session_id,
+            student_response=request.student_response
+        )
+        
+        return response
+        
+    except KeyError:
+        # Session not found
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "error": "Session Not Found",
+                "message": f"Session '{session_id}' does not exist or has expired",
+                "session_id": session_id
+            }
+        )
+    except Exception as e:
+        # Unexpected error
+        print(f"\n❌ Error processing simulation response:")
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": "Internal Server Error",
+                "message": "Failed to process student response",
+                "detail": str(e),
+                "session_id": session_id
+            }
+        )
+
+
+@app.get(
+    "/simulation/session/{session_id}",
+    response_model=SimSessionResponse,
+    tags=["Simulation"],
+    summary="Get Simulation Session State"
+)
+def get_simulation_session(session_id: str):
+    """
+    Retrieve current state of a simulation teaching session.
+    
+    ## Purpose
+    Used for recovering session state after:
+    - App crashes or restarts
+    - Network interruptions
+    - Device changes
+    
+    ## Response
+    Returns complete session state including:
+    - Full conversation history
+    - Current simulation state and parameters
+    - Current concept and learning progress
+    - Understanding level and trajectory
+    - All metadata for state restoration
+    
+    ## Use Case
+    Android app can save session_id in SharedPreferences and restore
+    the exact state when user reopens the app.
+    """
+    try:
+        # Retrieve session state
+        response = get_session_info(session_id)
+        
+        return response
+        
+    except KeyError:
+        # Session not found
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "error": "Session Not Found",
+                "message": f"Session '{session_id}' does not exist or has expired",
+                "session_id": session_id
+            }
+        )
+    except Exception as e:
+        # Unexpected error
+        print(f"\n❌ Error retrieving simulation session:")
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": "Internal Server Error",
+                "message": "Failed to retrieve session state",
+                "detail": str(e),
+                "session_id": session_id
+            }
+        )
+
+
+@app.post(
+    "/simulation/session/{session_id}/submit-quiz",
+    response_model=SimQuizEvaluationResponse,
+    tags=["Simulation"],
+    summary="Submit Quiz Answer for Simulation Session"
+)
+def submit_simulation_quiz(session_id: str, request: SimQuizSubmissionRequest):
+    """
+    Submit quiz answer with parameters from simulation.
+    
+    ## Process
+    1. Validates session exists and is in quiz mode
+    2. Evaluates submitted parameters against success rules (fast, rule-based)
+    3. Generates adaptive feedback using LLM based on score and attempt
+    4. Determines if retry is allowed (max 3 attempts)
+    5. Returns evaluation with feedback and quiz progress
+    
+    ## Request Body
+    ```json
+    {
+      "question_id": "pendulum_q1",
+      "submitted_parameters": {
+        "length": 5.0,
+        "mass": 1.0,
+        "number_of_oscillations": 10
+      },
+      "attempt_number": 1
+    }
+    ```
+    
+    ## Response
+    Returns evaluation including:
+    - Score (1.0=perfect, 0.5=partial, 0.0=wrong)
+    - Status (RIGHT, PARTIALLY_RIGHT, WRONG)
+    - Adaptive teacher feedback
+    - Whether retry is allowed
+    - Quiz progress statistics
+    - Next question details (if applicable)
+    
+    ## Scoring
+    - **Perfect (1.0)**: All parameters meet perfect criteria
+    - **Partial (0.5)**: Parameters meet partial criteria
+    - **Wrong (0.0)**: Parameters don't meet minimum criteria
+    
+    ## Retry Logic
+    - Maximum 3 attempts per question
+    - Progressive hints provided with each attempt
+    - After 3 attempts or correct answer, moves to next question
+    """
+    try:
+        # Submit quiz answer and get evaluation
+        response = submit_quiz_answer(
+            session_id=session_id,
+            question_id=request.question_id,
+            submitted_parameters=request.submitted_parameters
+        )
+        
+        return response
+        
+    except KeyError as e:
+        # Session not found
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "error": "Session Not Found",
+                "message": str(e)
+            }
+        )
+    except ValueError as e:
+        # Invalid state (e.g., not in quiz mode)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error": "Invalid Request",
+                "message": str(e)
+            }
+        )
+    except Exception as e:
+        # Unexpected error
+        print(f"\n❌ Error submitting simulation quiz:")
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": "Internal Server Error",
+                "message": "Failed to evaluate quiz submission",
+                "detail": str(e)
+            }
+        )
+
+
+@app.get(
+    "/simulation/simulations",
+    tags=["Simulation"],
+    summary="List Available Simulations"
+)
+def list_available_simulations():
+    """
+    Get list of all available simulations.
+    
+    Returns simulation IDs that can be used with /simulation/session/start
+    """
+    from simulation_to_concept.simulations_config import get_all_simulations
+    
+    all_sims = get_all_simulations()
+    
+    return {
+        "simulations": [
+            {
+                "id": sim_id,
+                "title": sim_data["title"],
+                "description": sim_data["description"].strip(),
+                "concepts_count": len(sim_data["concepts"])
+            }
+            for sim_id, sim_data in all_sims.items()
+        ]
+    }
 
 
 print("=" * 80)
