@@ -33,10 +33,10 @@ try:
     # Check both variable names (LANGCHAIN_API_KEY is the standard one)
     langsmith_api_key = os.getenv('LANGCHAIN_API_KEY') or os.getenv('LANGSMITH_API_KEY')
     if langsmith_api_key:
-        # Set up LangSmith environment
-        os.environ['LANGCHAIN_TRACING_V2'] = 'true'
-        os.environ['LANGCHAIN_API_KEY'] = langsmith_api_key
-        os.environ['LANGCHAIN_PROJECT'] = 'concept-map-generator'
+        # # Set up LangSmith environment
+        # os.environ['LANGCHAIN_TRACING_V2'] = 'true'
+        # os.environ['LANGCHAIN_API_KEY'] = langsmith_api_key
+        # os.environ['LANGCHAIN_PROJECT'] = 'concept-map-generator'
         langsmith_client = Client()
         langsmith_configured = True
         logger.info("✅ LangSmith tracing enabled - View at: https://smith.langchain.com")
