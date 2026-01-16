@@ -11,7 +11,7 @@ This node runs ONCE at the start of a session to:
 
 from typing import Dict, Any
 
-from simulations_config import get_simulation
+from simulation_to_concept.simulations_config import get_simulation
 
 
 def content_loader_node(state: Dict[str, Any]) -> Dict[str, Any]:

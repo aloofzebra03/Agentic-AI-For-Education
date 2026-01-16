@@ -18,7 +18,7 @@ It uses:
 
 from typing import Dict, Any, List
 
-from config import MAX_EXCHANGES, SCAFFOLD_TRIGGER, PARAMETER_INFO
+from simulation_to_concept.config import MAX_EXCHANGES, SCAFFOLD_TRIGGER, PARAMETER_INFO
 
 
 def analyze_param_effectiveness(param_history: List[dict]) -> dict:

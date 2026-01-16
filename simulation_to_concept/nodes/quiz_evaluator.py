@@ -21,10 +21,10 @@ from datetime import datetime
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from config import GOOGLE_API_KEY, GEMINI_MODEL, TEMPERATURE
-from state import TeachingState
-from simulations_config import get_quiz_questions
-from quiz_rules import (
+from simulation_to_concept.config import GOOGLE_API_KEY, GEMINI_MODEL, TEMPERATURE
+from simulation_to_concept.state import TeachingState
+from simulation_to_concept.simulations_config import get_quiz_questions
+from simulation_to_concept.quiz_rules import (
     evaluate_quiz_submission,
     get_hint_for_attempt,
     should_allow_retry,

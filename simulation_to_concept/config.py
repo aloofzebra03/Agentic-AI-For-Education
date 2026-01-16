@@ -7,7 +7,7 @@ Handles LLM setup, environment variables, and constants.
 import os
 from dotenv import load_dotenv
 from pathlib import Path
-from simulations_config import get_simulation, get_simulation_list
+from simulation_to_concept.simulations_config import get_simulation, get_simulation_list
 
 # Load environment variables
 ENV_PATH = Path(__file__).parent / ".env"

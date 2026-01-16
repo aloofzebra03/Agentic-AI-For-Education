@@ -10,8 +10,8 @@ import uuid
 from datetime import datetime
 from typing import Dict, Any, Tuple
 
-from config import build_simulation_url, CURRENT_SIMULATION_ID
-from simulations_config import get_simulation, get_simulation_list
+from simulation_to_concept.config import build_simulation_url, CURRENT_SIMULATION_ID
+from simulation_to_concept.simulations_config import get_simulation, get_simulation_list
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -187,7 +187,7 @@ def create_teaching_session(simulation_id: str, student_id: str = None) -> Tuple
     """
     # Validate simulation exists
     if not get_simulation(simulation_id):
-        from simulations_config import SIMULATIONS
+        from simulation_to_concept.simulations_config import SIMULATIONS
         available = list(SIMULATIONS.keys())
         raise ValueError(
             f"Invalid simulation_id: '{simulation_id}'. "
@@ -199,9 +199,9 @@ def create_teaching_session(simulation_id: str, student_id: str = None) -> Tuple
     
     # Import directly from backend modules (bypass backend_integration.py)
     import uuid
-    from config import validate_config
-    from state import create_initial_state
-    from graph import start_session
+    from simulation_to_concept.config import validate_config
+    from simulation_to_concept.state import create_initial_state
+    from simulation_to_concept.graph import start_session
     
     # Get simulation config dynamically (NOT from cached module constants!)
     sim_config = get_simulation(simulation_id)
@@ -253,7 +253,7 @@ def process_student_input(session_id: str, student_response: str) -> Dict[str, A
         Formatted API response dictionary
     """
     # Import directly from backend modules
-    from graph import continue_session
+    from simulation_to_concept.graph import continue_session
     
     print(f"\n{'='*60}")
     print(f"💬 Processing student response")
@@ -295,7 +295,7 @@ def get_session_info(session_id: str) -> Dict[str, Any]:
         Formatted API response dictionary
     """
     # Import directly from backend modules
-    from graph import get_session_state
+    from simulation_to_concept.graph import get_session_state
     
     print(f"\n{'='*60}")
     print(f"🔍 Retrieving session state")
@@ -351,9 +351,9 @@ def submit_quiz_answer(session_id: str, question_id: str, submitted_parameters: 
     Returns:
         Quiz evaluation response dictionary
     """
-    from graph import compile_graph, get_session_state
-    from nodes.quiz_evaluator import quiz_evaluator_node, quiz_teacher_node, quiz_router
-    from quiz_rules import calculate_quiz_progress
+    from simulation_to_concept.graph import compile_graph, get_session_state
+    from simulation_to_concept.nodes.quiz_evaluator import quiz_evaluator_node, quiz_teacher_node, quiz_router
+    from simulation_to_concept.quiz_rules import calculate_quiz_progress
     
     print(f"\n{'='*60}")
     print(f"🎯 Processing quiz submission")
