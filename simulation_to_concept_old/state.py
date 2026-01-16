@@ -52,11 +52,6 @@ class TeachingState(TypedDict):
     """
     
     # ═══════════════════════════════════════════════════════════════════════
-    # SIMULATION IDENTIFIER
-    # ═══════════════════════════════════════════════════════════════════════
-    simulation_id: str                  # Which simulation (e.g., "earth_rotation_revolution")
-    
-    # ═══════════════════════════════════════════════════════════════════════
     # CONTENT
     # ═══════════════════════════════════════════════════════════════════════
     topic_description: str              # The source material
@@ -126,22 +121,18 @@ class TeachingState(TypedDict):
     quiz_evaluation: Dict[str, Any]     # Last evaluation result (score, status, feedback)
 
 
-def create_initial_state(topic_description: str, initial_params: Dict[str, float], simulation_id: str = "simple_pendulum") -> TeachingState:
+def create_initial_state(topic_description: str, initial_params: Dict[str, float]) -> TeachingState:
     """
     Create a fresh initial state for a new teaching session.
     
     Args:
         topic_description: The source material to teach from
         initial_params: Starting simulation parameters
-        simulation_id: Which simulation this session is for (for dynamic config loading)
         
     Returns:
         Initialized TeachingState
     """
     return {
-        # Simulation identifier (used by content_loader to get correct concepts)
-        "simulation_id": simulation_id,
-        
         # Content (concepts will be filled by content_loader)
         "topic_description": topic_description,
         "concepts": [],

@@ -1093,7 +1093,6 @@ Respond with JSON only:
         response = invoke_llm_with_fallback(
             [HumanMessage(content=selection_prompt)],
             operation_name="Image selection",
-            model=model
         )
         
         # Parse response

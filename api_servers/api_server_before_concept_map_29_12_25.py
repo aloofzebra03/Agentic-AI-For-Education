@@ -16,7 +16,7 @@ from educational_agent_optimized_langsmith_autosuggestion.graph import graph
 from langchain_core.messages import HumanMessage
 from langgraph.types import Command
 
-from api_servers.schemas import (
+from api_servers_reference.schemas import (
     StartSessionRequest, StartSessionResponse,
     ContinueSessionRequest, ContinueSessionResponse,
     SessionStatusRequest, SessionStatusResponse,
@@ -136,7 +136,7 @@ def get_state_from_checkpoint(thread_id: str) -> Optional[Dict[str, Any]]:
 
 
 def extract_metadata_from_state(state: Dict[str, Any]):
-    from api_servers.schemas import SessionMetadata
+    from api_servers_reference.schemas import SessionMetadata
     
     # Extract image metadata (only image URL and node)
     image_url = None

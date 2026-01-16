@@ -10,8 +10,8 @@ import uuid
 from datetime import datetime
 from typing import Dict, Any, Tuple
 
-from config import build_simulation_url, CURRENT_SIMULATION_ID
-from simulations_config import get_simulation, get_simulation_list
+from simulation_to_concept.config import build_simulation_url, CURRENT_SIMULATION_ID
+from simulation_to_concept.simulations_config import get_simulation, get_simulation_list
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -67,8 +67,8 @@ def format_api_response(thread_id: str, state: Dict[str, Any], simulation_id: st
     # Extract current parameters
     current_params = state.get('current_params', {})
     
-    # Build current simulation URL with correct simulation_id
-    sim_url = build_simulation_url(current_params, autostart=True, simulation_id=simulation_id)
+    # Build current simulation URL
+    sim_url = build_simulation_url(current_params, autostart=True)
     
     # Check for parameter changes
     param_change = None
@@ -76,10 +76,10 @@ def format_api_response(thread_id: str, state: Dict[str, Any], simulation_id: st
     if param_history:
         last_change = param_history[-1]
         
-        # Build before and after URLs with correct simulation_id
+        # Build before and after URLs
         before_params = current_params.copy()
         before_params[last_change['parameter']] = last_change['old_value']
-        before_url = build_simulation_url(before_params, autostart=True, simulation_id=simulation_id)
+        before_url = build_simulation_url(before_params, autostart=True)
         after_url = sim_url
         
         param_change = {
@@ -194,24 +194,18 @@ def create_teaching_session(simulation_id: str, student_id: str = None) -> Tuple
             f"Available: {', '.join(available)}"
         )
     
-    # Set simulation in environment (for any modules that still use it)
+    # Set simulation in environment
     set_simulation_environment(simulation_id)
     
     # Import directly from backend modules (bypass backend_integration.py)
     import uuid
-    from config import validate_config
-    from state import create_initial_state
-    from graph import start_session
-    
-    # Get simulation config dynamically (NOT from cached module constants!)
-    sim_config = get_simulation(simulation_id)
-    topic_description = sim_config['description']
-    initial_params = sim_config['initial_params']
+    from simulation_to_concept.config import validate_config, TOPIC_DESCRIPTION, INITIAL_PARAMS
+    from simulation_to_concept.state import create_initial_state
+    from simulation_to_concept.graph import start_session
     
     print(f"\n{'='*60}")
     print(f"🚀 Creating new teaching session")
     print(f"   Simulation: {simulation_id}")
-    print(f"   Topic: {sim_config['title']}")
     if student_id:
         print(f"   Student: {student_id}")
     print(f"{'='*60}")
@@ -222,11 +216,10 @@ def create_teaching_session(simulation_id: str, student_id: str = None) -> Tuple
     # Create unique session ID
     thread_id = f"api_session_{uuid.uuid4().hex[:8]}"
     
-    # Create initial state with simulation_id for downstream nodes
+    # Create initial state
     initial_state = create_initial_state(
-        topic_description=topic_description,
-        initial_params=initial_params.copy(),
-        simulation_id=simulation_id  # Pass simulation_id for content_loader
+        topic_description=TOPIC_DESCRIPTION,
+        initial_params=INITIAL_PARAMS.copy()
     )
     
     # Start the session - runs until first interrupt
@@ -253,7 +246,7 @@ def process_student_input(session_id: str, student_response: str) -> Dict[str, A
         Formatted API response dictionary
     """
     # Import directly from backend modules
-    from graph import continue_session
+    from simulation_to_concept.graph import continue_session
     
     print(f"\n{'='*60}")
     print(f"💬 Processing student response")
@@ -295,7 +288,7 @@ def get_session_info(session_id: str) -> Dict[str, Any]:
         Formatted API response dictionary
     """
     # Import directly from backend modules
-    from graph import get_session_state
+    from simulation_to_concept.graph import get_session_state
     
     print(f"\n{'='*60}")
     print(f"🔍 Retrieving session state")
@@ -351,9 +344,9 @@ def submit_quiz_answer(session_id: str, question_id: str, submitted_parameters: 
     Returns:
         Quiz evaluation response dictionary
     """
-    from graph import compile_graph, get_session_state
-    from nodes.quiz_evaluator import quiz_evaluator_node, quiz_teacher_node, quiz_router
-    from quiz_rules import calculate_quiz_progress
+    from simulation_to_concept.graph import compile_graph, get_session_state
+    from simulation_to_concept.nodes.quiz_evaluator import quiz_evaluator_node, quiz_teacher_node, quiz_router
+    from simulation_to_concept.quiz_rules import calculate_quiz_progress
     
     print(f"\n{'='*60}")
     print(f"🎯 Processing quiz submission")

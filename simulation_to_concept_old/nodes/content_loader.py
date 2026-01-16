@@ -11,7 +11,7 @@ This node runs ONCE at the start of a session to:
 
 from typing import Dict, Any
 
-from simulations_config import get_simulation
+from simulation_to_concept.config import PRE_DEFINED_CONCEPTS, CANNOT_DEMONSTRATE, TOPIC_TITLE
 
 
 def content_loader_node(state: Dict[str, Any]) -> Dict[str, Any]:
@@ -20,7 +20,6 @@ def content_loader_node(state: Dict[str, Any]) -> Dict[str, Any]:
     
     Input State:
         - topic_description: The source material (for reference)
-        - simulation_id: Which simulation to load concepts for
         
     Output State:
         - concepts: List of pre-defined Concept objects
@@ -33,31 +32,21 @@ def content_loader_node(state: Dict[str, Any]) -> Dict[str, Any]:
     print("📚 CONTENT LOADER: Loading pre-defined concepts")
     print("="*60)
     
-    # Get simulation_id from state (passed during session creation)
-    simulation_id = state.get('simulation_id', 'simple_pendulum')
+    # Load pre-defined concepts (no LLM needed!)
+    concepts = PRE_DEFINED_CONCEPTS
     
-    # Dynamically fetch simulation config (not cached module constants!)
-    sim_config = get_simulation(simulation_id)
-    if not sim_config:
-        raise ValueError(f"Unknown simulation: {simulation_id}")
-    
-    # Extract concepts and constraints from simulation config
-    concepts = sim_config['concepts']
-    cannot_demonstrate = sim_config['cannot_demonstrate']
-    topic_title = sim_config['title']
-    
-    print(f"\n✅ Loaded {len(concepts)} concepts for '{topic_title}':")
+    print(f"\n✅ Loaded {len(concepts)} concepts for '{TOPIC_TITLE}':")
     for c in concepts:
         print(f"   {c['id']}. {c['title']}")
         print(f"      Key insight: {c['key_insight']}")
         print(f"      Params: {c['related_params']}")
     
     print(f"\n⚠️ Topics NOT in this simulation (will not mention):")
-    for item in cannot_demonstrate:
+    for item in CANNOT_DEMONSTRATE:
         print(f"   - {item}")
     
     return {
         "concepts": concepts,
         "current_concept_index": 0,
-        "cannot_demonstrate": cannot_demonstrate
+        "cannot_demonstrate": CANNOT_DEMONSTRATE
     }

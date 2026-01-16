@@ -19,11 +19,11 @@ from datetime import datetime
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage
 
-from config import (
+from simulation_to_concept.config import (
     GOOGLE_API_KEY, GEMINI_MODEL, TEMPERATURE, INITIAL_PARAMS,
     TOPIC_TITLE, TOPIC_DESCRIPTION, PARAMETER_INFO
 )
-from state import add_message_to_history
+from simulation_to_concept.state import add_message_to_history
 
 
 def get_llm():

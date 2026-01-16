@@ -19,10 +19,7 @@ from datetime import datetime
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage
 
-from config import (
-    GOOGLE_API_KEY, GEMINI_MODEL, TEMPERATURE, INITIAL_PARAMS,
-    TOPIC_TITLE, TOPIC_DESCRIPTION, PARAMETER_INFO
-)
+from config import GOOGLE_API_KEY, GEMINI_MODEL, TEMPERATURE, INITIAL_PARAMS
 from state import add_message_to_history
 
 
@@ -104,62 +101,16 @@ def understanding_evaluator_node(state: Dict[str, Any]) -> Dict[str, Any]:
     
     print(f"   Student said: \"{student_response[:100]}...\"" if len(student_response) > 100 else f"   Student said: \"{student_response}\"")
     
-    # Get parameter history for context - CRITICAL for evaluating correctness
-    param_history = state.get("parameter_history", [])
-    last_param_change = param_history[-1] if param_history else None
-    
-    # Build parameter change context using teacher's message (more reliable than param_history)
-    # Teacher's question contains the comparison baseline
-    
-    # Build parameter list dynamically from PARAMETER_INFO
-    param_list = "\n".join([f"- {key} = {current_params.get(key, '?')}" for key in PARAMETER_INFO.keys()])
-    
-    param_change_context = f"""
-⚠️ CRITICAL - DETERMINING CORRECTNESS:
-
-CURRENT SIMULATION STATE:
-{param_list}
-
-TEACHER'S LAST MESSAGE (contains the comparison context):
-"{last_teacher_msg}"
-
-HOW TO EVALUATE:
-1. Look at teacher's question - it asks student to compare current state to a previous value
-   Example: "faster or slower compared to when [parameter] was [value]?"
-   
-2. Extract the comparison baseline from teacher's question
-3. Compare to CURRENT value
-4. Apply the physics/scientific rules from the concept being taught
-5. If student's answer contradicts the rules → is_factually_wrong = true, level = "none"
-"""
-    
-    # Build concept-specific physics rules dynamically
-    physics_rules = f"""
-CONCEPT BEING TAUGHT:
-Title: {current_concept['title']}
-Description: {current_concept['description']}
-Key Insight: {current_concept['key_insight']}
-
-SIMULATION INFORMATION:
-Topic: {TOPIC_TITLE}
-{TOPIC_DESCRIPTION}
-
-PARAMETER EFFECTS (use these to judge correctness):
-"""
-    for param_name, param_info in PARAMETER_INFO.items():
-        physics_rules += f"\n{param_info['label']} ({param_info['range']}): {param_info['effect']}"
-    
     # Build the combined classification + evaluation prompt
-    eval_prompt = f"""You are analyzing a student's response in a science teaching session.
-
-═══════════════════════════════════════════════════════════════
-{physics_rules}
-═══════════════════════════════════════════════════════════════
-
-{param_change_context}
+    eval_prompt = f"""You are analyzing a student's response in a physics teaching session.
 
 CURRENT SIMULATION PARAMETERS:
-{param_list}
+- length: {current_params.get('length', 5)} (valid range: 1-10)
+- number_of_oscillations: {current_params.get('number_of_oscillations', 10)} (valid range: 5-50)
+
+CONCEPT BEING TAUGHT:
+Title: {current_concept['title']}
+Key Insight: {current_concept['key_insight']}
 
 TEACHER'S LAST MESSAGE:
 "{last_teacher_msg}"
@@ -181,7 +132,7 @@ First, determine what TYPE of response this is:
 
 3. "param_request" - Student wants to CHANGE simulation parameters
    Examples: "Change length to 3", "Set it to 5 units", "Make it shorter", "Try with 20 oscillations"
-   NOTE: Student may request MULTIPLE params at once
+   NOTE: Student may request MULTIPLE params at once like "change length to 5 and oscillations to 20"
 
 ═══════════════════════════════════════════════════════════════
 STEP 2: BASED ON TYPE, FILL RELEVANT FIELDS
@@ -242,13 +193,6 @@ RESPOND WITH ONLY THIS JSON:
 ```
 """
 
-    # DEBUG: Print parameter context being used
-    print(f"   🔎 DEBUG - param_history length: {len(param_history)}")
-    if last_param_change:
-        print(f"   🔎 DEBUG - Last change: {last_param_change.get('parameter')} {last_param_change.get('old_value')} → {last_param_change.get('new_value')}")
-    else:
-        print(f"   🔎 DEBUG - No param_history available!")
-    
     llm = get_llm()
     response = llm.invoke([HumanMessage(content=eval_prompt)])
     
@@ -318,16 +262,7 @@ RESPOND WITH ONLY THIS JSON:
         value = result.get("param_value")
         is_valid = result.get("param_valid", False)
         
-        # Handle "both" - multiple params requested
-        length_val = result.get("length_value")
-        osc_val = result.get("oscillations_value")
-        
-        if param == "both":
-            print(f"   🎛️ Multiple Parameters Requested:")
-            print(f"      - length = {length_val}")
-            print(f"      - oscillations = {osc_val}")
-        else:
-            print(f"   🎛️ Parameter Request: {param} = {value}")
+        print(f"   🎛️ Parameter Request: {param} = {value}")
         print(f"   ✓ Valid: {is_valid}")
         
         output["student_requested_param"] = True
@@ -336,18 +271,8 @@ RESPOND WITH ONLY THIS JSON:
         output["param_request_valid"] = is_valid
         
         # If valid, update the params
-        new_params = current_params.copy()
-        if param == "both":
-            # Handle both parameters
-            if length_val is not None:
-                new_params["length"] = length_val
-                print(f"   ✅ Updating length → {length_val}")
-            if osc_val is not None:
-                new_params["number_of_oscillations"] = osc_val
-                print(f"   ✅ Updating oscillations → {osc_val}")
-            if length_val is not None or osc_val is not None:
-                output["current_params"] = new_params
-        elif is_valid and param and value is not None:
+        if is_valid and param and value is not None:
+            new_params = current_params.copy()
             new_params[param] = value
             output["current_params"] = new_params
             print(f"   ✅ Updating params: {param} → {value}")

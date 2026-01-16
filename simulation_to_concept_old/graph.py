@@ -48,18 +48,18 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.checkpoint.postgres import PostgresSaver
 from psycopg_pool import ConnectionPool
 
-from state import TeachingState
+from simulation_to_concept.state import TeachingState
 
 # Load environment variables
 dotenv.load_dotenv(dotenv_path=".env", override=True)
-from nodes import (
+from simulation_to_concept.nodes import (
     content_loader_node,
     teacher_node,
     understanding_evaluator_node,
     trajectory_analyzer_node,
     strategy_selector_node
 )
-from nodes.quiz_evaluator import (
+from simulation_to_concept.nodes.quiz_evaluator import (
     quiz_initializer_node,
     quiz_teacher_node,
     quiz_evaluator_node,

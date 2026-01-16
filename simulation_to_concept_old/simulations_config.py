@@ -249,28 +249,26 @@ QUIZ_QUESTIONS = {
     "simple_pendulum": [
         {
             "id": "pendulum_q1",
-            "challenge": "Can you make the pendulum swing slower? Apply what you learned about how pendulum characteristics affect its motion.",
+            "challenge": "Can you make the pendulum swing slower? Set the pendulum length to 8 units or more to increase the time period.",
             "target_parameters": ["length"],
             "success_rule": {
-                "conditions": [],  # No hard conditions, just optimize
-                "optimization_target": {
-                    "parameter": "length",
-                    "objective": "maximize"  # Make it as long as possible for slowest swings
-                },
-                "tolerances": {
-                    "perfect": 0.15,  # Within 15% of maximum
-                    "partial": 0.35   # Within 35% of maximum
-                },
+                "conditions": [
+                    {"parameter": "length", "operator": ">=", "value": 8}
+                ],
                 "scoring": {
-                    "perfect": 1.0,
-                    "partial": 0.6,
-                    "wrong": 0.3
+                    "perfect": 1.0,    # length >= 8
+                    "partial": 0.6,    # length >= 6
+                    "wrong": 0.3       # length < 6
+                },
+                "thresholds": {
+                    "perfect": {"length": 8},
+                    "partial": {"length": 6}
                 }
             },
             "hints": {
                 "attempt_1": "Think about what makes a pendulum swing slower. Which parameter affects the time period?",
-                "attempt_2": "Remember from our lesson: longer pendulums take more time per swing. Try significantly increasing the length.",
-                "attempt_3": "Make the pendulum much longer - try a high length value to achieve a slower swing."
+                "attempt_2": "Remember from our lesson: longer pendulums take more time per swing. Try increasing the length parameter.",
+                "attempt_3": "Set the length to 8 or higher to make the pendulum swing slowly."
             },
             "concept_reminder": "The time period of a pendulum depends on its length. A longer pendulum swings slower (longer time period), while a shorter pendulum swings faster (shorter time period)."
         },
@@ -280,26 +278,23 @@ QUIZ_QUESTIONS = {
             "target_parameters": ["number_of_oscillations", "length"],
             "success_rule": {
                 "conditions": [
-                    {"parameter": "number_of_oscillations", "operator": "==", "value": 5}
+                    {"parameter": "number_of_oscillations", "operator": "==", "value": 5},
+                    {"parameter": "length", "operator": "<=", "value": 3}
                 ],
-                "optimization_target": {
-                    "parameter": "length",
-                    "objective": "minimize"  # Make it as short as possible for fastest swings
-                },
-                "tolerances": {
-                    "perfect": 0.15,  # Within 15% of optimal (min value)
-                    "partial": 0.35   # Within 35% of optimal
-                },
                 "scoring": {
-                    "perfect": 1.0,
-                    "partial": 0.6,
-                    "wrong": 0.3
+                    "perfect": 1.0,    # oscillations == 5 AND length <= 3
+                    "partial": 0.6,    # oscillations == 5 only
+                    "wrong": 0.3       # neither condition met
+                },
+                "thresholds": {
+                    "perfect": {"number_of_oscillations": 5, "length": 3},
+                    "partial": {"number_of_oscillations": 5}
                 }
             },
             "hints": {
                 "attempt_1": "You need to set the number of oscillations to exactly 5, and make the pendulum swing quickly.",
-                "attempt_2": "Remember: shorter pendulums swing faster! Try reducing the length significantly while keeping oscillations at 5.",
-                "attempt_3": "Set oscillations to exactly 5 and make the length very short for the fastest swings."
+                "attempt_2": "Remember: shorter pendulums swing faster! Try reducing the length while keeping oscillations at 5.",
+                "attempt_3": "Set number_of_oscillations to 5 and length to 3 or less for the fastest swings."
             },
             "concept_reminder": "The number of oscillations determines how many swings we count, while length affects how fast each swing happens. Shorter pendulums complete multiple swings in less total time."
         }

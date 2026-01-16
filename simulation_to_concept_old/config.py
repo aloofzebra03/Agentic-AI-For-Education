@@ -7,7 +7,7 @@ Handles LLM setup, environment variables, and constants.
 import os
 from dotenv import load_dotenv
 from pathlib import Path
-from simulations_config import get_simulation, get_simulation_list
+from simulation_to_concept.simulations_config import get_simulation, get_simulation_list
 
 # Load environment variables
 ENV_PATH = Path(__file__).parent / ".env"
@@ -85,35 +85,25 @@ def validate_config():
 # GitHub Pages base URL (set in .env for production, None for local dev)
 GITHUB_PAGES_BASE_URL = os.getenv("GITHUB_PAGES_BASE_URL", None)
 
-def get_simulation_base_url(simulation_id: str = None) -> str:
+def get_simulation_base_url() -> str:
     """
     Get the base URL for simulations based on environment.
-    
-    Args:
-        simulation_id: Which simulation to get URL for. If None, uses CURRENT_SIMULATION_ID.
     
     Returns GitHub Pages URL if GITHUB_PAGES_BASE_URL is set,
     otherwise returns relative path for local development.
     """
-    # Dynamically get the simulation file based on simulation_id
-    if simulation_id:
-        sim_config = get_simulation(simulation_id)
-        sim_file = sim_config["file"] if sim_config else SIMULATION_FILE
-    else:
-        sim_file = SIMULATION_FILE
-    
     if GITHUB_PAGES_BASE_URL:
-        # Production: Use GitHub Pages with full path
-        return f"{GITHUB_PAGES_BASE_URL.rstrip('/')}/{sim_file}"
+        # Production: Use GitHub Pages
+        return f"{GITHUB_PAGES_BASE_URL}/{SIMULATION_FILE}"
     else:
         # Local development: Use relative path
-        return sim_file
+        return SIMULATION_FILE
 
 # ═══════════════════════════════════════════════════════════════════════
 # SIMULATION URL BUILDING
 # ═══════════════════════════════════════════════════════════════════════
 
-def build_simulation_url(params: dict, autostart: bool = True, base_url: str = None, simulation_id: str = None) -> str:
+def build_simulation_url(params: dict, autostart: bool = True, base_url: str = None) -> str:
     """
     Build simulation URL with parameters dynamically.
     
@@ -121,28 +111,20 @@ def build_simulation_url(params: dict, autostart: bool = True, base_url: str = N
         params: Dictionary of parameters to pass to simulation
         autostart: Whether to auto-start the simulation
         base_url: Optional base URL override (for custom hosting)
-        simulation_id: Which simulation to build URL for (required for correct URL)
     
     Returns:
         Complete URL with query parameters
     """
-    # Use provided base_url, or get dynamically based on simulation_id
+    # Use provided base_url, or get from environment, or use relative path
     if base_url is None:
-        base_url = get_simulation_base_url(simulation_id)
-    
-    # Get parameter info for this specific simulation (for URL key mapping)
-    if simulation_id:
-        sim_config = get_simulation(simulation_id)
-        param_info = sim_config.get("parameter_info", {}) if sim_config else PARAMETER_INFO
-    else:
-        param_info = PARAMETER_INFO
+        base_url = get_simulation_base_url()
     
     # Build query string from parameters
     query_params = []
     for param_name, param_value in params.items():
-        # Get the URL key from parameter info
-        info = param_info.get(param_name, {})
-        url_key = info.get("url_key", param_name)
+        # Get the URL key from PARAMETER_INFO
+        param_info = PARAMETER_INFO.get(param_name, {})
+        url_key = param_info.get("url_key", param_name)
         query_params.append(f"{url_key}={param_value}")
     
     # Add autostart if requested

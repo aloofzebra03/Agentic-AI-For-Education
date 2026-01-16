@@ -21,10 +21,10 @@ from datetime import datetime
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from config import GOOGLE_API_KEY, GEMINI_MODEL, TEMPERATURE
-from state import TeachingState
-from simulations_config import get_quiz_questions
-from quiz_rules import (
+from simulation_to_concept.config import GOOGLE_API_KEY, GEMINI_MODEL, TEMPERATURE
+from simulation_to_concept.state import TeachingState
+from simulation_to_concept.simulations_config import get_quiz_questions
+from simulation_to_concept.quiz_rules import (
     evaluate_quiz_submission,
     get_hint_for_attempt,
     should_allow_retry,
@@ -153,32 +153,27 @@ def quiz_teacher_node(state: TeachingState) -> Dict[str, Any]:
         # First attempt - present the challenge
         message = f"**Challenge {current_index + 1}:**\n\n{current_question['challenge']}\n\n"
         message += "💡 Adjust the simulation parameters and click **SUBMIT** when you're ready!"
-        
-        # Update conversation history only on first attempt
-        existing_history = state.get("conversation_history", [])
-        new_history = existing_history + [{
-            "role": "teacher",
-            "content": message,
-            "timestamp": datetime.now().isoformat()
-        }]
-        
-        print(f"✅ Question presented - Waiting for student submission")
-        
-        return {
-            "conversation_history": new_history,
-            "last_teacher_message": message
-        }
     else:
-        # Retry attempt - don't add new message, quiz_evaluator already added feedback
-        # Just update last_teacher_message for the quiz UI
+        # Retry attempt - include previous evaluation feedback
         prev_eval = state.get("quiz_evaluation", {})
-        message = prev_eval.get('feedback', 'Try adjusting your parameters.')
-        
-        print(f"✅ Retry attempt - Using previous feedback")
-        
-        return {
-            "last_teacher_message": message
-        }
+        message = f"**Let's try again!**\n\n"
+        message += f"{prev_eval.get('feedback', '')}\n\n"
+        message += "Adjust your parameters and click **SUBMIT** when ready."
+    
+    # Update conversation history
+    existing_history = state.get("conversation_history", [])
+    new_history = existing_history + [{
+        "role": "teacher",
+        "content": message,
+        "timestamp": datetime.now().isoformat()
+    }]
+    
+    print(f"✅ Question presented - Waiting for student submission")
+    
+    return {
+        "conversation_history": new_history,
+        "last_teacher_message": message
+    }
 
 
 # ============================================================================
@@ -196,20 +191,11 @@ def quiz_evaluator_node(state: TeachingState) -> Dict[str, Any]:
     print("🔍 QUIZ EVALUATOR - Evaluating Submission")
     print("="*60)
     
-    from simulations_config import get_simulation
-    import os
-    
     current_index = state.get("current_quiz_index", 0)
     quiz_questions = state.get("quiz_questions", [])
     current_question = quiz_questions[current_index]
     question_id = current_question["id"]
     submitted_params = state.get("submitted_parameters", {})
-    
-    # Get parameter ranges from simulation config
-    simulation_id = os.getenv('SIMULATION_ID', 'simple_pendulum')
-    sim_config = get_simulation(simulation_id)
-    parameter_info = sim_config.get('parameter_info', {}) if sim_config else {}
-    parameter_ranges = {k: v['range'] for k, v in parameter_info.items() if 'range' in v}
     
     # Get and increment attempt count
     quiz_attempts = state.get("quiz_attempts", {}).copy()
@@ -219,15 +205,13 @@ def quiz_evaluator_node(state: TeachingState) -> Dict[str, Any]:
     print(f"Question: {question_id}")
     print(f"Attempt: {attempts}")
     print(f"Submitted: {submitted_params}")
-    print(f"Parameter ranges: {parameter_ranges}")
     
     # ========================================
     # STEP 1: Rule-based evaluation (fast)
     # ========================================
     score, status = evaluate_quiz_submission(
         submitted_params,
-        current_question["success_rule"],
-        parameter_ranges=parameter_ranges
+        current_question["success_rule"]
     )
     
     print(f"Score: {score} | Status: {status}")
@@ -248,51 +232,47 @@ def quiz_evaluator_node(state: TeachingState) -> Dict[str, Any]:
     llm = get_llm()
     
     # Build context for LLM
-    system_prompt = f"""You are a supportive science teacher providing feedback on a simulation-based challenge.
+    system_prompt = f"""You are a supportive physics teacher providing feedback on a simulation challenge.
 
-**Challenge:** {current_question['challenge']}
+**Current Challenge:** {current_question['challenge']}
 
-**Student's Attempt:**
-They configured the simulation with these parameters:
+**Student's Submission:**
 {json.dumps(submitted_params, indent=2)}
 
-**Evaluation:**
-- Result: {status}
-- Score: {score}/1.0
-- Attempt: {attempts} of 3
+**Evaluation Result:**
+- Status: {status}
+- Score: {score}
+- Attempt: {attempts}/3
 
-**Learning Context:**
+**Concept Reminder:**
 {current_question['concept_reminder']}
 
-**Feedback Guidelines:**
+**Your Task:**
+Generate encouraging, educational feedback following these guidelines:
 
-• **If CORRECT (score=1.0):**
-  - Celebrate their success enthusiastically
-  - Explain WHY their configuration achieved the goal
-  - Connect their choices to the underlying concept
-  - Keep it concise and positive (2-3 sentences)
+1. **If RIGHT (score=1.0):**
+   - Celebrate their success! 🎉
+   - Briefly explain WHY their parameters worked
+   - Connect to the physics concept
+   - Keep it short and positive
+   
+2. **If PARTIALLY_RIGHT (score=0.5):**
+   - Acknowledge what they got right
+   - Gently point out what needs adjustment
+   - Provide the hint: "{hint}"
+   - Encourage them to try again
+   
+3. **If WRONG (score=0.0):**
+   - Be supportive, not critical
+   - Explain the concept they might have missed
+   - Provide the hint: "{hint}"
+   - Guide them toward the right approach
 
-• **If PARTIALLY CORRECT (score between 0.3-0.9):**
-  - Acknowledge what they did well
-  - Identify what still needs adjustment (be specific but don't give exact values)
-  - Include this hint: "{hint}"
-  - Encourage experimentation
+**Tone:** Warm, encouraging, Socratic
+**Length:** 2-4 sentences
+**Format:** Plain text, no markdown formatting
 
-• **If INCORRECT (score < 0.3):**
-  - Stay encouraging - mistakes are learning opportunities
-  - Briefly explain the concept they may have overlooked
-  - Provide this guidance: "{hint}"
-  - Suggest a different approach without giving exact answers
-
-**Important Rules:**
-- Never reveal specific numerical values or exact parameter settings
-- Use directional guidance ("increase", "decrease", "much higher", "significantly lower")
-- Focus on understanding WHY, not just WHAT to change
-- Keep feedback to 2-4 sentences maximum
-- No markdown formatting - plain text only
-- Be warm, supportive, and Socratic in tone
-
-Generate your feedback now:"""
+Generate feedback now:"""
 
     user_prompt = f"Status: {status}, Attempt: {attempts}, Hint: {hint}"
     
