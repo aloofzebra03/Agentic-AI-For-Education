@@ -83,7 +83,7 @@ def validate_config():
 # ═══════════════════════════════════════════════════════════════════════
 
 # GitHub Pages base URL (set in .env for production, None for local dev)
-GITHUB_PAGES_BASE_URL = os.getenv("GITHUB_PAGES_BASE_URL", None)
+GITHUB_PAGES_BASE_URL = os.getenv("GITHUB_PAGES_BASE_URL", "https://imhv0609.github.io/simulation_to_concept_version3_github")
 
 def get_simulation_base_url(simulation_id: str = None) -> str:
     """
@@ -151,6 +151,9 @@ def build_simulation_url(params: dict, autostart: bool = True, base_url: str = N
     
     # Construct final URL
     url = f"{base_url}?{'&'.join(query_params)}"
+    print("base url:", base_url)
+    print("params:", query_params)
+    print(f"🔗 Built simulation URL: {url}")
     return url
 
 # Legacy variable for backward compatibility
