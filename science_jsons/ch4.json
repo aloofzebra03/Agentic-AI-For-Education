@@ -1,0 +1,525 @@
+{
+  "_id": { "$oid": "64b5f9a2e4b0d1a2c3d4e5f6" },
+  "chapter_number": 4,
+  "chapter": "The World of Metals and Non-Metals",
+  "concepts": [
+    {
+      "concept": "Malleability",
+      "description": "Ever wondered how a hard block of iron can become a flat tool, or how silver becomes a thin foil on sweets?",
+      "key_topics": ["Beating metals", "Thin sheets", "Brittleness"],
+      "detail": "Malleability is the property of materials (mostly metals) by which they can be beaten into thin sheets without breaking[cite: 51]. Materials that break into pieces when hammered, like coal or sulfur, are called brittle[cite: 59].",
+      "working": [
+        "1. Take a metal object (like an iron nail or aluminium piece).",
+        "2. Place it on a hard surface.",
+        "3. Beat it hard with a hammer.",
+        "4. The metal expands and flattens into a sheet instead of shattering[cite: 36, 50]."
+      ],
+      "intuition_logical_flow": "Think of play-dough or clay. When you smash it with your fist, it doesn't shatter like glass; it flattens out. Metals are like 'strong clay'—if you hit them hard enough, they flatten into sheets. This is why we can wrap food in aluminium foil!",
+      "critical_thinking": "If you hit a piece of wood with a hammer, it might dent or split, but it won't flatten into a sheet like aluminium. Why is wood not considered malleable based on this?",
+      "open_ended_mcqs": [
+        {
+          "question": "Which of the following items demonstrates the property of malleability?",
+          "options": ["a) A coal piece breaking into dust", "b) An aluminium wrapper around a chocolate bar", "c) A rubber band stretching", "d) A wooden stick breaking"],
+          "correct_answer": "b) An aluminium wrapper around a chocolate bar"
+        }
+      ],
+      "real_life_applications": [
+        "1. Silver foil used to decorate sweets[cite: 53].",
+        "2. Aluminium foil used for wrapping food[cite: 53].",
+        "3. Iron sheets used for making automobile bodies."
+      ],
+      "relation_between_sub_concepts": "Malleability helps distinguish metals (which flatten) from non-metals (which break/are brittle)[cite: 45, 59].",
+      "cross_concept_critical_thinking": "In the chapter 'Materials Around Us', we group things by hardness. Malleability is a specific type of behaviour related to hardness—how a material reacts to force (impact).",
+      "exam_oriented_questions": [
+        "1. Define malleability and name two metals that are highly malleable[cite: 51, 54].",
+        "2. Differentiate between malleable and brittle materials with examples[cite: 51, 59].",
+        "3. Why is aluminium used for food packaging? [cite: 53]"
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "10 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "3 min",
+        "number_of_revisions_needed_to_master": "2 (interval of revisit in days: 7)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "High",
+        "importance_for_the_olympiad": "Medium",
+        "importance_for_the_iit_neet": "Low",
+        "definition_getting_asked_in_the_unit_test": "High"
+      },
+      "which_aspect_is_important": "The definition and the contrast between metals (malleable) and non-metals (brittle).",
+      "should_you_remember_this": "Yes, because it is one of the fundamental physical properties used to identify metals.",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "Remember the 'Hammer Test'. If it flattens, it's malleable.",
+        "common_mistakes": "Students often confuse Malleability (sheets) with Ductility (wires). Remember 'M' for Mallet (Hammer) -> Sheet.",
+        "exam_tips": "Malleability = Sheets. Silver foil on Kaju Katli is the best example to recall."
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/Concept_Definition.png",
+          "description": "A realistic educational illustration showing a hammer striking an iron nail on an anvil. The nail is visibly flattening into a wide, thin shape. Next to it, for contrast, a piece of coal is being hit and shattering into dust. Labels: 'Malleable (Iron)' pointing to the flattened nail, and 'Brittle (Coal)' pointing to the shattered pieces.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/Concept_Definition.png",
+            "description": "A realistic educational illustration showing a hammer striking an iron nail on an anvil. The nail is visibly flattening into a wide, thin shape. Next to it, for contrast, a piece of coal is being hit and shattering into dust. Labels in Kannada script: 'Malleable (Iron)' pointing to the flattened nail, and 'Brittle (Coal)' pointing to the shattered pieces.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    },
+    {
+      "concept": "Ductility",
+      "description": "How does a thick chunk of gold turn into a wire so long it could stretch across a city?",
+      "key_topics": ["Drawing into wires", "Metals vs Non-metals", "Tensile strength"],
+      "detail": "Ductility is the property of materials by which they can be drawn (pulled) into wires[cite: 76]. This property is mainly possessed by metals. Non-metals like coal or sulfur cannot be drawn into wires; they would break[cite: 86].",
+      "working": [
+        "1. A metal is heated or treated to make it pliable.",
+        "2. It is pulled through a series of smaller and smaller holes (dies).",
+        "3. The metal stretches and lengthens into a thin wire without snapping[cite: 76]."
+      ],
+      "intuition_logical_flow": "Imagine chewing gum. If you pull it slowly, it stretches into a long, thin string. Metals can do this too! But if you try to stretch a piece of chalk, it just snaps. That 'stretchiness' into a string is ductility.",
+      "critical_thinking": "Why don't we use wood to make electrical wires, even if we could coat it in metal? (Hint: Can you pull wood into a wire?)",
+      "open_ended_mcqs": [
+        {
+          "question": "Gold is so ductile that 1 gram of it can be drawn into a wire of what length?",
+          "options": ["a) 2 meters", "b) 200 meters", "c) 2 kilometers", "d) 20 kilometers"],
+          "correct_answer": "c) 2 kilometers"
+        }
+      ],
+      "real_life_applications": [
+        "1. Copper and aluminium used in electrical wires[cite: 73].",
+        "2. Gold and silver used in making intricate jewelry[cite: 74].",
+        "3. Steel cables used to support suspension bridges[cite: 87, 88]."
+      ],
+      "relation_between_sub_concepts": "Ductility is often found together with Malleability in metals, but they are different. Malleability = Sheets; Ductility = Wires.",
+      "cross_concept_critical_thinking": "Ductility allows us to create cables for bridges. This connects to physics (tension and load-bearing forces).",
+      "exam_oriented_questions": [
+        "1. Define ductility. Name one metal that is extremely ductile[cite: 76, 78].",
+        "2. Why can't we make wires out of coal? [cite: 85, 86]",
+        "3. Differentiate between ductility and malleability."
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "8 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "2 min",
+        "number_of_revisions_needed_to_master": "1 (interval of revisit in days: 10)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "Medium",
+        "importance_for_the_olympiad": "High",
+        "importance_for_the_iit_neet": "Low",
+        "definition_getting_asked_in_the_unit_test": "Medium"
+      },
+      "which_aspect_is_important": "The definition and the example of Gold being highly ductile.",
+      "should_you_remember_this": "Yes. It explains why all our cables and jewelry are made of metal.",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "Think of 'Duct' -> 'Air Duct' (a long pipe) -> Wire.",
+        "common_mistakes": "Confusing it with Malleability.",
+        "exam_tips": "Ductility = Drawn into wires. Remember the fact: 1g Gold = 2km wire!"
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/Ductility.png",
+          "description": "A split-screen educational diagram. On the left, a thick gold bar. On the right, that same gold bar being pulled and stretched into a very long, thin, glowing wire that coils up. Label text: 'Ductility: Stretching into Wire'.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/Ductility.png",
+          "description": "A split-screen educational diagram. On the left, a thick gold bar. On the right, that same gold bar being pulled and stretched into a very long, thin, glowing wire that coils up. Label text in Kannada script: 'Ductility: Stretching into Wire'.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    },
+    {
+      "concept": "Sonority",
+      "description": "Why does dropping a coin ring out loud, but dropping a book just makes a thud?",
+      "key_topics": ["Sound production", "Ringing sound", "Metals"],
+      "detail": "Sonority is the property of metals to produce a ringing sound when struck hard[cite: 106]. Materials that make this sound are called sonorous. Non-metals like wood or coal produce a dull 'thud' sound[cite: 105].",
+      "working": [
+        "1. Strike a material with a hard object.",
+        "2. If it is a metal, it vibrates freely and produces a ringing tone.",
+        "3. If it is wood or coal, the vibration is dampened instantly, making a dull sound[cite: 104, 105]."
+      ],
+      "intuition_logical_flow": "Imagine a guitar string (metal). When you pluck it, it vibrates and sings. Now imagine a string made of damp rope. If you pluck it, it just stops. Metals are like the guitar string—they love to vibrate and make sound.",
+      "critical_thinking": "If school bells were made of wood, how would the sound change? Would it be effective for the whole school to hear?",
+      "open_ended_mcqs": [
+        {
+          "question": "Which of these objects is likely to be sonorous?",
+          "options": ["a) A plastic ruler", "b) A wooden spoon", "c) A brass temple bell", "d) A piece of charcoal"],
+          "correct_answer": "c) A brass temple bell"
+        }
+      ],
+      "real_life_applications": [
+        "1. School bells and temple bells[cite: 108].",
+        "2. Musical instruments like cymbals.",
+        "3. Ghungroos (dancing bells)[cite: 107]."
+      ],
+      "relation_between_sub_concepts": "Sonority is a physical property, just like luster and hardness, that helps us identify metals.",
+      "cross_concept_critical_thinking": "Connects to the physics of Sound. Sound is vibration. Metals sustain vibration better than wood or plastic.",
+      "exam_oriented_questions": [
+        "1. What does it mean to be 'sonorous'? [cite: 106]",
+        "2. Why are bells made of metal and not wood? [cite: 106, 134]"
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "5 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "1 min",
+        "number_of_revisions_needed_to_master": "0 (Just once is enough)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "Low",
+        "importance_for_the_olympiad": "Low",
+        "importance_for_the_iit_neet": "Low",
+        "definition_getting_asked_in_the_unit_test": "Low"
+      },
+      "which_aspect_is_important": "Just the definition.",
+      "should_you_remember_this": "Yes, it's a simple way to identify metals in daily life.",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "Tap a coin and tap a pencil. The difference is sonority.",
+        "common_mistakes": "None usually. It's a very easy concept.",
+        "exam_tips": "Sonorous = Sound. Think 'Sonar' or 'Song'."
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/Sonority.png",
+          "description": "An illustration comparing a brass bell and a wooden block. A hammer is striking the brass bell, releasing visible sound waves (ripples) labeled 'Ringing Sound (Sonorous)'. The same hammer hits the wooden block with a small 'thud' graphic and no sound waves, labeled 'Dull Sound (Non-sonorous)'.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/Sonority.png",
+          "description": "An illustration comparing a brass bell and a wooden block. A hammer is striking the brass bell, releasing visible sound waves (ripples) labeled in Kannada script: 'Ringing Sound (Sonorous)'. The same hammer hits the wooden block with a small 'thud' graphic and no sound waves, labeled in Kannada script: 'Dull Sound (Non-sonorous)'.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    },
+    {
+      "concept": "Conduction of Heat",
+      "description": "Why do you feel pain if you touch a hot metal spoon, but a wooden spoon feels okay?",
+      "key_topics": ["Heat transfer", "Conductors", "Insulators"],
+      "detail": "Metals are good conductors of heat, meaning they allow heat to pass through them easily[cite: 134]. Non-metals like wood and plastic are poor conductors (insulators), meaning they do not allow heat to pass through easily[cite: 132, 134].",
+      "working": [
+        "1. Immerse a metal spoon and a wooden spoon in hot water.",
+        "2. Wait for a few minutes.",
+        "3. Touch the handle. The metal handle will be hot because heat traveled up from the water.",
+        "4. The wooden handle will remain cool because wood blocked the heat transfer[cite: 129, 130, 131]."
+      ],
+      "intuition_logical_flow": "Imagine a line of people passing a basketball (heat). Metals are like people who pass the ball very fast—the heat gets from one end to the other quickly. Wood is like people who refuse to pass the ball—the heat gets stuck and doesn't reach your hand.",
+      "critical_thinking": "If you were designing a pot for cooking, which part should be metal and which part should be plastic? Why?",
+      "open_ended_mcqs": [
+        {
+          "question": "Why are pressure cooker handles usually made of plastic or wood?",
+          "options": ["a) They are cheaper", "b) They look better", "c) They are poor conductors of heat", "d) They are malleable"],
+          "correct_answer": "c) They are poor conductors of heat"
+        }
+      ],
+      "real_life_applications": [
+        "1. Metal pans used for cooking to heat food quickly[cite: 112].",
+        "2. Wooden or plastic handles on cookware to prevent burning hands[cite: 135].",
+        "3. Mercury used in thermometers (a liquid metal that expands with heat)[cite: 47]."
+      ],
+      "relation_between_sub_concepts": "This property (Conduction) is why metals are used in kitchens and industries where heating is needed.",
+      "cross_concept_critical_thinking": "Links to the chapter 'Heat Transfer'. Metals facilitate conduction, while non-metals act as insulators.",
+      "exam_oriented_questions": [
+        "1. Why are cooking utensils made of metal but their handles made of wood? [cite: 135]",
+        "2. Define conductors of heat with examples[cite: 133, 134]."
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "10 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "3 min",
+        "number_of_revisions_needed_to_master": "1 (interval of revisit in days: 15)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "High",
+        "importance_for_the_olympiad": "Medium",
+        "importance_for_the_iit_neet": "Medium",
+        "definition_getting_asked_in_the_unit_test": "High"
+      },
+      "which_aspect_is_important": "Understanding the application: Metal = Heat moves; Wood = Heat stops.",
+      "should_you_remember_this": "Yes. It's a safety concept! Don't touch hot metal.",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "Recall the spoon in hot water experiment.",
+        "common_mistakes": "Students sometimes think the wooden spoon doesn't get hot at all. It does eventually, but very slowly compared to metal.",
+        "exam_tips": "Conductor = Conveys heat (like a bus conductor conveys people)."
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/Conduction_of_Heat.png",
+          "description": "A cross-section diagram of a cooking pan on a fire. The pan body is labeled 'Metal (Good Conductor)' and shows red heat arrows flowing through it to the food. The handle is labeled 'Wood/Plastic (Poor Conductor)' and shows the red heat arrows stopping, keeping the handle blue/cool.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/Conduction_of_Heat.png",
+          "description": "A cross-section diagram of a cooking pan on a fire. The pan body is labeled in Kannada script: 'Metal (Good Conductor)' and shows red heat arrows flowing through it to the food. The handle is labeled in Kannada script: 'Wood/Plastic (Poor Conductor)' and shows the red heat arrows stopping, keeping the handle blue/cool.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    },
+    {
+      "concept": "Electrical Conductivity",
+      "description": "How does electricity travel from the wall socket to your TV? It needs a special path!",
+      "key_topics": ["Electric circuit", "Good conductors", "Poor conductors"],
+      "detail": "Materials that allow electricity to flow through them easily are called good conductors (e.g., copper, iron, aluminium)[cite: 155]. Materials that do not allow electricity to flow are called poor conductors or insulators (e.g., wood, rubber, sulfur)[cite: 156].",
+      "working": [
+        "1. Create a simple circuit with a battery and a bulb.",
+        "2. Connect the ends with the material to be tested.",
+        "3. If the bulb glows, the material conducts electricity (Metal).",
+        "4. If the bulb stays dark, the material blocks electricity (Non-metal)[cite: 152, 154]."
+      ],
+      "intuition_logical_flow": "Electricity is like a flow of water. Metals are like hollow pipes—water flows through them easily. Wood and rubber are like pipes filled with cement—water (electricity) cannot pass through.",
+      "critical_thinking": "Why do electricians wear rubber gloves while working with high-voltage wires?",
+      "open_ended_mcqs": [
+        {
+          "question": "Which of the following items would complete a circuit and make a bulb glow?",
+          "options": ["a) A piece of coal", "b) An iron nail", "c) A sulfur lump", "d) A dry wooden stick"],
+          "correct_answer": "b) An iron nail"
+        }
+      ],
+      "real_life_applications": [
+        "1. Copper wiring in houses[cite: 73].",
+        "2. Rubber gloves for electricians to prevent shock[cite: 157].",
+        "3. Plastic coating on screwdrivers[cite: 157]."
+      ],
+      "relation_between_sub_concepts": "Metals are generally good conductors of BOTH heat and electricity.",
+      "cross_concept_critical_thinking": "Connects to the 'Electricity' chapter. We use metals for the wires but non-metals for safety (insulation).",
+      "exam_oriented_questions": [
+        "1. Why is copper used for electrical wires? [cite: 152]",
+        "2. Why are screwdriver handles covered with plastic? [cite: 157]"
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "10 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "3 min",
+        "number_of_revisions_needed_to_master": "1 (interval of revisit in days: 30)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "Medium",
+        "importance_for_the_olympiad": "Medium",
+        "importance_for_the_iit_neet": "High",
+        "definition_getting_asked_in_the_unit_test": "High"
+      },
+      "which_aspect_is_important": "Knowing that Metals = Conductors, Non-Metals = Insulators.",
+      "should_you_remember_this": "Yes. Essential for understanding how circuits work.",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "Think of the 'Tester' experiment.",
+        "common_mistakes": "Graphite (pencil lead) is a non-metal but DOES conduct electricity. This is a common exception/trick question.",
+        "exam_tips": "Metal = Glows. Wood = No Glow."
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/Electrical_Conductivity.png",
+          "description": "A circuit diagram showing a battery, a light bulb, and a gap. In the first image, an Iron Nail fills the gap, and the bulb is glowing bright yellow (Good Conductor). In the second image next to it, a piece of Wood fills the gap, and the bulb is off/dark (Poor Conductor). Labels: 'Conductor' and 'Insulator'.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/Electrical_Conductivity.png",
+          "description": "A circuit diagram showing a battery, a light bulb, and a gap. In the first image, an Iron Nail fills the gap, and the bulb is glowing bright yellow (Good Conductor). In the second image next to it, a piece of Wood fills the gap, and the bulb is off/dark (Poor Conductor). Labels in Kannada script: 'Conductor' and 'Insulator'.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    },
+    {
+      "concept": "Rusting (Corrosion of Iron)",
+      "description": "Why do iron gates turn reddish-brown when left in the rain?",
+      "key_topics": ["Rust", "Moist air", "Chemical reaction"],
+      "detail": "Rusting is a chemical reaction where iron reacts with oxygen and water (moist air) to form a brown flaky substance called rust[cite: 217]. The presence of BOTH air and water is essential for rusting[cite: 215].",
+      "working": [
+        "1. Iron exposed to dry air only -> No Rust.",
+        "2. Iron exposed to water only (boiled water with oil layer) -> No Rust.",
+        "3. Iron exposed to Air + Water -> Rust forms[cite: 212, 213, 214]."
+      ],
+      "intuition_logical_flow": "Think of Iron, Oxygen, and Water as three ingredients needed to bake a 'Rust Cake'. If you miss one ingredient (like taking away the air or the water), you can't make the cake. You need all three.",
+      "critical_thinking": "The Iron Pillar in Delhi has not rusted for 1600 years. What does this tell us about ancient Indian metallurgy?",
+      "open_ended_mcqs": [
+        {
+          "question": "Which condition is necessary for rusting of iron?",
+          "options": ["a) Only air", "b) Only water", "c) Both air and water", "d) Neither air nor water"],
+          "correct_answer": "c) Both air and water"
+        }
+      ],
+      "real_life_applications": [
+        "1. Bridges and cars getting damaged by rust[cite: 222].",
+        "2. Need for painting or oiling iron gates to prevent rust[cite: 223].",
+        "3. Galvanisation (coating with Zinc) to protect iron[cite: 223]."
+      ],
+      "relation_between_sub_concepts": "This is a chemical property of metals (reaction with environment), unlike malleability which is a physical property.",
+      "cross_concept_critical_thinking": "This connects to 'Chemical Changes'. Rust is a new substance, different from the original iron.",
+      "exam_oriented_questions": [
+        "1. What acts on iron to cause rusting? [cite: 216]",
+        "2. Describe an experiment to show that both air and water are needed for rusting[cite: 170, 215].",
+        "3. What is the Iron Pillar of Delhi famous for? [cite: 230]"
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "15 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "5 min",
+        "number_of_revisions_needed_to_master": "3 (interval of revisit in days: 10)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "Very High",
+        "importance_for_the_olympiad": "High",
+        "importance_for_the_iit_neet": "Medium",
+        "definition_getting_asked_in_the_unit_test": "Very High"
+      },
+      "which_aspect_is_important": "The three-bottle experiment proves air AND water are required.",
+      "should_you_remember_this": "Yes. It explains a major real-world problem (corrosion).",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "Memorize the conditions of the three bottles (A, B, C).",
+        "common_mistakes": "Thinking water alone causes rust. (Boiled water with oil proves it doesn't!)",
+        "exam_tips": "Rust = Iron + Air + Water."
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/Rusting.png",
+          "description": "A scientific diagram showing three test tubes. Tube A: Iron nail + Dry Air (No Rust). Tube B: Iron nail + Boiled Water + Oil Layer (No Rust). Tube C: Iron nail + Water + Air (Reddish Rust visible). Labels explaining the conditions for each.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/Rusting.png",
+          "description": "A scientific diagram showing three test tubes. Tube A: Iron nail + Dry Air (No Rust). Tube B: Iron nail + Boiled Water + Oil Layer (No Rust). Tube C: Iron nail + Water + Air (Reddish Rust visible). Labels in Kannada script explaining the conditions for each.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    },
+    {
+      "concept": "Nature of Metal Oxides",
+      "description": "When metals burn, they create a new substance. Is it an acid or a base?",
+      "key_topics": ["Combustion", "Metal Oxides", "Basic Nature", "Litmus Test"],
+      "detail": "When metals burn in air (oxygen), they form metal oxides. These oxides are generally basic in nature[cite: 251]. This means if you dissolve the oxide in water, the solution turns red litmus paper blue[cite: 250].",
+      "working": [
+        "1. Burn magnesium ribbon -> White ash (Magnesium Oxide) is formed[cite: 244].",
+        "2. Mix ash with water.",
+        "3. Dip red litmus paper -> It turns Blue.",
+        "4. Conclusion: Metal oxides are basic[cite: 250, 251]."
+      ],
+      "intuition_logical_flow": "Remember: 'M' for Metal, 'B' for Base. (Maybe remember 'MB' - MegaByte?). Metals generally form Bases. Bases turn Red litmus Blue (B for Blue).",
+      "critical_thinking": "If you couldn't find litmus paper, how else could you test if the solution is basic? (Recall indicators like Turmeric from Grade 6).",
+      "open_ended_mcqs": [
+        {
+          "question": "What is the nature of the solution formed when magnesium oxide dissolves in water?",
+          "options": ["a) Acidic", "b) Basic", "c) Neutral", "d) Salty"],
+          "correct_answer": "b) Basic"
+        }
+      ],
+      "real_life_applications": [
+        "1. Antacids (bases) are used to cure acidity.",
+        "2. Magnesium hydroxide (Milk of Magnesia) is a common base."
+      ],
+      "relation_between_sub_concepts": "This contrasts directly with Non-metals, which form Acids.",
+      "cross_concept_critical_thinking": "Links to 'Acids, Bases and Salts'. You are synthesizing a base from a metal.",
+      "exam_oriented_questions": [
+        "1. What happens when magnesium burns in air? [cite: 244]",
+        "2. How would you test the chemical nature of metal oxides? [cite: 246, 250]"
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "12 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "4 min",
+        "number_of_revisions_needed_to_master": "2 (interval of revisit in days: 14)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "High",
+        "importance_for_the_olympiad": "High",
+        "importance_for_the_iit_neet": "High",
+        "definition_getting_asked_in_the_unit_test": "High"
+      },
+      "which_aspect_is_important": "The color change: Red Litmus -> Blue = Basic.",
+      "should_you_remember_this": "Yes. This is a fundamental principle of inorganic chemistry.",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "Remember: Metal -> Base -> Blue.",
+        "common_mistakes": "Confusing Metal oxides (Basic) with Non-metal oxides (Acidic).",
+        "exam_tips": "Mnemonics: 'M-O-B' (Metal Oxide Basic)."
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/Nature_of_Metal_Oxides.png",
+          "description": "Step-by-step diagram: 1. Magnesium ribbon burning with a bright white flame. 2. White ash (MgO) collected. 3. Ash mixed with water in a beaker. 4. Red litmus paper dipped in the beaker turning Blue. Label: 'Metal Oxides are Basic'.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/Nature_of_Metal_Oxides.png",
+          "description": "Step-by-step diagram: 1. Magnesium ribbon burning with a bright white flame. 2. White ash (MgO) collected. 3. Ash mixed with water in a beaker. 4. Red litmus paper dipped in the beaker turning Blue. Label in Kannada script: 'Metal Oxides are Basic'.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    },
+    {
+      "concept": "Nature of Non-Metal Oxides",
+      "description": "Sulfur is a non-metal. When it burns, does it create a base like metals do? No!",
+      "key_topics": ["Non-metals", "Acidic Nature", "Sulfur Dioxide", "Litmus Test"],
+      "detail": "Non-metals react with oxygen to produce oxides that are generally acidic in nature[cite: 302]. For example, Sulfur burns to form Sulfur Dioxide. When dissolved in water, it forms Sulfurous Acid, which turns blue litmus red[cite: 286, 287].",
+      "working": [
+        "1. Burn Sulfur powder -> Sulfur Dioxide gas (SO2)[cite: 286].",
+        "2. Dissolve gas in water -> Sulfurous Acid (H2SO3)[cite: 287].",
+        "3. Dip Blue litmus paper -> Turns Red[cite: 285].",
+        "4. Conclusion: Non-metal oxides are Acidic[cite: 302]."
+      ],
+      "intuition_logical_flow": "If Metals are the 'Good Guys' making Bases (Blue), Non-metals are the 'Opposite Team' making Acids (Red). (A for Acid, A for 'Antagonist' or just remember Acid turns Blue to Red).",
+      "critical_thinking": "Why is rain in industrial areas sometimes called 'Acid Rain'? (Hint: Burning coal releases non-metal oxides like sulfur dioxide into the air).",
+      "open_ended_mcqs": [
+        {
+          "question": "What is the product formed when Sulfur Dioxide dissolves in water?",
+          "options": ["a) Sulfuric acid", "b) Sulfurous acid", "c) Sulfur oxide", "d) Hydrogen sulfide"],
+          "correct_answer": "b) Sulfurous acid"
+        }
+      ],
+      "real_life_applications": [
+        "1. Formation of Acid Rain (pollution).",
+        "2. Carbonated drinks (Carbon dioxide is a non-metal oxide, making water acidic)."
+      ],
+      "relation_between_sub_concepts": "Completes the chemistry picture: Metals=Basic, Non-metals=Acidic.",
+      "cross_concept_critical_thinking": "Environmental Science: Understanding pollution (Acid Rain) requires understanding non-metal oxides.",
+      "exam_oriented_questions": [
+        "1. Write the reaction for burning sulfur and dissolving the gas in water[cite: 384, 397].",
+        "2. How does the nature of non-metal oxides differ from metal oxides? [cite: 302, 332, 333]"
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "15 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "5 min",
+        "number_of_revisions_needed_to_master": "3 (interval of revisit in days: 10)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "High",
+        "importance_for_the_olympiad": "High",
+        "importance_for_the_iit_neet": "High",
+        "definition_getting_asked_in_the_unit_test": "High"
+      },
+      "which_aspect_is_important": "The chemical equations (word equations) and the Litmus result.",
+      "should_you_remember_this": "Yes. It explains acid rain and basic chemistry.",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "Memorize: Sulfur (S) + Oxygen (O2) -> SO2. SO2 + Water -> H2SO3 (Sulfurous Acid).",
+        "common_mistakes": "Confusing Sulfurous acid (H2SO3) with Sulfuric acid (H2SO4). The text specifies Sulfurous acid.",
+        "exam_tips": "Non-metal = Acid = Red (Danger color)."
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/Nature_of_non_metal_oxides.png",
+          "description": "A diagram showing the Sulfur experiment. 1. A deflagrating spoon with burning sulfur inside a gas jar. 2. Water being added to the jar to dissolve the gas. 3. A blue litmus paper dipped into the water turning RED. Label: 'Non-metal Oxides are Acidic'.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/Nature_of_non_metal_oxides.png",
+          "description": "A diagram showing the Sulfur experiment. 1. A deflagrating spoon with burning sulfur inside a gas jar. 2. Water being added to the jar to dissolve the gas. 3. A blue litmus paper dipped into the water turning RED. Label in Kannada script: 'Non-metal Oxides are Acidic'.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    }
+  ]
+}

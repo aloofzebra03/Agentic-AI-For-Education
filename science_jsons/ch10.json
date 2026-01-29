@@ -1,0 +1,240 @@
+{
+  "_id": { "$oid": "64b8f1e2c9e77c0012345678" },
+  "chapter_number": 10,
+  "chapter_name": "Life Processes in Plants",
+  "concepts": [
+    {
+      "concept": "Photosynthesis",
+      "description": "The magical process by which plants cook their own food using sunlight, water, and air!",
+      "key_topics": [
+        "Chlorophyll",
+        "Sunlight",
+        "Carbon Dioxide",
+        "Glucose",
+        "Stomata"
+      ],
+      "detail": "Photosynthesis is the process by which plants prepare their own food in the presence of sunlight and chlorophyll[cite: 214]. Plants take in carbon dioxide from the air and water from the soil to produce glucose (a simple carbohydrate) and oxygen[cite: 213, 256]. The leaves are known as the 'food factories' of the plant because this is where the process primarily takes place[cite: 170]. The green pigment called chlorophyll helps capture the energy from sunlight to drive this chemical reaction[cite: 96, 169].",
+      "working": [
+        "1. Roots absorb water and minerals from the soil, which travel up to the leaves.",
+        "2. Tiny pores on the leaves called stomata take in carbon dioxide from the air[cite: 284].",
+        "3. Chlorophyll in the leaves traps energy from sunlight.",
+        "4. Using this energy, the plant converts water and carbon dioxide into glucose (food) and releases oxygen[cite: 258].",
+        "5. The glucose is used for energy or stored as starch[cite: 257]."
+      ],
+      "intuition_logical_flow": "Think of a leaf as a kitchen. The 'Cook' is Chlorophyll. The 'Fire' (energy source) is Sunlight. The 'Ingredients' are Water and Carbon Dioxide. The final 'Dish' prepared is Glucose (food), and the steam/smoke releasing out is Oxygen.",
+      "critical_thinking": "If you cover a healthy potted plant's leaves with black paper and leave it in the sun for a few days, will the leaves still contain starch? Why or why not?",
+      "open_ended_mcqs": [
+        {
+          "question": "Which component acts as the energy source during photosynthesis?",
+          "options": [
+            "a) Water",
+            "b) Carbon Dioxide",
+            "c) Sunlight",
+            "d) Chlorophyll"
+          ],
+          "correct_answer": "c) Sunlight"
+        }
+      ],
+      "real_life_applications": [
+        "1. Farming: Farmers ensure crops get enough light and water to maximize food production.",
+        "2. Oxygen Production: We rely on this process for the oxygen we breathe every day.",
+        "3. Greenhouses: Used to control light and temperature to help plants photosynthesize better in cold climates."
+      ],
+      "relation_between_sub_concepts": "Chlorophyll captures the sunlight necessary to combine Carbon Dioxide (entered through Stomata) and Water (transported from roots) to create Glucose.",
+      "cross_concept_critical_thinking": "How does deforestation affect the amount of Carbon Dioxide and Oxygen in the atmosphere, considering the process of photosynthesis?",
+      "exam_oriented_questions": [
+        "1. Write the word equation for photosynthesis[cite: 258].",
+        "2. Why are leaves called the 'food factories' of plants? [cite: 170]",
+        "3. Describe an experiment to show that sunlight is essential for photosynthesis[cite: 130]."
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "25 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "10 min",
+        "number_of_revisions_needed_to_master": "3 (interval of revisit in days: 7)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "100%",
+        "importance_for_the_olympiad": "High",
+        "importance_for_the_iit_neet": "High",
+        "definition_getting_asked_in_the_unit_test": "High"
+      },
+      "which_aspect_is_important": "Memorize the word equation: Carbon dioxide + Water -> (Sunlight/Chlorophyll) -> Glucose + Oxygen.",
+      "should_you_remember_this": "Yes, because it is the fundamental basis of life on Earth, providing food and oxygen for all organisms.",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "Practice drawing the diagram of photosynthesis showing inputs and outputs. Memorize the 4 requirements.",
+        "common_mistakes": "Students often forget to mention 'Chlorophyll' and 'Sunlight' in the equation, writing only CO2 and Water.",
+        "exam_tips": "Remember the recipe: Sun + Green + Air + Water = Sugar + Oxygen."
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/photosynthesis.png",
+          "description": "A clear, educational diagram showing the process of photosynthesis in a plant. The image features a sunflower plant with roots in soil and leaves. Arrows point into the leaves labeled 'Sunlight' (yellow rays), 'Carbon Dioxide' (from air), and 'Water' (from roots). Arrows point out of the leaves labeled 'Oxygen' and 'Glucose (Food)'. The leaf contains a zoomed-in section labeled 'Chlorophyll'. All text is in English.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/photosynthesis.png",
+          "description": "A clear, educational diagram showing the process of photosynthesis in a plant. The image features a sunflower plant with roots in soil and leaves. Arrows point into the leaves labeled 'ಸೂರ್ಯನ ಬೆಳಕು' (Sunlight), 'ಇಂಗಾಲದ ಡೈಆಕ್ಸೈಡ್' (Carbon Dioxide), and 'ನೀರು' (Water). Arrows point out of the leaves labeled 'ಆಮ್ಲಜನಕ' (Oxygen) and 'ಗ್ಲೂಕೋಸ್' (Glucose). The leaf contains a zoomed-in section labeled 'ಪತ್ರಹರಿತ್ತು' (Chlorophyll). All text is in Kannada script.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    },
+    {
+      "concept": "Transport System in Plants (Xylem & Phloem)",
+      "description": "The plant's internal highway system that moves water up and food down!",
+      "key_topics": [
+        "Xylem",
+        "Phloem",
+        "Transport of Water",
+        "Transport of Food",
+        "Roots"
+      ],
+      "detail": "Plants have a pipe-like transport system to move substances. The 'Xylem' acts as a set of pipes that transports water and minerals from the roots upwards to the stem, branches, and leaves[cite: 322, 324]. The 'Phloem' is another set of tubes that transports the food (glucose) prepared in the leaves to all other parts of the plant, including roots and seeds[cite: 330].",
+      "working": [
+        "1. Roots absorb water containing dissolved minerals from the soil.",
+        "2. This mixture travels UP through the Xylem vessels (like a straw) to the leaves.",
+        "3. Leaves use the water to make food (photosynthesis).",
+        "4. The prepared food travels from the leaves to other parts of the plant through the Phloem vessels."
+      ],
+      "intuition_logical_flow": "Imagine a tall building. The **Xylem** is the water pump system that pushes water from the basement (roots) to the top floor apartments (leaves). The **Phloem** is the food delivery service (elevator) that takes food cooked in the top floor kitchen (leaves) and distributes it to everyone in the building, even down to the basement.",
+      "critical_thinking": "If you cut a ring of bark (which contains phloem) off a tree trunk, the roots eventually die. Why do you think this happens?",
+      "open_ended_mcqs": [
+        {
+          "question": "If you place a white flower in a glass of red ink water, the petals turn red. Which tissue is responsible for this?",
+          "options": [
+            "a) Phloem",
+            "b) Stomata",
+            "c) Xylem",
+            "d) Roots"
+          ],
+          "correct_answer": "c) Xylem"
+        }
+      ],
+      "real_life_applications": [
+        "1. Florists: Dyeing white flowers different colors by putting their stems in colored water.",
+        "2. Gardening: Knowing that damaging the bark can starve the roots helps in tree care.",
+        "3. Agriculture: Understanding how fertilizers (minerals) dissolved in water reach the crops."
+      ],
+      "relation_between_sub_concepts": "Xylem brings the raw material (water) needed for photosynthesis to the leaves; Phloem takes the finished product (food) away from the leaves.",
+      "cross_concept_critical_thinking": "How does the process of Transpiration (water loss from leaves) help the Xylem lift water against gravity?",
+      "exam_oriented_questions": [
+        "1. What is the function of Xylem and Phloem? [cite: 324, 330]",
+        "2. Describe an experiment to demonstrate the transport of water in plants using colored ink[cite: 311].",
+        "3. How do minerals reach the leaves from the soil? [cite: 323]"
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "20 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "8 min",
+        "number_of_revisions_needed_to_master": "2 (interval of revisit in days: 10)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "60%",
+        "importance_for_the_olympiad": "Medium",
+        "importance_for_the_iit_neet": "Medium",
+        "definition_getting_asked_in_the_unit_test": "Medium"
+      },
+      "which_aspect_is_important": "Remember: Xylem = Water (Up), Phloem = Food (All directions).",
+      "should_you_remember_this": "Yes, to understand how tall trees get water to their topmost leaves.",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "Draw a cross-section of a stem showing Xylem and Phloem bundles.",
+        "common_mistakes": "Confusing Xylem and Phloem. Students often swap their functions.",
+        "exam_tips": "Mnemonic: 'W' comes before 'X' (Water -> Xylem). 'F' sounds like 'Ph' (Food -> Phloem)."
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/plant_transport_tissues.png",
+          "description": "A cross-section diagram of a plant stem showing the transport tissues. The diagram highlights two types of tubes. Blue-colored tubes labeled 'Xylem (Water & Minerals)' showing upward arrows. Orange-colored tubes labeled 'Phloem (Food)' showing arrows moving in both directions. Next to it, a visual of a white flower in a beaker of red water turning red. All text in English.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/plant_transport_tissues.png",
+          "description": "A cross-section diagram of a plant stem showing the transport tissues. The diagram highlights two types of tubes. Blue-colored tubes labeled 'ಕ್ಸೈಲಮ್ (ನೀರು ಮತ್ತು ಖನಿಜಗಳು)' (Xylem) showing upward arrows. Orange-colored tubes labeled 'ಪ್ಲೋಯೆಮ್ (ಆಹಾರ)' (Phloem) showing arrows moving in both directions. Next to it, a visual of a white flower in a beaker of red water turning red. All text in Kannada script.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    },
+    {
+      "concept": "Respiration in Plants",
+      "description": "How plants breathe and release energy from food, just like us!",
+      "key_topics": [
+        "Glucose Breakdown",
+        "Oxygen Intake",
+        "Carbon Dioxide Release",
+        "Energy Production",
+        "Germinating Seeds"
+      ],
+      "detail": "Just like animals, plants respire to survive. Respiration is the process where glucose (food) is broken down in the presence of oxygen to release energy, carbon dioxide, and water[cite: 363]. This energy is used for plant growth and development[cite: 366]. This process happens day and night in all living parts of the plant[cite: 367].",
+      "working": [
+        "1. Plants take in oxygen from the air through stomata (leaves) or air spaces in soil (roots).",
+        "2. Inside the cells, this oxygen reacts with glucose (stored food).",
+        "3. The glucose breaks down into Carbon Dioxide and Water.",
+        "4. Energy is released during this breakdown.",
+        "5. Carbon Dioxide is released back into the air."
+      ],
+      "intuition_logical_flow": "Respiration is the exact *reverse* of Photosynthesis. In Photosynthesis, you PUT energy (sun) IN to make food. In Respiration, you break food APART to GET energy OUT. It's like charging a battery (Photosynthesis) vs. using the battery to run a toy (Respiration).",
+      "critical_thinking": "We are told not to sleep under trees at night. Based on the concept of respiration, can you explain the scientific reason behind this advice?",
+      "open_ended_mcqs": [
+        {
+          "question": "What gas do plants release during respiration?",
+          "options": [
+            "a) Oxygen",
+            "b) Carbon Dioxide",
+            "c) Nitrogen",
+            "d) Hydrogen"
+          ],
+          "correct_answer": "b) Carbon Dioxide"
+        }
+      ],
+      "real_life_applications": [
+        "1. Seed Storage: Seeds must be kept dry so they don't respire too fast and spoil before planting.",
+        "2. Root Health: Farmers plough soil to ensure air (oxygen) reaches the roots for respiration.",
+        "3. Fruit Ripening: Respiration rate increases when fruits ripen."
+      ],
+      "relation_between_sub_concepts": "The Glucose created in Photosynthesis is the fuel used in Respiration to create energy.",
+      "cross_concept_critical_thinking": "Contrast the net gas exchange in plants during the day (when both photosynthesis and respiration happen) vs. at night (when only respiration happens).",
+      "exam_oriented_questions": [
+        "1. Write the word equation for respiration in plants[cite: 365].",
+        "2. How is respiration different from photosynthesis? [cite: 385]",
+        "3. Describe an experiment to show that germinating seeds release carbon dioxide[cite: 337]."
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "15 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "5 min",
+        "number_of_revisions_needed_to_master": "2 (interval of revisit in days: 14)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "40%",
+        "importance_for_the_olympiad": "Medium",
+        "importance_for_the_iit_neet": "Medium",
+        "definition_getting_asked_in_the_unit_test": "Low"
+      },
+      "which_aspect_is_important": "Understand that plants respire 24/7, not just at night.",
+      "should_you_remember_this": "Yes, to correct the misconception that plants only photosynthesize and never breathe like animals.",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "Compare the equations of Photosynthesis and Respiration side-by-side.",
+        "common_mistakes": "Thinking plants breathe CO2 and release O2 *during respiration*. (They actually take O2 and release CO2 during respiration, just like humans).",
+        "exam_tips": "Respiration = Release Energy. It requires Oxygen (O2) to burn the food."
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/respiration_in_plants.png",
+          "description": "A diagram comparing Photosynthesis and Respiration. Left side (Day): Sun shining, arrow showing 'Energy In', 'CO2 In', 'Oxygen Out'. Right side (Night/Respiration): Moon or dark background, arrow showing 'Energy Out', 'Oxygen In', 'CO2 Out'. A central formula shows: Glucose + Oxygen -> CO2 + Water + Energy. All text in English.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/respiration_in_plants.png",
+          "description": "A diagram comparing Photosynthesis and Respiration. Left side (Day): Sun shining, arrow showing 'ಶಕ್ತಿ' (Energy) In, 'ಇಂಗಾಲದ ಡೈಆಕ್ಸೈಡ್' (CO2) In, 'ಆಮ್ಲಜನಕ' (Oxygen) Out. Right side (Night/Respiration): Moon or dark background, arrow showing 'ಶಕ್ತಿ' (Energy) Out, 'ಆಮ್ಲಜನಕ' (Oxygen) In, 'ಇಂಗಾಲದ ಡೈಆಕ್ಸೈಡ್' (CO2) Out. A central formula shows: ಗ್ಲೂಕೋಸ್ + ಆಮ್ಲಜನಕ -> ಇಂಗಾಲದ ಡೈಆಕ್ಸೈಡ್ + ನೀರು + ಶಕ್ತಿ. All text in Kannada script.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    }
+  ]
+}

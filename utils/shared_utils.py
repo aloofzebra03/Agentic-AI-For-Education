@@ -623,86 +623,54 @@ _SECTION_KEY_MAPPING = {
 
 def _build_concept_to_file_mapping() -> Dict[str, str]:
     """
-    Hardcoded mapping of concept names (lowercase) to their JSON file paths.
-    This eliminates the need to scan files on every import, providing instant lookups.
+    Auto-scan science_jsons folder and build concept-to-file mapping dynamically.
+    This eliminates manual maintenance - just update JSON files and mapping stays current.
     
     Returns:
-        Dict mapping concept names to file paths
+        Dict mapping concept names (lowercase) to their JSON file paths
     """
     global _CONCEPT_TO_FILE_MAP
     
     if _CONCEPT_TO_FILE_MAP is not None:
         return _CONCEPT_TO_FILE_MAP
     
-    # Hardcoded mapping - add new concepts here as needed
-    mapping = {
-        # 8.json concepts
-        "conduction": "NCERT/8.json",
-        "convection": "NCERT/8.json",
-        "radiation": "NCERT/8.json",
-        "good conductors of heat": "NCERT/8.json",
-        "poor conductors (insulators) of heat": "NCERT/8.json",
-        "land breeze": "NCERT/8.json",
-        "sea breeze": "NCERT/8.json",
-        "water cycle": "NCERT/8.json",
-        "infiltration": "NCERT/8.json",
-        "groundwater": "NCERT/8.json",
-        
-        # 11.json concepts
-        "photosynthesis": "NCERT/11.json",
-        "chlorophyll": "NCERT/11.json",
-        "stomata": "NCERT/11.json",
-        "xylem": "NCERT/11.json",
-        "phloem": "NCERT/11.json",
-        "respiration": "NCERT/11.json",
-        "carbon dioxide": "NCERT/11.json",
-        "oxygen": "NCERT/11.json",
-        "water": "NCERT/11.json",
-        "sunlight": "NCERT/11.json",
-        
-        # 12.json concepts
-        "light": "NCERT/12.json",
-        "shadows": "NCERT/12.json",
-        "reflection": "NCERT/12.json",
-        "luminous objects": "NCERT/12.json",
-        "non-luminous objects": "NCERT/12.json",
-        "transparent materials": "NCERT/12.json",
-        "translucent materials": "NCERT/12.json",
-        "opaque materials": "NCERT/12.json",
-        "image formation": "NCERT/12.json",
-        "pinhole camera": "NCERT/12.json",
-        
-        # NCERT Class 7.json concepts
-        "measurement of time": "NCERT/NCERT Class 7.json",
-        "history of timekeeping devices": "NCERT/NCERT Class 7.json",
-        "sundial": "NCERT/NCERT Class 7.json",
-        "water clock": "NCERT/NCERT Class 7.json",
-        "hourglass": "NCERT/NCERT Class 7.json",
-        "candle clock": "NCERT/NCERT Class 7.json",
-        "pendulum and its time period": "NCERT/NCERT Class 7.json",
-        "speed": "NCERT/NCERT Class 7.json",
-        "uniform motion": "NCERT/NCERT Class 7.json",
-        "non-uniform motion": "NCERT/NCERT Class 7.json",
-        "si unit of time": "NCERT/NCERT Class 7.json",
-
-        # Fractions.txt concepts
-        "fraction as equal share": "NCERT/Fractions.txt",
-        "fractional units": "NCERT/Fractions.txt",
-        "reading fractions": "NCERT/Fractions.txt",
-        "numerator": "NCERT/Fractions.txt",
-        "denominator": "NCERT/Fractions.txt",
-        "mixed fractions": "NCERT/Fractions.txt",
-        "number line": "NCERT/Fractions.txt",
-        "equivalent fractions": "NCERT/Fractions.txt",
-        "lowest terms": "NCERT/Fractions.txt",
-        "brahmagupta's method for adding fractions": "NCERT/Fractions.txt",
-        "brahmagupta's method for subtracting fractions": "NCERT/Fractions.txt",
-        
-        "_default": "NCERT/8.json",
-    }
+    import glob
+    
+    mapping = {}
+    science_jsons_dir = "science_jsons"
+    
+    # Scan all .json files in science_jsons folder
+    json_pattern = os.path.join(science_jsons_dir, "*.json")
+    json_files = glob.glob(json_pattern)
+    
+    print(f"🔍 Scanning {len(json_files)} JSON files in {science_jsons_dir}/")
+    
+    total_concepts = 0
+    for json_file in json_files:
+        try:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            # Extract concepts from the "concepts" array
+            if "concepts" in data and isinstance(data["concepts"], list):
+                for concept_obj in data["concepts"]:
+                    concept_name = concept_obj.get("concept", "").strip()
+                    if concept_name:
+                        # Store with lowercase key for case-insensitive lookup
+                        concept_key = concept_name.lower()
+                        mapping[concept_key] = json_file
+                        total_concepts += 1
+        except Exception as e:
+            print(f"⚠️ Error reading {json_file}: {e}")
+            continue
+    
+    # Add default fallback (use first file if available)
+    if json_files:
+        mapping["_default"] = json_files[0]
     
     _CONCEPT_TO_FILE_MAP = mapping
-    print(f"✅ Loaded hardcoded mapping for {len(mapping)-1} concepts")
+    print(f"✅ Auto-loaded mapping for {total_concepts} concepts from {len(json_files)} files")
+    
     return mapping
 
 

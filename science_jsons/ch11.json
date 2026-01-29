@@ -1,0 +1,449 @@
+{
+  "_id": {
+    "$oid": "64be7a2f9d3e2a1b4c8f1e2a"
+  },
+  "chapter_number": 11,
+  "chapter_name": "Light: Shadows and Reflections",
+  "concepts": [
+    {
+      "concept": "Sources of Light: Luminous & Non-luminous",
+      "description": "Why do some things shine on their own while others need a flashlight?",
+      "key_topics": [
+        "Luminous Objects",
+        "Non-luminous Objects",
+        "Natural vs Artificial Light"
+      ],
+      "detail": "Objects that emit their own light are called luminous objects (e.g., Sun, stars, fireflies, electric bulbs). Objects that do not emit their own light are called non-luminous objects (e.g., Moon, tables, humans). We see non-luminous objects only when light from a luminous source reflects off them and enters our eyes.",
+      "working": [
+        "1. A luminous source (like the Sun) emits light energy.",
+        "2. This light travels and strikes a non-luminous object (like a tree).",
+        "3. The object reflects this light in various directions.",
+        "4. The reflected light reaches our eyes, allowing us to see the object."
+      ],
+      "intuition_logical_flow": "Think of light like water from a hose. Luminous objects are the 'taps' that pour out water. Non-luminous objects are like 'buckets'—they don't create water, they just get wet (lit up) when the tap pours on them.",
+      "critical_thinking": "If you are in a completely dark room with no windows and you hold a mirror, can you see your reflection? Why or why not?",
+      "open_ended_mcqs": [
+        {
+          "question": "Which of the following is a non-luminous object that shines by reflecting sunlight?",
+          "options": [
+            "a) The Sun",
+            "b) A burning candle",
+            "c) The Moon",
+            "d) A firefly"
+          ],
+          "correct_answer": "c) The Moon"
+        }
+      ],
+      "real_life_applications": [
+        "1. Safety reflectors on bicycles glow by reflecting car headlights.",
+        "2. Moonlight is actually sunlight reflecting off the Moon's surface."
+      ],
+      "relation_between_sub_concepts": "Luminous objects provide the energy required for us to see non-luminous objects.",
+      "cross_concept_critical_thinking": "Connects to 'Vision' in biology—we need light to stimulate our eyes to see.",
+      "exam_oriented_questions": [
+        "1. Define luminous and non-luminous objects with two examples each.",
+        "2. Why is the Moon considered non-luminous even though it shines at night?"
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "15 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "5 min",
+        "number_of_revisions_needed_to_master": "2 (interval of revisit in days: 7)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "100%",
+        "importance_for_the_olympiad": "Medium",
+        "importance_for_the_iit_neet": "Low",
+        "definition_getting_asked_in_the_unit_test": "High"
+      },
+      "which_aspect_is_important": "Distinguishing between objects that make light vs. objects that reflect light.",
+      "should_you_remember_this": "Yes, it is the fundamental basis of how we see the world.",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "List objects around you and categorize them as Luminous or Non-luminous.",
+        "common_mistakes": "Students often think the Moon is luminous because it shines at night. Remember, it only reflects the Sun.",
+        "exam_tips": "Remember 'Luminous' starts with 'L' for Light-maker."
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/luminous_and_non_luminous.png",
+          "description": "A split educational illustration. Left side: The Sun and a Light Bulb glowing brightly, labeled 'Luminous Objects'. Right side: The Moon, a wooden Chair, and a Book, labeled 'Non-luminous Objects'. Arrows show light rays travelling from the Sun hitting the Moon. High contrast, clean vector style, white background. English text labels.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/luminous_and_non_luminous.png",
+          "description": "A split educational illustration. Left side: The Sun and a Light Bulb glowing brightly, labeled 'ಸ್ವಯಂ ಪ್ರಕಾಶಿಸುವ ವಸ್ತುಗಳು (Luminous Objects)'. Right side: The Moon, a wooden Chair, and a Book, labeled 'ಪರಾವಲಂಬಿ ಪ್ರಕಾಶಿಸುವ ವಸ್ತುಗಳು (Non-luminous Objects)'. Arrows show light rays travelling from the Sun hitting the Moon. High contrast, clean vector style, white background. Kannada text labels.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    },
+    {
+      "concept": "Rectilinear Propagation of Light",
+      "description": "Why can't you see around a corner without a mirror?",
+      "key_topics": [
+        "Straight line travel",
+        "Ray of light",
+        "Beam of light"
+      ],
+      "detail": "Light travels in a straight line. It does not curve or bend around corners on its own. This property is known as the Rectilinear Propagation of Light.",
+      "working": [
+        "1. Take a straight pipe and look at a candle flame; you can see it.",
+        "2. Take a bent pipe and look at the same flame; you cannot see it.",
+        "3. This proves that light from the flame cannot turn the corner inside the bent pipe."
+      ],
+      "intuition_logical_flow": "Imagine shooting an arrow or a bullet. It flies straight. It cannot curve around a wall to hit a target. Light behaves exactly like that arrow—it only moves straight forward.",
+      "critical_thinking": "If light travels in straight lines, how do fiber optic cables carry light in curved paths?",
+      "open_ended_mcqs": [
+        {
+          "question": "Which activity proves that light travels in a straight line?",
+          "options": [
+            "a) Seeing your face in a mirror",
+            "b) Looking at a candle through a straight vs. bent pipe",
+            "c) Watching a shadow change size",
+            "d) Using a magnifying glass"
+          ],
+          "correct_answer": "b) Looking at a candle through a straight vs. bent pipe"
+        }
+      ],
+      "real_life_applications": [
+        "1. Aiming a laser pointer at a specific spot.",
+        "2. Formation of sharp shadows (if light curved, shadows would be fuzzy or non-existent)."
+      ],
+      "relation_between_sub_concepts": "This property is the reason shadows form and why pinhole cameras create inverted images.",
+      "cross_concept_critical_thinking": "In higher grades, you will learn about 'Diffraction' where light bends slightly, but for macroscopic objects, it travels straight.",
+      "exam_oriented_questions": [
+        "1. Describe an experiment to show that light travels in a straight line.",
+        "2. What happens when you try to look at a light source through a bent tube?"
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "20 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "10 min",
+        "number_of_revisions_needed_to_master": "1 (interval of revisit in days: 15)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "High",
+        "importance_for_the_olympiad": "High",
+        "importance_for_the_iit_neet": "Medium",
+        "definition_getting_asked_in_the_unit_test": "High"
+      },
+      "which_aspect_is_important": "The 'Bent Pipe vs Straight Pipe' experiment is a classic exam question.",
+      "should_you_remember_this": "Yes, this is a core property of light physics.",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "Draw the diagram of the boy with the bent pipe.",
+        "common_mistakes": "Forgetting that light travels in 'straight lines' specifically.",
+        "exam_tips": "Think of a laser beam—always straight."
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/rectilinear_propagation.png",
+          "description": "An educational diagram showing a student looking at a candle flame. Top panel: The student uses a straight pipe, and a dotted line representing light travels directly from the flame to the eye (labeled 'Visible'). Bottom panel: The student uses a bent/curved pipe, and the light ray hits the wall of the pipe and stops (labeled 'Not Visible'). Clear, colorful cartoon style. English text labels.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/rectilinear_propagation.png",
+          "description": "An educational diagram showing a student looking at a candle flame. Top panel: The student uses a straight pipe, and a dotted line representing light travels directly from the flame to the eye (labeled 'ಕಾಣಿಸುತ್ತದೆ - Visible'). Bottom panel: The student uses a bent/curved pipe, and the light ray hits the wall of the pipe and stops (labeled 'ಕಾಣಿಸುವುದಿಲ್ಲ - Not Visible'). Clear, colorful cartoon style. Kannada text labels.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    },
+    {
+      "concept": "Transparent, Translucent, and Opaque",
+      "description": "The difference between a window, a frosted glass, and a brick wall.",
+      "key_topics": [
+        "Transmission of Light",
+        "Material Properties",
+        "Visibility"
+      ],
+      "detail": "Materials are classified based on how much light passes through them. \n1. **Transparent**: Allows light to pass fully (e.g., clear glass, clean water). Objects are seen clearly through them.\n2. **Translucent**: Allows light to pass partially (e.g., butter paper, frosted glass). Objects look blurry.\n3. **Opaque**: Does not allow any light to pass (e.g., wood, metal, cardboard). Creates shadows.",
+      "working": [
+        "1. Shine a torch on a material.",
+        "2. If the light spot appears bright on the wall behind it -> Transparent.",
+        "3. If a dim light passes through -> Translucent.",
+        "4. If no light passes and a shadow forms -> Opaque."
+      ],
+      "intuition_logical_flow": "Transparent is like an open door (walk right through). Translucent is like a crowded room (you can get through but it's slow/messy). Opaque is like a locked steel door (no getting through).",
+      "critical_thinking": "Is clear water transparent? What happens if you add milk to it? Does it become translucent or opaque?",
+      "open_ended_mcqs": [
+        {
+          "question": "Which material would you choose to make a shadow puppet?",
+          "options": [
+            "a) Clear plastic sheet",
+            "b) Opaque cardboard",
+            "c) Butter paper",
+            "d) Glass pane"
+          ],
+          "correct_answer": "b) Opaque cardboard"
+        }
+      ],
+      "real_life_applications": [
+        "1. Windows are transparent to see outside.",
+        "2. Bathroom windows are translucent for privacy.",
+        "3. Umbrellas are opaque to block the sun."
+      ],
+      "relation_between_sub_concepts": "Opaque objects are the creators of shadows (the next concept).",
+      "cross_concept_critical_thinking": "In chemistry, this relates to the arrangement of molecules and how they absorb or transmit photons.",
+      "exam_oriented_questions": [
+        "1. Differentiate between transparent, translucent, and opaque materials with examples.",
+        "2. Why can't we see through a wooden wall?"
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "15 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "5 min",
+        "number_of_revisions_needed_to_master": "1 (interval of revisit in days: 30)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "Medium",
+        "importance_for_the_olympiad": "Medium",
+        "importance_for_the_iit_neet": "Low",
+        "definition_getting_asked_in_the_unit_test": "High"
+      },
+      "which_aspect_is_important": "Examples of each category are frequently asked.",
+      "should_you_remember_this": "Yes, helps in understanding shadow formation.",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "Make a table with three columns: Type, Definition, Example.",
+        "common_mistakes": "Confusing Translucent (blurry) with Transparent (clear).",
+        "exam_tips": "Trans'LUCENT' -> Not fully clear, like 'Loose' light."
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/transparent_translucent_opaque.png",
+          "description": "A comparative diagram with three sections. Left: A clear glass pane with a tree clearly visible behind it (labeled 'Transparent'). Middle: A sheet of tracing paper with the tree visible but blurry (labeled 'Translucent'). Right: A wooden board blocking the view completely (labeled 'Opaque'). A flashlight shines on each, showing light passing through the first two but blocked by the third. English text.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/transparent_translucent_opaque.png",
+          "description": "A comparative diagram with three sections. Left: A clear glass pane with a tree clearly visible behind it (labeled 'ಪಾರದರ್ಶಕ - Transparent'). Middle: A sheet of tracing paper with the tree visible but blurry (labeled 'ಅರೆಪಾರದರ್ಶಕ - Translucent'). Right: A wooden board blocking the view completely (labeled 'ಅಪಾರದರ್ಶಕ - Opaque'). A flashlight shines on each, showing light passing through the first two but blocked by the third. Kannada text.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    },
+    {
+      "concept": "Shadow Formation",
+      "description": "Why does your shadow follow you, and why is it sometimes long and sometimes short?",
+      "key_topics": [
+        "Requirements for a Shadow",
+        "Screen",
+        "Shape and Size"
+      ],
+      "detail": "A shadow is a dark patch formed when an opaque object comes in the path of light. \nThree things are absolutely required for a shadow to form:\n1. A source of light.\n2. An opaque object (to block the light).\n3. A screen (surface like a wall or ground where the shadow falls).",
+      "working": [
+        "1. Light travels in a straight line from the source.",
+        "2. An opaque object blocks a specific portion of these light rays.",
+        "3. The area behind the object receives no light.",
+        "4. This dark area appears on the screen as a shadow."
+      ],
+      "intuition_logical_flow": "Imagine spraying paint on a wall but standing in front of it. Your body blocks the paint. The wall gets painted everywhere *except* the shape of your body. The unpainted part is the 'shadow'.",
+      "critical_thinking": "If a bird flies high in the sky, why don't we see its shadow on the ground? (Hint: The screen is too far away).",
+      "open_ended_mcqs": [
+        {
+          "question": "Which of the following is NOT required to form a shadow?",
+          "options": [
+            "a) A source of light",
+            "b) A mirror",
+            "c) An opaque object",
+            "d) A screen"
+          ],
+          "correct_answer": "b) A mirror"
+        }
+      ],
+      "real_life_applications": [
+        "1. Sundials tell time using shadows.",
+        "2. Shadow puppetry for entertainment.",
+        "3. Eclipses are massive shadows of the Moon or Earth."
+      ],
+      "relation_between_sub_concepts": "Proves that light travels in straight lines (rectilinear propagation).",
+      "cross_concept_critical_thinking": "Connects to Astronomy (Eclipses). A Solar Eclipse is just the Moon's shadow falling on Earth.",
+      "exam_oriented_questions": [
+        "1. What are the three essential conditions for the formation of a shadow?",
+        "2. Does the color of the opaque object affect the color of the shadow? (Answer: No, shadows are always dark)."
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "20 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "10 min",
+        "number_of_revisions_needed_to_master": "1 (interval of revisit in days: 10)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "High",
+        "importance_for_the_olympiad": "High",
+        "importance_for_the_iit_neet": "Low",
+        "definition_getting_asked_in_the_unit_test": "High"
+      },
+      "which_aspect_is_important": "The fact that shadows are always black regardless of object color, and the 3 requirements.",
+      "should_you_remember_this": "Yes. It explains natural phenomena like eclipses.",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "Practice the 'Bird in the sky' reasoning question.",
+        "common_mistakes": "Thinking a red ball makes a red shadow. Shadows are the *absence* of light, so they are black.",
+        "exam_tips": "Formula for Shadow: Light + Opaque Object + Screen."
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/shadow_formation.png",
+          "description": "A 3D diagram showing the setup for shadow formation. A Flashlight (Source) shines on a Ball (Opaque Object), casting a dark circular Shadow on a white Wall (Screen). Dotted lines trace the light rays from the torch, grazing the edges of the ball to the shadow's edge, proving straight-line travel. Labels in English.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/shadow_formation.png",
+          "description": "A 3D diagram showing the setup for shadow formation. A Flashlight (ಬೆಳಕಿನ ಮೂಲ - Source) shines on a Ball (ಅಪಾರದರ್ಶಕ ವಸ್ತು - Opaque Object), casting a dark circular Shadow (ನೆರಳು - Shadow) on a white Wall (ಪರದೆ - Screen). Dotted lines trace the light rays from the torch. Labels in Kannada.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    },
+    {
+      "concept": "Reflection of Light & Plane Mirrors",
+      "description": "How do mirrors work and why does your left hand look like the right hand in them?",
+      "key_topics": [
+        "Reflection",
+        "Plane Mirror",
+        "Lateral Inversion",
+        "Virtual Image"
+      ],
+      "detail": "Reflection is the bouncing back of light when it falls on a shiny, smooth surface. \n**Characteristics of an image in a plane mirror:**\n1. **Erect**: Upright (head is top, feet are bottom).\n2. **Same Size**: Image is equal to the object.\n3. **Same Distance**: The image appears as far behind the mirror as the object is in front.\n4. **Laterally Inverted**: Left appears Right, and Right appears Left.",
+      "working": [
+        "1. Light rays strike the mirror surface.",
+        "2. The shiny surface bounces the rays back without absorbing them.",
+        "3. Our eyes catch these bounced rays.",
+        "4. Our brain traces them back in a straight line, making it look like the object is *inside* or *behind* the mirror."
+      ],
+      "intuition_logical_flow": "Throw a tennis ball at a wall. It bounces back. Light does the same thing on a mirror. The 'Lateral Inversion' is like stamping ink: when you stamp a paper, the letters reverse.",
+      "critical_thinking": "Why is the word AMBULANCE written backwards on the front of the vehicle?",
+      "open_ended_mcqs": [
+        {
+          "question": "If you stand 1 meter in front of a plane mirror, how far away is your image from you?",
+          "options": [
+            "a) 1 meter",
+            "b) 2 meters",
+            "c) 0.5 meters",
+            "d) On the mirror surface"
+          ],
+          "correct_answer": "b) 2 meters"
+        }
+      ],
+      "real_life_applications": [
+        "1. Dressing mirrors.",
+        "2. Rear-view mirrors in cars.",
+        "3. Periscopes."
+      ],
+      "relation_between_sub_concepts": "Reflection is the mechanism; Lateral Inversion is the property of the resulting image.",
+      "cross_concept_critical_thinking": "In math, this relates to 'Symmetry' and 'Transformations' (Reflection across an axis).",
+      "exam_oriented_questions": [
+        "1. State four characteristics of the image formed by a plane mirror.",
+        "2. Explain lateral inversion with an example."
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "25 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "10 min",
+        "number_of_revisions_needed_to_master": "2 (interval of revisit in days: 14)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "High",
+        "importance_for_the_olympiad": "High",
+        "importance_for_the_iit_neet": "Medium",
+        "definition_getting_asked_in_the_unit_test": "High"
+      },
+      "which_aspect_is_important": "Lateral Inversion and the distance calculation (Object distance = Image distance).",
+      "should_you_remember_this": "Yes, key for understanding optics in higher classes.",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "Stand in front of a mirror and touch your right ear. Observe what the image does.",
+        "common_mistakes": "Students often answer that the image distance is the same as object distance (1m), forgetting the question asks distance from *you* to the *image* (1m + 1m = 2m).",
+        "exam_tips": "Mirror logic: Left is Right, Right is Left."
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/reflection_plain_mirrors.png",
+          "description": "Illustration of a boy standing in front of a plane mirror. The boy raises his Right hand. The reflection in the mirror raises its Left hand. A text label 'Lateral Inversion' points to this. Another label shows 'Object Distance = Image Distance' with arrows indicating equal spacing from the glass. English text.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/reflection_plain_mirrors.png",
+          "description": "Illustration of a boy standing in front of a plane mirror. The boy raises his Right hand. The reflection in the mirror raises its Left hand. A text label 'ಪಾರ್ಶ್ವ ವಿಪರ್ಯಯ (Lateral Inversion)' points to this. Another label shows 'ವಸ್ತುವಿನ ದೂರ = ಪ್ರತಿಬಿಂಬದ ದೂರ' with arrows indicating equal spacing. Kannada text.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    },
+    {
+      "concept": "Pinhole Camera",
+      "description": "How to make a camera using a cardboard box and no lens!",
+      "key_topics": [
+        "Inverted Image",
+        "Rectilinear Propagation",
+        "Real Image"
+      ],
+      "detail": "A pinhole camera is a simple device that forms an image without a lens. It works on the principle that light travels in straight lines. \n**Image Characteristics:**\n1. **Inverted**: Upside down.\n2. **Real**: Formed on a screen (the tracing paper).\n3. **Colored**: Shows the actual colors of the object (unlike a shadow).",
+      "working": [
+        "1. Light from the top of a tree travels straight, passes through the pinhole, and hits the *bottom* of the screen.",
+        "2. Light from the bottom of the tree travels straight, passes through the pinhole, and hits the *top* of the screen.",
+        "3. This crossing over of light rays at the pinhole causes the image to be upside down."
+      ],
+      "intuition_logical_flow": "Imagine two strings. One goes from your head through a tiny hole to the floor. The other goes from your feet through the same hole to the ceiling. The strings cross at the hole. That's why the image is flipped.",
+      "critical_thinking": "What happens to the image if you make the pinhole bigger? (Answer: It becomes blurry because multiple light rays enter from the same point).",
+      "open_ended_mcqs": [
+        {
+          "question": "The image formed in a pinhole camera is always:",
+          "options": [
+            "a) Erect and same size",
+            "b) Inverted and colored",
+            "c) Black and white shadow",
+            "d) Erect and magnified"
+          ],
+          "correct_answer": "b) Inverted and colored"
+        }
+      ],
+      "real_life_applications": [
+        "1. Observing solar eclipses safely.",
+        "2. Understanding how basic cameras and our eyes work (both form inverted images initially)."
+      ],
+      "relation_between_sub_concepts": "Direct application of 'Rectilinear Propagation of Light'.",
+      "cross_concept_critical_thinking": "Biology: The human eye works like a pinhole camera (with a lens), forming an inverted image on the retina that the brain flips back up.",
+      "exam_oriented_questions": [
+        "1. Explain the working of a pinhole camera with a diagram.",
+        "2. Why is the image in a pinhole camera inverted?"
+      ],
+      "metrics_estimation": {
+        "estimated_avg_time_taken_for_the_1st_time_learners": "30 min",
+        "estimated_avg_time_taken_for_the_2nd_time_learners": "15 min",
+        "number_of_revisions_needed_to_master": "2 (interval of revisit in days: 20)"
+      },
+      "importance": {
+        "importance_for_the_rest_of_the_chapter": "Medium",
+        "importance_for_the_olympiad": "High",
+        "importance_for_the_iit_neet": "Medium",
+        "definition_getting_asked_in_the_unit_test": "Medium"
+      },
+      "which_aspect_is_important": "The diagram showing the crossing rays and the properties (Inverted, Real).",
+      "should_you_remember_this": "Yes, it is a fun experiment and a basic optical instrument.",
+      "exam_preparation_common_mistakes_exam_tips": {
+        "exam_preparation": "Draw the tree, the box, the hole, and the inverted tree on the screen.",
+        "common_mistakes": "Thinking the image is black and white (like a shadow). It is colored.",
+        "exam_tips": "Pinhole = 'Crossed Paths' = Upside Down."
+      },
+      "images": [
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/English/pinhole_camera.png",
+          "description": "A cross-section diagram of a Pinhole Camera. On the left is a colorful Tree (Object). In the middle, a box with a tiny Pinhole. Light rays from the top of the tree (A) go through the hole to the bottom of the screen (A'). Light rays from the bottom of the tree (B) go to the top (B'). On the screen (right side), an inverted image of the tree is formed. Labels: Object, Pinhole, Inverted Image. English text.",
+          "subtopic": "Concept Definition",
+          "language": "English"
+        },
+        {
+          "url": "https://github.com/aloofzebra03/NCERT_Class7_images/blob/main/Science/Kannada/pinhole_camera.png",
+          "description": "A cross-section diagram of a Pinhole Camera. On the left is a colorful Tree (ವಸ್ತು - Object). In the middle, a box with a tiny Pinhole (ರಂಧ್ರ). Light rays travel through the hole. On the screen (right side), an inverted image (ತಲೆಕೆಳಗಾದ ಪ್ರತಿಬಿಂಬ) of the tree is formed. Labels in Kannada.",
+          "subtopic": "Concept Definition",
+          "language": "Kannada"
+        }
+      ],
+      "youtube": []
+    }
+  ]
+}
