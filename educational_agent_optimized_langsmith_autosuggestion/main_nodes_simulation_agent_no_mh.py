@@ -737,9 +737,12 @@ Provide a concise definition (≤30 words) of '{state["concept_title"]}', then a
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
         # NEW: Select most relevant image for concept introduction
+        # Extract language from state: if is_kannada is True, use "Kannada", else "English"
+        language = "Kannada" if state.get("is_kannada", False) else "English"
         selected_image = select_most_relevant_image_for_concept_introduction(
             concept=state["concept_title"],
-            definition_context=gt + "\n\n" + content
+            definition_context=gt + "\n\n" + content,
+            language=language
         )
         
         # 🔍 CI NODE - FIRST PASS CONTENT 🔍

@@ -788,11 +788,12 @@ def test_with_persona(request: TestPersonaRequest):
 @app.post("/test/images", response_model=TestImageResponse)
 def get_test_image(request: TestImageRequest):
     try:
-        print(f"API /test/images - concept: {request.concept_title}")
+        print(f"API /test/images - concept: {request.concept_title}, language: {request.language}")
         
         selected_image = select_most_relevant_image_for_concept_introduction( #Same function is called by the agent when selecting images
             concept=request.concept_title,
-            definition_context=request.definition_context or f"Learning about {request.concept_title}"
+            definition_context=request.definition_context or f"Learning about {request.concept_title}",
+            language=request.language
         )
         
         if selected_image:

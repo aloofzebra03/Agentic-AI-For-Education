@@ -41,6 +41,7 @@ COPY concept_map_poc/ /app/concept_map_poc/
 COPY simulation_to_concept/ /app/simulation_to_concept/
 COPY api_tracker_utils/ /app/api_tracker_utils/ 
 COPY api_servers/ /app/api_servers/
+COPY science_jsons/ /app/science_jsons/
 COPY NCERT/ /app/NCERT/
 
 # Install project in editable mode (makes all modules importable)

@@ -387,6 +387,10 @@ class TestImageRequest(BaseModel):
         default="",
         description="Optional definition/explanation context to help select the most relevant image"
     )
+    language: str = Field(
+        default="English",
+        description="Language for the image ('English' or 'Kannada')"
+    )
 
 
 class TestImageResponse(BaseModel):

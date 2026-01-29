@@ -982,14 +982,16 @@ def create_simulation_config(variables: List, concept: str, action_config: Optio
         raise ValueError(f"Unrecognized independent variable '{independent_var}' for concept: {concept}")
 
 
-def select_most_relevant_image_for_concept_introduction(concept: str, definition_context: str, model: str = "gemma-3-27b-it") -> Optional[Dict]:
+def select_most_relevant_image_for_concept_introduction(concept: str, definition_context: str, language: str = "English", model: str = "gemma-3-27b-it") -> Optional[Dict]:
     """
     Select the most pedagogically relevant image for introducing a concept.
     Uses the concept-to-file mapping to find the correct JSON file.
+    Filters images by language before selection.
     
     Args:
         concept: The concept name (can be in any case)
         definition_context: The context/definition being provided to the student
+        language: Language for image selection ("English" or "Kannada"). Defaults to "English".
         model: Model to use for image selection. Defaults to gemma-3-27b-it.
     
     Returns:
@@ -1023,10 +1025,27 @@ def select_most_relevant_image_for_concept_introduction(concept: str, definition
         # Get images from concept data (handle different key variations)
         # 8.json and NCERT Class 7.json use "images" (plural)
         # 11.json and 12.json use "image" (singular)
-        available_images = concept_data.get("images", concept_data.get("image", concept_data.get("Images", [])))
+        all_images = concept_data.get("images", concept_data.get("image", concept_data.get("Images", [])))
+        
+        if not all_images:
+            print(f"No images found for concept '{concept}'")
+            return None
+        
+        # Filter images by language
+        available_images = [
+            img for img in all_images 
+            if img.get("language", "").lower() == language.lower()
+        ]
+        
+        # Fallback: if no images match the language, use all images
+        if not available_images:
+            print(f"⚠️ No images found for language '{language}', using all available images")
+            available_images = all_images
+        else:
+            print(f"✅ Found {len(available_images)} image(s) for language '{language}'")
         
         if not available_images:
-            print(f"No images found for concept '{concept}'")
+            print(f"No images available after language filtering")
             return None
         
         # Create LLM prompt for image selection
