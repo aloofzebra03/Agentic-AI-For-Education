@@ -129,7 +129,7 @@ def combine_autosuggestions(parsed_response: dict, fallback_suggestions: list[st
     # Translate autosuggestions to Kannada if needed (single translation point)
     if state and state.get("is_kannada", False):
         print("🌐 Translating autosuggestions to Kannada...")
-        final_suggestions = [translate_to_kannada_azure(s) if s else s for s in final_suggestions]
+        # final_suggestions = [translate_to_kannada_azure(s) if s else s for s in final_suggestions]
         # Also translate the selections dict values
         selections_dict = {
             k: translate_to_kannada_azure(v) if v and isinstance(v, str) else v
@@ -174,7 +174,8 @@ class BaseAutosuggestionResponse(BaseModel):
         "I don't know",
         "I'm confused",
         "Not very clear",
-        "Can you explain differently?"
+        "Can you explain differently?",
+
     ] = Field(
         description="Select EXACTLY ONE negative/uncertain suggestion that expresses confusion or need for help"
     )
@@ -183,7 +184,7 @@ class BaseAutosuggestionResponse(BaseModel):
     special_handling_autosuggestion: Literal[
         "Can you give me a hint?",
         "Can you explain that simpler?",
-        "Give me an example"
+        "Give me an example",
     ] = Field(
         description="Select EXACTLY ONE special handling suggestion that will trigger pedagogical intervention"
     )
