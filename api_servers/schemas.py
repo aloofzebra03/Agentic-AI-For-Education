@@ -81,6 +81,36 @@ class TestPersonaRequest(BaseModel):
         description="The educational concept to teach to the test persona"
     )
 
+class TestImageRequest(BaseModel):
+    concept_title: str = Field(
+        ...,
+        description="The concept to get an image for (e.g., 'Pendulum and its Time Period')"
+    )
+    definition_context: str = Field(
+        default="",
+        description="Optional definition/explanation context to help select the most relevant image"
+    )
+    language: str = Field(
+        default="English",
+        description="Language for the image ('English' or 'Kannada')"
+    )
+
+class TranslationRequest(BaseModel):
+    "Request for text translation."
+    text: str
+
+
+class TestSimulationRequest(BaseModel):
+    concept_title: str = Field(
+        ...,
+        description="The concept to get simulation config for (e.g., 'Pendulum and its Time Period')"
+    )
+    simulation_type: Optional[str] = Field(
+        default=None,
+        description="Optional specific simulation type (e.g., independent variable to vary like 'length', 'gravity', etc.)"
+    )
+
+
 
 # ============================================================================
 # RESPONSE MODELS
@@ -378,21 +408,6 @@ class PersonasListResponse(BaseModel):
     )
 
 
-class TestImageRequest(BaseModel):
-    concept_title: str = Field(
-        ...,
-        description="The concept to get an image for (e.g., 'Pendulum and its Time Period')"
-    )
-    definition_context: str = Field(
-        default="",
-        description="Optional definition/explanation context to help select the most relevant image"
-    )
-    language: str = Field(
-        default="English",
-        description="Language for the image ('English' or 'Kannada')"
-    )
-
-
 class TestImageResponse(BaseModel):
     success: bool = Field(
         description="Whether the image was retrieved successfully"
@@ -411,18 +426,6 @@ class TestImageResponse(BaseModel):
     message: str = Field(
         description="Status message about the retrieval"
     )
-
-
-class TestSimulationRequest(BaseModel):
-    concept_title: str = Field(
-        ...,
-        description="The concept to get simulation config for (e.g., 'Pendulum and its Time Period')"
-    )
-    simulation_type: Optional[str] = Field(
-        default=None,
-        description="Optional specific simulation type (e.g., independent variable to vary like 'length', 'gravity', etc.)"
-    )
-
 
 class TestSimulationResponse(BaseModel):
     success: bool = Field(
@@ -455,6 +458,12 @@ class ConceptsListResponse(BaseModel):
         default="Available concepts retrieved successfully",
         description="Status message about the retrieval"
     )
+
+class TranslationResponse(BaseModel):
+    original: str
+    translated: str
+    success: bool
+    error: str | None = None
 
 
 # ============================================================================

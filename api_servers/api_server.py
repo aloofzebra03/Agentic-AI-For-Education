@@ -26,7 +26,8 @@ from api_servers.schemas import (
     TestImageRequest, TestImageResponse,
     TestSimulationRequest, TestSimulationResponse,
     ConceptsListResponse,
-    ConceptMapRequest, ConceptMapResponse
+    ConceptMapRequest, ConceptMapResponse,
+    TranslationRequest, TranslationResponse
 )
 
 # Import personas from tester_agent
@@ -55,6 +56,7 @@ from utils.shared_utils import (
     select_most_relevant_image_for_concept_introduction,
     create_simulation_config,
     get_all_available_concepts,
+    translate_to_kannada_azure,
 )
 
 from api_tracker_utils.error import MinuteLimitExhaustedError, DayLimitExhaustedError
@@ -297,6 +299,8 @@ def read_root():
             "POST /simulation/session/{session_id}/submit-quiz - Submit quiz answer",
             "GET  /simulation/session/{session_id} - Get simulation session state",
             "GET  /simulation/simulations - List available simulations"
+            "POST /translate - Translate text to Kannada"
+
         ]
     }
 
@@ -1277,6 +1281,25 @@ def list_available_simulations():
             for sim_id, sim_data in all_sims.items()
         ]
     }
+
+@app.post("/translate", response_model=TranslationResponse)
+def translate_text(request: TranslationRequest):
+    """
+    Translate text to Kannada using Azure translation service.
+    """
+    try:
+        translated_text = translate_to_kannada_azure(request.text)
+        return TranslationResponse(
+            original=request.text,
+            translated=translated_text,
+            success=True,
+            error=None
+        )
+    except Exception as e:
+        print(f"API error in /translate: {str(e)}")
+        print(f"Full traceback:\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Error translating text: {str(e)}")
+    
 
 
 print("=" * 80)
