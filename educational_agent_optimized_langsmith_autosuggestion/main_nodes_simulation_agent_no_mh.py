@@ -20,6 +20,8 @@ from utils.shared_utils import (
     select_most_relevant_image_for_concept_introduction,
     add_ai_message_to_conversation,
     add_system_message_to_conversation,
+    translate_if_kannada,
+    translate_to_kannada_azure,
     # Import autosuggestion pool constants (single source of truth)
     POSITIVE_POOL,
     NEGATIVE_POOL,
@@ -65,14 +67,16 @@ PEDAGOGICAL_MOVES: Dict[str, Dict[str, str]] = {
 # Note: Autosuggestion pool constants (POSITIVE_POOL, NEGATIVE_POOL, SPECIAL_HANDLING_POOL)
 # are imported from utils.shared_utils - single source of truth for all pool definitions
 
-def combine_autosuggestions(parsed_response: dict, fallback_suggestions: list[str]) -> tuple[list[str], dict]:
+def combine_autosuggestions(parsed_response: dict, fallback_suggestions: list[str], state: AgentState = None) -> tuple[list[str], dict]:
     """
     Combine all 4 autosuggestion types (positive, negative, special, dynamic) into final list.
     Handles None values when agent asks questions or says "let me think".
+    Translates to Kannada if is_kannada flag is True.
     
     Args:
         parsed_response: Parsed LLM response dict
         fallback_suggestions: Default suggestions if LLM didn't provide valid ones
+        state: AgentState to check for is_kannada flag (optional for backward compatibility)
     
     Returns:
         Tuple of (final_suggestions_list, selections_dict)
@@ -121,6 +125,16 @@ def combine_autosuggestions(parsed_response: dict, fallback_suggestions: list[st
             'dynamic': dynamic
         }
         print(f"✅ Combined 4 autosuggestions: positive='{positive}', negative='{negative}', special='{special}', dynamic='{dynamic[:30] if dynamic else 'None'}...'")
+    
+    # Translate autosuggestions to Kannada if needed (single translation point)
+    if state and state.get("is_kannada", False):
+        print("🌐 Translating autosuggestions to Kannada...")
+        final_suggestions = [translate_to_kannada_azure(s) if s else s for s in final_suggestions]
+        # Also translate the selections dict values
+        selections_dict = {
+            k: translate_to_kannada_azure(v) if v and isinstance(v, str) else v
+            for k, v in selections_dict.items()
+        }
     
     return final_suggestions, selections_dict
 
@@ -296,13 +310,14 @@ Be natural and conversational."""
     resp = llm_with_history(state, final_prompt)
     hint_content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
     
+    translate_hint = translate_if_kannada(state, hint_content) 
     # Update agent output with hint
-    state["agent_output"] = hint_content
+    state["agent_output"] = translate_hint
     
     print("=" * 80)
     print("🔍 HANDLER: HINT GENERATED")
     print("=" * 80)
-    print(f"💡 HINT: {hint_content[:100]}...")
+    print(f"💡 HINT: {translate_hint[:100]}...")
     print("=" * 80)
     
     return state
@@ -334,13 +349,14 @@ Keep the same meaning but make it much easier to understand. Use tone and follow
     resp = llm_with_history(state, final_prompt)
     simple_content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
     
-    # Update agent output with simplified version
-    state["agent_output"] = simple_content
+    # Translate once and update agent output
+    translated_simple = translate_if_kannada(state, simple_content)
+    state["agent_output"] = translated_simple
     
     print("=" * 80)
     print("🔍 HANDLER: SIMPLIFIED EXPLANATION")
     print("=" * 80)
-    print(f"📝 SIMPLIFIED: {simple_content[:100]}...")
+    print(f"📝 SIMPLIFIED: {translated_simple[:100]}...")
     print("=" * 80)
     
     return state
@@ -373,13 +389,14 @@ Use tone and follow-up appropriate to the conversation context."""
     resp = llm_with_history(state, final_prompt)
     example_content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
     
-    # Update agent output with example
-    state["agent_output"] = example_content
+    # Translate once and update agent output
+    translated_example = translate_if_kannada(state, example_content)
+    state["agent_output"] = translated_example
     
     print("=" * 80)
     print("🔍 HANDLER: EXAMPLE PROVIDED")
     print("=" * 80)
-    print(f"🎯 EXAMPLE: {example_content[:100]}...")
+    print(f"🎯 EXAMPLE: {translated_example[:100]}...")
     print("=" * 80)
     
     return state
@@ -425,15 +442,16 @@ Be natural and supportive.and follow-up appropriate to the conversation context.
     resp = llm_with_history(state, final_prompt)
     dynamic_content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
     
-    # Update agent output with level-aware dynamic response
-    state["agent_output"] = dynamic_content
+    # Translate once and update agent output
+    translated_dynamic = translate_if_kannada(state, dynamic_content)
+    state["agent_output"] = translated_dynamic
     
     print("=" * 80)
     print("🔍 HANDLER: DYNAMIC SUGGESTION PROCESSED")
     print("=" * 80)
     print(f"🎯 STUDENT_LEVEL: {student_level}")
     print(f"💬 REQUEST: {dynamic_request}")
-    print(f"📝 RESPONSE: {dynamic_content[:100]}...")
+    print(f"📝 RESPONSE: {translated_dynamic[:100]}...")
     print("=" * 80)
     
     return state
@@ -554,11 +572,12 @@ def start_node(state: AgentState) -> AgentState:
     print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
     print("=" * 80)
     
-    # Initialize state fields to prevent KeyErrors
-    state["agent_output"]  = content
+    # Translate once and initialize state fields
+    translated_content = translate_if_kannada(state, content)
+    state["agent_output"] = translated_content
     state["current_state"] = "APK"
     state["messages"] = []  # Initialize empty message list
-    add_system_message_to_conversation(state, content)
+    add_system_message_to_conversation(state, translated_content)
     state["summary"] = ""  # Initialize summary
     state["summary_last_index"] = -1  # Initialize summary index
     return state
@@ -596,9 +615,11 @@ def apk_node(state: AgentState) -> AgentState:
         print(f"📏 CONTENT_LENGTH: {len(content)} characters")
         print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
         print("=" * 80)
+
+        translated_content = translate_if_kannada(state, content)
         
-        state["agent_output"] = content
-        add_ai_message_to_conversation(state, content)
+        state["agent_output"] = translated_content
+        add_ai_message_to_conversation(state, translated_content)
         return state
 
     # Handle student's response after hook question
@@ -642,9 +663,10 @@ Respond ONLY with a clear, encouraging message (not JSON - just the message text
         print(f"💬 LLM_FINAL_MESSAGE: {final_response}")
         print("=" * 80)
         
-        state["agent_output"] = final_response
+        translated_response = translate_if_kannada(state, final_response)
+        state["agent_output"] = translated_response
         state["current_state"] = "CI"
-        add_ai_message_to_conversation(state, final_response)
+        add_ai_message_to_conversation(state, translated_response)
         return state
 
     context = json.dumps(PEDAGOGICAL_MOVES["APK"], indent=2)
@@ -687,13 +709,16 @@ Remember to give feedback as mentioned in the required schema."""
         print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
         print("=" * 80)
 
-        state["agent_output"]  = parsed['feedback']
+        # Translate feedback once for both agent_output and messages
+        translated_feedback = translate_if_kannada(state, parsed['feedback'])
+        state["agent_output"] = translated_feedback
         state["current_state"] = parsed['next_state']
         
         # Combine all 4 autosuggestions (positive, negative, special, dynamic)
         final_suggestions, selections = combine_autosuggestions(
             parsed, 
-            ["I understand, continue", "I'm not sure", "Can you give me a hint?", "Continue exploring"]
+            ["I understand, continue", "I'm not sure", "Can you give me a hint?", "Continue exploring"],
+            state
         )
         
         # Store all 4 individual selections
@@ -703,7 +728,7 @@ Remember to give feedback as mentioned in the required schema."""
         state["dynamic_autosuggestion"] = selections['dynamic']
         state["autosuggestions"] = final_suggestions
         
-        add_ai_message_to_conversation(state, parsed['feedback'])
+        add_ai_message_to_conversation(state, translated_feedback)
     except Exception as e:
         print(f"Error parsing APK response: {e}")
         print(f"Raw response: {raw}")
@@ -755,14 +780,15 @@ Provide a concise definition (≤30 words) of '{state["concept_title"]}', then a
         print(f"🖼️ SELECTED_IMAGE: {selected_image['url'] if selected_image else 'None'}")
         print("=" * 80)
         
-        # Add AI message to conversation
-        add_ai_message_to_conversation(state, content)
+        # Translate once for both agent_output and messages
+        translated_content = translate_if_kannada(state, content)
+        add_ai_message_to_conversation(state, translated_content)
     
         
         result = {
             "asked_ci": True,
             "ci_tries": 0,
-            "agent_output": content
+            "agent_output": translated_content
         }
         
         # Add image metadata if image was selected
@@ -808,13 +834,14 @@ Provide a concise definition (≤30 words) of '{state["concept_title"]}', then a
         print(f"🔢 CI_TRIES: {ci_tries}")
         print("=" * 80)
         
-        # Add AI message to conversation before returning
-        add_ai_message_to_conversation(state, content)
+        # Translate once for both agent_output and messages
+        translated_content = translate_if_kannada(state, content)
+        add_ai_message_to_conversation(state, translated_content)
         
         # Return only the changed keys following LangGraph best practices
         return {
             "ci_tries": ci_tries,
-            "agent_output": content,
+            "agent_output": translated_content,
             "current_state": "SIM_CC",
             "enhanced_message_metadata": {}
         }
@@ -859,19 +886,23 @@ Task: Determine if the restatement is accurate. If accurate, move to SIM_CC to i
         print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
         print("=" * 80)
 
+        # Translate feedback once for both agent_output and messages
+        translated_feedback = translate_if_kannada(state, parsed['feedback'])
+        
         # Combine all 4 autosuggestions (positive, negative, special, dynamic)
         final_suggestions, selections = combine_autosuggestions(
             parsed,
-            ["I understand, continue", "I'm not sure", "Can you give me a hint?", "Continue exploring"]
+            ["I understand, continue", "I'm not sure", "Can you give me a hint?", "Continue exploring"],
+            state
         )
         
         # Add AI message to conversation before returning
-        add_ai_message_to_conversation(state, parsed['feedback'])
+        add_ai_message_to_conversation(state, translated_feedback)
         
         # Return only the changed keys following LangGraph best practices
         return {
             "ci_tries": ci_tries,
-            "agent_output": parsed['feedback'],
+            "agent_output": translated_feedback,
             "current_state": parsed['next_state'],
             "enhanced_message_metadata": {},
             "positive_autosuggestion": selections['positive'],
@@ -940,13 +971,14 @@ def ge_node(state: AgentState) -> AgentState:
         print(f"📋 CURRENT_CONCEPT: {concepts[current_idx] if concepts and current_idx < len(concepts) else 'None'}")
         print("=" * 80)
         
-        # Add AI message to conversation before returning
-        add_ai_message_to_conversation(state, content)
+        # Translate once for both agent_output and messages
+        translated_content = translate_if_kannada(state, content)
+        add_ai_message_to_conversation(state, translated_content)
         
         return {
             "asked_ge": True,
             "ge_tries": 0,
-            "agent_output": content
+            "agent_output": translated_content
         }
 
     # Handle tries for GE node - increment counter
@@ -988,12 +1020,13 @@ Then transition to testing their understanding by saying something like: 'Now le
         resp = llm_with_history(state, final_prompt)
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
-        # Add AI message to conversation before returning
-        add_ai_message_to_conversation(state, content)
+        # Translate once for both agent_output and messages
+        translated_content = translate_if_kannada(state, content)
+        add_ai_message_to_conversation(state, translated_content)
         
         # Return only the changed keys following LangGraph best practices
         return {
-            "agent_output": content,
+            "agent_output": translated_content,
             "current_state": "AR"  # NEW: Transition directly to AR for assessment
         }
         
@@ -1056,17 +1089,21 @@ OLD OPTIONS (commented out):
         print(f"🔢 CURRENT_CONCEPT_IDX: {current_idx}")
         print("=" * 80)
 
+        # Translate feedback once for both agent_output and messages
+        translated_feedback = translate_if_kannada(state, parsed['feedback'])
+        
         # Combine all 4 autosuggestions (positive, negative, special, dynamic)
         final_suggestions, selections = combine_autosuggestions(
             parsed,
-            ["I understand, continue", "I'm not sure", "Can you give me a hint?", "Continue exploring"]
+            ["I understand, continue", "I'm not sure", "Can you give me a hint?", "Continue exploring"],
+            state
         )
         
         # Add AI message to conversation before returning
-        add_ai_message_to_conversation(state, parsed['feedback'])
+        add_ai_message_to_conversation(state, translated_feedback)
         
         update = {
-            "agent_output": parsed['feedback'],
+            "agent_output": translated_feedback,
             "current_state": parsed['next_state'],
             "positive_autosuggestion": selections['positive'],
             "negative_autosuggestion": selections['negative'],
@@ -1112,9 +1149,11 @@ def mh_node(state: AgentState) -> AgentState:
         print(f"📝 CORRECTION: {correction}")
         print(f"💬 MESSAGE: {correction_message}")
         print("=" * 80)
+
+        translated_correction = translate_if_kannada(state, correction_message)
         
-        state["agent_output"] = correction_message
-        add_ai_message_to_conversation(state, correction_message)
+        state["agent_output"] = translated_correction
+        add_ai_message_to_conversation(state, translated_correction)
         return state
     
     # Handle student's response after correction
@@ -1279,8 +1318,9 @@ def ar_node(state: AgentState) -> AgentState:
         print(f"🔢 CURRENT_CONCEPT_IDX: {current_idx}")
         print("=" * 80)
         
-        state["agent_output"] = content
-        add_ai_message_to_conversation(state, content)
+        translated_content = translate_if_kannada(state, content)
+        state["agent_output"] = translated_content
+        add_ai_message_to_conversation(state, translated_content)
         return state
 
     # Second pass: grade & decide next step based on concept progress
@@ -1351,7 +1391,8 @@ Task: Grade this answer on a scale from 0 to 1 and determine next state. Respond
         # Combine all 4 autosuggestions (positive, negative, special, dynamic)
         final_suggestions, selections = combine_autosuggestions(
             parsed,
-            ["I understand, continue", "I'm not sure", "Can you give me a hint?", "Continue exploring"]
+            ["I understand, continue", "I'm not sure", "Can you give me a hint?", "Continue exploring"],
+            state
         )
         
         state["positive_autosuggestion"] = selections['positive']
@@ -1394,9 +1435,9 @@ Task: Grade this answer on a scale from 0 to 1 and determine next state. Respond
         print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
         print("=" * 80)
         
-        state["agent_output"] = content
+        agent_output = content
     else:
-        state["agent_output"] = feedback
+        agent_output = feedback
 
     # Handle concept progression
     # next_state = "TC"
@@ -1408,14 +1449,17 @@ Task: Grade this answer on a scale from 0 to 1 and determine next state. Respond
         next_concept_idx = current_idx + 1
         if next_concept_idx < len(concepts):
             transition_msg = f"\n\nGreat! Now let's explore the next concept: '{concepts[next_concept_idx]}'."
-            state["agent_output"] += transition_msg
+            agent_output += transition_msg
     elif next_state == "TC":
         # All concepts done, move to transfer
         # state["concepts_completed"] = True
         completion_msg = "\n\nExcellent! We've covered all the key concepts. Now let's see how you can apply this knowledge in a new context."
-        state["agent_output"] += completion_msg
+        agent_output += completion_msg
 
-    add_ai_message_to_conversation(state, state["agent_output"])
+    # Translate once for both agent_output and messages
+    translated_output = translate_if_kannada(state, agent_output)
+    state["agent_output"] = translated_output
+    add_ai_message_to_conversation(state, translated_output)
     state["current_state"] = next_state
     return state
 
@@ -1453,9 +1497,10 @@ def tc_node(state: AgentState) -> AgentState:
         print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
         print("=" * 80)
         
-        state["agent_output"] = content
+        translated_content = translate_if_kannada(state, content)
+        state["agent_output"] = translated_content
         state["asked_tc"] = True
-        add_ai_message_to_conversation(state, content)
+        add_ai_message_to_conversation(state, translated_content)
         return state
 
     # Second pass: evaluate & either affirm or explain
@@ -1501,7 +1546,8 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
         # Combine all 4 autosuggestions (positive, negative, special, dynamic)
         final_suggestions, selections = combine_autosuggestions(
             parsed,
-            ["I understand, continue", "I'm not sure", "Can you give me a hint?", "Continue exploring"]
+            ["I understand, continue", "I'm not sure", "Can you give me a hint?", "Continue exploring"],
+            state
         )
         
         # Store all 4 individual selections
@@ -1517,8 +1563,10 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
         raise
 
     if correct:
-        state["agent_output"] = feedback + "\nExcellent application! You've mastered this concept."
-        add_ai_message_to_conversation(state, state["agent_output"])
+        agent_output = feedback + "\nExcellent application! You've mastered this concept."
+        translated_output = translate_if_kannada(state, agent_output)
+        state["agent_output"] = translated_output
+        add_ai_message_to_conversation(state, translated_output)
     else:
         # Student struggled: give correct transfer answer + explanation
         explain_system_prompt = (
@@ -1548,8 +1596,9 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
         print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
         print("=" * 80)
         
-        state["agent_output"] = content
-        add_ai_message_to_conversation(state, content)
+        translated_content = translate_if_kannada(state, content)
+        state["agent_output"] = translated_content
+        add_ai_message_to_conversation(state, translated_content)
 
     state["current_state"] = "RLC"
     return state
@@ -1593,8 +1642,9 @@ def rlc_node(state: AgentState) -> AgentState:
         print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
         print("=" * 80)
         
-        state["agent_output"] = content
-        add_ai_message_to_conversation(state, content)
+        translated_content = translate_if_kannada(state, content)
+        state["agent_output"] = translated_content
+        add_ai_message_to_conversation(state, translated_content)
         return state
 
     # Increment attempt counter
@@ -1633,9 +1683,10 @@ def rlc_node(state: AgentState) -> AgentState:
         print(f"🔢 RLC_TRIES: {state['rlc_tries']}")
         print("=" * 80)
         
-        state["agent_output"] = content
+        translated_content = translate_if_kannada(state, content)
+        state["agent_output"] = translated_content
         state["current_state"] = "END"
-        add_ai_message_to_conversation(state, content)
+        add_ai_message_to_conversation(state, translated_content)
         return state
 
     context = json.dumps(PEDAGOGICAL_MOVES["RLC"], indent=2)
@@ -1681,17 +1732,20 @@ Task: Evaluate whether the student has more questions about the real-life applic
         # Combine all 4 autosuggestions (positive, negative, special, dynamic)
         final_suggestions, selections = combine_autosuggestions(
             parsed,
-            ["I understand, continue", "I'm not sure", "Can you give me a hint?", "Continue exploring"]
+            ["I understand, continue", "I'm not sure", "Can you give me a hint?", "Continue exploring"],
+            state
         )
         
-        state["agent_output"]  = parsed['feedback']
+        # Translate feedback once for both agent_output and messages
+        translated_feedback = translate_if_kannada(state, parsed['feedback'])
+        state["agent_output"] = translated_feedback
         state["current_state"] = parsed['next_state']
         state["positive_autosuggestion"] = selections['positive']
         state["negative_autosuggestion"] = selections['negative']
         state["special_handling_autosuggestion"] = selections['special']
         state["dynamic_autosuggestion"] = selections['dynamic']
         state["autosuggestions"] = final_suggestions
-        add_ai_message_to_conversation(state, parsed['feedback'])
+        add_ai_message_to_conversation(state, translated_feedback)
     except Exception as e:
         print(f"Error parsing RLC response: {e}")
         print(f"Raw response: {raw}")

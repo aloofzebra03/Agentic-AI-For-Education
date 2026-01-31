@@ -9,6 +9,8 @@ import json
 import re
 import random
 import time
+import requests
+import uuid
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 from collections import defaultdict
@@ -186,8 +188,88 @@ def invoke_llm_with_fallback(messages: List, operation_name: str = "LLM call"):
         raise
 
 
+def translate_to_kannada_azure(text: str, 
+                               api_key: Optional[str] = None,
+                               endpoint: str = "https://api.cognitive.microsofttranslator.com/",
+                               region: str = "centralindia") -> str:
+    """
+    Translate text from English to Kannada using Azure Translator.
+    
+    Args:
+        text: Text to translate (English or mixed English-Kannada)
+        api_key: Azure Translator API key. If None, reads from AZURE_TRANSLATOR_KEY env var
+        endpoint: Azure Translator endpoint URL
+        region: Azure region for the translator service
+    
+    Returns:
+        Translated text in Kannada, or original text if translation fails
+    """
+    # Get API key from environment if not provided
+    if api_key is None:
+        api_key = os.getenv("AZURE_TRANSLATOR_KEY")
+    
+    if not api_key:
+        print("⚠️ Azure Translator API key not found. Returning original text.")
+        return text
+    
+    try:
+        path = '/translate'
+        constructed_url = endpoint + path
+        
+        params = {
+            'api-version': '3.0',
+            'from': 'en',
+            'to': 'kn'
+        }
+        
+        headers = {
+            'Ocp-Apim-Subscription-Key': api_key,
+            'Ocp-Apim-Subscription-Region': region,
+            'Content-type': 'application/json',
+            'X-ClientTraceId': str(uuid.uuid4())
+        }
+        
+        body = [{'text': text}]
+        
+        request = requests.post(constructed_url, params=params, headers=headers, json=body, timeout=10)
+        response = request.json()
+        
+        if request.status_code == 200 and response:
+            translated_text = response[0]['translations'][0]['text']
+            detected_lang = response[0].get('detectedLanguage', {}).get('language', 'unknown')
+            print(f"✅ Translated to Kannada (detected: {detected_lang}): {translated_text[:50]}...")
+            return translated_text
+        else:
+            print(f"⚠️ Azure translation failed with status {request.status_code}: {response}")
+            return text
+            
+    except Exception as e:
+        print(f"⚠️ Azure translation error: {str(e)}. Returning original text.")
+        return text
+
+
+def translate_if_kannada(state: AgentState, content: str) -> str:
+    """
+    Translate content to Kannada if is_kannada flag is set.
+    This is the single point of translation - use before setting agent_output.
+    
+    Args:
+        state: AgentState to check for is_kannada flag
+        content: Text to potentially translate
+    
+    Returns:
+        Translated text if is_kannada=True, otherwise original content
+    """
+    if state.get("is_kannada", False):
+        return translate_to_kannada_azure(content)
+    return content
+
+
 def add_ai_message_to_conversation(state: AgentState, content: str):
-    """Add AI message to conversation after successful processing."""
+    """
+    Add AI message to conversation.
+    NOTE: Content should already be translated via translate_if_kannada() before calling this.
+    """
     state["messages"].append(AIMessage(content=content))
     print(f"📝 Added AI message to conversation: {content[:50]}...")
 
