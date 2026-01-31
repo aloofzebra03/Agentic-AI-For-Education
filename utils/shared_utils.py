@@ -260,8 +260,12 @@ def translate_if_kannada(state: AgentState, content: str) -> str:
     Returns:
         Translated text if is_kannada=True, otherwise original content
     """
+    import re
     if state.get("is_kannada", False):
-        return translate_to_kannada_azure(content)
+        # If content contains ANY English letters, call Azure
+        if re.search(r"[a-zA-Z]", content):
+            return translate_to_kannada_azure(content)
+        # If pure Kannada (no English), skip API call
     return content
 
 
