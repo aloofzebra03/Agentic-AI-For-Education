@@ -327,7 +327,8 @@ def health_check():
             "/test/persona",
             "/test/images",
             "/test/simulation",
-            "/concept-map/generate"
+            "/concept-map/generate",
+            "/translate"
         ]
     )
 
@@ -1282,10 +1283,12 @@ def list_available_simulations():
         ]
     }
 
-@app.post("/translate", response_model=TranslationResponse)
+@app.post("/translate", response_model=TranslationResponse, tags=["Translation"], summary="Translate text to Kannada using Azure Translator")
 def translate_text(request: TranslationRequest):
     """
-    Translate text to Kannada using Azure translation service.
+    Translate text to Kannada using Azure Translator.
+    
+    Returns original and translated text with success status.
     """
     try:
         translated_text = translate_to_kannada_azure(request.text)
@@ -1295,10 +1298,23 @@ def translate_text(request: TranslationRequest):
             success=True,
             error=None
         )
+    except ValueError as e:
+        # API key missing or invalid
+        return TranslationResponse(
+            original=request.text,
+            translated=request.text,
+            success=False,
+            error=str(e)
+        )
     except Exception as e:
         print(f"API error in /translate: {str(e)}")
         print(f"Full traceback:\n{traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=f"Error translating text: {str(e)}")
+        return TranslationResponse(
+            original=request.text,
+            translated=request.text,
+            success=False,
+            error=f"Translation error: {str(e)}"
+        )
     
 
 

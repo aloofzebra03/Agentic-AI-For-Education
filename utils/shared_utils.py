@@ -209,8 +209,9 @@ def translate_to_kannada_azure(text: str,
         api_key = os.getenv("AZURE_TRANSLATOR_KEY")
     
     if not api_key:
-        print("⚠️ Azure Translator API key not found. Returning original text.")
-        return text
+        error_msg = "⚠️ Azure Translator API key not found in environment. Set AZURE_TRANSLATOR_KEY in .env file."
+        print(error_msg)
+        raise ValueError(error_msg)
     
     try:
         path = '/translate'
