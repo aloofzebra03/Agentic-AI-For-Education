@@ -28,6 +28,55 @@ from utils.shared_utils import (
     SPECIAL_HANDLING_POOL,
 )
 
+# ─── Kannada Translation Cache for Autosuggestions ────────────────────────────
+# Cache Kannada translations for predefined autosuggestion pools to avoid
+# repeated Azure API calls. These are precomputed translations that map
+# English autosuggestions to their Kannada equivalents.
+
+KANNADA_AUTOSUGGESTION_CACHE = {
+    # Positive pool translations
+    "I understand, continue": "ನನಗೆ ಅರ್ಥವಾಗಿದೆ, ಮುಂದುವರಿಸಿ",
+    "Yes, got it": "ಹೌದು, ಅರ್ಥವಾಯಿತು",
+    "That makes sense": "ಅದು ಅರ್ಥಪೂರ್ಣವಾಗಿದೆ",
+    "Let's proceed further": "ಮುಂದೆ ಮುಂದುವರಿಯೋಣ",
+    "I'm following along": "ನಾನು ಅನುಸರಿಸುತ್ತಿದ್ದೇನೆ",
+    
+    # Negative pool translations
+    "I'm not sure": "ನನಗೆ ಖಚಿತವಿಲ್ಲ",
+    "I don't know": "ನನಗೆ ಗೊತ್ತಿಲ್ಲ",
+    "I'm confused": "ನನಗೆ ಗೊಂದಲವಾಗಿದೆ",
+    "Not very clear": "ಸ್ಪಷ್ಟವಾಗಿಲ್ಲ",
+    "Can you explain differently?": "ನೀವು ವಿಭಿನ್ನವಾಗಿ ವಿವರಿಸಬಹುದೇ?",
+    
+    # Special handling pool translations
+    "Can you give me a hint?": "ನೀವು ನನಗೆ ಸುಳಿವು ನೀಡಬಹುದೇ?",
+    "Can you explain that simpler?": "ನೀವು ಅದನ್ನು ಸರಳವಾಗಿ ವಿವರಿಸಬಹುದೇ?",
+    "Give me an example": "ನನಗೆ ಉದಾಹರಣೆ ನೀಡಿ",
+}
+
+def get_cached_kannada_translation(text: str) -> str:
+    """
+    Get Kannada translation from cache for predefined autosuggestions.
+    Falls back to Azure translation for dynamic/non-cached text.
+    
+    Args:
+        text: English text to translate
+    
+    Returns:
+        Kannada translation (from cache if available, otherwise from Azure)
+    """
+    if not text:
+        return text
+    
+    # Check cache first
+    if text in KANNADA_AUTOSUGGESTION_CACHE:
+        print(f"✅ Using cached Kannada translation for: '{text}'")
+        return KANNADA_AUTOSUGGESTION_CACHE[text]
+    
+    # Fall back to Azure for dynamic suggestions
+    print(f"🌐 No cache found, translating via Azure: '{text[:50]}...'")
+    return translate_to_kannada_azure(text)
+
 PEDAGOGICAL_MOVES: Dict[str, Dict[str, str]] = {
     "APK": {
         "goal": "Activate prior knowledge; pose a hook linking the concept to everyday intuition.",
@@ -128,11 +177,10 @@ def combine_autosuggestions(parsed_response: dict, fallback_suggestions: list[st
     
     # Translate autosuggestions to Kannada if needed (single translation point)
     if state and state.get("is_kannada", False):
-        print("🌐 Translating autosuggestions to Kannada...")
-        # final_suggestions = [translate_to_kannada_azure(s) if s else s for s in final_suggestions]
-        # Also translate the selections dict values
+        print("🌐 Translating autosuggestions to Kannada (using cache for predefined suggestions)...")
+        # Use cached translations for predefined suggestions, Azure for dynamic ones
         selections_dict = {
-            k: translate_to_kannada_azure(v) if v and isinstance(v, str) else v
+            k: get_cached_kannada_translation(v) if v and isinstance(v, str) else v
             for k, v in selections_dict.items()
         }
     

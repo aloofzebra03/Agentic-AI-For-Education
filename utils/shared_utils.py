@@ -526,6 +526,7 @@ CRITICAL CONTEXT AWARENESS:
 REMEMBER:
 - Questions/"let me think" → 2 suggestions (negative + special), positive and dynamic are null
 - Explanations/Feedback → 4 suggestions (positive + negative + special + dynamic)
+-Remember to choose autosuggestions only from the list given in output schema even though language may not match.
 - Set as None""")
 
     
