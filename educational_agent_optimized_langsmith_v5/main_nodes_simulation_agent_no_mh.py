@@ -20,6 +20,7 @@ from utils.shared_utils import (
     build_prompt_from_template_optimized,
     get_ground_truth_from_json,
     select_most_relevant_image_for_concept_introduction,
+    translate_if_kannada,
 )
 
 PEDAGOGICAL_MOVES: Dict[str, Dict[str, str]] = {
@@ -130,9 +131,6 @@ def start_node(state: AgentState) -> AgentState:
     # Apply JSON extraction in case LLM wraps response in markdown
     content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
     
-    # Add System message to conversation after successful processing (for start node)
-    add_system_message_to_conversation(state, content)
-    
     # 🔍 START NODE - CONTENT PROCESSING 🔍
     print("=" * 80)
     print("🎯 START NODE - CONTENT OUTPUT 🎯")
@@ -143,8 +141,17 @@ def start_node(state: AgentState) -> AgentState:
     print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
     print("=" * 80)
     
-    state["agent_output"]  = content
+    # Translate and set agent output
+    translated_content = translate_if_kannada(state, content)
+    state["agent_output"] = translated_content
     state["current_state"] = "APK"
+    
+    # Initialize message list and summary tracking
+    state["messages"] = []
+    add_system_message_to_conversation(state, translated_content)
+    state["summary"] = ""
+    state["summary_last_index"] = -1
+    
     return state
 
 def apk_node(state: AgentState) -> AgentState:
@@ -172,8 +179,9 @@ def apk_node(state: AgentState) -> AgentState:
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
-        # Add AI message to conversation after successful processing
-        add_ai_message_to_conversation(state, content)
+        # Translate and add to conversation
+        translated_content = translate_if_kannada(state, content)
+        add_ai_message_to_conversation(state, translated_content)
         
         # 🔍 APK NODE - FIRST PASS CONTENT 🔍
         print("=" * 80)
@@ -184,7 +192,7 @@ def apk_node(state: AgentState) -> AgentState:
         print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
         print("=" * 80)
         
-        state["agent_output"] = content
+        state["agent_output"] = translated_content
         return state
 
     # Handle student's response after hook question
@@ -220,9 +228,6 @@ Respond ONLY with a clear, encouraging message (not JSON - just the message text
         
         final_response = llm_with_history(state, final_prompt).content.strip()
         
-        # Add AI message to conversation
-        add_ai_message_to_conversation(state, final_response)
-        
         # 🔍 APK NODE - MAX TRIES REACHED 🔍
         print("=" * 80)
         print("🎯 APK NODE - MAX TRIES REACHED, PROVIDING ANSWER 🎯")
@@ -231,8 +236,11 @@ Respond ONLY with a clear, encouraging message (not JSON - just the message text
         print(f"💬 LLM_FINAL_MESSAGE: {final_response}")
         print("=" * 80)
         
-        state["agent_output"] = final_response
+        # Translate final response for Kannada users
+        translated_response = translate_if_kannada(state, final_response)
+        state["agent_output"] = translated_response
         state["current_state"] = "CI"
+        add_ai_message_to_conversation(state, translated_response)
         return state
 
     context = json.dumps(PEDAGOGICAL_MOVES["APK"], indent=2)
@@ -265,8 +273,9 @@ Remember to give feedback as mentioned in the required schema."""
         parsed_obj: ApkResponse = apk_parser.parse(json_text)
         parsed = parsed_obj.model_dump()
 
-        # Add AI message to conversation after successful parsing
-        add_ai_message_to_conversation(state, parsed['feedback'])
+        # Translate and add to conversation
+        translated_feedback = translate_if_kannada(state, parsed['feedback'])
+        add_ai_message_to_conversation(state, translated_feedback)
 
         # 🔍 APK PARSING OUTPUT - MAIN CONTENT 🔍
         print("=" * 80)
@@ -277,7 +286,7 @@ Remember to give feedback as mentioned in the required schema."""
         print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
         print("=" * 80)
 
-        state["agent_output"]  = parsed['feedback']
+        state["agent_output"]  = translated_feedback
         state["current_state"] = parsed['next_state']
     except Exception as e:
         print(f"Error parsing APK response: {e}")
@@ -311,13 +320,13 @@ Provide a concise definition (≤30 words) of '{state["concept_title"]}', then a
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
-        # Add AI message to conversation after successful processing
-        add_ai_message_to_conversation(state, content)
-        
         # NEW: Select most relevant image for concept introduction
+        # Extract language from state: if is_kannada is True, use "Kannada", else "English"
+        language = "Kannada" if state.get("is_kannada", False) else "English"
         selected_image = select_most_relevant_image_for_concept_introduction(
             concept=state["concept_title"],
-            definition_context=gt + "\n\n" + content
+            definition_context=gt + "\n\n" + content,
+            language=language
         )
         
         # 🔍 CI NODE - FIRST PASS CONTENT 🔍
@@ -330,11 +339,15 @@ Provide a concise definition (≤30 words) of '{state["concept_title"]}', then a
         print(f"🖼️ SELECTED_IMAGE: {selected_image['url'] if selected_image else 'None'}")
         print("=" * 80)
         
+        # Translate and set agent output
+        translated_content = translate_if_kannada(state, content)
+        add_ai_message_to_conversation(state, translated_content)
+        
         # Return only the changed keys following LangGraph best practices
         result = {
             "asked_ci": True,
             "ci_tries": 0,
-            "agent_output": content
+            "agent_output": translated_content
         }
         
         # Add image metadata if image was selected
@@ -371,9 +384,6 @@ Provide a concise definition (≤30 words) of '{state["concept_title"]}', then a
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
-        # Add AI message to conversation after successful processing
-        add_ai_message_to_conversation(state, content)
-        
         # 🔍 CI NODE - AUTO-PROGRESS CONTENT 🔍
         print("=" * 80)
         print("🎯 CI NODE - AUTO-PROGRESS AFTER 2 TRIES 🎯")
@@ -383,10 +393,14 @@ Provide a concise definition (≤30 words) of '{state["concept_title"]}', then a
         print(f"🔢 CI_TRIES: {ci_tries}")
         print("=" * 80)
         
+        # Translate and add to conversation
+        translated_content = translate_if_kannada(state, content)
+        add_ai_message_to_conversation(state, translated_content)
+        
         # Return only the changed keys following LangGraph best practices
         return {
             "ci_tries": ci_tries,
-            "agent_output": content,
+            "agent_output": translated_content,
             "current_state": "SIM_CC",
             "enhanced_message_metadata": {}
         }
@@ -490,31 +504,32 @@ def ge_node(state: AgentState) -> AgentState:
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
-        # Add AI message to conversation after successful processing
-        add_ai_message_to_conversation(state, content)
-        
         # 🔍 GE NODE - FIRST PASS CONTENT 🔍
         print("=" * 80)
         print("🎯 GE NODE - FIRST PASS CONTENT OUTPUT 🎯")
         print("=" * 80)
         print(f"📄 CONTENT: {content}")
         print(f"📏 CONTENT_LENGTH: {len(content)} characters")
-        print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
+        print(f"🔧 USED_JSON_extraction: {resp.content.strip().startswith('```')}")
         print(f"🔢 CURRENT_CONCEPT_IDX: {current_idx}")
         print(f"📋 CURRENT_CONCEPT: {concepts[current_idx] if concepts and current_idx < len(concepts) else 'None'}")
         print("=" * 80)
         
+        # Translate and add to conversation
+        translated_content = translate_if_kannada(state, content)
+        add_ai_message_to_conversation(state, translated_content)
+        
         return {
             "asked_ge": True,
             "ge_tries": 0,
-            "agent_output": content,
+            "agent_output": translated_content,
         }
 
     # Handle tries for GE node - increment counter
     state["ge_tries"] = state.get("ge_tries",0) + 1
     
-    # Check if we've reached max tries (1) - transition smoothly to AR
-    if state["ge_tries"] >= 1:
+    # Check if we've reached max tries (4) - transition smoothly to AR
+    if state["ge_tries"] >= 4:
         # NEW: Let LLM generate a natural transition to AR with gentle clarification
         current_idx = state.get("sim_current_idx", 0)
         concepts = state.get("sim_concepts", [])
@@ -549,11 +564,13 @@ Then transition to testing their understanding by saying something like: 'Now le
         resp = llm_with_history(state, final_prompt)
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
         
-        add_ai_message_to_conversation(state, content)
+        # Translate and add to conversation
+        translated_content = translate_if_kannada(state, content)
+        add_ai_message_to_conversation(state, translated_content)
         
         # Return only the changed keys following LangGraph best practices
         return {
-            "agent_output": content,
+            "agent_output": translated_content,
             "current_state": "AR"  # NEW: Transition directly to AR for assessment
         }
         
@@ -604,8 +621,9 @@ OLD OPTIONS (commented out):
         parsed_obj: GeResponse = ge_parser.parse(json_text)
         parsed = parsed_obj.model_dump()  # Convert to dictionary for serialization safety
 
-        # Add AI message to conversation after successful parsing
-        add_ai_message_to_conversation(state, parsed['feedback'])
+        # Translate and add to conversation
+        translated_feedback = translate_if_kannada(state, parsed['feedback'])
+        add_ai_message_to_conversation(state, translated_feedback)
 
         # 🔍 GE PARSING OUTPUT - MAIN CONTENT 🔍
         print("=" * 80)
@@ -619,7 +637,7 @@ OLD OPTIONS (commented out):
         print("=" * 80)
 
         update = {
-            "agent_output": parsed['feedback'],
+            "agent_output": translated_feedback,
             "current_state": parsed['next_state']
         }
 
@@ -834,7 +852,10 @@ def ar_node(state: AgentState) -> AgentState:
         print(f"🔢 CURRENT_CONCEPT_IDX: {current_idx}")
         print("=" * 80)
         
-        state["agent_output"] = content
+        # Translate and add to conversation
+        translated_content = translate_if_kannada(state, content)
+        state["agent_output"] = translated_content
+        add_ai_message_to_conversation(state, translated_content)
         return state
 
     # Second pass: grade & decide next step based on concept progress
@@ -935,9 +956,13 @@ Task: Grade this answer on a scale from 0 to 1 and determine next state. Respond
         print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
         print("=" * 80)
         
-        state["agent_output"] = content
+        # Translate and set agent output
+        # Translate and set agent output
+        translated_content = translate_if_kannada(state, content)
+        agent_output = translated_content
     else:
-        state["agent_output"] = feedback
+        # Use feedback as agent output
+        agent_output = feedback
 
     # Handle concept progression
     # next_state = "TC"
@@ -949,14 +974,17 @@ Task: Grade this answer on a scale from 0 to 1 and determine next state. Respond
         next_concept_idx = current_idx + 1
         if next_concept_idx < len(concepts):
             transition_msg = f"\n\nGreat! Now let's explore the next concept: '{concepts[next_concept_idx]}'."
-            state["agent_output"] += transition_msg
+            agent_output += transition_msg
     elif next_state == "TC":
         # All concepts done, move to transfer
         # state["concepts_completed"] = True
         completion_msg = "\n\nExcellent! We've covered all the key concepts. Now let's see how you can apply this knowledge in a new context."
-        state["agent_output"] += completion_msg
+        agent_output += completion_msg
 
-    add_ai_message_to_conversation(state, state["agent_output"])
+    # Translate once for both agent_output and messages
+    translated_output = translate_if_kannada(state, agent_output)
+    state["agent_output"] = translated_output
+    add_ai_message_to_conversation(state, translated_output)
     state["current_state"] = next_state
     return state
 
@@ -985,8 +1013,6 @@ def tc_node(state: AgentState) -> AgentState:
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
 
-        add_ai_message_to_conversation(state, content)
-
         # 🔍 TC NODE - FIRST PASS CONTENT 🔍
         print("=" * 80)
         print("🎯 TC NODE - FIRST PASS CONTENT OUTPUT 🎯")
@@ -996,7 +1022,10 @@ def tc_node(state: AgentState) -> AgentState:
         print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
         print("=" * 80)
         
-        state["agent_output"] = content
+        # Translate and add to conversation
+        translated_content = translate_if_kannada(state, content)
+        state["agent_output"] = translated_content
+        add_ai_message_to_conversation(state, translated_content)
         state["asked_tc"] = True
         return state
 
@@ -1045,8 +1074,10 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
         raise
 
     if correct:
-        state["agent_output"] = feedback + "\nExcellent application! You've mastered this concept."
-        add_ai_message_to_conversation(state, state["agent_output"])
+        msg = feedback + "\nExcellent application! You've mastered this concept."
+        translated_msg = translate_if_kannada(state, msg)
+        state["agent_output"] = translated_msg
+        add_ai_message_to_conversation(state, translated_msg)
     else:
         # Student struggled: give correct transfer answer + explanation
         explain_system_prompt = (
@@ -1066,7 +1097,6 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
         resp = llm_with_history(state, explain_final_prompt)
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-        add_ai_message_to_conversation(state, content)
 
         # 🔍 TC NODE - EXPLANATION CONTENT 🔍
         print("=" * 80)
@@ -1077,7 +1107,10 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
         print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
         print("=" * 80)
         
-        state["agent_output"] = content
+        # Translate and add to conversation
+        translated_content = translate_if_kannada(state, content)
+        add_ai_message_to_conversation(state, translated_content)
+        state["agent_output"] = translated_content
 
     state["current_state"] = "RLC"
     return state
@@ -1152,8 +1185,6 @@ def rlc_node(state: AgentState) -> AgentState:
         # Apply JSON extraction in case LLM wraps response in markdown
         content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
 
-        add_ai_message_to_conversation(state, content)
-        
         # 🔍 RLC NODE - FINAL ANSWER AND CONCLUSION 🔍
         print("=" * 80)
         print("🎯 RLC NODE - FINAL ANSWER AND CONCLUSION 🎯")
@@ -1163,7 +1194,10 @@ def rlc_node(state: AgentState) -> AgentState:
         print(f"🔢 RLC_TRIES: {state['rlc_tries']}")
         print("=" * 80)
         
-        state["agent_output"] = content
+        # Translate and add to conversation
+        translated_content = translate_if_kannada(state, content)
+        add_ai_message_to_conversation(state, translated_content)
+        state["agent_output"] = translated_content
         state["current_state"] = "END"
         return state
 
@@ -1196,8 +1230,9 @@ Task: Evaluate whether the student has more questions about the real-life applic
         parsed_obj: RlcResponse = rlc_parser.parse(json_text)
         parsed = parsed_obj.model_dump()
 
-        # Add AI message to conversation after successful parsing
-        add_ai_message_to_conversation(state, parsed['feedback'])
+        # Translate and add to conversation
+        translated_feedback = translate_if_kannada(state, parsed['feedback'])
+        add_ai_message_to_conversation(state, translated_feedback)
 
         # 🔍 RLC PARSING OUTPUT - MAIN CONTENT 🔍
         print("=" * 80)
@@ -1209,7 +1244,7 @@ Task: Evaluate whether the student has more questions about the real-life applic
         print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
         print("=" * 80)
 
-        state["agent_output"]  = parsed['feedback']
+        state["agent_output"]  = translated_feedback
         state["current_state"] = parsed['next_state']
     except Exception as e:
         print(f"Error parsing RLC response: {e}")

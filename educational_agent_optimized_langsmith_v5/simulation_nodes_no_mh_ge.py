@@ -13,7 +13,8 @@ from utils.shared_utils import (
     build_prompt_from_template,
     build_prompt_from_template_optimized,
     extract_json_block,
-    create_simulation_config
+    create_simulation_config,
+    translate_if_kannada,
 )
 
 
@@ -142,8 +143,9 @@ Guidelines:
         + "\n".join([f"{i+1}. {c}" for i, c in enumerate(parsed.concepts)])
         + f"\n\nLet's start with the first concept: '{parsed.concepts[0]}'. Are you ready?"
     )
-    add_ai_message_to_conversation(state, speak)
-    state["agent_output"] = speak
+    translated_speak = translate_if_kannada(state, speak)
+    state["agent_output"] = translated_speak
+    add_ai_message_to_conversation(state, translated_speak)
 
     state["current_state"] = "GE"
     return state

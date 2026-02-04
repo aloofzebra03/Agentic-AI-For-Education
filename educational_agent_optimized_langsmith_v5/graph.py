@@ -85,52 +85,8 @@ class AgentState(TypedDict, total=False):
     model: str
 
 # -----------------------------------------------------------------------------
-# // 4. Initialize state and wrap helper
+# // 4. Wrap helper for node execution tracking
 # -----------------------------------------------------------------------------
-def _INIT(state: AgentState,config: RunnableConfig = None) -> AgentState:
-    # state.setdefault("messages", [])
-    # state.setdefault("last_user_msg", "")
-    # state.setdefault("sim_concepts", [])
-    # state.setdefault("sim_total_concepts", 0)
-    # state.setdefault("sim_current_idx", 0)
-    # state.setdefault("concepts_completed", False)
-    # state.setdefault("in_simulation", False)
-    
-    # # Misconception and performance tracking
-    # state.setdefault("misconception_detected", False)
-    # state.setdefault("retrieval_score", 0.0)
-    # state.setdefault("transfer_success", False)
-    state.setdefault("last_correction", "")
-    # state.setdefault("quiz_score", 0.0)
-    
-    # Initialize session_summary with default values (will be updated throughout session)
-    state.setdefault("session_summary", {
-        "quiz_score": None,
-        "transfer_success": False,
-        "definition_echoed": False,
-        "misconception_detected": False,
-        "last_user_msg": "",
-        "history": None,
-        "status": "in_progress"  # Track if session reached END
-    })
-    
-    # # Simulation state - use dictionaries instead of Pydantic objects for serialization
-    # state.setdefault("sim_variables", [])  # List of dict with keys: name, role, note
-    state.setdefault("sim_action_config", {})
-    state.setdefault("show_simulation", False)
-    state.setdefault("simulation_config", {})
-    # # NEW: Initialize memory optimization state
-    # state.setdefault("node_transitions", [])
-    state.setdefault("summary", "")
-    state.setdefault("summary_last_index", 0)
-    # Initialize language preference - default to False
-    state.setdefault("is_kannada", False)
-    # Initialize concept_title with default value
-    state.setdefault("concept_title", "Pendulum and its Time Period")
-    # Initialize model with default value
-    state.setdefault("model", "gemma-3-27b-it")
-    return state
-
 def _wrap(fn):
     def inner(state: AgentState) -> AgentState:
         print(f"🔧 _WRAP DEBUG - Node processing started")
@@ -217,7 +173,6 @@ def _SIM_REFLECT(s):  return _wrap(sim_reflection_node)(s)
 # // 5. Build the StateGraph
 # -----------------------------------------------------------------------------
 g = StateGraph(AgentState)
-g.add_node("INIT", _INIT)
 g.add_node("START", _START)
 g.add_node("APK", _APK)
 g.add_node("CI",  _CI)
@@ -242,8 +197,6 @@ g.add_node("SIM_REFLECT", _SIM_REFLECT)
 def _route(state: AgentState) -> str:
     return state.get("current_state")
 
-# g.add_edge(START, "INIT")
-# g.add_edge("INIT", "START")
 g.add_edge(START,"START")
 
 g.add_edge("START","APK")
@@ -281,6 +234,7 @@ try:
     connection_kwargs = {
         "autocommit": True,  # Required for Transaction Mode
         "prepare_threshold": None,  # None = Never use prepared statements (required for Transaction Mode port 6543)
+        "gssencmode": "disable",  # Required for Windows
     }
     
     postgres_url = os.getenv('POSTGRES_DATABASE_URL')
