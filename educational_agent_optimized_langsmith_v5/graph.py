@@ -15,14 +15,13 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.checkpoint.postgres import PostgresSaver
 from psycopg_pool import ConnectionPool
 
-
-from educational_agent_optimized_langsmith.main_nodes_simulation_agent_no_mh import (
+from educational_agent_optimized_langsmith_v5.main_nodes_simulation_agent_no_mh import (
     start_node, apk_node, ci_node, ge_node,
     ar_node, tc_node, rlc_node, end_node,
 )
 
 # ▶ NEW: import simulation agent nodes
-from educational_agent_optimized_langsmith.simulation_nodes_no_mh_ge import (
+from educational_agent_optimized_langsmith_v5.simulation_nodes_no_mh_ge import (
     sim_concept_creator_node,
     sim_vars_node,
     sim_action_node,

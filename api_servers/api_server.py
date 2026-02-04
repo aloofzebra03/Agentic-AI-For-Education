@@ -12,7 +12,7 @@ from datetime import datetime
 # Add parent directory to path to import educational agent
 # sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from educational_agent_optimized_langsmith_autosuggestion.graph import graph
+from educational_agent_optimized_langsmith_v5.graph import graph
 from langchain_core.messages import HumanMessage
 from langgraph.types import Command
 
