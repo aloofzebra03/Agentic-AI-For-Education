@@ -24,7 +24,7 @@ from deep_translator import GoogleTranslator
 # ─────────────────────────────────────────────────────────────────────
 
 SIM_MOVES: Dict[str, Dict[str, str]] = {
-    "SIM_CC":     {"goal": "Propose 1–5 distinct, independently variable core concepts for simulation.", "constraints": "Clear, learner-friendly; testable via observable changes."},
+    "SIM_CC":     {"goal": "Propose 1–3 distinct, independently variable core concepts for simulation.", "constraints": "Clear, learner-friendly; testable via observable changes."},
     "SIM_VARS":   {"goal": "List variables; mark independent/dependent/controls.", "constraints": "Only relevant variables; concise."},
     "SIM_ACTION": {"goal": "Describe a single, testable change to perform.", "constraints": "Alter one independent variable; keep controls fixed."},
     "SIM_EXPECT": {"goal": "Elicit the learner's prediction and brief why.", "constraints": "No leading hints; accept 'not sure'."},
@@ -38,9 +38,9 @@ SIM_MOVES: Dict[str, Dict[str, str]] = {
 # Pydantic response models + parsers (same style as main nodes)
 # ─────────────────────────────────────────────────────────────────────
 
-# SIM_CC: 1–5 concepts
+# SIM_CC: 1–3 concepts
 class SimConcepts(BaseModel):
-    concepts: List[str] = Field(description="List of clear, testable concepts that can be demonstrated to the student", min_items=1, max_items=5)
+    concepts: List[str] = Field(description="List of clear, testable concepts that can be demonstrated to the student", min_items=1, max_items=3)
 
 
 # SIM_VARS: declare variables
@@ -95,7 +95,7 @@ sim_reflect_parser = PydanticOutputParser(pydantic_object=SimReflectResponse)
 
 def sim_concept_creator_node(state: AgentState) -> AgentState:
     """
-    SIM_CC: Generate 1–5 independently variable, testable concepts.
+    SIM_CC: Generate 1–3 independently variable, testable concepts.
     Stores:
       - sim_concepts: List[str]
       - sim_total_concepts: int
@@ -115,7 +115,7 @@ Context:
 {context}
 
 Task:
-Return JSON ONLY with 1–5 clear, independent, testable simulation concepts for a class 7 learner.
+Return JSON ONLY with 1–3 clear, independent, testable simulation concepts for a class 7 learner.
 
 Guidelines:
 - Keep each concept short (≤15 words), concrete, and experimentally manipulable.

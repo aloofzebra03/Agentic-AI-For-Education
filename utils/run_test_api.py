@@ -294,7 +294,7 @@ def run_test_api():
         print(f"👤 Tester Agent ({persona.name}): {user_msg}")
         
         # Add delay to avoid overwhelming the API
-        time.sleep(2)
+        time.sleep(15)
         
         # Continue session via API
         try:

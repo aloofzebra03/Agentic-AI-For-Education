@@ -1321,7 +1321,7 @@ def translate_text(request: TranslationRequest):
 print("=" * 80)
 print("🎓 Educational Agent API Server Starting...")
 print("=" * 80)
-print(f"Agent Type: educational_agent_optimized_langsmith")
+print(f"Agent Type: educational_agent_optimized_langsmith_autosuggestion")
 print(f"Concept: Dynamic (passed via API request)")
 print(f"Persistence: Supabase-Postgres (LangGraph)")
 print("=" * 80)
