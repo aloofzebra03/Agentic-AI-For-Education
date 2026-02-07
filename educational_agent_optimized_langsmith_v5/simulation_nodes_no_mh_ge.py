@@ -39,7 +39,7 @@ SIM_MOVES: Dict[str, Dict[str, str]] = {
 
 # SIM_CC: 1–5 concepts
 class SimConcepts(BaseModel):
-    concepts: List[str] = Field(description="List of clear, testable concepts that can be demonstrated to the student", min_items=1, max_items=5)
+    concepts: List[str] = Field(description="List of clear, testable concepts that can be demonstrated to the student", min_items=1, max_items=3)
 
 
 # SIM_VARS: declare variables

@@ -12,7 +12,7 @@ from datetime import datetime
 # Add parent directory to path to import educational agent
 # sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from educational_agent_optimized_langsmith_autosuggestion.graph import graph
+from educational_agent_optimized_langsmith_v5.graph import graph
 from langchain_core.messages import HumanMessage
 from langgraph.types import Command
 
@@ -278,7 +278,7 @@ def read_root():
     return {
         "message": "Educational Agent API is running!",
         "version": "1.0.0",
-        "agent_type": "educational_agent_optimized_langsmith_autosuggestion",
+        "agent_type": "educational_agent_optimized_langsmith_v5",
         "endpoints": [
             "GET  /health - Health check",
             "GET  /concepts - List all available concepts",
@@ -312,7 +312,7 @@ def health_check():
         status="healthy",
         version="1.0.0",
         persistence="Postgres (Supabase))",
-        agent_type="educational_agent_optimized_langsmith_autosuggestion",
+        agent_type="educational_agent_optimized_langsmith_v5",
         available_endpoints=[
             "/",
             "/health",
@@ -417,9 +417,6 @@ def start_session(request: StartSessionRequest):
         # Extract metadata
         metadata = extract_metadata_from_state(result)
         
-        # Extract autosuggestions
-        autosuggestions = result.get("autosuggestions", [])
-        
         return StartSessionResponse(
             success=True,
             session_id=session_id,
@@ -429,8 +426,7 @@ def start_session(request: StartSessionRequest):
             current_state=result.get("current_state", "START"),
             concept_title=request.concept_title,
             message="Session started successfully. Agent is ready for student input.",
-            metadata=metadata,
-            autosuggestions=autosuggestions
+            metadata=metadata
         )
 
     except MinuteLimitExhaustedError as e:
@@ -472,7 +468,6 @@ def continue_session(request: ContinueSessionRequest):
         update_dict = {
             "messages": [HumanMessage(content=request.user_message)],
             # "last_user_msg": request.user_message,
-            "clicked_autosuggestion": request.clicked_autosuggestion
         }
         
         # Allow updating student level mid-session
@@ -511,17 +506,13 @@ def continue_session(request: ContinueSessionRequest):
         # Extract metadata
         metadata = extract_metadata_from_state(result)
         
-        # Extract autosuggestions
-        autosuggestions = result.get("autosuggestions", [])
-        
         return ContinueSessionResponse(
             success=True,
             thread_id=request.thread_id,
             agent_response=agent_response,
             current_state=result.get("current_state", "UNKNOWN"),
             metadata=metadata,
-            message="Response generated successfully",
-            autosuggestions=autosuggestions
+            message="Response generated successfully"
         )
     
     except MinuteLimitExhaustedError as e:
@@ -679,7 +670,7 @@ def delete_session(thread_id: str):
             }
         
         try:
-            from educational_agent_optimized_langsmith_autosuggestion.graph import checkpointer
+            from educational_agent_optimized_langsmith_v5.graph import checkpointer
             
             # Get the connection pool from the checkpointer
             if hasattr(checkpointer, 'conn'):
@@ -1321,7 +1312,7 @@ def translate_text(request: TranslationRequest):
 print("=" * 80)
 print("🎓 Educational Agent API Server Starting...")
 print("=" * 80)
-print(f"Agent Type: educational_agent_optimized_langsmith_autosuggestion")
+print(f"Agent Type: educational_agent_optimized_langsmith_v5")
 print(f"Concept: Dynamic (passed via API request)")
 print(f"Persistence: Supabase-Postgres (LangGraph)")
 print("=" * 80)

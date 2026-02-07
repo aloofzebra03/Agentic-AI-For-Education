@@ -386,7 +386,7 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
                                        include_last_message: bool = False, 
                                        include_instructions: bool = False,
                                        parser=None, current_node: str = None,
-                                       include_autosuggestions: bool = True) -> str:
+                                       include_autosuggestions: bool = False) -> str:
     
     # Add Kannada instruction if needed
     if state.get("is_kannada", False):
