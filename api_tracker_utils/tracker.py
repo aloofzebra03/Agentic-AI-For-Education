@@ -416,6 +416,97 @@ class ModelUsageTracker:
         # recent_failures = self.get_failure_count(api_suffix, model_name)
         # return recent_failures < failure_threshold
     
+    def get_best_api_key_for_model(self, model_name: str) -> str:
+        """
+        Get the best API key for a specific model.
+        
+        Selection algorithm:
+        1. Validate model exists in AVAILABLE_MODELS
+        2. Filter to only API keys within rate limits for this specific model
+        3. Sort by usage for this model (ascending)
+        4. Randomly pick from top 3 least-used keys to spread load
+        5. If no keys are available (all hit limits), raise appropriate error
+        
+        Args:
+            model_name: Name of the model to get an API key for
+            
+        Returns:
+            The best available API key for the specified model
+            
+        Raises:
+            ValueError: If model_name is not in AVAILABLE_MODELS
+            MinuteLimitExhaustedError: If all API keys exhausted minute limits for this model
+            DayLimitExhaustedError: If all API keys exhausted day limits for this model
+        """
+        # Validate model
+        if model_name not in AVAILABLE_MODELS:
+            raise ValueError(f"Model '{model_name}' not found in AVAILABLE_MODELS: {AVAILABLE_MODELS}")
+        
+        available_keys = get_available_api_keys()
+        random.shuffle(available_keys)  # Shuffle to avoid bias
+        
+        # Collect valid API keys (within limits) with their usage for this specific model
+        valid_keys = []
+        all_keys = []  # Fallback if no valid keys
+        
+        for api_key in available_keys:
+            api_suffix = api_key[-6:]
+            total_usage = self.get_call_count(api_suffix, model_name)
+            within_limits = self.is_within_limits(api_suffix, model_name)
+            
+            key_info = (api_key, total_usage)
+            all_keys.append(key_info)
+            
+            if within_limits:
+                valid_keys.append(key_info)
+        
+        # Check if we have valid keys
+        if not valid_keys:
+            # Check if ALL keys have exhausted DAY limits or MINUTE limits for this model
+            all_day_exhausted = True
+            all_minute_exhausted = True
+            
+            for api_key in available_keys:
+                api_suffix = api_key[-6:]
+                
+                if all_day_exhausted:
+                    daily_usage = self.get_daily_usage(api_suffix, model_name)
+                    day_limit = RATE_LIMITS.get(model_name, {}).get("per_day", 0)
+                    if daily_usage < day_limit:
+                        all_day_exhausted = False
+                
+                if all_minute_exhausted:
+                    min_usage = self.get_minute_usage(api_suffix, model_name)
+                    min_limit = RATE_LIMITS.get(model_name, {}).get("per_minute", 0)
+                    if min_usage < min_limit:
+                        all_minute_exhausted = False
+                
+                if not all_day_exhausted and not all_minute_exhausted:
+                    break
+            
+            # Raise appropriate error
+            if all_day_exhausted:
+                print(f"[TRACKER] ⚠️ ALL API keys have exhausted their DAY limits for model '{model_name}'!")
+                raise DayLimitExhaustedError(f"All API keys exhausted day limits for model '{model_name}'")
+            elif all_minute_exhausted:
+                print(f"[TRACKER] ⚠️ ALL API keys have exhausted their MINUTE limits for model '{model_name}'!")
+                raise MinuteLimitExhaustedError(f"All API keys exhausted minute limits for model '{model_name}'")
+            else:
+                raise RuntimeError(f"[TRACKER] No valid API keys found for '{model_name}', but not all limits are exhausted? Check code")
+        else:
+            print(f"[TRACKER] Found {len(valid_keys)} valid API keys within limits for model '{model_name}'")
+        
+        # Sort by usage (ascending)
+        valid_keys.sort(key=lambda x: x[1])  # Sort by total_usage
+        
+        # Pick randomly from top 3 to better distribute concurrent requests
+        top_n = min(3, len(valid_keys))
+        selected_api, usage = random.choice(valid_keys[:top_n])
+        
+        print(f"[TRACKER] Selected ...{selected_api[-6:]} for {model_name} from top {top_n} (usage: {usage})")
+        
+        return selected_api
+    
     def get_next_available_api_model_pair(self) -> Tuple[str, str]:
         """
         Get the next available API-model pair to use.
@@ -467,3 +558,28 @@ def reset_tracker():
 def get_api_model_call_count(api_key_suffix: str, model_name: str) -> int:
     """Get call count for a specific API-model combination."""
     return _tracker.get_call_count(api_key_suffix, model_name)
+
+
+def get_best_api_key_for_model(model_name: str) -> str:
+    """
+    Get the best API key for a specific model.
+    
+    This function selects the API key with the least usage for the given model
+    while respecting rate limits (both per-minute and per-day).
+    
+    Args:
+        model_name: Name of the model (must be in AVAILABLE_MODELS)
+        
+    Returns:
+        The best available API key for the specified model
+        
+    Raises:
+        ValueError: If model_name is not in AVAILABLE_MODELS
+        MinuteLimitExhaustedError: If all API keys exhausted minute limits
+        DayLimitExhaustedError: If all API keys exhausted day limits
+        
+    Example:
+        >>> api_key = get_best_api_key_for_model("gemini-2.5-flash")
+        >>> # Use api_key with the specified model
+    """
+    return _tracker.get_best_api_key_for_model(model_name)
