@@ -86,7 +86,7 @@ class AgentState(TypedDict, total=False):
     # Model selection
     model: str
     # NEW: Autosuggestion fields
-    autosuggestions: List[str]  # Final combined list of suggestions to display
+    autosuggestions: List[str]  # Final combined list of suggestions to display in English
     positive_autosuggestion: str  # Selected positive suggestion
     negative_autosuggestion: str  # Selected negative suggestion
     special_handling_autosuggestion: str  # Selected special handling suggestion
@@ -337,7 +337,8 @@ def build_graph():
         checkpointer=checkpointer,
         # checkpointer=CHECKPOINTER,
         interrupt_after=[
-            "START", "APK", "CI","GE", "AR", "TC", "RLC",
+            "START", "PAUSE_FOR_HANDLER",  # Interrupt after START and after handler output
+            "APK", "CI","GE", "AR", "TC", "RLC",
             # ▶ NEW: pause points for simulation path
             "SIM_CC", "SIM_VARS", "SIM_EXPECT",
             "SIM_EXECUTE", "SIM_OBSERVE", "SIM_INSIGHT",

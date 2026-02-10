@@ -160,3 +160,57 @@ Use tone and follow-up appropriate to the conversation context."""
     print("=" * 80)
     
     return {"agent_output": translated_example}
+
+def handle_dynamic_suggestion(state: AgentState) -> AgentState:
+    """Process dynamic autosuggestion based on student level and their specific request."""
+    student_level = state.get("student_level", "medium")
+    dynamic_request = state.get("last_user_msg", "")
+    current_node = state.get("current_state", "UNKNOWN")
+    
+    # Level-specific context for tailored responses
+    level_instructions = {
+        "low": "Use very simple language, short sentences, and provide step-by-step guidance. Avoid complex terminology.",
+        "medium": "Use clear explanations with moderate complexity. Balance detail with accessibility.",
+        "advanced": "Provide deeper insights, encourage critical thinking, and explore nuances of the concept."
+    }
+    
+    instruction = level_instructions.get(student_level, level_instructions["medium"])
+    
+    dynamic_prompt = f"""The student (ability level: {student_level}) asked: "{dynamic_request}"
+
+Task: Respond to their specific request keeping in mind they are a {student_level}-level student.
+{instruction}
+
+Your response should:
+1. Be brief (2-3 sentences) and directly address what they asked
+2. Reference the ongoing conversation context
+3. Use tone and follow-up appropriate to the conversation flow
+
+Be natural and supportive.and follow-up appropriate to the conversation context."""
+    
+    # Build prompt - conversation history included automatically, no autosuggestions needed
+    final_prompt = build_prompt_from_template_optimized(
+        system_prompt=dynamic_prompt,
+        state=state,
+        include_last_message=False,
+        include_instructions=False,
+        current_node=current_node,
+        include_autosuggestions=False
+    )
+    
+    resp = llm_with_history(state, final_prompt)
+    dynamic_content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
+    
+    # Translate once and update agent output
+    translated_dynamic = translate_if_kannada(state, dynamic_content)
+    state["agent_output"] = translated_dynamic
+    
+    print("=" * 80)
+    print("🔍 HANDLER: DYNAMIC SUGGESTION PROCESSED")
+    print("=" * 80)
+    print(f"🎯 STUDENT_LEVEL: {student_level}")
+    print(f"💬 REQUEST: {dynamic_request}")
+    print(f"📝 RESPONSE: {translated_dynamic[:100]}...")
+    print("=" * 80)
+    
+    return state

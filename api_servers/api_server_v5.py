@@ -417,6 +417,9 @@ def start_session(request: StartSessionRequest):
         # Extract metadata
         metadata = extract_metadata_from_state(result)
         
+        # Extract autosuggestions
+        autosuggestions = result.get("autosuggestions", [])
+        
         return StartSessionResponse(
             success=True,
             session_id=session_id,
@@ -426,7 +429,8 @@ def start_session(request: StartSessionRequest):
             current_state=result.get("current_state", "START"),
             concept_title=request.concept_title,
             message="Session started successfully. Agent is ready for student input.",
-            metadata=metadata
+            metadata=metadata,
+            autosuggestions=autosuggestions
         )
 
     except MinuteLimitExhaustedError as e:
@@ -468,6 +472,7 @@ def continue_session(request: ContinueSessionRequest):
         update_dict = {
             "messages": [HumanMessage(content=request.user_message)],
             # "last_user_msg": request.user_message,
+            "clicked_autosuggestion": request.clicked_autosuggestion
         }
         
         # Allow updating student level mid-session
@@ -506,13 +511,17 @@ def continue_session(request: ContinueSessionRequest):
         # Extract metadata
         metadata = extract_metadata_from_state(result)
         
+        # Extract autosuggestions
+        autosuggestions = result.get("autosuggestions", [])
+        
         return ContinueSessionResponse(
             success=True,
             thread_id=request.thread_id,
             agent_response=agent_response,
             current_state=result.get("current_state", "UNKNOWN"),
             metadata=metadata,
-            message="Response generated successfully"
+            message="Response generated successfully",
+            autosuggestions=autosuggestions
         )
     
     except MinuteLimitExhaustedError as e:

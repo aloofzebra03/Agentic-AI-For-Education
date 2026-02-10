@@ -135,6 +135,15 @@ def generate_static_autosuggestions(state, current_node: str) -> Tuple[List[str]
         'special': special,
         'dynamic': dynamic
     }
+
+    # ─── Create Final Suggestions List ───────────────────────────────────
+    # Filter out None values for display and also always stores english autosuggestions for debugging
+    final_suggestions = [s for s in [
+        selections_dict['positive'],
+        selections_dict['negative'],
+        selections_dict['special'],
+        selections_dict['dynamic']
+    ] if s]
     
     # ─── Translate to Kannada if Needed ───────────────────────────────────
     if is_kannada:
@@ -144,14 +153,6 @@ def generate_static_autosuggestions(state, current_node: str) -> Tuple[List[str]
             for k, v in selections_dict.items()
         }
     
-    # ─── Create Final Suggestions List ───────────────────────────────────
-    # Filter out None values for display
-    final_suggestions = [s for s in [
-        selections_dict['positive'],
-        selections_dict['negative'],
-        selections_dict['special'],
-        selections_dict['dynamic']
-    ] if s]
     
     print("=" * 80)
     print(f"📋 STATIC AUTOSUGGESTIONS GENERATED FOR {current_node}")

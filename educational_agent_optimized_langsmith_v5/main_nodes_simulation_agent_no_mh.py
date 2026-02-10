@@ -196,6 +196,14 @@ def apk_node(state: AgentState) -> AgentState:
         print("=" * 80)
         
         state["agent_output"] = translated_content
+        
+        # Generate static autosuggestions before returning
+        autosuggestions, selections = generate_static_autosuggestions(state, "APK")
+        state["autosuggestions"] = autosuggestions
+        state["positive_autosuggestion"] = selections['positive'] or ""
+        state["negative_autosuggestion"] = selections['negative'] or ""
+        state["special_handling_autosuggestion"] = selections['special'] or ""
+        state["dynamic_autosuggestion"] = selections['dynamic'] or ""
         return state
 
     # Handle student's response after hook question
@@ -244,6 +252,14 @@ Respond ONLY with a clear, encouraging message (not JSON - just the message text
         state["agent_output"] = translated_response
         state["current_state"] = "CI"
         add_ai_message_to_conversation(state, translated_response)
+        
+        # Generate static autosuggestions before returning
+        autosuggestions, selections = generate_static_autosuggestions(state, "APK")
+        state["autosuggestions"] = autosuggestions
+        state["positive_autosuggestion"] = selections['positive'] or ""
+        state["negative_autosuggestion"] = selections['negative'] or ""
+        state["special_handling_autosuggestion"] = selections['special'] or ""
+        state["dynamic_autosuggestion"] = selections['dynamic'] or ""
         return state
 
     context = json.dumps(PEDAGOGICAL_MOVES["APK"], indent=2)
@@ -354,11 +370,20 @@ Provide a concise definition (≤30 words) of '{state["concept_title"]}', then a
         translated_content = translate_if_kannada(state, content)
         add_ai_message_to_conversation(state, translated_content)
         
+        # Generate static autosuggestions
+        state["agent_output"] = translated_content
+        autosuggestions, selections = generate_static_autosuggestions(state, "CI")
+        
         # Return only the changed keys following LangGraph best practices
         result = {
             "asked_ci": True,
             "ci_tries": 0,
-            "agent_output": translated_content
+            "agent_output": translated_content,
+            "autosuggestions": autosuggestions,
+            "positive_autosuggestion": selections['positive'] or "",
+            "negative_autosuggestion": selections['negative'] or "",
+            "special_handling_autosuggestion": selections['special'] or "",
+            "dynamic_autosuggestion": selections['dynamic'] or ""
         }
         
         # Add image metadata if image was selected
@@ -1086,6 +1111,14 @@ def tc_node(state: AgentState) -> AgentState:
         state["agent_output"] = translated_content
         add_ai_message_to_conversation(state, translated_content)
         state["asked_tc"] = True
+        
+        # Generate static autosuggestions before returning
+        autosuggestions, selections = generate_static_autosuggestions(state, "TC")
+        state["autosuggestions"] = autosuggestions
+        state["positive_autosuggestion"] = selections['positive'] or ""
+        state["negative_autosuggestion"] = selections['negative'] or ""
+        state["special_handling_autosuggestion"] = selections['special'] or ""
+        state["dynamic_autosuggestion"] = selections['dynamic'] or ""
         return state
 
     # Second pass: evaluate & either affirm or explain
@@ -1223,6 +1256,14 @@ def rlc_node(state: AgentState) -> AgentState:
         print("=" * 80)
         
         state["agent_output"] = content
+        
+        # Generate static autosuggestions before returning
+        autosuggestions, selections = generate_static_autosuggestions(state, "RLC")
+        state["autosuggestions"] = autosuggestions
+        state["positive_autosuggestion"] = selections['positive'] or ""
+        state["negative_autosuggestion"] = selections['negative'] or ""
+        state["special_handling_autosuggestion"] = selections['special'] or ""
+        state["dynamic_autosuggestion"] = selections['dynamic'] or ""
         return state
 
     # Increment attempt counter
@@ -1321,6 +1362,14 @@ Task: Evaluate whether the student has more questions about the real-life applic
 
         state["agent_output"]  = translated_feedback
         state["current_state"] = parsed['next_state']
+        
+        # Generate static autosuggestions before returning
+        autosuggestions, selections = generate_static_autosuggestions(state, "RLC")
+        state["autosuggestions"] = autosuggestions
+        state["positive_autosuggestion"] = selections['positive'] or ""
+        state["negative_autosuggestion"] = selections['negative'] or ""
+        state["special_handling_autosuggestion"] = selections['special'] or ""
+        state["dynamic_autosuggestion"] = selections['dynamic'] or ""
     except Exception as e:
         print(f"Error parsing RLC response: {e}")
         print(f"Raw response: {raw}")
