@@ -32,6 +32,9 @@ from educational_agent_optimized_langsmith_v5.simulation_nodes_no_mh_ge import (
     sim_reflection_node,
 )
 
+# ▶ NEW: import autosuggestion module
+from autosuggestion import autosuggestion_manager_node, pause_for_handler
+
 dotenv.load_dotenv(dotenv_path=".env", override=True)
 
 # -----------------------------------------------------------------------------
@@ -82,6 +85,14 @@ class AgentState(TypedDict, total=False):
     concept_title: str
     # Model selection
     model: str
+    # NEW: Autosuggestion fields
+    autosuggestions: List[str]  # Final combined list of suggestions to display
+    positive_autosuggestion: str  # Selected positive suggestion
+    negative_autosuggestion: str  # Selected negative suggestion
+    special_handling_autosuggestion: str  # Selected special handling suggestion
+    dynamic_autosuggestion: str  # Always None for static implementation
+    clicked_autosuggestion: Annotated[bool, lambda x, y: y if y is not None else x]  # True if user clicked button
+    handler_triggered: bool  # True if handler was triggered by manager
 
 # -----------------------------------------------------------------------------
 # // 4. Wrap helper for node execution tracking
@@ -157,6 +168,10 @@ def _TC(s):    return _wrap(tc_node)(s)
 def _RLC(s):   return _wrap(rlc_node)(s)
 def _END(s):   return _wrap(end_node)(s)
 
+# NEW: Node wrappers (autosuggestion)
+def _AUTOSUGGESTION_MANAGER(s): return _wrap(autosuggestion_manager_node)(s)
+def _PAUSE(s): return _wrap(pause_for_handler)(s)
+
 # NEW: Node wrappers (simulation)
 def _SIM_CC(s):       return _wrap(sim_concept_creator_node)(s)
 def _SIM_VARS(s):     return _wrap(sim_vars_node)(s)
@@ -182,6 +197,10 @@ g.add_node("TC",  _TC)
 g.add_node("RLC", _RLC)
 g.add_node("END", _END)
 
+# ▶ NEW: Autosuggestion nodes
+g.add_node("AUTOSUGGESTION_MANAGER", _AUTOSUGGESTION_MANAGER)
+g.add_node("PAUSE_FOR_HANDLER", _PAUSE)
+
 # ▶ NEW: Simulation nodes
 g.add_node("SIM_CC", _SIM_CC)
 g.add_node("SIM_VARS", _SIM_VARS)
@@ -196,22 +215,64 @@ g.add_node("SIM_REFLECT", _SIM_REFLECT)
 def _route(state: AgentState) -> str:
     return state.get("current_state")
 
+def _route_with_manager_check(state: AgentState) -> str:
+    """Route to manager if autosuggestion was clicked, otherwise continue normal flow."""
+    current_state = state.get("current_state")
+    clicked = state.get("clicked_autosuggestion", False)
+    
+    if clicked:
+        # User clicked autosuggestion - route through manager
+        print(f"➡️ Routing to AUTOSUGGESTION_MANAGER from {current_state} due to clicked autosuggestion")
+        return f"{current_state}_TO_MANAGER"
+    else:
+        # User typed - continue normal pedagogical flow
+        print(f"➡️ Continuing to {current_state} without AUTOSUGGESTION_MANAGER")
+        return current_state
+
+def _route_after_manager(state: AgentState) -> str:
+    """
+    Route from AUTOSUGGESTION_MANAGER back to the appropriate pedagogical node.
+    If handler was triggered, go to PAUSE_FOR_HANDLER (which interrupts).
+    Otherwise, continue directly to the pedagogical node.
+    """
+    current_state = state.get("current_state")
+    handler_triggered = state.get("handler_triggered", False)
+    
+    if handler_triggered:
+        # Handler modified output - pause to show user
+        print(f"⏸️ Routing to PAUSE_FOR_HANDLER after AUTOSUGGESTION_MANAGER")
+        return f"{current_state}_PAUSED"
+    else:
+        # Normal autosuggestion - continue flow
+        print(f"➡️ Continuing to {current_state} after AUTOSUGGESTION_MANAGER")
+        return current_state
+
 g.add_edge(START,"START")
 
 g.add_edge("START","APK")
-# Core flow
-g.add_conditional_edges("APK", _route, {"APK": "APK", "CI": "CI"})
-g.add_conditional_edges("CI",  _route, {"CI": "CI","SIM_CC":"SIM_CC"})
-# g.add_conditional_edges("GE",  _route, {"MH": "MH", "AR": "AR","GE": "GE"})
-# g.add_conditional_edges("GE",  _route, {"GE": "GE","SIM_VARS":"SIM_VARS"})
-g.add_conditional_edges("GE",  _route, {"GE": "GE","AR": "AR"}) #Completely removing the simulation from this point
-# g.add_conditional_edges("MH", _route,{"MH": "MH", "SIM_VARS": "SIM_VARS", "AR": "AR"})
-# g.add_conditional_edges("MH", _route,{"MH": "MH", "SIM_VARS": "SIM_VARS"})
-g.add_conditional_edges("AR", _route, {"AR": "AR","TC": "TC", "GE": "GE"})
-# g.add_conditional_edges("AR", _route, {"AR": "AR","TC": "TC"})
-g.add_conditional_edges("TC", _route, {"TC": "TC","RLC": "RLC"})
-g.add_conditional_edges("RLC", _route, {"RLC": "RLC","END": "END"})
+# Core flow - pedagogical nodes conditionally route to manager based on clicked_autosuggestion
+g.add_conditional_edges("APK", _route_with_manager_check, {"APK": "APK", "CI": "CI", "APK_TO_MANAGER": "AUTOSUGGESTION_MANAGER", "CI_TO_MANAGER": "AUTOSUGGESTION_MANAGER"})
+g.add_conditional_edges("CI",  _route_with_manager_check, {"CI": "CI","SIM_CC":"SIM_CC", "CI_TO_MANAGER": "AUTOSUGGESTION_MANAGER", "SIM_CC_TO_MANAGER": "AUTOSUGGESTION_MANAGER"})
+g.add_conditional_edges("GE",  _route_with_manager_check, {"GE": "GE","AR": "AR", "GE_TO_MANAGER": "AUTOSUGGESTION_MANAGER", "AR_TO_MANAGER": "AUTOSUGGESTION_MANAGER"})
+g.add_conditional_edges("AR", _route_with_manager_check, {"AR": "AR","TC": "TC", "GE": "GE", "AR_TO_MANAGER": "AUTOSUGGESTION_MANAGER", "TC_TO_MANAGER": "AUTOSUGGESTION_MANAGER", "GE_TO_MANAGER": "AUTOSUGGESTION_MANAGER"})
+g.add_conditional_edges("TC", _route_with_manager_check, {"TC": "TC","RLC": "RLC", "TC_TO_MANAGER": "AUTOSUGGESTION_MANAGER", "RLC_TO_MANAGER": "AUTOSUGGESTION_MANAGER"})
+g.add_conditional_edges("RLC", _route_with_manager_check, {"RLC": "RLC","END": "END", "RLC_TO_MANAGER": "AUTOSUGGESTION_MANAGER", "END_TO_MANAGER": "AUTOSUGGESTION_MANAGER"})
 g.add_edge("END", END)
+
+# Manager routes back to pedagogical nodes OR pause node based on handler_triggered
+g.add_conditional_edges(
+    "AUTOSUGGESTION_MANAGER", 
+    _route_after_manager, 
+    {
+        "APK": "APK", "CI": "CI", "GE": "GE", "AR": "AR", "TC": "TC", "RLC": "RLC","SIM_CC": "SIM_CC",
+        "APK_PAUSED": "PAUSE_FOR_HANDLER", "CI_PAUSED": "PAUSE_FOR_HANDLER", 
+        "GE_PAUSED": "PAUSE_FOR_HANDLER", "AR_PAUSED": "PAUSE_FOR_HANDLER", 
+        "TC_PAUSED": "PAUSE_FOR_HANDLER", "RLC_PAUSED": "PAUSE_FOR_HANDLER"
+    }
+)
+
+# Pause node routes back to the actual pedagogical node
+g.add_conditional_edges("PAUSE_FOR_HANDLER", _route, {"APK": "APK", "CI": "CI","SIM_CC": "SIM_CC", "GE": "GE", "AR": "AR", "TC": "TC", "RLC": "RLC"})
 
 # Simulation flow edges
 g.add_conditional_edges("SIM_CC", _route, {"GE": "GE"})

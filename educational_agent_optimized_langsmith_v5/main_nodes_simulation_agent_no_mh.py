@@ -23,6 +23,9 @@ from utils.shared_utils import (
     translate_if_kannada,
 )
 
+# Import autosuggestion utilities
+from autosuggestion import generate_static_autosuggestions
+
 PEDAGOGICAL_MOVES: Dict[str, Dict[str, str]] = {
     "APK": {
         "goal": "Activate prior knowledge; pose a hook linking the concept to everyday intuition.",
@@ -288,6 +291,14 @@ Remember to give feedback as mentioned in the required schema."""
 
         state["agent_output"]  = translated_feedback
         state["current_state"] = parsed['next_state']
+        
+        # Generate static autosuggestions before returning
+        autosuggestions, selections = generate_static_autosuggestions(state, "APK")
+        state["autosuggestions"] = autosuggestions
+        state["positive_autosuggestion"] = selections['positive'] or ""
+        state["negative_autosuggestion"] = selections['negative'] or ""
+        state["special_handling_autosuggestion"] = selections['special'] or ""
+        state["dynamic_autosuggestion"] = selections['dynamic'] or ""
     except Exception as e:
         print(f"Error parsing APK response: {e}")
         print(f"Raw response: {raw}")
@@ -397,12 +408,23 @@ Provide a concise definition (≤30 words) of '{state["concept_title"]}', then a
         translated_content = translate_if_kannada(state, content)
         add_ai_message_to_conversation(state, translated_content)
         
+        # Generate static autosuggestions
+        state["agent_output"] = translated_content
+        state["ci_tries"] = ci_tries
+        state["current_state"] = "SIM_CC"
+        autosuggestions, selections = generate_static_autosuggestions(state, "CI")
+        
         # Return only the changed keys following LangGraph best practices
         return {
             "ci_tries": ci_tries,
             "agent_output": translated_content,
             "current_state": "SIM_CC",
-            "enhanced_message_metadata": {}
+            "enhanced_message_metadata": {},
+            "autosuggestions": autosuggestions,
+            "positive_autosuggestion": selections['positive'] or "",
+            "negative_autosuggestion": selections['negative'] or "",
+            "special_handling_autosuggestion": selections['special'] or "",
+            "dynamic_autosuggestion": selections['dynamic'] or ""
         }
 
     context = json.dumps(PEDAGOGICAL_MOVES["CI"], indent=2)
@@ -447,13 +469,23 @@ Task: Determine if the restatement is accurate. If accurate, move to SIM_CC to i
         print(f"📊 PARSED_TYPE: {type(parsed).__name__}")
         print("=" * 80)
 
+        # Generate static autosuggestions
+        state["agent_output"] = parsed['feedback']
+        state["ci_tries"] = ci_tries
+        state["current_state"] = parsed['next_state']
+        autosuggestions, selections = generate_static_autosuggestions(state, "CI")
+        
         # Return only the changed keys following LangGraph best practices
         return {
             "ci_tries": ci_tries,
             "agent_output": parsed['feedback'],
             "current_state": parsed['next_state'],
-            "enhanced_message_metadata": {}
-
+            "enhanced_message_metadata": {},
+            "autosuggestions": autosuggestions,
+            "positive_autosuggestion": selections['positive'] or "",
+            "negative_autosuggestion": selections['negative'] or "",
+            "special_handling_autosuggestion": selections['special'] or "",
+            "dynamic_autosuggestion": selections['dynamic'] or ""
         }
     except Exception as e:
         print(f"Error parsing CI response: {e}")
@@ -519,10 +551,19 @@ def ge_node(state: AgentState) -> AgentState:
         translated_content = translate_if_kannada(state, content)
         add_ai_message_to_conversation(state, translated_content)
         
+        # Generate static autosuggestions
+        state["agent_output"] = translated_content
+        autosuggestions, selections = generate_static_autosuggestions(state, "GE")
+        
         return {
             "asked_ge": True,
             "ge_tries": 0,
             "agent_output": translated_content,
+            "autosuggestions": autosuggestions,
+            "positive_autosuggestion": selections['positive'] or "",
+            "negative_autosuggestion": selections['negative'] or "",
+            "special_handling_autosuggestion": selections['special'] or "",
+            "dynamic_autosuggestion": selections['dynamic'] or ""
         }
 
     # Handle tries for GE node - increment counter
@@ -568,10 +609,20 @@ Then transition to testing their understanding by saying something like: 'Now le
         translated_content = translate_if_kannada(state, content)
         add_ai_message_to_conversation(state, translated_content)
         
+        # Generate static autosuggestions
+        state["agent_output"] = translated_content
+        state["current_state"] = "AR"
+        autosuggestions, selections = generate_static_autosuggestions(state, "GE")
+        
         # Return only the changed keys following LangGraph best practices
         return {
             "agent_output": translated_content,
-            "current_state": "AR"  # NEW: Transition directly to AR for assessment
+            "current_state": "AR",
+            "autosuggestions": autosuggestions,
+            "positive_autosuggestion": selections['positive'] or "",
+            "negative_autosuggestion": selections['negative'] or "",
+            "special_handling_autosuggestion": selections['special'] or "",
+            "dynamic_autosuggestion": selections['dynamic'] or ""
         }
         
         # OLD: Transition to SIM_VARS for simulation-based misconception handling
@@ -986,6 +1037,14 @@ Task: Grade this answer on a scale from 0 to 1 and determine next state. Respond
     state["agent_output"] = translated_output
     add_ai_message_to_conversation(state, translated_output)
     state["current_state"] = next_state
+    
+    # Generate static autosuggestions before returning
+    autosuggestions, selections = generate_static_autosuggestions(state, "AR")
+    state["autosuggestions"] = autosuggestions
+    state["positive_autosuggestion"] = selections['positive'] or ""
+    state["negative_autosuggestion"] = selections['negative'] or ""
+    state["special_handling_autosuggestion"] = selections['special'] or ""
+    state["dynamic_autosuggestion"] = selections['dynamic'] or ""
     return state
 
 def tc_node(state: AgentState) -> AgentState:
@@ -1113,6 +1172,14 @@ Task: Evaluate whether the application is correct. Respond ONLY with JSON matchi
         state["agent_output"] = translated_content
 
     state["current_state"] = "RLC"
+    
+    # Generate static autosuggestions before returning
+    autosuggestions, selections = generate_static_autosuggestions(state, "TC")
+    state["autosuggestions"] = autosuggestions
+    state["positive_autosuggestion"] = selections['positive'] or ""
+    state["negative_autosuggestion"] = selections['negative'] or ""
+    state["special_handling_autosuggestion"] = selections['special'] or ""
+    state["dynamic_autosuggestion"] = selections['dynamic'] or ""
     return state
 
 def rlc_node(state: AgentState) -> AgentState:
@@ -1199,6 +1266,14 @@ def rlc_node(state: AgentState) -> AgentState:
         add_ai_message_to_conversation(state, translated_content)
         state["agent_output"] = translated_content
         state["current_state"] = "END"
+        
+        # Generate static autosuggestions before returning
+        autosuggestions, selections = generate_static_autosuggestions(state, "RLC")
+        state["autosuggestions"] = autosuggestions
+        state["positive_autosuggestion"] = selections['positive'] or ""
+        state["negative_autosuggestion"] = selections['negative'] or ""
+        state["special_handling_autosuggestion"] = selections['special'] or ""
+        state["dynamic_autosuggestion"] = selections['dynamic'] or ""
         return state
 
     context = json.dumps(PEDAGOGICAL_MOVES["RLC"], indent=2)
