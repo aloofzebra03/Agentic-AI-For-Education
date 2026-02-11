@@ -161,7 +161,7 @@ Use tone and follow-up appropriate to the conversation context."""
     
     return {"agent_output": translated_example}
 
-def handle_dynamic_suggestion(state: AgentState) -> AgentState:
+def handle_dynamic_suggestion(state) -> Dict:
     """Process dynamic autosuggestion based on student level and their specific request."""
     student_level = state.get("student_level", "medium")
     dynamic_request = state.get("last_user_msg", "")
