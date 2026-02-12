@@ -114,7 +114,7 @@ Context:
 {context}
 
 Task:
-Return JSON ONLY with 1–5 clear, independent, testable simulation concepts for a class 7 learner.
+Return JSON ONLY with 1–3 clear, independent, testable simulation concepts for a class 7 learner.
 
 Guidelines:
 - Keep each concept short (≤15 words), concrete, and experimentally manipulable.

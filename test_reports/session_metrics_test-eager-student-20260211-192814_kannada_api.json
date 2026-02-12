@@ -1,0 +1,23 @@
+{
+  "concepts_covered": [
+    "Temperature",
+    "Heat",
+    "Thermal Expansion",
+    "Molecular Motion",
+    "Evaporation",
+    "Measurement of Temperature",
+    "Thermometer"
+  ],
+  "num_concepts_covered": 7,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "High",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.95,
+  "quiz_score": 0.0,
+  "error_handling_count": 1,
+  "adaptability": true,
+  "session_id": "test-eager-student-20260211-192814",
+  "total_interactions": 20,
+  "persona_name": "Eager Student"
+}

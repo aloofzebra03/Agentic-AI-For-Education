@@ -1280,12 +1280,12 @@ Summary:"""
         summary_response = invoke_llm_with_fallback(
             [HumanMessage(content=summary_prompt)],
             operation_name="Educational summary",
-            model=model
         )
         return summary_response.content.strip()
     except Exception as e:
         print(f"❌ Error creating LLM summary: {e}")
         # Fallback to simple summary if LLM fails
+        raise e
         return f"Educational discussion with {len(messages)} exchanges about the concept"
 
 def create_educational_summary_from_text(conversation_text: str, model: str = "gemma-3-27b-it") -> str:
@@ -1318,12 +1318,12 @@ Summary:"""
         summary_response = invoke_llm_with_fallback(
             [HumanMessage(content=summary_prompt)],
             operation_name="Summary from text",
-            model=model
         )
         return summary_response.content.strip()
     except Exception as e:
         print(f"❌ Error creating LLM summary: {e}")
         # Fallback to simple summary if LLM fails
+        raise e
         return "Educational discussion about the concept"
 
 def build_node_aware_conversation_history(state: AgentState, current_node: str) -> str:

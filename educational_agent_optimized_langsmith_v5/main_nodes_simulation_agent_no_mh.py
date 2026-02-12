@@ -1034,8 +1034,8 @@ Task: Grade this answer on a scale from 0 to 1 and determine next state. Respond
         
         # Translate and set agent output
         # Translate and set agent output
-        translated_content = translate_if_kannada(state, content)
-        agent_output = translated_content
+        # translated_content = translate_if_kannada(state, content)
+        agent_output = content
     else:
         # Use feedback as agent output
         agent_output = feedback
