@@ -1,0 +1,6 @@
+{
+  "dependencies": [".", "../utils", "../api_tracker_utils"],
+  "graphs": {
+    "revision_agent": "./graph.py:graph"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "chapter": "Nutrition in Plants",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the process by which plants make their own food?",
+      "expected_answer": "Photosynthesis",
+      "difficulty": "easy"
+    },
+    {
+      "id": 2,
+      "question": "Why are leaves green in color?",
+      "expected_answer": "Because they contain chlorophyll",
+      "difficulty": "easy"
+    },
+    {
+      "id": 3,
+      "question": "What are the raw materials required for photosynthesis?",
+      "expected_answer": "Carbon dioxide, water, and sunlight",
+      "difficulty": "medium"
+    },
+    {
+      "id": 4,
+      "question": "Where in the plant cell does photosynthesis take place?",
+      "expected_answer": "In the chloroplasts",
+      "difficulty": "medium"
+    },
+    {
+      "id": 5,
+      "question": "What is the main product of photosynthesis that plants use for energy?",
+      "expected_answer": "Glucose (or starch)",
+      "difficulty": "easy"
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 {
   "dependencies": ["."],
   "graphs": {
-    "agent": "educational_agent_optimized_langsmith_autosuggestion.graph:graph"
+    "agent": "revision_agent.graph:graph"
   },
-  "env": "../.env",
+  "env": ".env",
   "image_distro": "wolfi"
 }
