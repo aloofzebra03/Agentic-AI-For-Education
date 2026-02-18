@@ -19,4 +19,5 @@ cloudflare
 
 # Protobuf - PINNED for Streamlit compatibility (critical!)
 protobuf==3.20.3
+-e .
 
