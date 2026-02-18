@@ -184,11 +184,11 @@ g.add_conditional_edges(
 # GE → GE (keep explaining) or AR (test understanding)
 g.add_conditional_edges("GE", _route, {"GE": "GE", "AR": "AR"})
 
-# AR → GE (still struggling) or QUESTION_PRESENTER (understood, move on)
+# AR → GE (still struggling) or QUESTION_PRESENTER (understood, move on) or AR (self-loop for safety)
 g.add_conditional_edges(
     "AR",
     _route,
-    {"GE": "GE", "QUESTION_PRESENTER": "QUESTION_PRESENTER"}
+    {"GE": "GE", "QUESTION_PRESENTER": "QUESTION_PRESENTER", "AR": "AR"}
 )
 
 # REVISION_END → END
@@ -210,7 +210,7 @@ checkpointer = InMemorySaver()
 def build_graph():
     """Build and compile the revision agent graph"""
     compiled = g.compile(
-        # checkpointer=checkpointer,
+        checkpointer=checkpointer,
         interrupt_after=[
             "REVISION_START",      # Pause after welcome message
             "QUESTION_PRESENTER",  # Pause after presenting each question

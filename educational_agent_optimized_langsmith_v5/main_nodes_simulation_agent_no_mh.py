@@ -162,6 +162,7 @@ def apk_node(state: AgentState) -> AgentState:
         state["asked_apk"] = True
         state["apk_tries"] = 0
         # Include ground truth for Concept Definition
+        print(f"Looking for ground truth for concept: {state['concept_title']}")
         gt = get_ground_truth_from_json(state["concept_title"], "Concept Definition")
         system_prompt = f"""
             Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n

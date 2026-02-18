@@ -396,12 +396,34 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
     template_parts = ["{system_prompt}"]
     template_vars = ["system_prompt"]
     
-    # Call history building functions once and reuse the result
-    if current_node:
-        history = build_node_aware_conversation_history(state, current_node)
-    else:
-        # Fall back to regular history if no current_node provided
-        history = build_conversation_history(state)
+    # SIMPLIFIED: Just take the last 4 messages from state['messages']
+    # This replaces the complex node-aware history building that was here before
+    messages = state.get("messages", [])
+    
+    # Take last 4 messages (or fewer if less than 4 messages exist)
+    last_n_messages = messages[-4:] if len(messages) > 4 else messages
+    
+    # Build history text from these messages
+    history = ""
+    for msg in last_n_messages:
+        if isinstance(msg, HumanMessage) and msg.content == "__start__":
+            continue
+        elif isinstance(msg, HumanMessage):
+            history += f"Student: {msg.content}\n"
+        elif isinstance(msg, AIMessage):
+            history += f"Agent: {msg.content}\n"
+        elif isinstance(msg, SystemMessage):
+            history += f"System: {msg.content}\n"
+    
+    history = history.strip()
+    
+    # # COMMENTED OUT: Complex node-aware history building (original implementation)
+    # # Call history building functions once and reuse the result
+    # if current_node:
+    #     history = build_node_aware_conversation_history(state, current_node)
+    # else:
+    #     # Fall back to regular history if no current_node provided
+    #     history = build_conversation_history(state)
     
     # Add history to template if available
     if history:
