@@ -32,7 +32,7 @@ except ImportError as e:
 # ══════════════════════════════════════════════════════════════════════════════
 
 st.set_page_config(
-    page_title="Educational Agent V5", 
+    page_title="Educational Agent V5(Static Autosuggestions and Last 4 messages in Conversation History)", 
     page_icon="🎓",
     layout="wide"
 )
@@ -205,7 +205,7 @@ def main():
     # ========================================================================
     
     if not st.session_state.session_started:
-        st.title("🎓 Educational Agent V5")
+        st.title("🎓 Educational Agent V5(Static Autosuggestions and Last 4 messages in Conversation History)")
         st.caption("Interactive learning with simulation and autosuggestions")
         st.markdown("---")
         
@@ -223,7 +223,7 @@ def main():
         with col2:
             if st.button("🚀 Start Learning Session", type="primary", use_container_width=True):
                 # Generate session ID
-                st.session_state.session_id = f"edu_v5_{selected_concept.replace(' ', '_').lower()}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                st.session_state.session_id = f"streamlit_{selected_concept.replace(' ', '_').lower()}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
                 st.session_state.selected_concept = selected_concept
                 st.session_state.session_started = True
                 st.session_state.processing = True
