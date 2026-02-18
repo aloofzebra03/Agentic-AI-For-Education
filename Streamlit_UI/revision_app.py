@@ -143,7 +143,7 @@ def main():
         with col2:
             if st.button("🚀 Start Revision Session", type="primary", use_container_width=True):
                 # Generate session ID
-                st.session_state.session_id = f"revision_{selected_chapter}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                st.session_state.session_id = f"streamlit_revision_{selected_chapter}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
                 st.session_state.selected_chapter = selected_chapter
                 st.session_state.session_started = True
                 st.session_state.processing = True
