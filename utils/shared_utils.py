@@ -18,7 +18,7 @@ import dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_core.prompts import PromptTemplate
-from langchain_groq import ChatGroq
+# from langchain_groq import ChatGroq
 
 # from educational_agent_v1.config_rag import concept_pkg
 # from educational_agent_v1.Creating_Section_Text.retriever import retrieve_docs
