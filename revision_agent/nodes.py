@@ -46,7 +46,7 @@ class ArResponse(BaseModel):
     """Response for AR node (adapted from learning agent, autosuggestions removed)"""
     score: float
     feedback: str
-    next_state: Literal["QUESTION_PRESENTER", "GE"]  # Modified routing
+    next_state: Literal["QUESTION_PRESENTER"]  # Always move forward after AR
 
 
 # ─── Parsers ─────────────────────────────────────────────────────────────────
@@ -101,6 +101,7 @@ Greet the student warmly and explain that:
 1. You'll ask them questions about {chapter}
 2. If they answer correctly, you'll move to the next question
 3. If they struggle, you'll explain the concept and ask a followup question
+4. Remember that don;t start asking the questions now.We are ONLY greeting the students.Questions will come later
 
 Keep it brief (2-3 sentences) and encouraging.
 """
@@ -158,7 +159,7 @@ def question_presenter_node(state: Dict[str, Any]) -> Dict[str, Any]:
         # All questions completed - go to END
         print("✅ All questions completed! Moving to END.")
         state["current_state"] = "REVISION_END"
-        state["agent_output"] = ""  # END node will generate summary
+        state["agent_output"] = "Great! You have sucessfully answered all questions"  # END node will generate summary
         return state
     
     # Store current question
@@ -176,7 +177,7 @@ def question_presenter_node(state: Dict[str, Any]) -> Dict[str, Any]:
 
 Progress: Question {current_idx + 1} of {total}
 
-Present this question to the student:
+Present this exact question to the student:
 "{question_text}"
 
 Keep it simple and clear. Just present the question naturally (you can add a brief encouraging phrase).
@@ -610,18 +611,20 @@ Just ask the question naturally (no need for JSON here, just output the question
 
 Student's answer: "{student_answer}"
 
-Task: Evaluate their answer and decide next steps.
-Score from 0.0 to 1.0 (0.7+ is good enough to move on).
+Task: Evaluate their answer and always move forward to the next question.
+Score from 0.0 to 1.0.
+
+If the answer is correct or mostly correct: praise them and confirm their understanding.
+If the answer is incorrect or incomplete: politely correct them, briefly reiterate the key idea about '{concept}', and then encourage them to move on.
+
+Always set next_state to "QUESTION_PRESENTER"
 
 Respond with JSON:
 {{
     "score": 0.0 to 1.0,
-    "feedback": "Brief feedback on their answer",
-    "next_state": "QUESTION_PRESENTER" if score >= 0.7 else "GE"
+    "feedback": "Your response to the student (polite correction + reiteration if wrong, praise if right)",
+    "next_state": "QUESTION_PRESENTER"
 }}
-
-If score >= 0.7: They understood, move to next question
-If score < 0.7: They're still struggling, explain again (GE)
 """
     
     # Add Kannada instruction if needed
@@ -653,20 +656,9 @@ If score < 0.7: They're still struggling, explain again (GE)
         print(f"💬 Feedback: {feedback[:50]}...")
         print(f"🚀 Next state: {next_state}")
         
-        if next_state == "QUESTION_PRESENTER":
-            # Student understood - move to next question
-            state["current_question_index"] += 1
-            print("✅ Student understood! Moving to next question.")
-        else:
-            # Student still struggling - will loop back to GE
-            # Add concept to review list - simple inline logic
-            concepts_for_review = state.setdefault("concepts_for_review", [])
-            if concept and concept not in concepts_for_review:
-                concepts_for_review.append(concept)
-                print(f"📌 Added '{concept}' to review list. Total: {len(concepts_for_review)}")
-            
-            state["asked_ge"] = False  # Reset for another explanation round
-            print(f"⚠️ Student still struggling with '{concept}'. Will explain again.")
+        # Always move to next question from AR
+        state["current_question_index"] += 1
+        print("✅ AR complete. Moving to next question.")
         
         translated_feedback = translate_if_kannada(state, feedback)
         state["agent_output"] = translated_feedback

@@ -165,7 +165,7 @@ def _route(state: RevisionAgentState) -> str:
 g.add_edge(START, "REVISION_START")
 
 # REVISION_START → QUESTION_PRESENTER
-g.add_conditional_edges("REVISION_START", _route, {"QUESTION_PRESENTER": "QUESTION_PRESENTER"})
+g.add_edge("REVISION_START", "QUESTION_PRESENTER")
 
 # QUESTION_PRESENTER → EVALUATOR or REVISION_END
 g.add_conditional_edges(
@@ -188,7 +188,7 @@ g.add_conditional_edges("GE", _route, {"GE": "GE", "AR": "AR"})
 g.add_conditional_edges(
     "AR",
     _route,
-    {"GE": "GE", "QUESTION_PRESENTER": "QUESTION_PRESENTER", "AR": "AR"}
+    {"QUESTION_PRESENTER": "QUESTION_PRESENTER", "AR": "AR"}
 )
 
 # REVISION_END → END
