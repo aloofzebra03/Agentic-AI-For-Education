@@ -30,6 +30,42 @@
       "question": "What is the main product of photosynthesis that plants use for energy?",
       "expected_answer": "Glucose (or starch)",
       "difficulty": "easy"
+    },
+    {
+      "id": 6,
+      "question": "Define 'nutrition'.",
+      "expected_answer": "Nutrition is the mode of taking food by an organism and its utilisation by the body.",
+      "difficulty": "easy"
+    },
+    {
+      "id": 7,
+      "question": "What are autotrophs?",
+      "expected_answer": "Organisms that make their own food from simple substances.",
+      "difficulty": "easy"
+    },
+    {
+      "id": 8,
+      "question": "What are stomata?",
+      "expected_answer": "Tiny pores present on the surface of leaves through which carbon dioxide is taken in.",
+      "difficulty": "medium"
+    },
+    {
+      "id": 9,
+      "question": "What are saprotrophs?",
+      "expected_answer": "Organisms that take in nutrients from dead and decaying matter, such as fungi.",
+      "difficulty": "medium"
+    },
+    {
+      "id": 10,
+      "question": "What is a symbiotic relationship?",
+      "expected_answer": "A relationship where two different organisms live together and share shelter and nutrients.",
+      "difficulty": "medium"
+    },
+    {
+      "id": 11,
+      "question": "Define 'host' in the context of plant nutrition.",
+      "expected_answer": "The plant from which a parasitic plant derives its ready-made food.",
+      "difficulty": "hard"
     }
   ]
 }

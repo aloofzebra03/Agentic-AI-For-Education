@@ -1,0 +1,23 @@
+{
+  "concepts_covered": [
+    "Uniform motion",
+    "Non-uniform motion",
+    "Speed",
+    "Distance",
+    "Time",
+    "Relationship between speed, distance, and time",
+    "Velocity"
+  ],
+  "num_concepts_covered": 7,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "Dull",
+  "user_interest_rating": 2.0,
+  "user_engagement_rating": 3.0,
+  "enjoyment_probability": 0.6,
+  "quiz_score": 0.0,
+  "error_handling_count": 12,
+  "adaptability": true,
+  "session_id": "test-dull-student-20260219-155634",
+  "total_interactions": 24,
+  "persona_name": "Dull Student"
+}

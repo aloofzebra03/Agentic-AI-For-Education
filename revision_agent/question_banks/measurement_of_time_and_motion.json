@@ -10,44 +10,74 @@
     {
       "id": 2,
       "question": "What is the term for the time taken by a pendulum to complete one full oscillation?",
-      "expected_answer": "Time period [cite: 118]",
+      "expected_answer": "Time period",
       "difficulty": "easy"
     },
     {
       "id": 3,
       "question": "Which instrument in a vehicle measures the distance travelled?",
-      "expected_answer": "Odometer [cite: 296]",
+      "expected_answer": "Odometer",
       "difficulty": "easy"
     },
     {
       "id": 4,
       "question": "How is the speed of an object calculated?",
-      "expected_answer": "Total distance covered divided by the total time taken [cite: 232]",
+      "expected_answer": "Total distance covered divided by the total time taken",
       "difficulty": "medium"
     },
     {
       "id": 5,
       "question": "What factor determines the time period of a simple pendulum?",
-      "expected_answer": "The length of the pendulum (it does not depend on the bob's mass) [cite: 151]",
+      "expected_answer": "The length of the pendulum (it does not depend on the bob's mass)",
       "difficulty": "medium"
     },
     {
       "id": 6,
       "question": "When is an object said to be in uniform linear motion?",
-      "expected_answer": "When it moves along a straight line with a constant speed [cite: 318]",
+      "expected_answer": "When it moves along a straight line with a constant speed",
       "difficulty": "medium"
     },
     {
       "id": 7,
       "question": "Name two ancient devices used for measuring time before mechanical clocks.",
-      "expected_answer": "Sundials, water clocks, hourglasses (sand clocks), or candle clocks [cite: 36]",
+      "expected_answer": "Sundials, water clocks, hourglasses (sand clocks), or candle clocks",
       "difficulty": "easy"
     },
     {
       "id": 8,
       "question": "Who invented the pendulum clock in 1656?",
-      "expected_answer": "Christiaan Huygens [cite: 93]",
+      "expected_answer": "Christiaan Huygens",
       "difficulty": "hard"
+    },
+    {
+      "id": 9,
+      "question": "Define 'speed'.",
+      "expected_answer": "The distance covered by an object in a unit time.",
+      "difficulty": "easy"
+    },
+    {
+      "id": 10,
+      "question": "What is meant by 'oscillatory motion'?",
+      "expected_answer": "The to and fro motion of an object, such as a simple pendulum.",
+      "difficulty": "medium"
+    },
+    {
+      "id": 11,
+      "question": "What is non-uniform motion?",
+      "expected_answer": "Motion in which the speed of an object moving along a straight line keeps changing.",
+      "difficulty": "medium"
+    },
+    {
+      "id": 12,
+      "question": "What is a speedometer?",
+      "expected_answer": "An instrument on the dashboard of a vehicle that records the speed directly in km/h.",
+      "difficulty": "easy"
+    },
+    {
+      "id": 13,
+      "question": "What is the basic unit of speed?",
+      "expected_answer": "Meter per second (m/s).",
+      "difficulty": "medium"
     }
   ]
 }

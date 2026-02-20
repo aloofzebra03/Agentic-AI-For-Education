@@ -1,0 +1,22 @@
+{
+  "concepts_covered": [
+    "Temperature",
+    "Heat",
+    "Heat Transfer (from hot to cold)",
+    "Thermal Equilibrium",
+    "Specific Heat Capacity",
+    "Molecular Motion and Temperature"
+  ],
+  "num_concepts_covered": 6,
+  "clarity_conciseness_score": 4.0,
+  "user_type": "High",
+  "user_interest_rating": 5.0,
+  "user_engagement_rating": 5.0,
+  "enjoyment_probability": 0.95,
+  "quiz_score": 0.0,
+  "error_handling_count": 1,
+  "adaptability": true,
+  "session_id": "test-eager-student-20260219-154706",
+  "total_interactions": 20,
+  "persona_name": "Eager Student"
+}
