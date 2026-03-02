@@ -454,7 +454,7 @@ Task: Provide a clear, concise explanation of '{concept}' that:
 2. Explains why it's important
 3. Relates it back to the question they missed
 
-Keep it simple and encouraging. Don't lecture - be conversational.
+Keep it simple and encouraging. Don't lecture - be conversational.Also ensure that the response is small and not too text heavy.
 """
         
         # Add Kannada instruction if needed

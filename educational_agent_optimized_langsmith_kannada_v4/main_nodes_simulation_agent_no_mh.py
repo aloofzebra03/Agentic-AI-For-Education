@@ -771,12 +771,12 @@ def ar_node(state: AgentState) -> AgentState:
                 f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
                 f"Ground truth (MCQs):\n{gt}\n\n"
                 f"Generate a short quiz question (T/F, MCQ, or short answer) specifically about concept {current_idx + 1}: '{current_concept}' "
-                f"within the topic '{concept_pkg.title}'. Focus the question on this specific concept."
+                f"within the topic '{concept_pkg.title}'. Focus the question on this specific concept. Ensure you dont give the answer. "
             )
         else:
             system_prompt = (
                 f"Please use the following ground truth as a baseline and build upon it, but do not deviate too much.\n"
-            f"Ground truth (MCQs):\n{gt}\nGenerate a short quiz question (T/F, MCQ, or short answer) on '{concept_pkg.title}' and prompt the learner."
+            f"Ground truth (MCQs):\n{gt}\nGenerate a short quiz question (T/F, MCQ, or short answer) on '{concept_pkg.title}' and prompt the learner.Ensure you dont give the answer."
         )
         
         # Build final prompt using optimized template

@@ -1336,14 +1336,14 @@ def ar_node(state: AgentState) -> AgentState:
             {gt}
 
                 Generate a short quiz question (T/F, MCQ, or short answer) specifically about concept {current_idx + 1}: '{current_concept}' 
-                within the topic '{state["concept_title"]}'. Focus the question on this specific concept.
+                within the topic '{state["concept_title"]}'. Focus the question on this specific concept. Ensure you dont give the answer.
             """
         else:
             system_prompt = f"""
                 Please use the following ground truth as a baseline and build upon it, but do not deviate too much.
                 Ground truth (MCQs):
 {gt}
-                Generate a short quiz question (T/F, MCQ, or short answer) on '{state["concept_title"]}' and prompt the learner."""
+                Generate a short quiz question (T/F, MCQ, or short answer) on '{state["concept_title"]}' and prompt the learner.Ensure you dont give the answer."""
         
         # Build final prompt using optimized template
         final_prompt = build_prompt_from_template_optimized(
