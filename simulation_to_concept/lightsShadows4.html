@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Light & Shadows – Compare & Explore</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f4f6f8;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+/* ---------- Titles ---------- */
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 8px 4px;
+  color: #444;
+}
+
+/* ---------- Card ---------- */
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  margin-bottom: 12px;
+}
+
+/* ---------- Visual ---------- */
+.visual {
+  position: relative;
+  height: 32vh;
+  min-height: 220px;
+  background: #eef3f9;
+  border-radius: 12px;
+  overflow: hidden;
+  touch-action: none;
+}
+
+svg { width: 100%; height: 100%; }
+
+/* ---------- Static Instruction ---------- */
+.static-hint {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 11px;
+  line-height: 1.3;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+}
+
+/* ---------- Overlays ---------- */
+.metrics {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  background: rgba(255,255,255,0.96);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 11px;
+  line-height: 1.4;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+}
+
+.control-toggle {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  background: #007AFF;
+  color: #fff;
+  font-size: 11px;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+
+/* ---------- Controls ---------- */
+.control-overlay {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.97);
+  border-top: 1px solid #ddd;
+  padding: 8px;
+  transform: translateY(100%);
+  transition: transform .25s ease;
+}
+
+.control-overlay.open { transform: translateY(0); }
+
+.control-group {
+  margin-bottom: 6px;
+}
+
+.control-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.segmented {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.segmented button {
+  flex: 1;
+  padding: 6px;
+  border-radius: 6px;
+  border: none;
+  font-size: 11px;
+  background: #e0e0e0;
+}
+
+.segmented button.active {
+  background: #007AFF;
+  color: white;
+  font-weight: 600;
+}
+
+.submit-btn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  background: #007AFF;
+  color: white;
+  font-weight: 600;
+}
+
+/* ---------- SVG ---------- */
+.light { fill: #FFD700; }
+.light-ray { stroke: #FFD700; stroke-width: 3; }
+.object { fill: #888; stroke: #333; }
+.wall { fill: #eee; stroke: #ccc; }
+.shadow { fill: rgba(0,0,0,0.55); }
+
+/* ---------- Hover Hint (SVG) ---------- */
+.hover-hint text {
+  font-size: 16px;
+  fill: #333;
+  font-weight: 500;
+}
+
+.hover-hint rect {
+  fill: rgba(255,255,255,0.95);
+  stroke: #007AFF;
+  stroke-dasharray: 4 3;
+  rx: 6;
+  ry: 6;
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="section-title">Reference (baseline)</div>
+<div class="sim-card" id="ref"></div>
+
+<div class="section-title">Experiment (change & observe)</div>
+<div class="sim-card" id="exp"></div>
+
+</div>
+
+<script>
+function createSimulation(containerId, showHoverHint) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = `
+  <div class="visual">
+    <div class="static-hint">
+      Drag object ↔ distance • ↕ size
+    </div>
+
+    <div class="control-toggle">Adjust</div>
+
+    <svg viewBox="0 0 1000 500">
+      <rect class="wall" x="850" y="50" width="20" height="400"/>
+
+      <line class="light-ray rt1"/><line class="light-ray rt2"/>
+      <line class="light-ray rb1"/><line class="light-ray rb2"/>
+
+      <!-- Object + Hover Hint Group -->
+      <g id="${containerId}-objGroup">
+        <rect class="object sim-object" x="400" y="200" width="50" height="100"/>
+
+        ${showHoverHint ? `
+        <g class="hover-hint" id="${containerId}-hover">
+          <rect x="365" y="160" width="170" height="42"></rect>
+          <text x="450" y="187" text-anchor="middle">
+            Drag ↔ / ↕
+          </text>
+        </g>` : ``}
+      </g>
+
+      <circle class="light" cx="120" cy="250" r="24"/>
+      <rect class="shadow"/>
+    </svg>
+
+    <div class="metrics">
+      Distance: <span class="md">5</span><br>
+      Size: <span class="ms">5</span><br>
+      Material: <span class="mt">Opaque</span>
+    </div>
+
+    <div class="control-overlay">
+      <div class="segmented">
+        <button class="active" data-type="Opaque">Opaque</button>
+        <button data-type="Translucent">Translucent</button>
+        <button data-type="Transparent">Transparent</button>
+      </div>
+
+      <div class="control-group">
+        <div class="control-label"><span>Distance</span><span class="dval">5</span></div>
+        <input type="range" class="dist" min="1" max="10" value="5">
+      </div>
+
+      <div class="control-group">
+        <div class="control-label"><span>Size</span><span class="sval">5</span></div>
+        <input type="range" class="size" min="1" max="10" value="5">
+      </div>
+
+      <button class="submit-btn">Submit</button>
+    </div>
+  </div>`;
+
+  let state = { d:5, s:5, type:"Opaque" };
+  const LS_Y=250, OBJ_X=400, SCREEN_X=850;
+
+  const svg=c.querySelector("svg"),
+        obj=c.querySelector(".sim-object"),
+        objGroup=c.querySelector(`#${containerId}-objGroup`),
+        hover=showHoverHint ? c.querySelector(`#${containerId}-hover`) : null,
+        light=c.querySelector(".light"),
+        shadow=c.querySelector(".shadow"),
+        md=c.querySelector(".md"),
+        ms=c.querySelector(".ms"),
+        mt=c.querySelector(".mt"),
+        overlay=c.querySelector(".control-overlay"),
+        dist=c.querySelector(".dist"),
+        size=c.querySelector(".size"),
+        dval=c.querySelector(".dval"),
+        sval=c.querySelector(".sval");
+
+  const [rt1,rt2,rb1,rb2]=c.querySelectorAll(".light-ray");
+
+  function intersectY(x1,y1,x2,y2,x){
+    return y1+(y2-y1)/(x2-x1)*(x-x1);
+  }
+
+  function render(){
+    const lx=120+(state.d-1)*20;
+    const h=50+(state.s-1)*12;
+    const y=LS_Y-h/2;
+
+    light.setAttribute("cx",lx);
+    obj.setAttribute("y",y);
+    obj.setAttribute("height",h);
+
+    if(hover){
+      hover.setAttribute("transform", `translate(0 ${y-200})`);
+    }
+
+    const tY=intersectY(lx,LS_Y,OBJ_X,y,SCREEN_X);
+    const bY=intersectY(lx,LS_Y,OBJ_X,y+h,SCREEN_X);
+
+    rt1.setAttribute("x1",lx); rt1.setAttribute("y1",LS_Y);
+    rt1.setAttribute("x2",OBJ_X); rt1.setAttribute("y2",y);
+    rt2.setAttribute("x1",OBJ_X); rt2.setAttribute("y1",y);
+    rt2.setAttribute("x2",SCREEN_X); rt2.setAttribute("y2",tY);
+
+    rb1.setAttribute("x1",lx); rb1.setAttribute("y1",LS_Y);
+    rb1.setAttribute("x2",OBJ_X); rb1.setAttribute("y2",y+h);
+    rb2.setAttribute("x1",OBJ_X); rb2.setAttribute("y1",y+h);
+    rb2.setAttribute("x2",SCREEN_X); rb2.setAttribute("y2",bY);
+
+    if(state.type==="Transparent"){
+      shadow.style.display="none";
+    } else {
+      shadow.style.display="block";
+      shadow.setAttribute("x",SCREEN_X);
+      shadow.setAttribute("y",Math.min(tY,bY));
+      shadow.setAttribute("height",Math.abs(bY-tY));
+      shadow.setAttribute("width",20);
+      shadow.style.filter = state.type==="Translucent" ? "blur(3px)" : "none";
+    }
+
+    md.textContent=state.d.toFixed(1);
+    ms.textContent=state.s.toFixed(1);
+    mt.textContent=state.type;
+    dval.textContent=state.d.toFixed(1);
+    sval.textContent=state.s.toFixed(1);
+  }
+
+  let dragging=false,x0=0,y0=0;
+  obj.onpointerdown=e=>{
+    dragging=true;x0=e.clientX;y0=e.clientY;
+    if(hover) hover.style.display="none";
+  };
+  c.onpointermove=e=>{
+    if(!dragging) return;
+    state.d=Math.min(10,Math.max(1,state.d+(e.clientX-x0)/40));
+    state.s=Math.min(10,Math.max(1,state.s-(e.clientY-y0)/40));
+    x0=e.clientX;y0=e.clientY;
+    render();
+  };
+  c.onpointerup=()=>dragging=false;
+
+  c.querySelector(".control-toggle").onclick=()=>{
+    overlay.classList.toggle("open");
+    dist.value=state.d;
+    size.value=state.s;
+  };
+
+  dist.oninput=e=>{ state.d=+e.target.value; render(); };
+  size.oninput=e=>{ state.s=+e.target.value; render(); };
+
+  c.querySelector(".submit-btn").onclick=()=>overlay.classList.remove("open");
+
+  c.querySelectorAll(".segmented button").forEach(b=>{
+    b.onclick=()=>{
+      c.querySelectorAll(".segmented button").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active");
+      state.type=b.dataset.type;
+      render();
+    };
+  });
+
+  render();
+}
+
+createSimulation("ref", false);
+createSimulation("exp", true);
+</script>
+</body>
+</html>

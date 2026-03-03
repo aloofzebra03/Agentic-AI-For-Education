@@ -13,7 +13,6 @@ Streamlit_UI/app_optimized_animation_kannada.py
 Streamlit_UI/app_optimized_animation_old.py
 Streamlit_UI/app_simulation.py
 Streamlit_UI/app_simulation_optimized.py
-Streamlit_UI/math_reference.py
 Streamlit_UI/revision_app.py
 agentic_ai_for_education.egg-info/PKG-INFO
 agentic_ai_for_education.egg-info/SOURCES.txt
