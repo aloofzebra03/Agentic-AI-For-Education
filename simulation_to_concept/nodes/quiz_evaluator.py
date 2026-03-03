@@ -18,10 +18,9 @@ import os
 from typing import Dict, Any
 from datetime import datetime
 
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from simulation_to_concept.config import GOOGLE_API_KEY, GEMINI_MODEL, TEMPERATURE
+from simulation_to_concept.config import GEMINI_MODEL, TEMPERATURE, get_llm
 from simulation_to_concept.state import TeachingState
 from simulation_to_concept.simulations_config import get_quiz_questions
 from simulation_to_concept.quiz_rules import (
@@ -31,14 +30,6 @@ from simulation_to_concept.quiz_rules import (
     calculate_quiz_progress
 )
 
-
-def get_llm():
-    """Get configured LLM instance."""
-    return ChatGoogleGenerativeAI(
-        model=GEMINI_MODEL,
-        google_api_key=GOOGLE_API_KEY,
-        temperature=TEMPERATURE
-    )
 
 
 def is_gemma_model() -> bool:

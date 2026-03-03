@@ -22,23 +22,15 @@ import re
 from typing import Dict, Any
 from datetime import datetime
 
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from simulation_to_concept.config import (
-    GOOGLE_API_KEY, GEMINI_MODEL, TEMPERATURE, CANNOT_DEMONSTRATE, 
-    PARAMETER_INFO, TOPIC_TITLE, TOPIC_DESCRIPTION
+    GEMINI_MODEL, TEMPERATURE, CANNOT_DEMONSTRATE,
+    PARAMETER_INFO, TOPIC_TITLE, TOPIC_DESCRIPTION,
+    get_llm
 )
 from simulation_to_concept.state import add_message_to_history
 
-
-def get_llm():
-    """Get configured LLM instance."""
-    return ChatGoogleGenerativeAI(
-        model=GEMINI_MODEL,
-        google_api_key=GOOGLE_API_KEY,
-        temperature=TEMPERATURE
-    )
 
 
 def is_gemma_model() -> bool:

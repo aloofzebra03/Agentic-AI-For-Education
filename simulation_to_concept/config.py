@@ -8,6 +8,8 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 from simulation_to_concept.simulations_config import get_simulation, get_simulation_list
+from langchain_google_genai import ChatGoogleGenerativeAI
+from api_tracker_utils.tracker import track_model_call, get_next_available_api_model_pair
 
 # Load environment variables
 ENV_PATH = Path(__file__).parent / ".env"
@@ -72,11 +74,45 @@ SIMULATION_FILE = _current_sim["file"]
 
 def validate_config():
     """Validate that required configuration is present."""
-    if not GOOGLE_API_KEY:
-        raise ValueError("GOOGLE_API_KEY is not set in .env file")
-    print(f"✅ Config loaded: Model={GEMINI_MODEL}, MaxExchanges={MAX_EXCHANGES}")
+    print(f"✅ Config loaded: MaxExchanges={MAX_EXCHANGES}")
     print(f"✅ Current Simulation: {TOPIC_TITLE} ({CURRENT_SIMULATION_ID})")
+    print(f"✅ LLM selection handled by api_tracker_utils (GOOGLE_API_KEY_1 ... _7)")
     return True
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# LLM FACTORY (tracker-backed)
+# ═══════════════════════════════════════════════════════════════════════
+
+def get_llm(temperature: float = TEMPERATURE) -> ChatGoogleGenerativeAI:
+    """
+    Get a configured LLM instance using the api_tracker_utils tracker.
+
+    The tracker automatically selects the optimal API key and model
+    from GOOGLE_API_KEY_1 ... GOOGLE_API_KEY_7 based on rate limits
+    and load balancing.
+
+    Args:
+        temperature: Sampling temperature (default from env/config).
+
+    Returns:
+        ChatGoogleGenerativeAI instance ready to call .invoke() on.
+
+    Raises:
+        MinuteLimitExhaustedError: All API-model pairs hit per-minute limit.
+        DayLimitExhaustedError:    All API-model pairs hit daily limit.
+    """
+    selected_api_key, selected_model = get_next_available_api_model_pair()
+    print(f"🔑 [get_llm] Using ...{selected_api_key[-6:]} with model: {selected_model}")
+
+    # Track BEFORE invocation for accurate rate limiting
+    track_model_call(selected_api_key, selected_model)
+
+    return ChatGoogleGenerativeAI(
+        model=selected_model,
+        api_key=selected_api_key,
+        temperature=temperature,
+    )
 
 # ═══════════════════════════════════════════════════════════════════════
 # SIMULATION HOSTING CONFIGURATION
