@@ -1047,6 +1047,7 @@ Task: Grade this answer on a scale from 0 to 1 and determine next state. Respond
         # Move to next concept
         state["sim_current_idx"] = current_idx + 1
         state["asked_ge"] = False  # Reset GE flag for next concept
+        state['asked_ar'] = False
         # Add transition message
         next_concept_idx = current_idx + 1
         if next_concept_idx < len(concepts):
