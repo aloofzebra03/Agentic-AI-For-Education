@@ -13,6 +13,9 @@ from datetime import datetime
 # sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from educational_agent_optimized_langsmith_v5.graph import graph
+
+# Import revision agent graph
+from revision_agent.graph import graph as revision_graph
 from langchain_core.messages import HumanMessage
 from langgraph.types import Command
 
@@ -27,7 +30,12 @@ from api_servers.schemas import (
     TestSimulationRequest, TestSimulationResponse,
     ConceptsListResponse,
     ConceptMapRequest, ConceptMapResponse,
-    TranslationRequest, TranslationResponse
+    TranslationRequest, TranslationResponse,
+    # Revision agent schemas
+    RevStartSessionRequest, RevStartSessionResponse,
+    RevContinueSessionRequest, RevContinueSessionResponse,
+    RevSessionStatusResponse, RevSessionHistoryResponse,
+    RevChaptersListResponse,
 )
 
 # Import personas from tester_agent
@@ -61,6 +69,9 @@ from utils.shared_utils import (
 
 from api_tracker_utils.error import MinuteLimitExhaustedError, DayLimitExhaustedError
 from api_tracker_utils.tracker import track_model_call
+
+# Import question bank loader for listing available chapters
+from revision_agent.question_bank import load_question_bank
 
 # Import concept map functions from external repo
 from concept_map_poc.timeline_mapper import create_timeline
@@ -298,9 +309,14 @@ def read_root():
             "POST /simulation/session/{session_id}/respond - Send student response",
             "POST /simulation/session/{session_id}/submit-quiz - Submit quiz answer",
             "GET  /simulation/session/{session_id} - Get simulation session state",
-            "GET  /simulation/simulations - List available simulations"
-            "POST /translate - Translate text to Kannada"
-
+            "GET  /simulation/simulations - List available simulations",
+            "POST /translate - Translate text to Kannada",
+            "GET  /revision/chapters - List available revision chapters",
+            "POST /revision/session/start - Start new revision session",
+            "POST /revision/session/continue - Continue existing revision session",
+            "GET  /revision/session/status/{thread_id} - Get revision session status",
+            "GET  /revision/session/history/{thread_id} - Get revision conversation history",
+            "DELETE /revision/session/{thread_id} - Delete revision session",
         ]
     }
 
@@ -539,10 +555,7 @@ def continue_session(request: ContinueSessionRequest):
             status_code = 502,
             detail=f"Error processing query: {e}"
         )
-        
-    except HTTPException:
-        raise
-
+    
     except Exception as e:
         print(f"API error in /session/continue: {str(e)}")
         print(f"Full traceback:\n{traceback.format_exc()}")
@@ -732,8 +745,6 @@ def delete_session(thread_id: str):
             print(f"Error during deletion: {delete_error}")
             raise HTTPException(status_code=500, detail=f"Error deleting session from database: {str(delete_error)}")
             
-    except HTTPException:
-        raise
     except Exception as e:
         print(f"API error in DELETE /session: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error deleting session: {str(e)}")
@@ -928,9 +939,6 @@ def generate_concept_map(request: ConceptMapRequest):
             timeline=timeline
         )
         
-    except HTTPException:
-        # Re-raise HTTP exceptions as-is
-        raise
     except Exception as e:
         print(f"API error in /concept-map/generate: {str(e)}")
         print(f"Full traceback:\n{traceback.format_exc()}")
@@ -1283,6 +1291,306 @@ def list_available_simulations():
         ]
     }
 
+# ============================================================================
+# REVISION AGENT ENDPOINTS
+# ============================================================================
+
+# (Revision agent Pydantic schemas are defined in api_servers/schemas.py)
+
+
+# --------------- Helper: get state from revision graph checkpoint  -----------
+
+def get_revision_state_from_checkpoint(thread_id: str) -> Optional[Dict[str, Any]]:
+    """Get state from the revision agent's checkpointer."""
+    try:
+        state_snapshot = revision_graph.get_state(
+            config={"configurable": {"thread_id": thread_id}}
+        )
+        if state_snapshot and state_snapshot.values:
+            return state_snapshot.values
+        return None
+    except Exception as e:
+        print(f"Error retrieving revision state for thread {thread_id}: {e}")
+        return None
+
+
+# --------------- Endpoints ---------------------------------------------------
+
+@app.get("/revision/chapters", response_model=RevChaptersListResponse, tags=["Revision"], summary="List available revision chapters")
+def list_revision_chapters():
+    """
+    List all chapters available in the revision agent's question bank.
+
+    Returns chapter names that can be used with POST /revision/session/start.
+    """
+    import os
+    question_banks_dir = os.path.join("revision_agent", "question_banks")
+    chapters = []
+    try:
+        for fname in os.listdir(question_banks_dir):
+            if fname.endswith(".json"):
+                # Convert filename back to a readable title
+                title = fname.replace(".json", "").replace("_", " ").title()
+                chapters.append(title)
+        chapters.sort()
+        return RevChaptersListResponse(
+            success=True,
+            chapters=chapters,
+            total=len(chapters),
+            message=f"Retrieved {len(chapters)} available chapters"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error listing chapters: {str(e)}")
+
+
+@app.post("/revision/session/start", response_model=RevStartSessionResponse, tags=["Revision"], summary="Start a new revision session")
+def start_revision_session(request: RevStartSessionRequest):
+    """
+    Start a new revision session for the given chapter.
+
+    The revision agent will:
+    1. Load the question bank for the requested chapter
+    2. Greet the student and explain the revision flow
+    3. Pause and wait for the student's confirmation before presenting questions
+
+    Use POST /revision/session/continue with the returned thread_id for subsequent turns.
+    """
+    try:
+        print(f"API /revision/session/start - chapter: {request.chapter}, student: {request.student_id}, kannada: {request.is_kannada}")
+
+        # Generate a unique thread_id for this revision session
+        thread_id = generate_thread_id(
+            concept_title=request.chapter,
+            is_kannada=request.is_kannada,
+            label=request.session_label or "revision",
+            user_id=request.student_id,
+        )
+
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        session_id = f"revision-{request.session_label or 'session'}-{timestamp}"
+        student_id = request.student_id or "anonymous"
+
+        print(f"📌 Generated revision thread_id: {thread_id}")
+
+        # Invoke the revision graph to start the session
+        result = revision_graph.invoke(
+            {
+                "messages": [HumanMessage(content="__start__")],
+                "is_kannada": request.is_kannada,
+                "chapter": request.chapter,
+                "summary": "",
+                "summary_last_index": -1,
+            },
+            config={"configurable": {"thread_id": thread_id}},
+        )
+
+        # Extract agent response
+        agent_response = result.get("agent_output", "")
+        if not agent_response and result.get("messages"):
+            for msg in reversed(result["messages"]):
+                if hasattr(msg, "type") and msg.type == "ai":
+                    agent_response = msg.content
+                    break
+
+        return RevStartSessionResponse(
+            success=True,
+            thread_id=thread_id,
+            session_id=session_id,
+            student_id=student_id,
+            chapter=result.get("chapter", request.chapter),
+            agent_response=agent_response,
+            current_state=result.get("current_state", "QUESTION_PRESENTER"),
+            message="Revision session started successfully.",
+        )
+
+    except MinuteLimitExhaustedError as e:
+        print(f"[API] Revision start - minute limit: {e}")
+        raise HTTPException(status_code=501, detail=f"Rate limit error: {e}")
+
+    except DayLimitExhaustedError as e:
+        print(f"[API] Revision start - day limit: {e}")
+        raise HTTPException(status_code=502, detail=f"Daily limit error: {e}")
+
+    except FileNotFoundError as e:
+        print(f"API error in /revision/session/start (chapter not found): {e}")
+        raise HTTPException(status_code=404, detail=str(e))
+
+    except Exception as e:
+        print(f"API error in /revision/session/start: {str(e)}")
+        print(f"Full traceback:\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Error starting revision session: {str(e)}")
+
+
+@app.post("/revision/session/continue", response_model=RevContinueSessionResponse, tags=["Revision"], summary="Continue an existing revision session")
+def continue_revision_session(request: RevContinueSessionRequest):
+    """
+    Send a student message and receive the agent's next response.
+
+    Supply the thread_id returned by POST /revision/session/start.
+    Optionally pass is_kannada to switch language mid-session.
+    """
+    try:
+        print(f"API /revision/session/continue - thread: {request.thread_id}, message: {request.user_message[:50]}...")
+
+        # Verify session exists
+        existing_state = get_revision_state_from_checkpoint(request.thread_id)
+        if existing_state is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Revision session not found for thread_id: {request.thread_id}. Please start a new session.",
+            )
+
+        update_dict: Dict[str, Any] = {
+            "messages": [HumanMessage(content=request.user_message)],
+        }
+
+        # Allow mid-session language switching
+        if request.is_kannada is not None:
+            update_dict["is_kannada"] = request.is_kannada
+
+        cmd = Command(resume=True, update=update_dict)
+
+        result = revision_graph.invoke(
+            cmd,
+            config={"configurable": {"thread_id": request.thread_id}},
+        )
+
+        # Extract agent response
+        agent_response = result.get("agent_output", "")
+        if not agent_response and result.get("messages"):
+            for msg in reversed(result["messages"]):
+                if hasattr(msg, "type") and msg.type == "ai":
+                    agent_response = msg.content
+                    break
+
+        return RevContinueSessionResponse(
+            success=True,
+            thread_id=request.thread_id,
+            agent_response=agent_response,
+            current_state=result.get("current_state", "UNKNOWN"),
+            message="Response generated successfully",
+        )
+
+    except MinuteLimitExhaustedError as e:
+        print(f"[API] Revision continue - minute limit: {e}")
+        raise HTTPException(status_code=501, detail=f"Rate limit error: {e}")
+
+    except DayLimitExhaustedError as e:
+        print(f"[API] Revision continue - day limit: {e}")
+        raise HTTPException(status_code=502, detail=f"Daily limit error: {e}")
+
+    except Exception as e:
+        print(f"API error in /revision/session/continue: {str(e)}")
+        print(f"Full traceback:\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Error continuing revision session: {str(e)}")
+
+
+@app.get("/revision/session/status/{thread_id}", response_model=RevSessionStatusResponse, tags=["Revision"], summary="Get revision session status")
+def get_revision_session_status(thread_id: str):
+    """Get the current status and progress of a revision session."""
+    try:
+        state = get_revision_state_from_checkpoint(thread_id)
+        if state is None:
+            return RevSessionStatusResponse(
+                success=True,
+                thread_id=thread_id,
+                exists=False,
+                message="Revision session not found",
+            )
+
+        total = state.get("questions_total", 0)
+        current_idx = state.get("current_question_index", 0)
+
+        progress = {
+            "current_state": state.get("current_state", "UNKNOWN"),
+            "current_question_index": current_idx,
+            "questions_total": total,
+            "questions_correct_first_try": state.get("questions_correct_first_try", 0),
+            "questions_needed_explanation": state.get("questions_needed_explanation", 0),
+            "concepts_for_review": state.get("concepts_for_review", []),
+            "asked_ge": state.get("asked_ge", False),
+            "asked_ar": state.get("asked_ar", False),
+            "is_kannada": state.get("is_kannada", False),
+            "node_transitions": state.get("node_transitions", []),
+        }
+
+        return RevSessionStatusResponse(
+            success=True,
+            thread_id=thread_id,
+            exists=True,
+            current_state=state.get("current_state", "UNKNOWN"),
+            chapter=state.get("chapter", "Unknown Chapter"),
+            progress=progress,
+            message="Revision session status retrieved successfully",
+        )
+
+    except Exception as e:
+        print(f"API error in /revision/session/status: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving revision status: {str(e)}")
+
+
+@app.get("/revision/session/history/{thread_id}", response_model=RevSessionHistoryResponse, tags=["Revision"], summary="Get revision conversation history")
+def get_revision_session_history(thread_id: str):
+    """Get the full conversation history of a revision session."""
+    try:
+        state = get_revision_state_from_checkpoint(thread_id)
+        if state is None:
+            return RevSessionHistoryResponse(
+                success=True,
+                thread_id=thread_id,
+                exists=False,
+                message="Revision session not found",
+            )
+
+        history = get_history_from_state(state)
+        node_transitions = state.get("node_transitions", [])
+
+        return RevSessionHistoryResponse(
+            success=True,
+            thread_id=thread_id,
+            exists=True,
+            messages=history,
+            node_transitions=node_transitions,
+            chapter=state.get("chapter", "Unknown Chapter"),
+            message="Revision history retrieved successfully",
+        )
+
+    except Exception as e:
+        print(f"API error in /revision/session/history: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving revision history: {str(e)}")
+
+
+@app.delete("/revision/session/{thread_id}", tags=["Revision"], summary="Delete a revision session")
+def delete_revision_session(thread_id: str):
+    """
+    Delete a revision session.
+
+    Since the revision graph uses InMemorySaver, deletion simply confirms
+    the thread will no longer be accessible after a server restart. Future
+    migrations to a persistent checkpointer can be hooked in here.
+    """
+    try:
+        state = get_revision_state_from_checkpoint(thread_id)
+        if state is None:
+            return {
+                "success": False,
+                "thread_id": thread_id,
+                "message": "Revision session not found",
+            }
+
+        # Revision graph currently uses InMemorySaver - no explicit DB deletion needed.
+        # If migrated to a persistent checkpointer add deletion logic here.
+        return {
+            "success": True,
+            "thread_id": thread_id,
+            "message": "Revision session marked for cleanup (in-memory session will be cleared on restart)",
+        }
+
+    except Exception as e:
+        print(f"API error in DELETE /revision/session: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error deleting revision session: {str(e)}")
+
+
 @app.post("/translate", response_model=TranslationResponse, tags=["Translation"], summary="Translate text to Kannada using Azure Translator")
 def translate_text(request: TranslationRequest):
     """
@@ -1340,6 +1648,12 @@ print("  POST /test/persona - Test with predefined persona")
 print("  POST /test/images - Get image for a concept")
 print("  POST /test/simulation - Get simulation config for a concept")
 print("  POST /concept-map/generate - Generate concept map timeline (character-based timing)")
+print("  GET  /revision/chapters - List available revision chapters")
+print("  POST /revision/session/start - Start new revision session")
+print("  POST /revision/session/continue - Continue existing revision session")
+print("  GET  /revision/session/status/{thread_id} - Get revision session status")
+print("  GET  /revision/session/history/{thread_id} - Get revision conversation history")
+print("  DELETE /revision/session/{thread_id} - Delete revision session")
 print("=" * 80)
 print(f"Available Test Personas: {len(personas)}")
 for p in personas:

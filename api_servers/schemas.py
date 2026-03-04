@@ -533,3 +533,146 @@ class ConceptMapResponse(BaseModel):
                 }
             }
         }
+
+
+# ============================================================================
+# REVISION AGENT SCHEMAS
+# ============================================================================
+
+# ── Request Models ──────────────────────────────────────────────────────────
+
+class RevStartSessionRequest(BaseModel):
+    """Request to start a new revision session for a given chapter."""
+    chapter: str = Field(
+        ...,
+        description="Chapter name to revise (e.g. 'Nutrition in Plants'). "
+                    "Must match a file in revision_agent/question_banks/."
+    )
+    student_id: Optional[str] = Field(
+        default=None,
+        description="Optional unique identifier for the student (used in thread_id generation)."
+    )
+    is_kannada: bool = Field(
+        default=False,
+        description="Whether to conduct the revision session in Kannada. Default is False (English)."
+    )
+    session_label: Optional[str] = Field(
+        default=None,
+        description="Optional custom label for this session (used in thread_id generation)."
+    )
+
+
+class RevContinueSessionRequest(BaseModel):
+    """Request to continue an existing revision session with a student message."""
+    thread_id: str = Field(
+        ...,
+        description="The unique thread ID returned by POST /revision/session/start."
+    )
+    user_message: str = Field(
+        ...,
+        description="The student's message or answer to the agent's previous question."
+    )
+    is_kannada: Optional[bool] = Field(
+        default=None,
+        description="Optional: switch language mid-session. Pass True for Kannada, False for English. "
+                    "Omit to keep the current language."
+    )
+
+
+# ── Response Models ─────────────────────────────────────────────────────────
+
+class RevStartSessionResponse(BaseModel):
+    """Response from starting a new revision session."""
+    success: bool = Field(description="Whether the session was started successfully.")
+    thread_id: str = Field(description="Unique thread ID for continuing this session (store on client side).")
+    session_id: str = Field(description="Unique session identifier for tracking purposes.")
+    student_id: str = Field(description="Student identifier ('anonymous' if not provided in request).")
+    chapter: str = Field(description="The chapter being revised in this session.")
+    agent_response: str = Field(description="The agent's initial greeting / welcome message.")
+    current_state: str = Field(
+        description="Current revision node after start (e.g. 'QUESTION_PRESENTER')."
+    )
+    message: str = Field(
+        default="Revision session started successfully.",
+        description="Human-readable status message."
+    )
+
+
+class RevContinueSessionResponse(BaseModel):
+    """Response from continuing a revision session."""
+    success: bool = Field(description="Whether the agent response was generated successfully.")
+    thread_id: str = Field(description="The thread ID of this session (same as request).")
+    agent_response: str = Field(description="The agent's response to the student's message.")
+    current_state: str = Field(
+        description="Current revision node after processing (e.g. 'EVALUATOR', 'GE', 'AR', 'REVISION_END')."
+    )
+    message: str = Field(
+        default="Response generated successfully.",
+        description="Human-readable status message."
+    )
+
+
+class RevSessionStatusResponse(BaseModel):
+    """Response from GET /revision/session/status/{thread_id}."""
+    success: bool = Field(description="Whether the status was retrieved successfully.")
+    thread_id: str = Field(description="The thread ID of the session.")
+    exists: bool = Field(description="Whether the session exists in the checkpoint store.")
+    current_state: Optional[str] = Field(
+        default=None,
+        description="Current revision node if session exists (e.g. 'QUESTION_PRESENTER', 'GE', 'AR')."
+    )
+    chapter: Optional[str] = Field(
+        default=None,
+        description="The chapter being revised in this session."
+    )
+    progress: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description=(
+            "Progress information including: current_question_index, questions_total, "
+            "questions_correct_first_try, questions_needed_explanation, concepts_for_review, "
+            "asked_ge, asked_ar, is_kannada, node_transitions."
+        )
+    )
+    message: str = Field(
+        default="Revision session status retrieved successfully.",
+        description="Human-readable status message."
+    )
+
+
+class RevSessionHistoryResponse(BaseModel):
+    """Response from GET /revision/session/history/{thread_id}."""
+    success: bool = Field(description="Whether the history was retrieved successfully.")
+    thread_id: str = Field(description="The thread ID of the session.")
+    exists: bool = Field(description="Whether the session exists in the checkpoint store.")
+    messages: Optional[List[Dict[str, Any]]] = Field(
+        default=None,
+        description="List of conversation messages with role ('user' or 'assistant') and content."
+    )
+    node_transitions: Optional[List[Dict[str, Any]]] = Field(
+        default=None,
+        description="History of revision node transitions (from_node → to_node) during the session."
+    )
+    chapter: Optional[str] = Field(
+        default=None,
+        description="The chapter being revised in this session."
+    )
+    message: str = Field(
+        default="Revision history retrieved successfully.",
+        description="Human-readable status message."
+    )
+
+
+class RevChaptersListResponse(BaseModel):
+    """Response from GET /revision/chapters."""
+    success: bool = Field(
+        default=True,
+        description="Whether the chapters were listed successfully."
+    )
+    chapters: List[str] = Field(
+        description="List of available chapter names (readable titles, e.g. 'Nutrition In Plants')."
+    )
+    total: int = Field(description="Total number of available chapters.")
+    message: str = Field(
+        default="Available chapters retrieved successfully.",
+        description="Human-readable status message."
+    )
