@@ -14,9 +14,11 @@ import dotenv
 
 from langgraph.graph import StateGraph, END, START
 from langgraph.graph.message import add_messages
-# from langgraph.checkpoint.sqlite import SqliteSaver
+from langgraph.checkpoint.sqlite import SqliteSaver
 from langchain_core.messages import AnyMessage, HumanMessage, AIMessage
 from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.checkpoint.postgres import PostgresSaver
+from psycopg_pool import ConnectionPool
 
 # Import revision agent nodes
 from revision_agent.nodes import (
@@ -200,7 +202,52 @@ g.add_edge("REVISION_END", END)
 # ══════════════════════════════════════════════════════════════════════════════
 
 # checkpointer = SqliteSaver.from_conn_string("sqlite:///./revision_agent/.lg_memory.db")
-checkpointer = InMemorySaver()
+# checkpointer = InMemorySaver()
+
+checkpointer = SqliteSaver.from_conn_string("sqlite:///./.lg_memory.db")
+
+# Initialize PostgreSQL checkpointer
+try:
+    connection_kwargs = {
+        "autocommit": True,  # Required for Transaction Mode
+        "prepare_threshold": None,  # None = Never use prepared statements (required for Transaction Mode port 6543)
+        "gssencmode": "disable",  # Required for Windows
+    }
+    
+    postgres_url = os.getenv('POSTGRES_DATABASE_URL')
+    print(f"🔍 Initializing Postgres checkpointer with URL: {postgres_url}")
+    if not postgres_url:
+        raise ValueError("POSTGRES_DATABASE_URL environment variable is not set")
+    
+    # IMPORTANT: Assume tables are already created (skip setup for Transaction Mode compatibility)
+    # Tables must be created beforehand via Supabase dashboard or setup_postgres_tables.py
+    skip_setup = os.getenv('SKIP_POSTGRES_SETUP', 'true').lower() == 'true'  # Default to TRUE
+    
+    pool = ConnectionPool(
+        conninfo=postgres_url,
+        max_size=40,  # Stay within Supabase Transaction Mode limits (set to 42 on dashboard)
+        min_size=5,   # Reduced for Transaction Mode efficiency
+        timeout=30,   # Wait up to 30s for available connection
+        # === CONNECTION LIFECYCLE MANAGEMENT (fixes SSL/DbHandler errors) ===
+        max_idle=300,        # Close connections idle > 5 min (before Supabase closes them)
+        max_lifetime=1800,   # Recycle ALL connections every 30 min (fresh SSL sessions)
+        reconnect_timeout=30,  # Retry failed connections for up to 30s
+        kwargs=connection_kwargs,
+    )
+    checkpointer = PostgresSaver(pool)
+    
+    if not skip_setup:
+        print("🔧 Running checkpointer.setup() to create tables...")
+        checkpointer.setup()  # Create tables if they don't exist
+        print("✅ Tables created/verified")
+    else:
+        print("⏭️  Skipping table setup (assuming tables exist)")
+    
+    print("✅ Postgres checkpointer initialized successfully (with connection lifecycle management)")
+except Exception as e:
+    print(f"❌ Error initializing Postgres checkpointer: {e}")
+    print(f"💡 Ensure tables exist: checkpoints, checkpoint_writes, checkpoint_migrations")
+    raise e
 
 
 # ══════════════════════════════════════════════════════════════════════════════

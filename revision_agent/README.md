@@ -138,9 +138,9 @@ Both the revision agent and all learning agent variants use the same functions f
 
 All 6 nodes are in one `nodes.py` for simplicity. The main agent splits nodes across `main_nodes_simulation_agent_no_mh.py` and `simulation_nodes_no_mh_ge.py`.
 
-### 4. InMemorySaver checkpointer
+### 4. PostgresSaver checkpointer
 
-The revision agent uses `InMemorySaver` (not Postgres). Sessions are not persisted across server restarts. This is simpler for the revision use case where sessions are short and ephemeral.
+The revision agent uses `PostgresSaver` (same Supabase connection pool as the learning agents), configured via the `POSTGRES_DATABASE_URL` environment variable. Sessions **are persisted** across server restarts. The connection pool uses the same settings as the learning agent (`max_size=40`, `gssencmode=disable` for Windows compatibility). Table setup is skipped by default (`SKIP_POSTGRES_SETUP=true`) — tables must be pre-created via Supabase dashboard or `setup_postgres_tables.py`.
 
 ### 5. Node wrapper pattern
 
