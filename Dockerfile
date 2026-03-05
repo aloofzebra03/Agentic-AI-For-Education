@@ -36,7 +36,10 @@ RUN python -m pip install --upgrade pip setuptools wheel && \
 # Copy application code
 COPY utils/ /app/utils/
 COPY tester_agent/ /app/tester_agent/
+COPY revision_agent/ /app/revision_agent/
 COPY educational_agent_optimized_langsmith_autosuggestion/ /app/educational_agent_optimized_langsmith_autosuggestion/
+COPY educational_agent_optimized_langsmith_v5/ /app/educational_agent_optimized_langsmith_v5/
+COPY autosuggestion/ /app/autosuggestion/
 COPY concept_map_poc/ /app/concept_map_poc/
 COPY simulation_to_concept/ /app/simulation_to_concept/
 COPY api_tracker_utils/ /app/api_tracker_utils/ 
@@ -58,4 +61,4 @@ ENV SKIP_POSTGRES_SETUP=true
 # Run FastAPI server
 # IMPORTANT: For Transaction Mode (port 6543), ensure tables are created beforehand
 # Environment variables will be passed at runtime via docker run -e or --env-file
-CMD ["uvicorn", "api_servers.api_server:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "api_servers.api_server_v5:app", "--host", "0.0.0.0", "--port", "8000"]
