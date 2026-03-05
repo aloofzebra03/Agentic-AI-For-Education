@@ -335,9 +335,11 @@ def build_prompt_from_template(system_prompt: str, state: AgentState,
                              include_instructions: bool = False,
                              parser=None) -> str:
     
-    # Add Kannada instruction if needed
+    # Add language instruction
     if state.get("is_kannada", False):
         system_prompt += "\n\nIMPORTANT: You must respond ONLY in Kannada language. All your responses must be in Kannada script, not English."
+    else:
+        system_prompt += "\n\nIMPORTANT: You must respond ONLY in English. All your responses must be in English, not Kannada or any other language."
     
     # Build the template string based on what we need
     template_parts = ["{system_prompt}"]
@@ -388,9 +390,11 @@ def build_prompt_from_template_optimized(system_prompt: str, state: AgentState,
                                        parser=None, current_node: str = None,
                                        include_autosuggestions: bool = False) -> str:
     
-    # Add Kannada instruction if needed
+    # Add language instruction
     if state.get("is_kannada", False):
         system_prompt += "\n\nIMPORTANT: You must respond ONLY in Kannada language. All your responses must be in Kannada script, not English."
+    else:
+        system_prompt += "\n\nIMPORTANT: You must respond ONLY in English. All your responses must be in English, not Kannada or any other language."
     
     # Build the template string based on what we need
     template_parts = ["{system_prompt}"]

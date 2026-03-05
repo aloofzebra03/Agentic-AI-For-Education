@@ -497,6 +497,11 @@ def continue_session(request: ContinueSessionRequest):
             update_dict["student_level"] = validated_level
             print(f"📊 Updated student level to: {validated_level}")
         
+        # Allow updating language mid-session (Kannada ↔ English)
+        if request.is_kannada is not None:
+            update_dict["is_kannada"] = request.is_kannada
+            print(f"🌐 Updated language to: {'Kannada' if request.is_kannada else 'English'}")
+        
         # Continue the conversation using Command (resume)
         cmd = Command(
             resume=True,
@@ -555,7 +560,7 @@ def continue_session(request: ContinueSessionRequest):
             status_code = 502,
             detail=f"Error processing query: {e}"
         )
-    
+
     except Exception as e:
         print(f"API error in /session/continue: {str(e)}")
         print(f"Full traceback:\n{traceback.format_exc()}")
