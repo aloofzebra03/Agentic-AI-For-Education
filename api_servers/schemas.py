@@ -60,6 +60,10 @@ class ContinueSessionRequest(BaseModel):
         default=None,
         description="Optional: Update student ability level mid-session. Options: 'low', 'medium', 'advanced'."
     )
+    is_kannada: Optional[bool] = Field(
+        default=None,
+        description="Optional: Update the session language mid-session. True = Kannada, False = English. Leave None to keep the current language."
+    )
 
 
 class SessionStatusRequest(BaseModel):
