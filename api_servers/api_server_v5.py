@@ -65,6 +65,7 @@ from utils.shared_utils import (
     create_simulation_config,
     get_all_available_concepts,
     translate_to_kannada_azure,
+    translate_to_english_gemini,
 )
 
 from api_tracker_utils.error import MinuteLimitExhaustedError, DayLimitExhaustedError
@@ -310,7 +311,8 @@ def read_root():
             "POST /simulation/session/{session_id}/submit-quiz - Submit quiz answer",
             "GET  /simulation/session/{session_id} - Get simulation session state",
             "GET  /simulation/simulations - List available simulations",
-            "POST /translate - Translate text to Kannada",
+            "POST /translate/to-kannada - Translate text to Kannada (Azure)",
+            "POST /translate/to-english - Translate text to English (Gemini)",
             "GET  /revision/chapters - List available revision chapters",
             "POST /revision/session/start - Start new revision session",
             "POST /revision/session/continue - Continue existing revision session",
@@ -344,7 +346,14 @@ def health_check():
             "/test/images",
             "/test/simulation",
             "/concept-map/generate",
-            "/translate"
+            "/translate/to-kannada",
+            "/translate/to-english",
+            "/revision/chapters",
+            "/revision/session/start",
+            "/revision/session/continue",
+            "/revision/session/status/{thread_id}",
+            "/revision/session/history/{thread_id}",
+            "/revision/session/{thread_id}",
         ]
     )
 
@@ -1596,7 +1605,7 @@ def delete_revision_session(thread_id: str):
         raise HTTPException(status_code=500, detail=f"Error deleting revision session: {str(e)}")
 
 
-@app.post("/translate", response_model=TranslationResponse, tags=["Translation"], summary="Translate text to Kannada using Azure Translator")
+@app.post("/translate/to-kannada", response_model=TranslationResponse, tags=["Translation"], summary="Translate text to Kannada using Azure Translator")
 def translate_text(request: TranslationRequest):
     """
     Translate text to Kannada using Azure Translator.
@@ -1620,7 +1629,7 @@ def translate_text(request: TranslationRequest):
             error=str(e)
         )
     except Exception as e:
-        print(f"API error in /translate: {str(e)}")
+        print(f"API error in /translate/to-kannada: {str(e)}")
         print(f"Full traceback:\n{traceback.format_exc()}")
         return TranslationResponse(
             original=request.text,
@@ -1629,6 +1638,33 @@ def translate_text(request: TranslationRequest):
             error=f"Translation error: {str(e)}"
         )
     
+
+
+@app.post("/translate/to-english", response_model=TranslationResponse, tags=["Translation"], summary="Translate text to English using Gemini")
+def translate_to_english(request: TranslationRequest):
+    """
+    Translate text from Kannada (or any language) to English using Gemini.
+
+    Uses the tracker-managed API key and model for the Gemini call.
+    Returns original and translated text with success status.
+    """
+    try:
+        translated_text = translate_to_english_gemini(request.text)
+        return TranslationResponse(
+            original=request.text,
+            translated=translated_text,
+            success=True,
+            error=None
+        )
+    except Exception as e:
+        print(f"API error in /translate/to-english: {str(e)}")
+        print(f"Full traceback:\n{traceback.format_exc()}")
+        return TranslationResponse(
+            original=request.text,
+            translated=request.text,
+            success=False,
+            error=f"Translation error: {str(e)}"
+        )
 
 
 print("=" * 80)
@@ -1659,6 +1695,8 @@ print("  POST /revision/session/continue - Continue existing revision session")
 print("  GET  /revision/session/status/{thread_id} - Get revision session status")
 print("  GET  /revision/session/history/{thread_id} - Get revision conversation history")
 print("  DELETE /revision/session/{thread_id} - Delete revision session")
+print("  POST /translate/to-kannada - Translate text to Kannada (Azure)")
+print("  POST /translate/to-english - Translate text to English (Gemini)")
 print("=" * 80)
 print(f"Available Test Personas: {len(personas)}")
 for p in personas:

@@ -249,7 +249,40 @@ def translate_to_kannada_azure(text: str,
         return text
 
 
+def translate_to_english_gemini(text: str) -> str:
+    """
+    Translate text from Kannada (or any language) to English using the Gemini API.
+
+    Uses invoke_llm_with_fallback so the API key and model are selected and
+    tracked automatically by the existing tracker infrastructure.
+
+    Args:
+        text: Text to translate to English.
+
+    Returns:
+        Translated text in English, or original text if translation fails.
+    """
+    messages = [
+        SystemMessage(content=(
+            "You are a professional translator. "
+            "Translate the following text to English. "
+            "Output ONLY the translated text — no explanation, commentary, or extra formatting."
+        )),
+        HumanMessage(content=text),
+    ]
+
+    try:
+        response = invoke_llm_with_fallback(messages, operation_name="Kannada-to-English translation")
+        translated = response.content.strip()
+        print(f"✅ Translated to English: {translated[:80]}...")
+        return translated
+    except Exception as e:
+        print(f"⚠️ Gemini translation error: {str(e)}. Returning original text.")
+        return text
+
+
 def translate_if_kannada(state: AgentState, content: str) -> str:
+
     """
     Translate content to Kannada if is_kannada flag is set.
     This is the single point of translation - use before setting agent_output.
