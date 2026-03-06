@@ -10,6 +10,8 @@ langchain-google-genai
 langchain-core
 langgraph
 pydantic
+langgraph-checkpoint-sqlite
+langgraph-checkpoint-postgres
 
 # Environment & Configuration
 python-dotenv
