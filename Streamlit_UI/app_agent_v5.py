@@ -119,6 +119,9 @@ def initialize_session_state():
     if "messages" not in st.session_state:
         st.session_state.messages = []
     
+    if "is_kannada" not in st.session_state:
+        st.session_state.is_kannada = False
+    
     if "processing" not in st.session_state:
         st.session_state.processing = False
     
@@ -146,6 +149,7 @@ def reset_session():
         "negative": "",
         "dynamic": ""
     }
+    st.session_state.is_kannada = False
 
 
 def extract_autosuggestions(result: Dict[str, Any]) -> Dict[str, str]:
@@ -218,12 +222,16 @@ def main():
             index=0
         )
         
+        # Language selection toggle
+        is_kannada = st.toggle("Speak in Kannada / ಕನ್ನಡದಲ್ಲಿ ಮಾತನಾಡಿ", value=st.session_state.get("is_kannada", False))
+        st.session_state.is_kannada = is_kannada
+        
         # Start button
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             if st.button("🚀 Start Learning Session", type="primary", use_container_width=True):
                 # Generate session ID
-                st.session_state.session_id = f"streamlit_{selected_concept.replace(' ', '_').lower()}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                st.session_state.session_id = f"streamlit_v5_agent_{selected_concept.replace(' ', '_').lower()}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
                 st.session_state.selected_concept = selected_concept
                 st.session_state.session_started = True
                 st.session_state.processing = True
@@ -254,6 +262,15 @@ def main():
         if st.session_state.selected_concept:
             st.info(f"**Topic:** {st.session_state.selected_concept}")
         
+        st.markdown("---")
+        
+        # Language Toggle (mid-session)
+        is_kannada_toggle = st.toggle("Speak in Kannada / ಕನ್ನಡದಲ್ಲಿ ಮಾತನಾಡಿ", 
+                                      value=st.session_state.is_kannada, 
+                                      key="kannada_toggle_sidebar")
+        if is_kannada_toggle != st.session_state.is_kannada:
+            st.session_state.is_kannada = is_kannada_toggle
+            
         st.markdown("---")
         
         # Reset button
@@ -332,7 +349,8 @@ def main():
                     user_message = HumanMessage(content="start")
                     initial_state = {
                         "concept_title": st.session_state.selected_concept,
-                        "messages": [user_message]
+                        "messages": [user_message],
+                        "is_kannada": st.session_state.is_kannada
                     }
                     result = graph.invoke(initial_state, config)
                     
@@ -365,6 +383,7 @@ def main():
                             resume=True,
                             update={
                                 "messages": [user_message],
+                                "is_kannada": st.session_state.is_kannada
                             },
                         )
                         
