@@ -12,6 +12,8 @@ langgraph
 pydantic
 langgraph-checkpoint-sqlite
 langgraph-checkpoint-postgres
+psycopg[binary]>=3.0.0
+psycopg-pool>=3.0.0
 
 # Environment & Configuration
 python-dotenv
