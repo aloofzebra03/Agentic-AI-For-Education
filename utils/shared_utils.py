@@ -191,7 +191,7 @@ def invoke_llm_with_fallback(messages: List, operation_name: str = "LLM call"):
 def translate_to_kannada_azure(text: str, 
                                api_key: Optional[str] = None,
                                endpoint: str = "https://api.cognitive.microsofttranslator.com/",
-                               region: str = "centralindia") -> str:
+                               region: str = "eastasia") -> str:
     """
     Translate text from English to Kannada using Azure Translator.
     
@@ -242,11 +242,11 @@ def translate_to_kannada_azure(text: str,
             return translated_text
         else:
             print(f"⚠️ Azure translation failed with status {request.status_code}: {response}")
-            return text
+            raise Exception(f"Azure translation failed with status {request.status_code}: {response}")
             
     except Exception as e:
         print(f"⚠️ Azure translation error: {str(e)}. Returning original text.")
-        return text
+        raise Exception(f"Azure translation error: {str(e)}. Returning original text.")
 
 
 def translate_to_english_gemini(text: str) -> str:
