@@ -69,8 +69,8 @@ PERFORMANCE_THRESHOLDS = {
 REQUEST_TIMEOUT = 60  # seconds (LLM calls can be slow)
 
 # Think time between requests (simulates real users)
-MIN_WAIT_TIME = 10  # seconds
-MAX_WAIT_TIME = 20 # seconds
+MIN_WAIT_TIME = 20  # seconds
+MAX_WAIT_TIME = 30 # seconds
 
 print("=" * 80)
 print("🔬 Load Testing Configuration Loaded")
