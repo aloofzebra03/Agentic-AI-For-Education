@@ -112,11 +112,6 @@ class TeachingState(TypedDict):
     is_factually_wrong: bool            # True if student stated something incorrect
     
     # ═══════════════════════════════════════════════════════════════════════
-    # LANGUAGE
-    # ═══════════════════════════════════════════════════════════════════════
-    language: str                       # "english" | "kannada" — controls API translation
-    
-    # ═══════════════════════════════════════════════════════════════════════
     # QUIZ MODE (activated after all concepts taught)
     # ═══════════════════════════════════════════════════════════════════════
     quiz_mode: bool                     # True when in quiz mode, False during teaching
@@ -131,7 +126,7 @@ class TeachingState(TypedDict):
     quiz_evaluation: Dict[str, Any]     # Last evaluation result (score, status, feedback)
 
 
-def create_initial_state(topic_description: str, initial_params: Dict[str, float], simulation_id: str = "simple_pendulum", language: str = "english") -> TeachingState:
+def create_initial_state(topic_description: str, initial_params: Dict[str, float], simulation_id: str = "simple_pendulum") -> TeachingState:
     """
     Create a fresh initial state for a new teaching session.
     
@@ -139,7 +134,6 @@ def create_initial_state(topic_description: str, initial_params: Dict[str, float
         topic_description: The source material to teach from
         initial_params: Starting simulation parameters
         simulation_id: Which simulation this session is for (for dynamic config loading)
-        language: Session language ('english' or 'kannada') — controls API translation
         
     Returns:
         Initialized TeachingState
@@ -180,9 +174,6 @@ def create_initial_state(topic_description: str, initial_params: Dict[str, float
         "waiting_for_input": False,
         "needs_deeper": False,
         "cannot_demonstrate": [],
-        
-        # Language (for API translation layer)
-        "language": language,
         
         # Student response type flags
         "student_asked_question": False,

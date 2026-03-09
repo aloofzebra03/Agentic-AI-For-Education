@@ -17,6 +17,3 @@ requests==2.31.0        # Simple HTTP client for test scripts
 
 # Optional: For better development experience
 python-multipart==0.0.6  # For form data handling (if needed later)
-
-# Translation (English <-> Kannada)
-deep-translator>=1.11.4  # Free Google Translate wrapper, no API key required

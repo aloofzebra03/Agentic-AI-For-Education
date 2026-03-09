@@ -59,7 +59,7 @@ from simulation_to_concept.nodes import (
     trajectory_analyzer_node,
     strategy_selector_node
 )
-from nodes.quiz_evaluator import (
+from simulation_to_concept.nodes.quiz_evaluator import (
     quiz_initializer_node,
     quiz_teacher_node,
     quiz_evaluator_node,

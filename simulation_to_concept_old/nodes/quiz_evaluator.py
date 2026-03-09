@@ -18,14 +18,9 @@ import os
 from typing import Dict, Any
 from datetime import datetime
 
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_core.runnables import RunnableConfig
 
-from simulation_to_concept.config import (
-    GOOGLE_API_KEY, GEMINI_MODEL, TEMPERATURE, USE_API_TRACKER,
-    get_best_api_key_for_model, track_model_call
-)
+from simulation_to_concept.config import GEMINI_MODEL, TEMPERATURE, get_llm
 from simulation_to_concept.state import TeachingState
 from simulation_to_concept.simulations_config import get_quiz_questions
 from simulation_to_concept.quiz_rules import (
@@ -35,25 +30,6 @@ from simulation_to_concept.quiz_rules import (
     calculate_quiz_progress
 )
 
-
-def get_llm():
-    """Get configured LLM instance with API tracking."""
-    if USE_API_TRACKER:
-        try:
-            # Get best API key for this model from tracker
-            api_key = get_best_api_key_for_model(GEMINI_MODEL)
-            print(f"[QUIZ_EVALUATOR] Using tracked API key ...{api_key[-6:]} for {GEMINI_MODEL}")
-        except Exception as e:
-            print(f"[QUIZ_EVALUATOR] Tracker error: {e}, falling back to GOOGLE_API_KEY")
-            api_key = GOOGLE_API_KEY
-    else:
-        api_key = GOOGLE_API_KEY
-    
-    return ChatGoogleGenerativeAI(
-        model=GEMINI_MODEL,
-        google_api_key=api_key,
-        temperature=TEMPERATURE
-    )
 
 
 def is_gemma_model() -> bool:
@@ -200,15 +176,12 @@ def quiz_teacher_node(state: TeachingState) -> Dict[str, Any]:
 # NODE 3: Quiz Evaluator
 # ============================================================================
 
-def quiz_evaluator_node(state: TeachingState, config: RunnableConfig) -> Dict[str, Any]:
+def quiz_evaluator_node(state: TeachingState) -> Dict[str, Any]:
     """
     Evaluate student's submitted parameters and generate feedback.
     
     Uses quiz_rules.py for scoring, then LLM for adaptive feedback.
     Returns a dictionary of state updates.
-    
-    Args:
-        config: RunnableConfig from LangGraph with tracing callbacks for LangSmith.
     """
     print("\n" + "="*60)
     print("🔍 QUIZ EVALUATOR - Evaluating Submission")
@@ -314,67 +287,7 @@ Generate your feedback now:"""
 
     user_prompt = f"Status: {status}, Attempt: {attempts}, Hint: {hint}"
     
-    # Get the API key that was used (for tracking)
-    used_api_key = None
-    if USE_API_TRACKER:
-        try:
-            used_api_key = get_best_api_key_for_model(GEMINI_MODEL)
-        except:
-            pass
-    
-    # Build simulation URL for LangSmith metadata
-    from simulations_config import get_simulation
-    simulation_id = os.environ.get("SIMULATION_ID", "simple_pendulum")
-    sim_config = get_simulation(simulation_id)
-    
-    # Build URL with submitted parameters
-    base_url = sim_config.get("file", "")
-    github_pages_base = os.environ.get("GITHUB_PAGES_BASE_URL", "")
-    if github_pages_base:
-        # Keep the full path including simulations/ directory
-        simulation_url = f"{github_pages_base}/{base_url}"
-    else:
-        simulation_url = base_url
-    
-    # Add parameters to URL
-    param_parts = []
-    for key, value in submitted_params.items():
-        if value is not None:
-            param_parts.append(f"{key}={value}")
-    
-    if param_parts:
-        simulation_url += "?" + "&".join(param_parts)
-    
-    # Prepare LangSmith metadata
-    langsmith_metadata = {
-        "simulation_url": simulation_url,
-        "simulation_id": simulation_id,
-        "quiz_question_id": current_question["id"],
-        "quiz_challenge": current_question["challenge"],
-        "evaluation_status": status,
-        "score": score,
-        "attempt_number": attempts,
-        "submitted_parameters": json.dumps(submitted_params)
-    }
-    
-    print(f"[QUIZ_EVALUATOR] 📊 LangSmith metadata: simulation_url={simulation_url}")
-    print(f"[QUIZ_EVALUATOR] 📊 LangSmith metadata: simulation_id={simulation_id}")
-    
-    # Also try to update the current node run's metadata directly
     try:
-        from langsmith import get_current_run_tree
-        rt = get_current_run_tree()
-        if rt:
-            rt.metadata = {**(rt.metadata or {}), **langsmith_metadata}
-            print(f"[QUIZ_EVALUATOR] ✅ Updated current run tree metadata")
-        else:
-            print(f"[QUIZ_EVALUATOR] ℹ️ No current run tree (metadata will be on child span)")
-    except Exception as e:
-        print(f"[QUIZ_EVALUATOR] ⚠️ Run tree update: {e}")
-    
-    try:
-        import langsmith
-        
         if is_gemma_model():
             combined = f"{system_prompt}\n\n{user_prompt}"
             messages = [HumanMessage(content=combined)]
@@ -384,25 +297,7 @@ Generate your feedback now:"""
                 HumanMessage(content=user_prompt)
             ]
         
-        # Use langsmith.trace() to create a visible span with metadata in LangSmith UI
-        with langsmith.trace(
-            name="quiz_evaluator_llm_call",
-            run_type="llm",
-            metadata=langsmith_metadata,
-            inputs={"status": status, "attempt": attempts, "score": score},
-        ) as trace_rt:
-            llm_config = config or {}
-            response = llm.invoke(messages, config=llm_config)
-            trace_rt.outputs = {"response_length": len(response.content) if response.content else 0}
-        
-        # Track the API call
-        if USE_API_TRACKER and used_api_key:
-            try:
-                track_model_call(used_api_key, GEMINI_MODEL)
-                print(f"[QUIZ_EVALUATOR] Tracked API call: ...{used_api_key[-6:]} + {GEMINI_MODEL}")
-            except Exception as e:
-                print(f"[QUIZ_EVALUATOR] Warning: Failed to track API call: {e}")
-        
+        response = llm.invoke(messages)
         feedback = response.content.strip()
         
     except Exception as e:

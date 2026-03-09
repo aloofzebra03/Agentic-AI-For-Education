@@ -1033,8 +1033,7 @@ def start_simulation_session(request: SimStartSessionRequest):
         # Create session
         session_id, response = create_teaching_session(
             simulation_id=request.simulation_id,
-            student_id=request.student_id,
-            language=request.language or "english"
+            student_id=request.student_id
         )
         
         return response

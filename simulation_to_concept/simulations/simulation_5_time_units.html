@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#e91e63">
+<title>Time Units Converter</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #e91e63 0%, #f48fb1 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #e91e63;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #c2185b; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.input-section {
+  margin-bottom: 15px;
+}
+
+.input-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #37474f;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+}
+
+.input-field {
+  flex: 2;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+}
+
+.input-field:focus { border-color: #e91e63; }
+
+.unit-select {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  background: #fce4ec;
+  color: #c2185b;
+  cursor: pointer;
+}
+
+.convert-btn {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #e91e63, #f06292);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.convert-btn:active { transform: scale(0.98); }
+
+.results-section {
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.results-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.result-item {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.result-item.highlight {
+  border-color: #e91e63;
+  background: #fce4ec;
+}
+
+.result-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+}
+
+.result-unit {
+  font-size: 11px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.result-symbol {
+  font-size: 10px;
+  color: #e91e63;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.conversions-table {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2196f3;
+}
+
+.table-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 10px; }
+
+.conversion-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  font-size: 12px;
+}
+
+.conversion-row:last-child { border-bottom: none; }
+
+.small-units {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.small-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 8px; }
+.small-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.notation-box {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #f44336;
+}
+
+.notation-title { font-size: 12px; font-weight: 700; color: #c62828; margin-bottom: 8px; }
+
+.notation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.notation-item {
+  padding: 8px;
+  background: #fff;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.notation-correct {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4caf50;
+}
+
+.notation-wrong {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f44336;
+  text-decoration: line-through;
+}
+
+.notation-label {
+  font-size: 9px;
+  color: #666;
+  margin-top: 4px;
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>⏰ Time Units Converter</h1>
+  <p>Convert between different units of time</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 SI Unit of Time</div>
+  <div class="concept-text">
+    The SI unit of time is the <strong>second (s)</strong>. Other common units are minutes (min) and hours (h). Always use correct symbols without periods!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="input-section">
+    <div class="input-label">Enter a time value to convert:</div>
+    <div class="input-row">
+      <input type="number" class="input-field" id="time-input" value="1" min="0" oninput="convertTime()">
+      <select class="unit-select" id="unit-select" onchange="convertTime()">
+        <option value="h">hours</option>
+        <option value="min">minutes</option>
+        <option value="s" selected>seconds</option>
+        <option value="ms">milliseconds</option>
+      </select>
+    </div>
+  </div>
+  
+  <div class="results-section">
+    <div class="results-title">📊 Equivalent Values</div>
+    <div class="results-grid">
+      <div class="result-item" id="result-h">
+        <div class="result-value" id="value-h">0.000278</div>
+        <div class="result-unit">hours</div>
+        <div class="result-symbol">h</div>
+      </div>
+      <div class="result-item" id="result-min">
+        <div class="result-value" id="value-min">0.0167</div>
+        <div class="result-unit">minutes</div>
+        <div class="result-symbol">min</div>
+      </div>
+      <div class="result-item highlight" id="result-s">
+        <div class="result-value" id="value-s">1</div>
+        <div class="result-unit">seconds</div>
+        <div class="result-symbol">s</div>
+      </div>
+      <div class="result-item" id="result-ms">
+        <div class="result-value" id="value-ms">1000</div>
+        <div class="result-unit">milliseconds</div>
+        <div class="result-symbol">ms</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="conversions-table">
+  <div class="table-title">📐 Conversion Factors</div>
+  <div class="conversion-row">
+    <span>1 hour (h)</span>
+    <span>= 60 minutes = 3600 seconds</span>
+  </div>
+  <div class="conversion-row">
+    <span>1 minute (min)</span>
+    <span>= 60 seconds</span>
+  </div>
+  <div class="conversion-row">
+    <span>1 second (s)</span>
+    <span>= 1000 milliseconds</span>
+  </div>
+  <div class="conversion-row">
+    <span>1 millisecond (ms)</span>
+    <span>= 1000 microseconds (μs)</span>
+  </div>
+</div>
+
+<div class="small-units">
+  <div class="small-title">🔬 Why Small Time Units Matter</div>
+  <div class="small-text">
+    • <strong>Sports:</strong> Olympic races decided by milliseconds!<br>
+    • <strong>Medicine:</strong> ECG measures heartbeats precisely<br>
+    • <strong>Computers:</strong> Processors work in nanoseconds<br>
+    • <strong>Music:</strong> Digital recording samples thousands of times per second
+  </div>
+</div>
+
+<div class="notation-box">
+  <div class="notation-title">✍️ Correct Notation (SI Standard)</div>
+  <div class="notation-grid">
+    <div class="notation-item">
+      <div class="notation-correct">s</div>
+      <div class="notation-wrong">sec</div>
+      <div class="notation-label">second</div>
+    </div>
+    <div class="notation-item">
+      <div class="notation-correct">min</div>
+      <div class="notation-wrong">mins</div>
+      <div class="notation-label">minute</div>
+    </div>
+    <div class="notation-item">
+      <div class="notation-correct">h</div>
+      <div class="notation-wrong">hr, hrs</div>
+      <div class="notation-label">hour</div>
+    </div>
+    <div class="notation-item">
+      <div class="notation-correct">ms</div>
+      <div class="notation-wrong">msec</div>
+      <div class="notation-label">millisecond</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// Parse URL parameters
+function getURLParams() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    timeValue: parseFloat(params.get('timeValue')) || 1,
+    timeUnit: params.get('timeUnit') || 's'
+  };
+}
+
+// Initialize from URL parameters
+function initFromURL() {
+  const params = getURLParams();
+  document.getElementById('time-input').value = params.timeValue;
+  document.getElementById('unit-select').value = params.timeUnit;
+  convertTime();
+}
+
+function convertTime() {
+  const value = parseFloat(document.getElementById('time-input').value) || 0;
+  const unit = document.getElementById('unit-select').value;
+  
+  // Convert to seconds first
+  let seconds;
+  switch(unit) {
+    case 'h': seconds = value * 3600; break;
+    case 'min': seconds = value * 60; break;
+    case 's': seconds = value; break;
+    case 'ms': seconds = value / 1000; break;
+  }
+  
+  // Convert to all units
+  const hours = seconds / 3600;
+  const minutes = seconds / 60;
+  const milliseconds = seconds * 1000;
+  
+  // Format numbers nicely
+  function format(num) {
+    if (num === 0) return '0';
+    if (num >= 1000000) return num.toExponential(2);
+    if (num >= 1) return num.toFixed(2);
+    if (num >= 0.01) return num.toFixed(4);
+    return num.toExponential(2);
+  }
+  
+  document.getElementById('value-h').textContent = format(hours);
+  document.getElementById('value-min').textContent = format(minutes);
+  document.getElementById('value-s').textContent = format(seconds);
+  document.getElementById('value-ms').textContent = format(milliseconds);
+  
+  // Highlight current unit
+  document.querySelectorAll('.result-item').forEach(item => item.classList.remove('highlight'));
+  document.getElementById(`result-${unit}`).classList.add('highlight');
+  
+  // Send parameters to parent (Streamlit)
+  sendParametersToParent();
+}
+
+// Send current parameters to parent window via postMessage
+function sendParametersToParent() {
+  const value = parseFloat(document.getElementById('time-input').value) || 0;
+  const unit = document.getElementById('unit-select').value;
+  
+  const params = {
+    timeValue: value,
+    timeUnit: unit
+  };
+  
+  // Send to parent window (Streamlit)
+  if (window.parent) {
+    window.parent.postMessage({
+      type: 'simulation_params',
+      params: params
+    }, '*');
+  }
+}
+
+// Listen for parameter updates from parent (Streamlit)
+window.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'update_params') {
+    const params = event.data.params;
+    if (params.timeValue !== undefined) {
+      document.getElementById('time-input').value = params.timeValue;
+    }
+    if (params.timeUnit !== undefined) {
+      document.getElementById('unit-select').value = params.timeUnit;
+    }
+    convertTime();
+  }
+});
+
+// Initialize
+initFromURL();
+</script>
+</body>
+</html>

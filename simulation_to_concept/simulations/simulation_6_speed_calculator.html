@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ff5722">
+<title>Speed Calculator</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #ff5722 0%, #ff8a65 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fbe9e7 0%, #ffccbc 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #ff5722;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #d84315; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.formula-display {
+  text-align: center;
+  padding: 15px;
+  background: #fff;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.formula-big {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ff5722;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.mode-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 15px;
+}
+
+.mode-tab {
+  flex: 1;
+  padding: 10px 6px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.mode-tab:active { transform: scale(0.98); }
+.mode-tab.active { border-color: #ff5722; background: #fbe9e7; color: #d84315; }
+
+.mode-tab .emoji { font-size: 18px; display: block; margin-bottom: 2px; }
+
+.input-group {
+  margin-bottom: 12px;
+}
+
+.input-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #37474f;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.input-field {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+}
+
+.input-field:focus { border-color: #ff5722; }
+.input-field:disabled { background: #f5f5f5; color: #999; }
+
+.unit-label {
+  padding: 12px;
+  background: #fbe9e7;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #d84315;
+  min-width: 60px;
+  text-align: center;
+}
+
+.calculate-btn {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ff5722, #ff8a65);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.calculate-btn:active { transform: scale(0.98); }
+
+.result-panel {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 15px;
+  text-align: center;
+  border: 3px solid #4caf50;
+}
+
+.result-label { font-size: 12px; color: #2e7d32; font-weight: 600; }
+.result-value { font-size: 32px; font-weight: 700; color: #2e7d32; margin: 10px 0; }
+.result-unit { font-size: 14px; color: #388e3c; }
+
+.working-panel {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.working-title { font-size: 11px; font-weight: 600; color: #666; margin-bottom: 8px; }
+.working-text { font-size: 12px; color: #333; line-height: 1.8; font-family: monospace; }
+
+.examples-box {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2196f3;
+}
+
+.examples-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 8px; }
+
+.example-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  background: #fff;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+
+.example-item:last-child { margin-bottom: 0; }
+
+.conversion-note {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.conversion-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 6px; }
+.conversion-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🏃 Speed Calculator</h1>
+  <p>Calculate speed, distance, or time!</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 Speed Formula</div>
+  <div class="concept-text">
+    <strong>Speed</strong> tells us how fast an object is moving. It's the distance covered per unit time.
+  </div>
+  <div class="formula-display">
+    <div class="formula-big">Speed = Distance ÷ Time</div>
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="mode-tabs">
+    <button class="mode-tab active" onclick="setMode('speed', this)">
+      <span class="emoji">🏃</span>
+      Find Speed
+    </button>
+    <button class="mode-tab" onclick="setMode('distance', this)">
+      <span class="emoji">📏</span>
+      Find Distance
+    </button>
+    <button class="mode-tab" onclick="setMode('time', this)">
+      <span class="emoji">⏱️</span>
+      Find Time
+    </button>
+  </div>
+  
+  <div class="input-group" id="distance-group">
+    <div class="input-label">📏 Distance</div>
+    <div class="input-row">
+      <input type="number" class="input-field" id="distance-input" value="100" min="0">
+      <div class="unit-label">km</div>
+    </div>
+  </div>
+  
+  <div class="input-group" id="time-group">
+    <div class="input-label">⏱️ Time</div>
+    <div class="input-row">
+      <input type="number" class="input-field" id="time-input" value="2" min="0" step="0.1">
+      <div class="unit-label">h</div>
+    </div>
+  </div>
+  
+  <div class="input-group" id="speed-group" style="display: none;">
+    <div class="input-label">🏃 Speed</div>
+    <div class="input-row">
+      <input type="number" class="input-field" id="speed-input" value="50" min="0">
+      <div class="unit-label">km/h</div>
+    </div>
+  </div>
+  
+  <button class="calculate-btn" onclick="calculate()">🔢 Calculate</button>
+  
+  <div class="result-panel" id="result-panel">
+    <div class="result-label" id="result-label">Speed</div>
+    <div class="result-value" id="result-value">50</div>
+    <div class="result-unit" id="result-unit">km/h</div>
+  </div>
+  
+  <div class="working-panel" id="working-panel">
+    <div class="working-title">📝 Working:</div>
+    <div class="working-text" id="working-text">
+      Speed = Distance ÷ Time<br>
+      Speed = 100 km ÷ 2 h<br>
+      Speed = 50 km/h
+    </div>
+  </div>
+</div>
+
+<div class="examples-box">
+  <div class="examples-title">🌟 Real-World Speeds</div>
+  <div class="example-item">
+    <span>🚶 Walking</span>
+    <span>~5 km/h</span>
+  </div>
+  <div class="example-item">
+    <span>🚴 Cycling</span>
+    <span>~15-25 km/h</span>
+  </div>
+  <div class="example-item">
+    <span>🚗 Car (city)</span>
+    <span>~40-60 km/h</span>
+  </div>
+  <div class="example-item">
+    <span>🚆 Train</span>
+    <span>~80-160 km/h</span>
+  </div>
+  <div class="example-item">
+    <span>✈️ Airplane</span>
+    <span>~800-900 km/h</span>
+  </div>
+</div>
+
+<div class="conversion-note">
+  <div class="conversion-title">🔄 Unit Conversion</div>
+  <div class="conversion-text">
+    <strong>km/h to m/s:</strong> Divide by 3.6<br>
+    Example: 36 km/h = 36 ÷ 3.6 = 10 m/s<br><br>
+    <strong>m/s to km/h:</strong> Multiply by 3.6<br>
+    Example: 10 m/s = 10 × 3.6 = 36 km/h
+  </div>
+</div>
+
+</div>
+
+<script>
+let currentMode = 'speed';
+
+// Parse URL parameters
+function getURLParams() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    calculationMode: params.get('calculationMode') || 'speed',
+    distance: parseFloat(params.get('distance')) || 100,
+    time: parseFloat(params.get('time')) || 2,
+    speed: parseFloat(params.get('speed')) || 50
+  };
+}
+
+// Initialize from URL parameters
+function initFromURL() {
+  const params = getURLParams();
+  
+  // Set input values
+  document.getElementById('distance-input').value = params.distance;
+  document.getElementById('time-input').value = params.time;
+  document.getElementById('speed-input').value = params.speed;
+  
+  // Set mode
+  currentMode = params.calculationMode;
+  
+  // Update UI for the selected mode
+  const modes = {
+    'speed': 0,
+    'distance': 1,
+    'time': 2
+  };
+  
+  const modeIndex = modes[currentMode] || 0;
+  const modeTabs = document.querySelectorAll('.mode-tab');
+  
+  modeTabs.forEach(tab => tab.classList.remove('active'));
+  modeTabs[modeIndex].classList.add('active');
+  
+  // Show/hide appropriate inputs
+  updateInputVisibility();
+  calculate();
+}
+
+function updateInputVisibility() {
+  const distanceGroup = document.getElementById('distance-group');
+  const timeGroup = document.getElementById('time-group');
+  const speedGroup = document.getElementById('speed-group');
+  
+  distanceGroup.style.display = 'block';
+  timeGroup.style.display = 'block';
+  speedGroup.style.display = 'none';
+  
+  document.getElementById('distance-input').disabled = false;
+  document.getElementById('time-input').disabled = false;
+  
+  if (currentMode === 'distance') {
+    distanceGroup.style.display = 'none';
+    speedGroup.style.display = 'block';
+  } else if (currentMode === 'time') {
+    timeGroup.style.display = 'none';
+    speedGroup.style.display = 'block';
+  }
+}
+
+function setMode(mode, btn) {
+  currentMode = mode;
+  
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  
+  updateInputVisibility();
+  calculate();
+  sendParametersToParent();
+}
+
+function calculate() {
+  const distance = parseFloat(document.getElementById('distance-input').value) || 0;
+  const time = parseFloat(document.getElementById('time-input').value) || 0;
+  const speed = parseFloat(document.getElementById('speed-input').value) || 0;
+  
+  let result, label, unit, working;
+  
+  switch(currentMode) {
+    case 'speed':
+      if (time === 0) {
+        result = 0;
+        working = 'Cannot divide by zero!';
+      } else {
+        result = distance / time;
+        working = `Speed = Distance ÷ Time\nSpeed = ${distance} km ÷ ${time} h\nSpeed = ${result.toFixed(2)} km/h`;
+      }
+      label = 'Speed';
+      unit = 'km/h';
+      break;
+      
+    case 'distance':
+      result = speed * time;
+      label = 'Distance';
+      unit = 'km';
+      working = `Distance = Speed × Time\nDistance = ${speed} km/h × ${time} h\nDistance = ${result.toFixed(2)} km`;
+      break;
+      
+    case 'time':
+      if (speed === 0) {
+        result = 0;
+        working = 'Cannot divide by zero!';
+      } else {
+        result = distance / speed;
+        working = `Time = Distance ÷ Speed\nTime = ${distance} km ÷ ${speed} km/h\nTime = ${result.toFixed(2)} h`;
+      }
+      label = 'Time';
+      unit = 'hours';
+      break;
+  }
+  
+  document.getElementById('result-label').textContent = label;
+  document.getElementById('result-value').textContent = result.toFixed(2);
+  document.getElementById('result-unit').textContent = unit;
+  document.getElementById('working-text').textContent = working;
+}
+
+// Send current parameters to parent window via postMessage
+function sendParametersToParent() {
+  const params = {
+    calculationMode: currentMode,
+    distance: parseFloat(document.getElementById('distance-input').value) || 0,
+    time: parseFloat(document.getElementById('time-input').value) || 0,
+    speed: parseFloat(document.getElementById('speed-input').value) || 0
+  };
+  
+  // Send to parent window (Streamlit)
+  if (window.parent) {
+    window.parent.postMessage({
+      type: 'simulation_params',
+      params: params
+    }, '*');
+  }
+}
+
+// Listen for parameter updates from parent (Streamlit)
+window.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'update_params') {
+    const params = event.data.params;
+    
+    if (params.calculationMode !== undefined) {
+      currentMode = params.calculationMode;
+      const modes = ['speed', 'distance', 'time'];
+      const modeIndex = modes.indexOf(currentMode);
+      if (modeIndex !== -1) {
+        const modeTabs = document.querySelectorAll('.mode-tab');
+        modeTabs.forEach(tab => tab.classList.remove('active'));
+        modeTabs[modeIndex].classList.add('active');
+      }
+      updateInputVisibility();
+    }
+    
+    if (params.distance !== undefined) {
+      document.getElementById('distance-input').value = params.distance;
+    }
+    if (params.time !== undefined) {
+      document.getElementById('time-input').value = params.time;
+    }
+    if (params.speed !== undefined) {
+      document.getElementById('speed-input').value = params.speed;
+    }
+    
+    calculate();
+  }
+});
+
+// Add event listeners to inputs
+document.getElementById('distance-input').addEventListener('input', () => {
+  calculate();
+  sendParametersToParent();
+});
+
+document.getElementById('time-input').addEventListener('input', () => {
+  calculate();
+  sendParametersToParent();
+});
+
+document.getElementById('speed-input').addEventListener('input', () => {
+  calculate();
+  sendParametersToParent();
+});
+
+// Initialize from URL
+initFromURL();
+</script>
+</body>
+</html>

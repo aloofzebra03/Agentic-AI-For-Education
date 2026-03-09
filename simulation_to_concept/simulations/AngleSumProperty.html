@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Triangle Angle Sum</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f4f6f8;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 8px 4px;
+  color: #444;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  margin-bottom: 12px;
+}
+
+.visual {
+  position: relative;
+  height: 32vh;
+  min-height: 220px;
+  background: #eef3f9;
+  border-radius: 12px;
+  overflow: hidden;
+  touch-action: none;
+}
+
+svg { width: 100%; height: 100%; }
+
+.static-hint {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 11px;
+  line-height: 1.3;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+}
+
+.metrics {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  background: rgba(255,255,255,0.96);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 11px;
+  line-height: 1.4;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+}
+
+.control-toggle {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  background: #007AFF;
+  color: #fff;
+  font-size: 11px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.control-overlay {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.97);
+  border-top: 1px solid #ddd;
+  padding: 8px;
+  transform: translateY(100%);
+  transition: transform .25s ease;
+}
+
+.control-overlay.open { transform: translateY(0); }
+
+.control-group {
+  margin-bottom: 6px;
+}
+
+.control-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.control-group input[type="range"] {
+  width: 100%;
+}
+
+.segmented {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.segmented button {
+  flex: 1;
+  padding: 6px;
+  border-radius: 6px;
+  border: none;
+  font-size: 11px;
+  background: #e0e0e0;
+  cursor: pointer;
+}
+
+.segmented button.active {
+  background: #007AFF;
+  color: white;
+  font-weight: 600;
+}
+
+.submit-btn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  background: #007AFF;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* SVG element styles - customize per simulation */
+:root {
+  --shape_fill: #E0FFFF;
+  --shape_stroke: #333333;
+  --drag_handle: #FFD700;
+  --background: #eef3f9;
+  --text: #333333;
+  --stroke_width: 3;
+}
+
+.triangle-shape {
+  fill: var(--shape_fill);
+  stroke: var(--shape_stroke);
+  stroke-width: var(--stroke_width);
+}
+
+.vertex-handle {
+  fill: var(--drag_handle);
+  stroke: var(--shape_stroke);
+  stroke-width: 2;
+  cursor: grab;
+}
+
+.angle-arc {
+  stroke-width: 3;
+  fill: none;
+}
+
+.proof-line {
+  stroke: #8A2BE2;
+  stroke-width: 2;
+  stroke-dasharray: 5 5;
+}
+
+.alt-angle-arc {
+  stroke-width: 3;
+  fill: none;
+}
+
+.alt-angle-text {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.rearranged-arc {
+  stroke-width: 3;
+  fill: none;
+}
+
+.hover-hint text { font-size: 16px; fill: #333; font-weight: 500; }
+.hover-hint rect { fill: rgba(255,255,255,0.95); stroke: #007AFF; stroke-dasharray: 4 3; rx: 6; ry: 6; }
+</style>
+</head>
+
+<body>
+<div id="app">
+  <div class="section-title">Reference (baseline)</div>
+  <div class="sim-card" id="ref"></div>
+  
+  <div class="section-title">Experiment (change & observe)</div>
+  <div class="sim-card" id="exp"></div>
+</div>
+
+<script>
+// Helper functions for math calculations
+const ARC_RADIUS = 40;
+const LABEL_OFFSET = 20; // For angle labels from arc
+const VERTEX_LABEL_OFFSET = 20; // For A, B, C from vertex
+const ALT_ANGLE_TEXT_OFFSET = 60; // For alt angle text from vertex A
+
+function degToRad(degrees) {
+    return degrees * Math.PI / 180;
+}
+
+function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+    const angleInRadians = degToRad(angleInDegrees);
+    return {
+        x: centerX + (radius * Math.cos(angleInRadians)),
+        y: centerY + (radius * Math.sin(angleInRadians))
+    };
+}
+
+function calculateAngle(p1, p2, p3) { // p2 is the vertex of the angle
+    const v1 = {x: p1.x - p2.x, y: p1.y - p2.y};
+    const v2 = {x: p3.x - p2.x, y: p3.y - p2.y};
+    const dot = v1.x * v2.x + v1.y * v2.y;
+    const mag1 = Math.sqrt(v1.x*v1.x + v1.y*v1.y);
+    const mag2 = Math.sqrt(v2.x*v2.x + v2.y*v2.y);
+    if (mag1 === 0 || mag2 === 0) return 0;
+    let angleRad = Math.acos(dot / (mag1 * mag2));
+    if (isNaN(angleRad)) angleRad = (dot > 0) ? 0 : Math.PI; // Handle floating point inaccuracies
+    return parseFloat((angleRad * 180 / Math.PI).toFixed(1));
+}
+
+function getTriangleArcPath(center, p1, p2, radius) {
+    const v1 = {x: p1.x - center.x, y: p1.y - center.y};
+    const v2 = {x: p2.x - center.x, y: p2.y - center.y};
+
+    let angle1Rad = Math.atan2(v1.y, v1.x);
+    let angle2Rad = Math.atan2(v2.y, v2.x);
+
+    // Normalize angles to [0, 2*PI)
+    if (angle1Rad < 0) angle1Rad += 2 * Math.PI;
+    if (angle2Rad < 0) angle2Rad += 2 * Math.PI;
+
+    // Determine sweep direction for interior angle using cross product
+    const crossProduct = v1.x * v2.y - v1.y * v2.x;
+    let sweepFlag = (crossProduct > 0) ? 1 : 0; // 1 for CCW, 0 for CW
+
+    // If the angle is reflex (>180 deg), largeArcFlag should be 1. For triangle interior, it's 0.
+    const largeArcFlag = 0; 
+
+    const start = polarToCartesian(center.x, center.y, radius, angle1Rad * 180 / Math.PI);
+    const end = polarToCartesian(center.x, center.y, radius, angle2Rad * 180 / Math.PI);
+
+    return [
+        "M", start.x, start.y,
+        "A", radius, radius, 0, largeArcFlag, sweepFlag, end.x, end.y
+    ].join(" ");
+}
+
+function getAngleBisectorPoint(center, p1, p2, distance) {
+    const v1 = {x: p1.x - center.x, y: p1.y - center.y};
+    const v2 = {x: p2.x - center.x, y: p2.y - center.y};
+
+    const normV1 = {x: v1.x / Math.sqrt(v1.x*v1.x + v1.y*v1.y), y: v1.y / Math.sqrt(v1.x*v1.x + v1.y*v1.y)};
+    const normV2 = {x: v2.x / Math.sqrt(v2.x*v2.x + v2.y*v2.y), y: v2.y / Math.sqrt(v2.x*v2.x + v2.y*v2.y)};
+    
+    const bisectorVec = {x: normV1.x + normV2.x, y: normV1.y + normV2.y};
+    const bisectorMag = Math.sqrt(bisectorVec.x*bisectorVec.x + bisectorVec.y*bisectorVec.y);
+    
+    if (bisectorMag === 0) return {x: center.x, y: center.y}; 
+
+    const bisectorUnitVec = {x: bisectorVec.x / bisectorMag, y: bisectorVec.y / bisectorMag};
+
+    return {
+        x: center.x + bisectorUnitVec.x * distance,
+        y: center.y + bisectorUnitVec.y * distance
+    };
+}
+
+function getParallelLineCoords(pA, pB, pC, viewBoxWidth, viewBoxHeight) {
+    const dx_BC = pC.x - pB.x;
+    const dy_BC = pC.y - pB.y;
+
+    let x1, y1, x2, y2;
+
+    if (dx_BC === 0) { // Vertical line BC
+        x1 = pA.x; y1 = 0;
+        x2 = pA.x; y2 = viewBoxHeight;
+    } else {
+        const m = dy_BC / dx_BC;
+        const c = pA.y - m * pA.x; // y-intercept for line through A
+
+        // Extend line across the viewBox
+        x1 = 0; y1 = m * x1 + c;
+        x2 = viewBoxWidth; y2 = m * x2 + c;
+    }
+    return {x1, y1, x2, y2};
+}
+
+// Initial state for reference panel (pre-calculated)
+const refInitialState = {
+    vertexA_x: 500, vertexA_y: 150,
+    vertexB_x: 200, vertexB_y: 450,
+    vertexC_x: 800, vertexC_y: 450,
+    show_proof_lines: false
+};
+
+function calculateAllSVGAttributes(state, containerId) {
+    const pA = {x: state.vertexA_x, y: state.vertexA_y};
+    const pB = {x: state.vertexB_x, y: state.vertexB_y};
+    const pC = {x: state.vertexC_x, y: state.vertexC_y};
+
+    const angleA = calculateAngle(pC, pA, pB);
+    const angleB = calculateAngle(pA, pB, pC);
+    const angleC = calculateAngle(pB, pC, pA);
+    const angleSum = angleA + angleB + angleC;
+
+    // Triangle Polygon
+    const trianglePoints = `${pA.x},${pA.y} ${pB.x},${pB.y} ${pC.x},${pC.y}`;
+
+    // Vertex Handles
+    const vertexA_cx = pA.x, vertexA_cy = pA.y;
+    const vertexB_cx = pB.x, vertexB_cy = pB.y;
+    const vertexC_cx = pC.x, vertexC_cy = pC.y;
+
+    // Angle Arcs
+    const angleA_arc_d = getTriangleArcPath(pA, pC, pB, ARC_RADIUS);
+    const angleB_arc_d = getTriangleArcPath(pB, pA, pC, ARC_RADIUS);
+    const angleC_arc_d = getTriangleArcPath(pC, pB, pA, ARC_RADIUS);
+
+    // Proof Elements
+    const proofVisibility = state.show_proof_lines ? "visible" : "hidden";
+    const rearrangedVisibility = state.show_proof_lines ? "visible" : "hidden";
+
+    const parallelLine = getParallelLineCoords(pA, pB, pC, 1000, 600);
+
+    // Points on parallel line for alternate angles
+    // Vector BC
+    const vBC = {x: pC.x - pB.x, y: pC.y - pB.y};
+    const magBC = Math.sqrt(vBC.x*vBC.x + vBC.y*vBC.y);
+    const unitVBC = magBC > 0 ? {x: vBC.x / magBC, y: vBC.y / magBC} : {x: 1, y: 0};
+
+    const p_pl_left = {x: pA.x - unitVBC.x * 100, y: pA.y - unitVBC.y * 100}; // Point on parallel line to the left of A
+    const p_pl_right = {x: pA.x + unitVBC.x * 100, y: pA.y + unitVBC.y * 100}; // Point on parallel line to the right of A
+
+    const alt_angleB_arc_d = getTriangleArcPath(pA, p_pl_left, pB, ARC_RADIUS);
+    const alt_angleC_arc_d = getTriangleArcPath(pA, pC, p_pl_right, ARC_RADIUS);
+
+    // Alt angle text positions
+    const altAngleBTextX = pA.x - ALT_ANGLE_TEXT_OFFSET;
+    const altAngleBTextY = pA.y + 20;
+    const altAngleCTextX = pA.x + ALT_ANGLE_TEXT_OFFSET;
+    const altAngleCTextY = pA.y + 20;
+
+    // Rearranged angles
+    const rearranged_angleA_arc_d = angleA_arc_d;
+    const rearranged_angleB_arc_d = alt_angleB_arc_d;
+    const rearranged_angleC_arc_d = alt_angleC_arc_d;
+
+    // Labels
+    const labelA_pos = {x: pA.x, y: pA.y - VERTEX_LABEL_OFFSET};
+    const labelB_pos = {x: pB.x - VERTEX_LABEL_OFFSET, y: pB.y + VERTEX_LABEL_OFFSET};
+    const labelC_pos = {x: pC.x + VERTEX_LABEL_OFFSET, y: pC.y + VERTEX_LABEL_OFFSET};
+
+    const angleATextPos = getAngleBisectorPoint(pA, pC, pB, ARC_RADIUS + LABEL_OFFSET);
+    const angleBTextPos = getAngleBisectorPoint(pB, pA, pC, ARC_RADIUS + LABEL_OFFSET);
+    const angleCTextPos = getAngleBisectorPoint(pC, pB, pA, ARC_RADIUS + LABEL_OFFSET);
+
+    return {
+        pA, pB, pC,
+        angleA, angleB, angleC, angleSum,
+        trianglePoints,
+        vertexA_cx, vertexA_cy, vertexB_cx, vertexB_cy, vertexC_cx, vertexC_cy,
+        angleA_arc_d, angleB_arc_d, angleC_arc_d,
+        proofVisibility, rearrangedVisibility,
+        parallelLine_x1: parallelLine.x1, parallelLine_y1: parallelLine.y1,
+        parallelLine_x2: parallelLine.x2, parallelLine_y2: parallelLine.y2,
+        alt_angleB_arc_d, alt_angleC_arc_d,
+        altAngleBTextX, altAngleBTextY, altAngleCTextX, altAngleCTextY,
+        rearranged_angleA_arc_d, rearranged_angleB_arc_d, rearranged_angleC_arc_d,
+        labelA_x: labelA_pos.x, labelA_y: labelA_pos.y,
+        labelB_x: labelB_pos.x, labelB_y: labelB_pos.y,
+        labelC_x: labelC_pos.x, labelC_y: labelC_pos.y,
+        angleATextX: angleATextPos.x, angleATextY: angleATextPos.y,
+        angleBTextX: angleBTextPos.x, angleBTextY: angleBTextPos.y,
+        angleCTextX: angleCTextPos.x, angleCTextY: angleCTextPos.y,
+    };
+}
+
+// Pre-calculate for the reference panel
+const refCalculated = calculateAllSVGAttributes(refInitialState, "ref");
+
+// Parse URL parameters (for agent integration)
+const urlParams = new URLSearchParams(window.location.search);
+
+function getUrlParam(name, defaultValue) {
+  const value = urlParams.get(name);
+  if (value === null) return defaultValue;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  const num = parseFloat(value);
+  return isNaN(num) ? defaultValue : num;
+}
+
+function createSimulation(containerId, isInteractive) {
+  const c = document.getElementById(containerId);
+  
+  // Initial state for interactive panel (with URL parameter support)
+  let state = {
+    vertexA_x: getUrlParam('vertexA_x', 500),
+    vertexA_y: getUrlParam('vertexA_y', 150),
+    vertexB_x: getUrlParam('vertexB_x', 200),
+    vertexB_y: getUrlParam('vertexB_y', 450),
+    vertexC_x: getUrlParam('vertexC_x', 800),
+    vertexC_y: getUrlParam('vertexC_y', 450),
+    show_proof_lines: getUrlParam('show_proof_lines', false)
+  };
+
+  // Use pre-calculated values for reference panel, or initial state for experiment
+  const initialRenderData = isInteractive ? calculateAllSVGAttributes(state, containerId) : refCalculated;
+
+  // Build HTML structure with visual, controls, metrics
+  c.innerHTML = `
+  <div class="visual">
+    ${isInteractive ? `<div class="static-hint">Drag points A, B, C to change the triangle shape</div>` : ''}
+    ${isInteractive ? '<button class="control-toggle">Adjust</button>' : ''}
+    
+    <svg viewBox="0 0 1000 600">
+      <polygon id="${containerId}-triangle_polygon" class="triangle-shape" points="${initialRenderData.trianglePoints}" style="fill: var(--shape_fill); stroke: var(--shape_stroke); stroke-width: var(--stroke_width);"></polygon>
+      
+      ${isInteractive ? `
+      <circle id="${containerId}-vertexA_handle_drag_target" cx="${initialRenderData.vertexA_cx}" cy="${initialRenderData.vertexA_cy}" r="30" fill="transparent" style="cursor: grab;"></circle>
+      <g id="${containerId}-vertexA_handle-hover" class="hover-hint" style="display: block;">
+        <rect x="${initialRenderData.vertexA_cx - 50}" y="${initialRenderData.vertexA_cy - 80}" width="100" height="40"></rect>
+        <text x="${initialRenderData.vertexA_cx}" y="${initialRenderData.vertexA_cy - 55}" text-anchor="middle">Drag A</text>
+      </g>
+      ` : ''}
+      <circle id="${containerId}-vertexA_handle" class="vertex-handle" cx="${initialRenderData.vertexA_cx}" cy="${initialRenderData.vertexA_cy}" r="15" style="fill: var(--drag_handle); stroke: var(--shape_stroke); stroke-width: 2; ${isInteractive ? 'pointer-events: none;' : ''}"></circle>
+      
+      ${isInteractive ? `
+      <circle id="${containerId}-vertexB_handle_drag_target" cx="${initialRenderData.vertexB_cx}" cy="${initialRenderData.vertexB_cy}" r="30" fill="transparent" style="cursor: grab;"></circle>
+      <g id="${containerId}-vertexB_handle-hover" class="hover-hint" style="display: block;">
+        <rect x="${initialRenderData.vertexB_cx - 50}" y="${initialRenderData.vertexB_cy - 80}" width="100" height="40"></rect>
+        <text x="${initialRenderData.vertexB_cx}" y="${initialRenderData.vertexB_cy - 55}" text-anchor="middle">Drag B</text>
+      </g>
+      ` : ''}
+      <circle id="${containerId}-vertexB_handle" class="vertex-handle" cx="${initialRenderData.vertexB_cx}" cy="${initialRenderData.vertexB_cy}" r="15" style="fill: var(--drag_handle); stroke: var(--shape_stroke); stroke-width: 2; ${isInteractive ? 'pointer-events: none;' : ''}"></circle>
+      
+      ${isInteractive ? `
+      <circle id="${containerId}-vertexC_handle_drag_target" cx="${initialRenderData.vertexC_cx}" cy="${initialRenderData.vertexC_cy}" r="30" fill="transparent" style="cursor: grab;"></circle>
+      <g id="${containerId}-vertexC_handle-hover" class="hover-hint" style="display: block;">
+        <rect x="${initialRenderData.vertexC_cx - 50}" y="${initialRenderData.vertexC_cy - 80}" width="100" height="40"></rect>
+        <text x="${initialRenderData.vertexC_cx}" y="${initialRenderData.vertexC_cy - 55}" text-anchor="middle">Drag C</text>
+      </g>
+      ` : ''}
+      <circle id="${containerId}-vertexC_handle" class="vertex-handle" cx="${initialRenderData.vertexC_cx}" cy="${initialRenderData.vertexC_cy}" r="15" style="fill: var(--drag_handle); stroke: var(--shape_stroke); stroke-width: 2; ${isInteractive ? 'pointer-events: none;' : ''}"></circle>
+      
+      <path id="${containerId}-angleA_arc" class="angle-arc" d="${initialRenderData.angleA_arc_d}" style="stroke: #FF6347; stroke-width: 3; fill: none;"></path>
+      <path id="${containerId}-angleB_arc" class="angle-arc" d="${initialRenderData.angleB_arc_d}" style="stroke: #4682B4; stroke-width: 3; fill: none;"></path>
+      <path id="${containerId}-angleC_arc" class="angle-arc" d="${initialRenderData.angleC_arc_d}" style="stroke: #3CB371; stroke-width: 3; fill: none;"></path>
+      
+      <g id="${containerId}-proof_group" class="proof-elements" visibility="${initialRenderData.proofVisibility}" style="opacity: 0.8;">
+        <line id="${containerId}-parallel_line" class="proof-line" x1="${initialRenderData.parallelLine_x1}" y1="${initialRenderData.parallelLine_y1}" x2="${initialRenderData.parallelLine_x2}" y2="${initialRenderData.parallelLine_y2}" style="stroke: #8A2BE2; stroke-width: 2; stroke-dasharray: 5 5;"></line>
+        <path id="${containerId}-alt_angleB_arc" class="alt-angle-arc" d="${initialRenderData.alt_angleB_arc_d}" style="stroke: #4682B4; stroke-width: 3; fill: none;"></path>
+        <path id="${containerId}-alt_angleC_arc" class="alt-angle-arc" d="${initialRenderData.alt_angleC_arc_d}" style="stroke: #3CB371; stroke-width: 3; fill: none;"></path>
+        <text id="${containerId}-alt_angleB_text" class="alt-angle-text" x="${initialRenderData.altAngleBTextX}" y="${initialRenderData.altAngleBTextY}" style="font-size: 24px; fill: #4682B4; font-weight: bold;" text-anchor="middle">${initialRenderData.angleB}&#176;</text>
+        <text id="${containerId}-alt_angleC_text" class="alt-angle-text" x="${initialRenderData.altAngleCTextX}" y="${initialRenderData.altAngleCTextY}" style="font-size: 24px; fill: #3CB371; font-weight: bold;" text-anchor="middle">${initialRenderData.angleC}&#176;</text>
+        <g id="${containerId}-rearranged_angles_group" class="rearranged-angles" visibility="${initialRenderData.rearrangedVisibility}">
+          <path id="${containerId}-rearranged_angleB_arc" class="rearranged-arc" d="${initialRenderData.rearranged_angleB_arc_d}" style="stroke: #4682B4; stroke-width: 3; fill: none;"></path>
+          <path id="${containerId}-rearranged_angleC_arc" class="rearranged-arc" d="${initialRenderData.rearranged_angleC_arc_d}" style="stroke: #3CB371; stroke-width: 3; fill: none;"></path>
+          <path id="${containerId}-rearranged_angleA_arc" class="rearranged-arc" d="${initialRenderData.rearranged_angleA_arc_d}" style="stroke: #FF6347; stroke-width: 3; fill: none;"></path>
+        </g>
+      </g>
+
+      <text x="${initialRenderData.labelA_x}" y="${initialRenderData.labelA_y}" style="font-size: 28px; font-weight: bold; fill: var(--text);" text-anchor="middle">A</text>
+      <text x="${initialRenderData.labelB_x}" y="${initialRenderData.labelB_y}" style="font-size: 28px; font-weight: bold; fill: var(--text);" text-anchor="middle">B</text>
+      <text x="${initialRenderData.labelC_x}" y="${initialRenderData.labelC_y}" style="font-size: 28px; font-weight: bold; fill: var(--text);" text-anchor="middle">C</text>
+      <text id="${containerId}-angleA_text" x="${initialRenderData.angleATextX}" y="${initialRenderData.angleATextY}" style="font-size: 24px; fill: #FF6347; font-weight: bold;" text-anchor="middle">${initialRenderData.angleA}&#176;</text>
+      <text id="${containerId}-angleB_text" x="${initialRenderData.angleBTextX}" y="${initialRenderData.angleBTextY}" style="font-size: 24px; fill: #4682B4; font-weight: bold;" text-anchor="middle">${initialRenderData.angleB}&#176;</text>
+      <text id="${containerId}-angleC_text" x="${initialRenderData.angleCTextX}" y="${initialRenderData.angleCTextY}" style="font-size: 24px; fill: #3CB371; font-weight: bold;" text-anchor="middle">${initialRenderData.angleC}&#176;</text>
+    </svg>
+    
+    <div class="metrics">
+      <div id="${containerId}-metric_angleA">Angle A: ${initialRenderData.angleA}&#176;</div>
+      <div id="${containerId}-metric_angleB">Angle B: ${initialRenderData.angleB}&#176;</div>
+      <div id="${containerId}-metric_angleC">Angle C: ${initialRenderData.angleC}&#176;</div>
+      <div id="${containerId}-metric_angleSum">Angle Sum: ${initialRenderData.angleSum}&#176;</div>
+    </div>
+    
+    ${isInteractive ? `
+    <div class="control-overlay">
+      <div class="control-group">
+        <label class="control-label">Show Proof Steps
+          <input type="checkbox" id="${containerId}-toggle_show_proof_lines" ${state.show_proof_lines ? 'checked' : ''}>
+        </label>
+      </div>
+      <button class="submit-btn">Done</button>
+    </div>` : ''}
+  </div>`;
+
+  // Cache DOM elements
+  const svg = c.querySelector("svg");
+  const trianglePolygon = c.querySelector(`#${containerId}-triangle_polygon`);
+  const vertexAHandle = c.querySelector(`#${containerId}-vertexA_handle`);
+  const vertexBHandle = c.querySelector(`#${containerId}-vertexB_handle`);
+  const vertexCHandle = c.querySelector(`#${containerId}-vertexC_handle`);
+  const vertexADragTarget = c.querySelector(`#${containerId}-vertexA_handle_drag_target`);
+  const vertexBDragTarget = c.querySelector(`#${containerId}-vertexB_handle_drag_target`);
+  const vertexCDragTarget = c.querySelector(`#${containerId}-vertexC_handle_drag_target`);
+  const angleAArc = c.querySelector(`#${containerId}-angleA_arc`);
+  const angleBArc = c.querySelector(`#${containerId}-angleB_arc`);
+  const angleCArc = c.querySelector(`#${containerId}-angleC_arc`);
+  const proofGroup = c.querySelector(`#${containerId}-proof_group`);
+  const parallelLine = c.querySelector(`#${containerId}-parallel_line`);
+  const altAngleBArc = c.querySelector(`#${containerId}-alt_angleB_arc`);
+  const altAngleCArc = c.querySelector(`#${containerId}-alt_angleC_arc`);
+  const altAngleBText = c.querySelector(`#${containerId}-alt_angleB_text`);
+  const altAngleCText = c.querySelector(`#${containerId}-alt_angleC_text`);
+  const rearrangedAnglesGroup = c.querySelector(`#${containerId}-rearranged_angles_group`);
+  const rearrangedAngleAArc = c.querySelector(`#${containerId}-rearranged_angleA_arc`);
+  const rearrangedAngleBArc = c.querySelector(`#${containerId}-rearranged_angleB_arc`);
+  const rearrangedAngleCArc = c.querySelector(`#${containerId}-rearranged_angleC_arc`);
+  const labelA = c.querySelector(`text[text-anchor="middle"][x="${initialRenderData.labelA_x}"][y="${initialRenderData.labelA_y}"]`);
+  const labelB = c.querySelector(`text[text-anchor="middle"][x="${initialRenderData.labelB_x}"][y="${initialRenderData.labelB_y}"]`);
+  const labelC = c.querySelector(`text[text-anchor="middle"][x="${initialRenderData.labelC_x}"][y="${initialRenderData.labelC_y}"]`);
+  const angleAText = c.querySelector(`#${containerId}-angleA_text`);
+  const angleBText = c.querySelector(`#${containerId}-angleB_text`);
+  const angleCText = c.querySelector(`#${containerId}-angleC_text`);
+
+  const metricAngleA = c.querySelector(`#${containerId}-metric_angleA`);
+  const metricAngleB = c.querySelector(`#${containerId}-metric_angleB`);
+  const metricAngleC = c.querySelector(`#${containerId}-metric_angleC`);
+  const metricAngleSum = c.querySelector(`#${containerId}-metric_angleSum`);
+
+  function render() {
+    const renderData = calculateAllSVGAttributes(state, containerId);
+
+    // Update SVG elements based on state
+    trianglePolygon.setAttribute("points", renderData.trianglePoints);
+    vertexAHandle.setAttribute("cx", renderData.vertexA_cx);
+    vertexAHandle.setAttribute("cy", renderData.vertexA_cy);
+    vertexBHandle.setAttribute("cx", renderData.vertexB_cx);
+    vertexBHandle.setAttribute("cy", renderData.vertexB_cy);
+    vertexCHandle.setAttribute("cx", renderData.vertexC_cx);
+    vertexCHandle.setAttribute("cy", renderData.vertexC_cy);
+
+    if (vertexADragTarget) {
+      vertexADragTarget.setAttribute("cx", renderData.vertexA_cx);
+      vertexADragTarget.setAttribute("cy", renderData.vertexA_cy);
+    }
+    if (vertexBDragTarget) {
+      vertexBDragTarget.setAttribute("cx", renderData.vertexB_cx);
+      vertexBDragTarget.setAttribute("cy", renderData.vertexB_cy);
+    }
+    if (vertexCDragTarget) {
+      vertexCDragTarget.setAttribute("cx", renderData.vertexC_cx);
+      vertexCDragTarget.setAttribute("cy", renderData.vertexC_cy);
+    }
+
+    angleAArc.setAttribute("d", renderData.angleA_arc_d);
+    angleBArc.setAttribute("d", renderData.angleB_arc_d);
+    angleCArc.setAttribute("d", renderData.angleC_arc_d);
+
+    proofGroup.setAttribute("visibility", renderData.proofVisibility);
+    parallelLine.setAttribute("x1", renderData.parallelLine_x1);
+    parallelLine.setAttribute("y1", renderData.parallelLine_y1);
+    parallelLine.setAttribute("x2", renderData.parallelLine_x2);
+    parallelLine.setAttribute("y2", renderData.parallelLine_y2);
+    altAngleBArc.setAttribute("d", renderData.alt_angleB_arc_d);
+    altAngleCArc.setAttribute("d", renderData.alt_angleC_arc_d);
+    altAngleBText.setAttribute("x", renderData.altAngleBTextX);
+    altAngleBText.setAttribute("y", renderData.altAngleBTextY);
+    altAngleBText.textContent = `${renderData.angleB}°`;
+    altAngleCText.setAttribute("x", renderData.altAngleCTextX);
+    altAngleCText.setAttribute("y", renderData.altAngleCTextY);
+    altAngleCText.textContent = `${renderData.angleC}°`;
+
+    rearrangedAnglesGroup.setAttribute("visibility", renderData.rearrangedVisibility);
+    rearrangedAngleAArc.setAttribute("d", renderData.rearranged_angleA_arc_d);
+    rearrangedAngleBArc.setAttribute("d", renderData.rearranged_angleB_arc_d);
+    rearrangedAngleCArc.setAttribute("d", renderData.rearranged_angleC_arc_d);
+
+    labelA.setAttribute("x", renderData.labelA_x);
+    labelA.setAttribute("y", renderData.labelA_y);
+    labelB.setAttribute("x", renderData.labelB_x);
+    labelB.setAttribute("y", renderData.labelB_y);
+    labelC.setAttribute("x", renderData.labelC_x);
+    labelC.setAttribute("y", renderData.labelC_y);
+    angleAText.setAttribute("x", renderData.angleATextX);
+    angleAText.setAttribute("y", renderData.angleATextY);
+    angleAText.textContent = `${renderData.angleA}°`;
+    angleBText.setAttribute("x", renderData.angleBTextX);
+    angleBText.setAttribute("y", renderData.angleBTextY);
+    angleBText.textContent = `${renderData.angleB}°`;
+    angleCText.setAttribute("x", renderData.angleCTextX);
+    angleCText.setAttribute("y", renderData.angleCTextY);
+    angleCText.textContent = `${renderData.angleC}°`;
+
+    // Update metrics display
+    metricAngleA.textContent = `Angle A: ${renderData.angleA}°`;
+    metricAngleB.textContent = `Angle B: ${renderData.angleB}°`;
+    metricAngleC.textContent = `Angle C: ${renderData.angleC}°`;
+    metricAngleSum.textContent = `Angle Sum: ${renderData.angleSum}°`;
+  }
+  
+  // Setup interactions (only for experiment panel)
+  if (isInteractive) {
+    const svgViewBox = svg.viewBox.baseVal;
+
+    function getSVGCoords(clientX, clientY) {
+      const svgRect = svg.getBoundingClientRect();
+      const scaleX = svgViewBox.width / svgRect.width;
+      const scaleY = svgViewBox.height / svgRect.height;
+      const x = (clientX - svgRect.left) * scaleX;
+      const y = (clientY - svgRect.top) * scaleY;
+      return { x, y };
+    }
+
+    let dragging = false;
+    let activeVertex = null;
+    let startX, startY;
+
+    const dragMinX = 50, dragMaxX = 950;
+    const dragMinY = 50, dragMaxY = 550;
+
+    function setupDrag(handleId, paramX, paramY) {
+      const dragTarget = c.querySelector(`#${containerId}-${handleId}_drag_target`);
+      const hoverHint = c.querySelector(`#${containerId}-${handleId}-hover`);
+
+      dragTarget.onpointerdown = e => {
+        dragging = true;
+        activeVertex = { paramX, paramY };
+        const svgCoords = getSVGCoords(e.clientX, e.clientY);
+        startX = svgCoords.x;
+        startY = svgCoords.y;
+        if (hoverHint) hoverHint.style.display = "none";
+        dragTarget.setPointerCapture(e.pointerId);
+      };
+
+      dragTarget.onpointermove = e => {
+        if (!dragging || activeVertex === null) return;
+        const svgCoords = getSVGCoords(e.clientX, e.clientY);
+        const dx = svgCoords.x - startX;
+        const dy = svgCoords.y - startY;
+
+        state[activeVertex.paramX] = Math.min(dragMaxX, Math.max(dragMinX, state[activeVertex.paramX] + dx));
+        state[activeVertex.paramY] = Math.min(dragMaxY, Math.max(dragMinY, state[activeVertex.paramY] + dy));
+
+        startX = svgCoords.x;
+        startY = svgCoords.y;
+        render();
+      };
+
+      dragTarget.onpointerup = () => {
+        dragging = false;
+        activeVertex = null;
+      };
+      dragTarget.onpointerleave = () => {
+        dragging = false;
+        activeVertex = null;
+      };
+    }
+
+    setupDrag("vertexA_handle", "vertexA_x", "vertexA_y");
+    setupDrag("vertexB_handle", "vertexB_x", "vertexB_y");
+    setupDrag("vertexC_handle", "vertexC_x", "vertexC_y");
+    
+    // Control panel toggle
+    c.querySelector(".control-toggle").onclick = () => {
+      c.querySelector(".control-overlay").classList.toggle("open");
+    };
+    
+    // Auto-open controls if autoStart parameter is present
+    if (getUrlParam('autoStart', false)) {
+      // Initial state is already set from URL params
+    }
+    
+    // Toggle handler for show_proof_lines
+    const showProofLinesToggle = c.querySelector(`#${containerId}-toggle_show_proof_lines`);
+    if (showProofLinesToggle) {
+      showProofLinesToggle.onchange = (e) => {
+        state.show_proof_lines = e.target.checked;
+        render();
+      };
+    }
+    
+    // Submit button closes overlay
+    c.querySelector(".submit-btn").onclick = () => {
+      c.querySelector(".control-overlay").classList.remove("open");
+    };
+  }
+  
+  render();
+}
+
+createSimulation("ref", false);
+createSimulation("exp", true);
+</script>
+</body>
+</html>

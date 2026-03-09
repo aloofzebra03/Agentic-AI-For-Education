@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#dc2626">
+<title>Brackets & Sign Rules</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#dc2626 0%,#f59e0b 100%);min-height:100vh;-webkit-font-smoothing:antialiased}
+#app{max-width:420px;margin:auto;padding:10px;padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.header{text-align:center;color:#fff;padding:12px}
+.header h1{font-size:18px;font-weight:700;margin-bottom:4px}
+.header p{font-size:12px;opacity:.9}
+.sim-card{background:#fff;border-radius:14px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.15);margin-bottom:12px}
+.mode-tabs{display:flex;gap:6px;margin-bottom:12px}
+.mode-tab{flex:1;padding:10px 6px;border:2px solid #e0e0e0;border-radius:8px;background:#fafafa;font-size:11px;font-weight:600;text-align:center;cursor:pointer}
+.mode-tab.active{border-color:#dc2626;background:#fef2f2;color:#991b1b}
+/* Expression box */
+.expr-box{background:linear-gradient(135deg,#1c1917,#292524);border-radius:12px;padding:16px 10px;text-align:center;margin-bottom:10px;font-family:'Courier New',monospace}
+.expr-line{font-size:18px;font-weight:700;color:#fff;margin:6px 0;letter-spacing:1px}
+.expr-label{font-size:10px;color:rgba(255,255,255,.5);margin-bottom:4px}
+.arrow-down{text-align:center;font-size:20px;color:#dc2626;margin:4px 0}
+/* Badges */
+.rule-badge{display:inline-block;padding:8px 14px;border-radius:16px;font-size:11px;font-weight:600;margin:6px 0}
+.rule-badge.flip{background:#fef3c7;color:#92400e}
+.rule-badge.keep{background:#dcfce7;color:#166534}
+/* Result */
+.result-panel{background:linear-gradient(135deg,#fef2f2,#fecaca);border-radius:12px;padding:14px;text-align:center;border:2px solid #f87171;margin:10px 0}
+.result-label{font-size:11px;color:#991b1b;font-weight:600}
+.result-value{font-size:24px;font-weight:800;color:#7f1d1d;margin:4px 0}
+/* Steps */
+.step-card{background:#fef2f2;border-radius:10px;padding:10px;margin-bottom:8px;border-left:4px solid #dc2626;font-size:12px;line-height:1.6;color:#475569}
+.step-card b{color:#dc2626}
+.step-num{display:inline-block;width:20px;height:20px;border-radius:50%;background:#dc2626;color:#fff;font-size:10px;font-weight:700;text-align:center;line-height:20px;margin-right:6px}
+/* Controls */
+.slider-group{margin-bottom:10px}
+.slider-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px}
+.slider-label .name{color:#555}
+.slider-label .val{font-weight:700;color:#dc2626}
+input[type="range"]{width:100%;height:6px;border-radius:3px;background:#e5e7eb;-webkit-appearance:none;outline:none}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#dc2626;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.2);cursor:pointer}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.preset-btn{padding:6px 10px;border-radius:16px;border:2px solid #fecaca;background:#fff;font-size:10px;font-weight:600;cursor:pointer;color:#991b1b;font-family:'Courier New',monospace}
+.preset-btn:active{transform:scale(.95)}
+/* Quiz */
+.quiz-q{font-size:14px;font-weight:700;color:#1e293b;text-align:center;padding:14px;background:#fef2f2;border-radius:10px;margin-bottom:10px;line-height:1.4;font-family:'Courier New',monospace}
+.quiz-q .bracket-expr{font-size:18px;display:block;margin:6px 0;color:#dc2626}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.quiz-opt{padding:12px 14px;border-radius:10px;border:2px solid #e5e7eb;font-size:13px;font-weight:600;cursor:pointer;background:#fff;text-align:center;font-family:'Courier New',monospace;transition:all .15s}
+.quiz-opt:active{transform:scale(.97)}
+.quiz-opt.correct{border-color:#16a34a;background:#dcfce7;color:#166534}
+.quiz-opt.wrong{border-color:#dc2626;background:#fef2f2;color:#991b1b}
+.feedback-box{text-align:center;font-size:12px;padding:10px;border-radius:8px;min-height:20px;margin-bottom:8px}
+.next-btn{display:block;margin:0 auto;padding:12px 28px;border-radius:10px;border:none;background:linear-gradient(135deg,#dc2626,#f59e0b);color:#fff;font-weight:600;font-size:13px;cursor:pointer}
+.next-btn:active{transform:scale(.97)}
+.score-bar{text-align:center;font-size:12px;font-weight:600;color:#555;margin-bottom:10px}
+.score-bar b{color:#dc2626}
+/* Insight */
+.insight-box{background:linear-gradient(135deg,#fef2f2,#fecaca);border-radius:10px;padding:12px;margin-top:12px;border-left:4px solid #dc2626;font-size:12px;line-height:1.5}
+.insight-title{font-weight:700;color:#991b1b;margin-bottom:4px}
+/* Help */
+.help-btn{position:fixed;bottom:20px;right:20px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#dc2626,#f59e0b);color:#fff;border:3px solid #fff;box-shadow:0 4px 15px rgba(220,38,38,.4);font-size:20px;font-weight:700;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center}
+.help-btn:active{transform:scale(.9)}
+.help-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.help-overlay.open{display:flex}
+.help-panel{background:#fff;border-radius:20px 20px 0 0;max-width:420px;width:100%;max-height:75vh;overflow-y:auto;padding:20px 16px env(safe-area-inset-bottom);animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.help-close{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.help-close h2{font-size:16px;font-weight:700;color:#333}
+.help-close button{width:32px;height:32px;border-radius:50%;border:none;background:#f1f5f9;font-size:18px;cursor:pointer;color:#64748b}
+.help-section{margin-bottom:14px}
+.help-section-title{font-size:12px;font-weight:700;color:#dc2626;margin-bottom:6px}
+.help-step{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:12px;line-height:1.5;color:#475569}
+.help-step:last-child{border-bottom:none}
+.help-step-num{width:22px;height:22px;border-radius:50%;background:#dc2626;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.help-try{background:#fef2f2;border-radius:8px;padding:8px 10px;font-size:11px;color:#991b1b;line-height:1.5;margin-top:4px}
+.help-try b{color:#7f1d1d}
+.help-key{background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:8px;padding:8px 10px;font-size:11px;color:#92400e;line-height:1.5;margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="header">
+  <h1>Brackets & Sign Rules</h1>
+  <p>Learn and practice bracket removal</p>
+</div>
+<div class="sim-card" id="sim"></div>
+<div class="insight-box">
+  <div class="insight-title">The Sign Rule</div>
+  <b>Minus before bracket</b> → every sign inside <b>flips</b>: + becomes −, − becomes +.<br>
+  <b>Plus before bracket</b> → signs <b>stay the same</b>, just remove the brackets.
+</div>
+
+<button class="help-btn" id="helpBtn">?</button>
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-panel">
+    <div class="help-close"><h2>How to Use This Simulation</h2><button id="helpClose">&times;</button></div>
+    <div class="help-section">
+      <div class="help-section-title">What To Do</div>
+      <div class="help-step"><span class="help-step-num">1</span><span>In <b>Learn mode</b>, browse examples showing bracket removal step by step.</span></div>
+      <div class="help-step"><span class="help-step-num">2</span><span>In <b>Quiz mode</b>, you're given an expression with brackets. Pick the correct version without brackets.</span></div>
+      <div class="help-step"><span class="help-step-num">3</span><span>Check if there's a <b>minus</b> or <b>plus</b> before the bracket — this tells you whether signs flip.</span></div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">Try This</div>
+      <div class="help-try"><b>500 − (250 − 100)</b>: Minus before bracket → +250 becomes −250, but −100 becomes +100. Answer: 500 − 250 + 100 = 350.</div>
+      <div class="help-try"><b>28 + (35 − 10)</b>: Plus before bracket → nothing changes. Answer: 28 + 35 − 10 = 53.</div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">Key Concept</div>
+      <div class="help-key"><b>Subtracting a sum</b> = subtract each part. <b>Subtracting a difference</b> = subtract the first, but <b>add back</b> the second (you subtracted too much!).</div>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+document.getElementById('helpBtn').onclick=()=>document.getElementById('helpOverlay').classList.add('open');
+document.getElementById('helpClose').onclick=()=>document.getElementById('helpOverlay').classList.remove('open');
+document.getElementById('helpOverlay').onclick=(e)=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open')};
+
+const PROBLEMS=[
+  {with:"200 − (40 + 3)",without:"200 − 40 − 3",val:157,rule:"flip",steps:["Minus before bracket: signs flip","+ 40 → − 40, + 3 → − 3","200 − 40 − 3 = 157"]},
+  {with:"500 − (250 − 100)",without:"500 − 250 + 100",val:350,rule:"flip",steps:["Minus before bracket: signs flip","+ 250 → − 250, − 100 → + 100","500 − 250 + 100 = 350"]},
+  {with:"100 − (15 + 56)",without:"100 − 15 − 56",val:29,rule:"flip",steps:["Irfan's change: minus before bracket","+ 15 → − 15, + 56 → − 56","100 − 15 − 56 = 29"]},
+  {with:"28 + (35 − 10)",without:"28 + 35 − 10",val:53,rule:"keep",steps:["Plus before bracket: signs stay","+ 35 stays + 35, − 10 stays − 10","28 + 35 − 10 = 53"]},
+  {with:"24 + (6 − 4)",without:"24 + 6 − 4",val:26,rule:"keep",steps:["Plus before bracket: signs stay","+ 6 stays, − 4 stays","24 + 6 − 4 = 26"]},
+  {with:"24 − (6 + 4)",without:"24 − 6 − 4",val:14,rule:"flip",steps:["Minus before bracket: signs flip","+ 6 → − 6, + 4 → − 4","24 − 6 − 4 = 14"]},
+  {with:"27 − (8 + 3)",without:"27 − 8 − 3",val:16,rule:"flip",steps:["Minus before bracket: signs flip","+ 8 → − 8, + 3 → − 3","27 − 8 − 3 = 16"]},
+  {with:"27 − (8 − 3)",without:"27 − 8 + 3",val:22,rule:"flip",steps:["Minus before bracket: signs flip","+ 8 → − 8, − 3 → + 3","27 − 8 + 3 = 22"]},
+  {with:"14 − (12 − 10)",without:"14 − 12 + 10",val:12,rule:"flip",steps:["Minus before bracket: signs flip","+ 12 → − 12, − 10 → + 10","14 − 12 + 10 = 12"]},
+  {with:"14 − (−12 − 10)",without:"14 + 12 + 10",val:36,rule:"flip",steps:["Minus before bracket: signs flip","− 12 → + 12, − 10 → + 10","14 + 12 + 10 = 36"]}
+];
+
+// Quiz questions: given expression with brackets, pick correct bracket-removed form
+const QUIZ=[
+  {q:"34 − (9 + 12)",ans:"34 − 9 − 12",wrong:["34 − 9 + 12","34 + 9 − 12","34 + 9 + 12"],val:13,explain:"Minus before bracket → both signs flip: +9→−9, +12→−12"},
+  {q:"56 − (14 − 8)",ans:"56 − 14 + 8",wrong:["56 − 14 − 8","56 + 14 − 8","56 + 14 + 8"],val:50,explain:"Minus before bracket → +14→−14, −8→+8"},
+  {q:"45 + (20 − 7)",ans:"45 + 20 − 7",wrong:["45 − 20 + 7","45 − 20 − 7","45 + 20 + 7"],val:58,explain:"Plus before bracket → signs stay the same"},
+  {q:"80 − (30 + 25)",ans:"80 − 30 − 25",wrong:["80 − 30 + 25","80 + 30 − 25","80 + 30 + 25"],val:25,explain:"Minus before bracket → +30→−30, +25→−25"},
+  {q:"100 − (60 − 15)",ans:"100 − 60 + 15",wrong:["100 − 60 − 15","100 + 60 − 15","100 + 60 + 15"],val:55,explain:"Minus before bracket → +60→−60, −15→+15"},
+  {q:"50 + (18 + 7)",ans:"50 + 18 + 7",wrong:["50 − 18 − 7","50 − 18 + 7","50 + 18 − 7"],val:75,explain:"Plus before bracket → signs stay the same"},
+  {q:"90 − (−10 + 30)",ans:"90 + 10 − 30",wrong:["90 − 10 − 30","90 − 10 + 30","90 + 10 + 30"],val:70,explain:"Minus before bracket → −10→+10, +30→−30"},
+  {q:"73 − (14 + 1)",ans:"73 − 14 − 1",wrong:["73 − 14 + 1","73 + 14 − 1","73 + 14 + 1"],val:58,explain:"Minus before bracket → +14→−14, +1→−1"},
+  {q:"73 − (14 − 1)",ans:"73 − 14 + 1",wrong:["73 − 14 − 1","73 + 14 − 1","73 + 14 + 1"],val:60,explain:"Minus before bracket → +14→−14, −1→+1"},
+  {q:"−22 − (12 + 10) + 22",ans:"−22 − 12 − 10 + 22",wrong:["−22 − 12 + 10 + 22","−22 + 12 − 10 + 22","−22 + 12 + 10 + 22"],val:-22,explain:"Minus before bracket → +12→−12, +10→−10. The +22 outside is unaffected."}
+];
+
+const c=document.getElementById("sim");
+let mode="learn",pIdx=0,qIdx=0,score=0,total=0,answered=false;
+
+// URL Parameter Support
+function getURLParams() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    mode: params.get('mode') || 'learn',
+    problemIndex: parseInt(params.get('problemIndex') || '0')
+  };
+}
+
+function initFromURL() {
+  const params = getURLParams();
+  
+  // Validate and apply mode
+  if (params.mode === 'quiz') {
+    mode = 'quiz';
+  } else {
+    mode = 'learn';
+  }
+  
+  // Validate and apply problem index
+  if (params.problemIndex >= 0 && params.problemIndex < PROBLEMS.length) {
+    pIdx = params.problemIndex;
+  }
+  
+  console.log('Initialized from URL:', { mode, pIdx });
+}
+
+// PostMessage Communication with Streamlit
+function sendParametersToParent() {
+  const params = {
+    mode: mode,
+    problemIndex: pIdx
+  };
+  
+  // Send to parent (Streamlit)
+  if (window.parent !== window) {
+    window.parent.postMessage({
+      type: 'simulation-update',
+      simulationKey: 'brackets_signs',
+      parameters: params
+    }, '*');
+  }
+}
+
+// Listen for messages from Streamlit
+window.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'update-parameters') {
+    const params = event.data.parameters;
+    
+    if (params.mode !== undefined) {
+      if (params.mode === 'quiz') {
+        mode = 'quiz';
+        qIdx = 0;
+        score = 0;
+        total = 0;
+        renderQuiz();
+      } else {
+        mode = 'learn';
+        renderLearn();
+      }
+    }
+    
+    if (params.problemIndex !== undefined && mode === 'learn') {
+      pIdx = Math.max(0, Math.min(PROBLEMS.length - 1, parseInt(params.problemIndex)));
+      renderLearn();
+    }
+  }
+});
+
+function shuffle(arr){let a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+function renderLearn(){
+  const p=PROBLEMS[pIdx];
+  const ruleBadge=p.rule==="flip"?`<div class="rule-badge flip">− before bracket → signs FLIP</div>`:`<div class="rule-badge keep">+ before bracket → signs STAY</div>`;
+  let stepsHtml=p.steps.map((s,i)=>`<div class="step-card"><span class="step-num">${i+1}</span>${s}</div>`).join("");
+  let presetsHtml=PROBLEMS.map((pr,i)=>`<button class="preset-btn${i===pIdx?" active":""}" data-i="${i}">${pr.with}</button>`).join("");
+
+  c.innerHTML=`
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-m="learn">Learn</button>
+    <button class="mode-tab" data-m="quiz">Quiz</button>
+  </div>
+  <div class="expr-box">
+    <div class="expr-label">With brackets</div>
+    <div class="expr-line">${p.with}</div>
+    <div class="arrow-down">↓ remove brackets ↓</div>
+    <div class="expr-label">Without brackets</div>
+    <div class="expr-line">${p.without}</div>
+  </div>
+  <div style="text-align:center">${ruleBadge}</div>
+  ${stepsHtml}
+  <div class="result-panel"><div class="result-label">Value (both forms)</div><div class="result-value">${p.val}</div></div>
+  <div class="slider-group"><div class="slider-label"><span class="name">Expression</span><span class="val">${pIdx+1} of ${PROBLEMS.length}</span></div><input type="range" id="prob-sl" min="0" max="${PROBLEMS.length-1}" step="1" value="${pIdx}"></div>
+  <div class="presets">${presetsHtml}</div>`;
+
+  c.querySelector("#prob-sl").oninput=function(){pIdx=parseInt(this.value);renderLearn();sendParametersToParent()};
+  c.querySelectorAll(".preset-btn").forEach(b=>b.onclick=()=>{pIdx=parseInt(b.dataset.i);renderLearn();sendParametersToParent()});
+  c.querySelectorAll(".mode-tab").forEach(b=>b.onclick=()=>{if(b.dataset.m==="quiz"){mode="quiz";qIdx=0;score=0;total=0;renderQuiz();sendParametersToParent()}});
+  
+  // Send initial parameters
+  sendParametersToParent();
+}
+
+function renderQuiz(){
+  if(qIdx>=QUIZ.length)qIdx=0;
+  const q=QUIZ[qIdx];
+  const opts=shuffle([q.ans,...q.wrong]);
+
+  c.innerHTML=`
+  <div class="mode-tabs">
+    <button class="mode-tab" data-m="learn">Learn</button>
+    <button class="mode-tab active" data-m="quiz">Quiz</button>
+  </div>
+  <div class="score-bar">Score: <b>${score}/${total}</b> &nbsp; Question <b>${qIdx+1}/${QUIZ.length}</b></div>
+  <div class="quiz-q">Remove the brackets:<span class="bracket-expr">${q.q}</span>Which expression is equal?</div>
+  <div class="quiz-opts" id="qopts">${opts.map(o=>`<button class="quiz-opt" data-v="${o}">${o}</button>`).join("")}</div>
+  <div class="feedback-box" id="fb"></div>
+  <button class="next-btn" id="nxt" style="display:none">Next Question</button>`;
+
+  answered=false;
+  c.querySelector("#qopts").addEventListener("click",e=>{
+    const b=e.target.closest(".quiz-opt");if(!b||answered)return;answered=true;total++;
+    if(b.dataset.v===q.ans){
+      b.classList.add("correct");score++;
+      c.querySelector("#fb").innerHTML=`<div style="background:#dcfce7;color:#166534;padding:10px;border-radius:8px"><b>Correct!</b> = ${q.val}. ${q.explain}</div>`;
+    } else {
+      b.classList.add("wrong");
+      c.querySelectorAll(".quiz-opt").forEach(x=>{if(x.dataset.v===q.ans)x.classList.add("correct")});
+      c.querySelector("#fb").innerHTML=`<div style="background:#fef2f2;color:#991b1b;padding:10px;border-radius:8px"><b>Not quite.</b> ${q.explain}. Value = ${q.val}</div>`;
+    }
+    c.querySelector("#nxt").style.display="block";
+  });
+  c.querySelector("#nxt").onclick=()=>{qIdx++;renderQuiz()};
+  c.querySelectorAll(".mode-tab").forEach(b=>b.onclick=()=>{if(b.dataset.m==="learn"){mode="learn";renderLearn();sendParametersToParent()}});
+  
+  // Send parameters to parent
+  sendParametersToParent();
+}
+
+// Initialize from URL parameters on page load
+initFromURL();
+renderLearn();
+</script>
+</body>
+</html>

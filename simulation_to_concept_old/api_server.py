@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import traceback
 
-from simulation_to_concept.api_models import (
+from api_models import (
     StartSessionRequest,
     StudentResponseRequest,
     SessionResponse,
@@ -21,7 +21,7 @@ from simulation_to_concept.api_models import (
     QuizSubmissionRequest,
     QuizEvaluationResponse
 )
-from simulation_to_concept.api_integration import (
+from api_integration import (
     create_teaching_session,
     process_student_input,
     get_session_info,
@@ -149,8 +149,7 @@ async def start_session(request: StartSessionRequest):
         # Create session
         session_id, response = create_teaching_session(
             simulation_id=request.simulation_id,
-            student_id=request.student_id,
-            language=request.language or "english"
+            student_id=request.student_id
         )
         
         return response

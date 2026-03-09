@@ -152,7 +152,7 @@ def check_thresholds(
     
     Args:
         submitted_params: Parameter values from student
-        thresholds: Dict like {"time_period": 2.0} or {"angleB_min": 89, "angleB_max": 91}
+        thresholds: Dict like {"time_period": 2.0} for perfect thresholds
         conditions: Original conditions list to get operators
         
     Returns:
@@ -167,7 +167,14 @@ def check_thresholds(
         operators[cond["parameter"]] = cond["operator"]
     
     for param_name, threshold_value in thresholds.items():
-        # Handle min/max thresholds (e.g., angleB_min, angleB_max)
+        if param_name not in submitted_params:
+            return False
+        
+        param_value = submitted_params[param_name]
+        # Get operator from conditions, default to ">=" for perfect thresholds
+        operator = operators.get(param_name, ">=")
+        
+        # Handle min/max thresholds (e.g., rotation_angle_min, rotation_angle_max)
         if param_name.endswith("_min"):
             base_param = param_name.replace("_min", "")
             if base_param not in submitted_params:
@@ -181,14 +188,6 @@ def check_thresholds(
             if float(submitted_params[base_param]) > float(threshold_value):
                 return False
         else:
-            # Regular parameter (not _min or _max)
-            if param_name not in submitted_params:
-                return False
-            
-            param_value = submitted_params[param_name]
-            # Get operator from conditions, default to ">=" for perfect thresholds
-            operator = operators.get(param_name, ">=")
-            
             try:
                 if not evaluate_condition(float(param_value), operator, float(threshold_value)):
                     return False

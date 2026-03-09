@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#2980b9">
+<title>Parallel Lines & Transversal</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 10px;
+}
+
+.header h1 { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 11px; opacity: 0.9; }
+
+.main-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+/* Phase Tabs */
+.phase-tabs {
+  display: flex;
+  background: #f0f0f0;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 14px;
+}
+
+.phase-tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+}
+
+.phase-tab.active {
+  background: #3498db;
+  color: white;
+}
+
+/* Diagram Area */
+.diagram-area {
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 14px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+svg { 
+  width: 100%; 
+  height: auto; 
+  display: block;
+}
+
+/* Transversal line - make it look draggable */
+.transversal-line {
+  cursor: grab;
+  transition: stroke-width 0.15s;
+}
+
+.transversal-line:hover,
+.transversal-line.dragging {
+  stroke-width: 6;
+}
+
+.transversal-hitarea {
+  cursor: grab;
+}
+
+/* Angle Display */
+.angle-display {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.angle-pill {
+  background: #f0f0f0;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.angle-pill .label { color: #666; }
+.angle-pill .val { color: #333; margin-left: 4px; }
+
+/* Angles Panel */
+.angles-panel {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.angles-panel h4 {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.angles-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.angle-chip {
+  text-align: center;
+  padding: 6px 4px;
+  background: white;
+  border-radius: 8px;
+  border: 2px solid #eee;
+}
+
+.angle-chip .name {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.angle-chip .value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.angle-chip.red .name { color: #e74c3c; }
+.angle-chip.blue .name { color: #3498db; }
+.angle-chip.green .name { color: #27ae60; }
+.angle-chip.orange .name { color: #f39c12; }
+
+/* Drag hint */
+.drag-hint {
+  text-align: center;
+  padding: 10px;
+  background: linear-gradient(90deg, #f3e8ff, #e8f4ff);
+  border-radius: 8px;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 14px;
+  border: 1px dashed #9b59b6;
+}
+
+/* Relationship Cards */
+.rel-section {
+  margin-bottom: 14px;
+}
+
+.rel-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.rel-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rel-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #3498db;
+  font-size: 12px;
+}
+
+.rel-card .pair { font-weight: 700; color: #2c3e50; min-width: 60px; }
+.rel-card .type { color: #666; flex: 1; }
+.rel-card .result { background: #27ae60; color: white; padding: 3px 8px; border-radius: 4px; font-weight: 600; font-size: 11px; }
+
+/* Quiz Section */
+.quiz-section { display: none; }
+.quiz-section.active { display: block; }
+
+.question-box {
+  background: #3498db;
+  color: white;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.question-num { font-size: 11px; opacity: 0.9; margin-bottom: 6px; }
+.question-text { font-size: 15px; font-weight: 600; }
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.option-btn {
+  padding: 14px;
+  border-radius: 10px;
+  border: 2px solid #e0e0e0;
+  background: white;
+  text-align: left;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+
+.option-btn.correct { border-color: #27ae60; background: #d5f4e6; }
+.option-btn.wrong { border-color: #e74c3c; background: #fce4ec; }
+
+.next-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  background: #27ae60;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: none;
+}
+
+.next-btn.show { display: block; }
+
+.result-banner {
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  border-radius: 10px;
+  color: white;
+  display: none;
+}
+
+.result-banner.show { display: block; }
+.result-banner h3 { font-size: 20px; margin-bottom: 8px; }
+
+/* Tip */
+.tip-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 12px;
+}
+
+.tip-box h4 { font-size: 13px; color: #2980b9; margin-bottom: 8px; }
+.tip-box p { font-size: 11px; color: #555; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>📐 Parallel Lines & Transversal</h1>
+  <p>Drag the purple line to change its angle</p>
+</div>
+
+<div class="main-card">
+  <div class="phase-tabs">
+    <button class="phase-tab active" data-phase="explore">1. Explore</button>
+    <button class="phase-tab" data-phase="quiz">2. Quiz</button>
+  </div>
+  
+  <!-- EXPLORE -->
+  <div id="explorePhase">
+    <div class="diagram-area" id="diagramArea">
+      <svg viewBox="0 0 320 240" id="diagram"></svg>
+    </div>
+    
+    <div class="drag-hint">👆 Drag the purple transversal line to rotate it</div>
+    
+    <div class="angle-display">
+      <div class="angle-pill"><span class="label">Acute:</span><span class="val" id="acuteVal">60°</span></div>
+      <div class="angle-pill"><span class="label">Obtuse:</span><span class="val" id="obtuseVal">120°</span></div>
+    </div>
+    
+    <div class="angles-panel">
+      <h4>All 8 Angles</h4>
+      <div class="angles-grid">
+        <div class="angle-chip red"><div class="name">∠1</div><div class="value" id="v1">60°</div></div>
+        <div class="angle-chip blue"><div class="name">∠2</div><div class="value" id="v2">120°</div></div>
+        <div class="angle-chip green"><div class="name">∠3</div><div class="value" id="v3">120°</div></div>
+        <div class="angle-chip orange"><div class="name">∠4</div><div class="value" id="v4">60°</div></div>
+        <div class="angle-chip red"><div class="name">∠5</div><div class="value" id="v5">60°</div></div>
+        <div class="angle-chip blue"><div class="name">∠6</div><div class="value" id="v6">120°</div></div>
+        <div class="angle-chip green"><div class="name">∠7</div><div class="value" id="v7">120°</div></div>
+        <div class="angle-chip orange"><div class="name">∠8</div><div class="value" id="v8">60°</div></div>
+      </div>
+    </div>
+    
+    <div class="rel-section">
+      <div class="rel-title">Angle Relationships (always hold!):</div>
+      <div class="rel-cards">
+        <div class="rel-card"><span class="pair">∠1 = ∠5</span><span class="type">Corresponding</span><span class="result">Equal</span></div>
+        <div class="rel-card"><span class="pair">∠3 = ∠5</span><span class="type">Alternate interior</span><span class="result">Equal</span></div>
+        <div class="rel-card"><span class="pair">∠3 + ∠6</span><span class="type">Co-interior</span><span class="result">180°</span></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- QUIZ -->
+  <div id="quizPhase" class="quiz-section">
+    <div class="diagram-area">
+      <svg viewBox="0 0 320 240" id="quizDiagram"></svg>
+    </div>
+    
+    <div class="question-box">
+      <div class="question-num">Question <span id="qNum">1</span> of 5</div>
+      <div class="question-text" id="qText"></div>
+    </div>
+    
+    <div class="options-list" id="optionsList"></div>
+    <button class="next-btn" id="nextBtn">Next Question →</button>
+    
+    <div class="result-banner" id="resultBanner">
+      <h3>🎉 Quiz Complete!</h3>
+      <p>Score: <span id="finalScore">0</span>/5</p>
+    </div>
+  </div>
+</div>
+
+<div class="tip-box">
+  <h4>💡 Key Facts</h4>
+  <p><strong>Corresponding:</strong> Same position at each intersection → Equal<br>
+  <strong>Alternate interior:</strong> Opposite sides between lines → Equal<br>
+  <strong>Co-interior:</strong> Same side between lines → Sum = 180°</p>
+</div>
+
+</div>
+
+<script>
+// Parse URL parameters (for agent integration)
+const urlParams = new URLSearchParams(window.location.search);
+
+function getUrlParam(name, defaultValue) {
+  const value = urlParams.get(name);
+  if (value === null) return defaultValue;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  const num = parseFloat(value);
+  return isNaN(num) ? defaultValue : num;
+}
+
+// URL-controllable parameters
+let angle = getUrlParam('angle', 60); // transversal angle (acute angle)
+let isDragging = false;
+let phase = getUrlParam('phase', 'explore'); // 'explore' or 'quiz'
+let highlightPair = getUrlParam('highlightPair', null); // e.g., "1-5" to highlight specific angle pair
+let showRelationships = getUrlParam('showRelationships', true); // show/hide relationship cards
+let lockAngle = getUrlParam('lockAngle', false); // disable dragging for demos
+let quizQ = 0, quizScore = 0;
+
+const LINE1_Y = 70;
+const LINE2_Y = 170;
+const CENTER_X = 160;
+
+function getAngles() {
+  const a = Math.round(angle);  // acute angle
+  const b = 180 - a;            // obtuse angle
+  // Correct mapping for parallel lines:
+  // - Vertically opposite angles are equal: (1,3), (2,4), (5,7), (6,8)
+  // - Corresponding angles are equal: (1,5), (2,6), (3,7), (4,8)
+  // - Alternate interior angles are equal: (3,5), (4,6)
+  // - Co-interior angles sum to 180°: (3,6), (4,5)
+  return { 1: a, 2: b, 3: a, 4: b, 5: a, 6: b, 7: a, 8: b };
+}
+
+function getTransversalPoints() {
+  const rad = angle * Math.PI / 180;
+  // Calculate where transversal intersects the parallel lines
+  // Line goes through center, at the given angle
+  const midY = (LINE1_Y + LINE2_Y) / 2;
+  
+  // Extend line well beyond the parallel lines
+  const length = 150;
+  const dx = length * Math.cos(rad);
+  const dy = length * Math.sin(rad);
+  
+  return {
+    x1: CENTER_X - dx,
+    y1: midY + dy,
+    x2: CENTER_X + dx,
+    y2: midY - dy,
+    int1: { x: CENTER_X, y: LINE1_Y },
+    int2: { x: CENTER_X, y: LINE2_Y }
+  };
+}
+
+function renderDiagram(svgId = 'diagram', interactive = true) {
+  const svg = document.getElementById(svgId);
+  const t = getTransversalPoints();
+  
+  // Check if angle is locked (for demo mode)
+  const isDraggable = interactive && !lockAngle;
+  
+  // Arc indicator (just a small curve to show angle)
+  function arc(cx, cy, startDeg, endDeg, color, angleNum) {
+    const r = 22;
+    const s = startDeg * Math.PI / 180;
+    const e = endDeg * Math.PI / 180;
+    const x1 = cx + r * Math.cos(s);
+    const y1 = cy + r * Math.sin(s);
+    const x2 = cx + r * Math.cos(e);
+    const y2 = cy + r * Math.sin(e);
+    
+    return `<path d="M ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2}" 
+            fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>`;
+  }
+  
+  svg.innerHTML = `
+    <!-- Parallel line 1 -->
+    <line x1="20" y1="${LINE1_Y}" x2="300" y2="${LINE1_Y}" stroke="#2c3e50" stroke-width="3.5" stroke-linecap="round"/>
+    
+    <!-- Parallel line 2 -->
+    <line x1="20" y1="${LINE2_Y}" x2="300" y2="${LINE2_Y}" stroke="#2c3e50" stroke-width="3.5" stroke-linecap="round"/>
+    
+    <!-- Parallel markers -->
+    <path d="M 55 ${LINE1_Y-8} l 5 8 l -5 8" fill="none" stroke="#2c3e50" stroke-width="2"/>
+    <path d="M 62 ${LINE1_Y-8} l 5 8 l -5 8" fill="none" stroke="#2c3e50" stroke-width="2"/>
+    <path d="M 55 ${LINE2_Y-8} l 5 8 l -5 8" fill="none" stroke="#2c3e50" stroke-width="2"/>
+    <path d="M 62 ${LINE2_Y-8} l 5 8 l -5 8" fill="none" stroke="#2c3e50" stroke-width="2"/>
+    
+    <!-- Transversal (the draggable line) -->
+    ${isDraggable ? `
+      <line x1="${t.x1}" y1="${t.y1}" x2="${t.x2}" y2="${t.y2}" 
+            stroke="#8e44ad" stroke-width="14" stroke-linecap="round" 
+            opacity="0" class="transversal-hitarea" id="transversalHit"/>
+    ` : ''}
+    <line x1="${t.x1}" y1="${t.y1}" x2="${t.x2}" y2="${t.y2}" 
+          stroke="#8e44ad" stroke-width="4" stroke-linecap="round" 
+          class="transversal-line ${isDragging ? 'dragging' : ''}" id="transversalLine"/>
+    
+    <!-- Angle arcs at intersection 1 -->
+    ${arc(t.int1.x, t.int1.y, -angle, 0, '#e74c3c', 1)}
+    ${arc(t.int1.x, t.int1.y, 180, 360-angle, '#3498db', 2)}
+    ${arc(t.int1.x, t.int1.y, 180-angle, 180, '#27ae60', 3)}
+    ${arc(t.int1.x, t.int1.y, 0, 180-angle, '#f39c12', 4)}
+    
+    <!-- Angle arcs at intersection 2 -->
+    ${arc(t.int2.x, t.int2.y, -angle, 0, '#e74c3c', 5)}
+    ${arc(t.int2.x, t.int2.y, 180, 360-angle, '#3498db', 6)}
+    ${arc(t.int2.x, t.int2.y, 180-angle, 180, '#27ae60', 7)}
+    ${arc(t.int2.x, t.int2.y, 0, 180-angle, '#f39c12', 8)}
+    
+    <!-- Intersection points -->
+    <circle cx="${t.int1.x}" cy="${t.int1.y}" r="5" fill="#333"/>
+    <circle cx="${t.int2.x}" cy="${t.int2.y}" r="5" fill="#333"/>
+    
+    <!-- Angle labels at intersection 1 -->
+    <text x="${t.int1.x + 30}" y="${t.int1.y - 12}" font-size="14" font-weight="700" fill="#e74c3c">1</text>
+    <text x="${t.int1.x - 40}" y="${t.int1.y - 12}" font-size="14" font-weight="700" fill="#3498db">2</text>
+    <text x="${t.int1.x - 40}" y="${t.int1.y + 24}" font-size="14" font-weight="700" fill="#27ae60">3</text>
+    <text x="${t.int1.x + 30}" y="${t.int1.y + 24}" font-size="14" font-weight="700" fill="#f39c12">4</text>
+    
+    <!-- Angle labels at intersection 2 -->
+    <text x="${t.int2.x + 30}" y="${t.int2.y - 12}" font-size="14" font-weight="700" fill="#e74c3c">5</text>
+    <text x="${t.int2.x - 40}" y="${t.int2.y - 12}" font-size="14" font-weight="700" fill="#3498db">6</text>
+    <text x="${t.int2.x - 40}" y="${t.int2.y + 24}" font-size="14" font-weight="700" fill="#27ae60">7</text>
+    <text x="${t.int2.x + 30}" y="${t.int2.y + 24}" font-size="14" font-weight="700" fill="#f39c12">8</text>
+    
+    <!-- Line labels -->
+    <text x="305" y="${LINE1_Y + 5}" font-size="15" font-weight="600" fill="#2c3e50">l</text>
+    <text x="305" y="${LINE2_Y + 5}" font-size="15" font-weight="600" fill="#2c3e50">m</text>
+    <text x="${t.x2 + 8}" y="${t.y2 - 5}" font-size="15" font-weight="600" fill="#8e44ad">t</text>
+  `;
+}
+
+function updateDisplay() {
+  const angles = getAngles();
+  const acute = Math.min(angles[1], angles[2]);
+  const obtuse = Math.max(angles[1], angles[2]);
+  
+  document.getElementById('acuteVal').textContent = acute + '°';
+  document.getElementById('obtuseVal').textContent = obtuse + '°';
+  
+  for (let i = 1; i <= 8; i++) {
+    document.getElementById('v' + i).textContent = angles[i] + '°';
+  }
+}
+
+// Touch/Mouse handling
+function screenToSVG(clientX, clientY) {
+  const svg = document.getElementById('diagram');
+  const rect = svg.getBoundingClientRect();
+  const vb = svg.viewBox.baseVal;
+  return {
+    x: ((clientX - rect.left) / rect.width) * vb.width,
+    y: ((clientY - rect.top) / rect.height) * vb.height
+  };
+}
+
+function handleStart(e) {
+  // Don't allow dragging if angle is locked
+  if (lockAngle) return;
+  
+  const target = e.target;
+  if (target.id === 'transversalHit' || target.id === 'transversalLine') {
+    isDragging = true;
+    e.preventDefault();
+    document.body.style.cursor = 'grabbing';
+  }
+}
+
+function handleMove(e) {
+  if (!isDragging) return;
+  e.preventDefault();
+  
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  
+  const pt = screenToSVG(clientX, clientY);
+  const midY = (LINE1_Y + LINE2_Y) / 2;
+  
+  // Calculate angle from center point to touch point
+  let newAngle = Math.atan2(midY - pt.y, pt.x - CENTER_X) * 180 / Math.PI;
+  
+  // Normalize to 0-180 range (we only care about the acute angle)
+  if (newAngle < 0) newAngle += 180;
+  if (newAngle > 180) newAngle -= 180;
+  
+  // Clamp to reasonable range
+  newAngle = Math.max(20, Math.min(160, newAngle));
+  
+  angle = newAngle;
+  renderDiagram();
+  updateDisplay();
+}
+
+function handleEnd() {
+  if (isDragging) {
+    isDragging = false;
+    document.body.style.cursor = '';
+    renderDiagram();
+  }
+}
+
+// Quiz
+const quizQuestions = [
+  { q: 'If ∠1 = 70°, what is ∠5?', options: ['70°', '110°', '180°', '90°'], correct: 0, setup: 70 },
+  { q: 'If ∠3 = 120°, what is ∠5?', options: ['60°', '120°', '180°', '90°'], correct: 1, setup: 60 },
+  { q: 'If ∠3 = 80°, what is ∠6?', options: ['80°', '180°', '100°', '90°'], correct: 2, setup: 100 },
+  { q: 'Which are corresponding angles?', options: ['∠3 & ∠5', '∠1 & ∠5', '∠3 & ∠6', '∠2 & ∠5'], correct: 1, setup: 55 },
+  { q: 'Which are co-interior (sum = 180°)?', options: ['∠1 & ∠5', '∠3 & ∠5', '∠4 & ∠5', '∠2 & ∠6'], correct: 2, setup: 65 }
+];
+
+function showQuestion() {
+  const q = quizQuestions[quizQ];
+  angle = q.setup;
+  renderDiagram('quizDiagram', false);
+  
+  document.getElementById('qNum').textContent = quizQ + 1;
+  document.getElementById('qText').textContent = q.q;
+  
+  document.getElementById('optionsList').innerHTML = q.options.map((opt, i) => `
+    <button class="option-btn" data-idx="${i}">${opt}</button>
+  `).join('');
+  
+  document.querySelectorAll('#optionsList .option-btn').forEach(btn => {
+    btn.onclick = () => selectAnswer(parseInt(btn.dataset.idx));
+  });
+  
+  document.getElementById('nextBtn').classList.remove('show');
+}
+
+function selectAnswer(idx) {
+  const q = quizQuestions[quizQ];
+  document.querySelectorAll('#optionsList .option-btn').forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.correct) btn.classList.add('correct');
+    if (i === idx && idx !== q.correct) btn.classList.add('wrong');
+  });
+  
+  if (idx === q.correct) quizScore++;
+  
+  if (quizQ < quizQuestions.length - 1) {
+    document.getElementById('nextBtn').classList.add('show');
+  } else {
+    setTimeout(() => {
+      document.getElementById('finalScore').textContent = quizScore;
+      document.getElementById('resultBanner').classList.add('show');
+    }, 500);
+  }
+}
+
+function switchPhase(newPhase) {
+  phase = newPhase;
+  document.querySelectorAll('.phase-tab').forEach(t => t.classList.toggle('active', t.dataset.phase === phase));
+  document.getElementById('explorePhase').style.display = phase === 'explore' ? 'block' : 'none';
+  document.getElementById('quizPhase').classList.toggle('active', phase === 'quiz');
+  
+  // Hide/show relationship cards based on URL parameter
+  const relSection = document.querySelector('.rel-section');
+  if (relSection) {
+    relSection.style.display = showRelationships ? 'block' : 'none';
+  }
+  
+  // Update drag hint based on lock state
+  const dragHint = document.querySelector('.drag-hint');
+  if (dragHint) {
+    if (lockAngle) {
+      dragHint.textContent = '🔒 Angle locked for demonstration';
+      dragHint.style.borderColor = '#e74c3c';
+      dragHint.style.background = 'linear-gradient(90deg, #ffe8e8, #fff3cd)';
+    } else {
+      dragHint.textContent = '👆 Drag the purple transversal line to rotate it';
+      dragHint.style.borderColor = '#9b59b6';
+      dragHint.style.background = 'linear-gradient(90deg, #f3e8ff, #e8f4ff)';
+    }
+  }
+  
+  if (phase === 'quiz') {
+    quizQ = 0;
+    quizScore = 0;
+    document.getElementById('resultBanner').classList.remove('show');
+    showQuestion();
+  }
+}
+
+// Event listeners
+const area = document.getElementById('diagramArea');
+area.addEventListener('mousedown', handleStart);
+area.addEventListener('touchstart', handleStart, { passive: false });
+document.addEventListener('mousemove', handleMove);
+document.addEventListener('touchmove', handleMove, { passive: false });
+document.addEventListener('mouseup', handleEnd);
+document.addEventListener('touchend', handleEnd);
+
+document.querySelectorAll('.phase-tab').forEach(tab => {
+  tab.onclick = () => switchPhase(tab.dataset.phase);
+});
+
+document.getElementById('nextBtn').onclick = () => { quizQ++; showQuestion(); };
+
+// Init
+renderDiagram();
+updateDisplay();
+
+// Start in the phase specified by URL
+if (phase === 'quiz') {
+  switchPhase('quiz');
+} else {
+  switchPhase('explore');
+}
+
+// Apply initial settings from URL
+document.addEventListener('DOMContentLoaded', () => {
+  switchPhase(phase);
+});
+</script>
+</body>
+</html>

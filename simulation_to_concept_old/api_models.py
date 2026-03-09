@@ -17,23 +17,18 @@ class StartSessionRequest(BaseModel):
     """Request to start a new teaching session"""
     simulation_id: str = Field(
         ..., 
-        description="ID of simulation: 'simple_pendulum', 'simple_pendulum_new', 'earth_rotation_revolution', 'light_shadows', 'time_units', 'speed_race', 'speed_calculator', 'brackets_signs', 'distributive', etc."
+        description="ID of simulation: 'simple_pendulum', 'earth_rotation_revolution', or 'light_shadows'"
     )
     student_id: Optional[str] = Field(
         None, 
         description="Optional student identifier for tracking"
-    )
-    language: Optional[str] = Field(
-        "english",
-        description="Session language: 'english' or 'kannada'. Controls translation of all user-facing text."
     )
     
     class Config:
         json_schema_extra = {
             "example": {
                 "simulation_id": "simple_pendulum",
-                "student_id": "student_12345",
-                "language": "english"
+                "student_id": "student_12345"
             }
         }
 
@@ -58,11 +53,13 @@ class StudentResponseRequest(BaseModel):
 # ═══════════════════════════════════════════════════════════════════════
 
 class ParameterChange(BaseModel):
-    """Details about a parameter change (metadata only, no separate URLs)"""
+    """Details about a parameter change"""
     parameter: str
     before: Any
     after: Any
     reason: str
+    before_url: str
+    after_url: str
 
 
 class SimulationState(BaseModel):
@@ -124,7 +121,6 @@ class SessionResponse(BaseModel):
     concepts: ConceptsState
     teacher_message: TeacherMessage
     learning_state: LearningState
-    language: Optional[str] = "english"
     summary: Optional[Dict[str, Any]] = None
     
     class Config:

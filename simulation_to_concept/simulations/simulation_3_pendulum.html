@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#5c6bc0">
+<title>Simple Pendulum - Interactive</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #5c6bc0 0%, #7986cb 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #5c6bc0;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #3949ab; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.control-group {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.control-group label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #37474f;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.control-group input[type="range"] {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: #e0e0e0;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.control-group input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #5c6bc0;
+  cursor: pointer;
+}
+
+.control-value {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #5c6bc0;
+  margin-top: 5px;
+}
+
+.pendulum-visual {
+  position: relative;
+  height: 300px;
+  background: linear-gradient(180deg, #fafafa 0%, #e0e0e0 100%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.support {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 15px;
+  background: linear-gradient(180deg, #5d4037, #795548);
+  border-radius: 3px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+}
+
+.pivot {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  background: #333;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.pendulum {
+  position: absolute;
+  top: 36px;
+  left: 50%;
+  transform-origin: top center;
+  transition: none;
+}
+
+.string {
+  width: 3px;
+  background: linear-gradient(180deg, #333, #666);
+  margin: 0 auto;
+  border-radius: 2px;
+}
+
+.bob {
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle at 30% 30%, #7986cb, #3949ab);
+  border-radius: 50%;
+  margin: 0 auto;
+  margin-top: -5px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.bob.heavy {
+  width: 50px;
+  height: 50px;
+  background: radial-gradient(circle at 30% 30%, #78909c, #37474f);
+}
+
+.position-markers {
+  position: absolute;
+  bottom: 30px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  font-size: 10px;
+  color: #666;
+}
+
+.mean-position {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 30px;
+  background: #f44336;
+  opacity: 0.5;
+}
+
+.mean-label {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: #f44336;
+  font-weight: 600;
+}
+
+.control-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.control-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.start-btn { background: linear-gradient(135deg, #4caf50, #66bb6a); color: #fff; }
+.stop-btn { background: linear-gradient(135deg, #f44336, #e57373); color: #fff; }
+.reset-btn { background: linear-gradient(135deg, #9e9e9e, #bdbdbd); color: #fff; }
+
+.measurements {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.measurement {
+  text-align: center;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.measurement .label { font-size: 9px; color: #666; }
+.measurement .value { font-size: 16px; font-weight: 700; color: #5c6bc0; margin-top: 4px; }
+.measurement .unit { font-size: 10px; color: #999; }
+
+.formula-box {
+  background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #5c6bc0;
+}
+
+.formula-title { font-size: 12px; font-weight: 700; color: #3949ab; margin-bottom: 8px; }
+.formula { font-size: 14px; font-weight: 600; color: #333; text-align: center; margin: 10px 0; }
+.formula-note { font-size: 10px; color: #666; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🔔 Simple Pendulum</h1>
+  <p>Interactive - adjust length and mass!</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 What is a Simple Pendulum?</div>
+  <div class="concept-text">
+    A simple pendulum is a <strong>bob</strong> (weight) hanging from a <strong>string</strong> attached to a fixed point. When displaced and released, it swings back and forth in a regular pattern called <strong>oscillation</strong>.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="controls">
+    <div class="control-group">
+      <label>📏 String Length</label>
+      <input type="range" id="length-slider" min="50" max="200" value="100" oninput="updateLength(this.value)">
+      <div class="control-value" id="length-value">100 cm</div>
+    </div>
+    <div class="control-group">
+      <label>⚖️ Bob Mass</label>
+      <input type="range" id="mass-slider" min="50" max="200" value="100" oninput="updateMass(this.value)">
+      <div class="control-value" id="mass-value">100 g</div>
+    </div>
+  </div>
+  
+  <div class="pendulum-visual">
+    <div class="support"></div>
+    <div class="pivot"></div>
+    
+    <div class="pendulum" id="pendulum">
+      <div class="string" id="string" style="height: 150px;"></div>
+      <div class="bob" id="bob"></div>
+    </div>
+    
+    <div class="mean-position"></div>
+    <div class="mean-label">Mean Position</div>
+    
+    <div class="position-markers">
+      <span>← Extreme</span>
+      <span>Extreme →</span>
+    </div>
+  </div>
+  
+  <div class="control-buttons">
+    <button class="control-btn start-btn" id="start-btn" onclick="startPendulum()">▶️ Start</button>
+    <button class="control-btn stop-btn" onclick="stopPendulum()">⏹️ Stop</button>
+    <button class="control-btn reset-btn" onclick="resetPendulum()">🔄 Reset</button>
+  </div>
+  
+  <div class="measurements">
+    <div class="measurement">
+      <div class="label">Oscillations</div>
+      <div class="value" id="oscillation-count">0</div>
+      <div class="unit">complete</div>
+    </div>
+    <div class="measurement">
+      <div class="label">Time Period</div>
+      <div class="value" id="time-period">0.00</div>
+      <div class="unit">seconds</div>
+    </div>
+    <div class="measurement">
+      <div class="label">Frequency</div>
+      <div class="value" id="frequency">0.00</div>
+      <div class="unit">Hz</div>
+    </div>
+  </div>
+</div>
+
+<div class="formula-box">
+  <div class="formula-title">📐 Time Period Formula</div>
+  <div class="formula">T = 2π √(L/g)</div>
+  <div class="formula-note">
+    <strong>T</strong> = Time period (seconds)<br>
+    <strong>L</strong> = Length of pendulum (meters)<br>
+    <strong>g</strong> = Acceleration due to gravity (9.8 m/s²)<br><br>
+    ⭐ Notice: <strong>Mass doesn't appear!</strong> Time period depends ONLY on length.
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 Key Discovery</div>
+  <div class="takeaway-text">
+    • Time period <strong>depends on length</strong> - longer = slower<br>
+    • Time period <strong>does NOT depend on mass</strong><br>
+    • This constant period is why pendulums are used in clocks!<br>
+    • Try changing the mass slider - the period stays the same!
+  </div>
+</div>
+
+</div>
+
+<script>
+let isSwinging = false;
+let animationId;
+let startTime;
+let oscillationCount = 0;
+let lastCrossing = 0;
+let currentAngle = 30; // degrees
+let angularVelocity = 0;
+let length = 100; // cm
+let mass = 100; // g
+
+const pendulum = document.getElementById('pendulum');
+const string = document.getElementById('string');
+const bob = document.getElementById('bob');
+const g = 980; // cm/s²
+
+// ═════════════════════════════════════════════════════════════
+// URL PARAMETER PARSING
+// ═════════════════════════════════════════════════════════════
+
+function getURLParams() {
+  const params = new URLSearchParams(window.location.search);
+  const result = {};
+  
+  if (params.has('length')) {
+    const val = parseFloat(params.get('length'));
+    if (!isNaN(val) && val >= 50 && val <= 200) {
+      result.length = val;
+    }
+  }
+  
+  if (params.has('mass')) {
+    const val = parseFloat(params.get('mass'));
+    if (!isNaN(val) && val >= 50 && val <= 200) {
+      result.mass = val;
+    }
+  }
+  
+  return result;
+}
+
+function initFromURL() {
+  const urlParams = getURLParams();
+  
+  if (urlParams.length !== undefined) {
+    length = urlParams.length;
+    document.getElementById('length-slider').value = length;
+    updateLength(length);
+  }
+  
+  if (urlParams.mass !== undefined) {
+    mass = urlParams.mass;
+    document.getElementById('mass-slider').value = mass;
+    updateMass(mass);
+  }
+  
+  console.log('Initialized from URL:', urlParams);
+}
+
+// ═════════════════════════════════════════════════════════════
+// POSTMESSAGE COMMUNICATION (with Streamlit/Parent)
+// ═════════════════════════════════════════════════════════════
+
+function sendParametersToParent() {
+  const params = {
+    type: 'simulationUpdate',
+    simulation: 'simple_pendulum_new',
+    parameters: {
+      length: length,
+      mass: mass
+    }
+  };
+  
+  // Send to parent window (Streamlit)
+  if (window.parent !== window) {
+    window.parent.postMessage(params, '*');
+  }
+  
+  console.log('Sent to parent:', params);
+}
+
+// Listen for parameter updates from parent (Streamlit)
+window.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'updateParameters') {
+    const params = event.data.parameters;
+    
+    if (params.length !== undefined && params.length >= 50 && params.length <= 200) {
+      length = params.length;
+      document.getElementById('length-slider').value = length;
+      updateLength(length);
+    }
+    
+    if (params.mass !== undefined && params.mass >= 50 && params.mass <= 200) {
+      mass = params.mass;
+      document.getElementById('mass-slider').value = mass;
+      updateMass(mass);
+    }
+    
+    console.log('Received parameter update from parent:', params);
+  }
+});
+
+// ═════════════════════════════════════════════════════════════
+// SIMULATION LOGIC
+// ═════════════════════════════════════════════════════════════
+
+function updateLength(value) {
+  length = parseInt(value);
+  document.getElementById('length-value').textContent = `${length} cm`;
+  
+  // Update visual
+  const visualLength = 50 + (length - 50) * 0.67; // Scale for display
+  string.style.height = `${visualLength}px`;
+  
+  // Update calculated time period
+  updateCalculations();
+  
+  // Send update to parent
+  sendParametersToParent();
+}
+
+function updateMass(value) {
+  mass = parseInt(value);
+  document.getElementById('mass-value').textContent = `${mass} g`;
+  
+  // Update bob appearance
+  if (mass > 150) {
+    bob.classList.add('heavy');
+  } else {
+    bob.classList.remove('heavy');
+  }
+  
+  // Time period stays the same! (mass doesn't affect it)
+  updateCalculations();
+  
+  // Send update to parent
+  sendParametersToParent();
+}
+
+function updateCalculations() {
+  // T = 2π√(L/g)
+  const T = 2 * Math.PI * Math.sqrt(length / g);
+  document.getElementById('time-period').textContent = T.toFixed(2);
+  document.getElementById('frequency').textContent = (1 / T).toFixed(2);
+}
+
+function startPendulum() {
+  if (isSwinging) return;
+  
+  isSwinging = true;
+  startTime = Date.now();
+  oscillationCount = 0;
+  lastCrossing = 0;
+  currentAngle = 30;
+  angularVelocity = 0;
+  
+  document.getElementById('start-btn').textContent = '⏸️ Running...';
+  document.getElementById('start-btn').disabled = true;
+  
+  animate();
+}
+
+function animate() {
+  if (!isSwinging) return;
+  
+  // Physics: angular acceleration = -(g/L) * sin(θ)
+  const angularAcceleration = -(g / length) * Math.sin(currentAngle * Math.PI / 180);
+  
+  // Update velocity and angle (simple Euler method)
+  const dt = 0.02; // time step
+  angularVelocity += angularAcceleration * dt;
+  currentAngle += angularVelocity * dt * (180 / Math.PI);
+  
+  // Add small damping
+  angularVelocity *= 0.9995;
+  
+  // Detect zero crossing (oscillation complete when crossing from negative to positive)
+  if (lastCrossing < 0 && currentAngle >= 0) {
+    oscillationCount++;
+    document.getElementById('oscillation-count').textContent = Math.floor(oscillationCount / 2);
+  }
+  lastCrossing = currentAngle;
+  
+  // Update visual
+  pendulum.style.transform = `translateX(-50%) rotate(${currentAngle}deg)`;
+  
+  animationId = requestAnimationFrame(animate);
+}
+
+function stopPendulum() {
+  isSwinging = false;
+  cancelAnimationFrame(animationId);
+  document.getElementById('start-btn').textContent = '▶️ Start';
+  document.getElementById('start-btn').disabled = false;
+}
+
+function resetPendulum() {
+  stopPendulum();
+  currentAngle = 0;
+  oscillationCount = 0;
+  pendulum.style.transform = 'translateX(-50%) rotate(0deg)';
+  document.getElementById('oscillation-count').textContent = '0';
+}
+
+// ═════════════════════════════════════════════════════════════
+// INITIALIZATION
+// ═════════════════════════════════════════════════════════════
+
+// Initialize from URL parameters first
+initFromURL();
+
+// If no URL params, use defaults
+if (window.location.search === '') {
+  updateLength(100);
+  updateMass(100);
+}
+
+// AUTO START: Check if we should auto-click the Start button
+const urlParams = new URLSearchParams(window.location.search);
+const autoStart = urlParams.get('autoStart');
+if (autoStart === 'true' || autoStart === '1') {
+  // Delay auto-start to let user see the parameters first
+  setTimeout(() => {
+    startPendulum();
+  }, 800); // 800ms delay so student sees parameters before simulation starts
+}
+</script>
+</body>
+</html>

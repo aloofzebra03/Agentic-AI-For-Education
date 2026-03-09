@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#9b59b6">
+<title>Angle Sum Property</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 8px 4px;
+  color: #fff;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 12px;
+}
+
+.visual {
+  position: relative;
+  height: 42vh;
+  min-height: 300px;
+  background: linear-gradient(145deg, #f3e5f5 0%, #e1bee7 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  touch-action: none;
+}
+
+svg { width: 100%; height: 100%; display: block; }
+
+.static-hint {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  color: #9b59b6;
+  font-weight: 500;
+  z-index: 10;
+}
+
+.sum-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  text-align: center;
+  z-index: 10;
+}
+
+.sum-badge .label { font-size: 10px; opacity: 0.9; }
+.sum-badge .value { font-size: 24px; font-weight: 700; }
+
+.metrics {
+  background: #f3e5f5;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.angles-display {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.angle-box {
+  flex: 1;
+  padding: 12px 8px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.angle-box.a { background: #e74c3c20; }
+.angle-box.b { background: #3498db20; }
+.angle-box.c { background: #27ae6020; }
+
+.angle-box .label { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+.angle-box.a .label { color: #c0392b; }
+.angle-box.b .label { color: #2980b9; }
+.angle-box.c .label { color: #27ae60; }
+
+.angle-box .value { font-size: 20px; font-weight: 700; color: #333; }
+
+.formula-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px;
+  background: white;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.formula-bar .num { color: #333; }
+.formula-bar .op { color: #9b59b6; }
+.formula-bar .result { color: #27ae60; }
+
+.insight-box {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-left: 4px solid #9b59b6;
+}
+
+.insight-title { font-weight: 600; color: #6a1b9a; margin-bottom: 6px; }
+
+.magic-box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 12px;
+  text-align: center;
+}
+
+.magic-box .icon { font-size: 36px; margin-bottom: 8px; }
+.magic-box .text { font-size: 16px; font-weight: 600; color: #9b59b6; }
+.magic-box .subtext { font-size: 11px; color: #666; margin-top: 6px; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e1bee7 0%, #ce93d8 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 12px;
+  display: none;
+}
+
+.takeaway.show { display: block; }
+.takeaway-title { font-weight: 600; color: #6a1b9a; margin-bottom: 6px; }
+
+.triangle-edge { stroke: #333; stroke-width: 3; fill: none; }
+.triangle-fill { fill: #9b59b620; }
+.drag-handle { cursor: grab; }
+.drag-handle:active { cursor: grabbing; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🔺 Angle Sum Property</h1>
+  <p>The angles always add to... what?</p>
+</div>
+
+<div class="section-title">Drag point C and watch the angles</div>
+<div class="sim-card" id="sim"></div>
+
+<div class="magic-box">
+  <div class="icon">✨</div>
+  <div class="text">∠A + ∠B + ∠C = 180° ALWAYS!</div>
+  <div class="subtext">No matter how you change the triangle shape</div>
+</div>
+
+<div class="insight-box">
+  <div class="insight-title">🔑 Why is this useful?</div>
+  If you know <strong>any two angles</strong> of a triangle, you can find the third! Just subtract from 180°. This works for ALL triangles — big, small, thin, wide!
+</div>
+
+<div class="takeaway" id="takeaway">
+  <div class="takeaway-title">💡 What you discovered</div>
+  <span id="takeaway-text"></span>
+</div>
+
+</div>
+
+<script>
+const container = document.getElementById('sim');
+
+// Parse URL parameters for initial configuration
+function getURLParams() {
+  const params = new URLSearchParams(window.location.search);
+  
+  // Check if old coordinate-based parameters are provided (backward compatibility only)
+  const hasCoordinates = params.has('Cx') || params.has('Cy') || params.has('Ax') || params.has('Ay') || params.has('Bx') || params.has('By');
+  
+  if (hasCoordinates) {
+    // Backward compatibility: support old coordinate-based parameters
+    return {
+      useAngles: false,
+      Cx: parseFloat(params.get('Cx')) || 320,
+      Cy: parseFloat(params.get('Cy')) || 250,
+      Ax: parseFloat(params.get('Ax')) || 200,
+      Ay: parseFloat(params.get('Ay')) || 60,
+      Bx: parseFloat(params.get('Bx')) || 80,
+      By: parseFloat(params.get('By')) || 250,
+      autoInteract: params.get('autoInteract') === 'true'
+    };
+  } else {
+    // PRIMARY: Always use angle-based parameters (default and from URL)
+    const angleA = parseFloat(params.get('angleA')) || 60;
+    const angleB = parseFloat(params.get('angleB')) || 60;
+    const angleC = parseFloat(params.get('angleC')) || (180 - angleA - angleB);
+    
+    return {
+      useAngles: true,
+      angleA: angleA,
+      angleB: angleB,
+      angleC: angleC,
+      autoInteract: params.get('autoInteract') === 'true'
+    };
+  }
+}
+
+const urlParams = getURLParams();
+
+// Initialize points based on URL parameters
+let A, B, C, hasInteracted, dragHandlePos;
+
+if (urlParams.useAngles) {
+  // Build triangle from angles (intuitive approach)
+  const result = buildTriangleFromAngles(urlParams.angleA, urlParams.angleB, urlParams.angleC);
+  A = result.A;
+  B = result.B;
+  C = result.C;
+  hasInteracted = urlParams.autoInteract;
+  dragHandlePos = {x: C.x, y: C.y};
+} else {
+  // Use coordinates directly (legacy approach)
+  A = {x: urlParams.Ax, y: urlParams.Ay};
+  B = {x: urlParams.Bx, y: urlParams.By};
+  C = {x: urlParams.Cx, y: urlParams.Cy};
+  hasInteracted = urlParams.autoInteract;
+  dragHandlePos = {x: C.x, y: C.y};
+}
+
+// Build triangle from angle specifications
+function buildTriangleFromAngles(angleA, angleB, angleC) {
+  // Normalize angles to sum to 180
+  const sum = angleA + angleB + angleC;
+  if (Math.abs(sum - 180) > 0.1) {
+    const ratio = 180 / sum;
+    angleA *= ratio;
+    angleB *= ratio;
+    angleC *= ratio;
+  }
+  
+  // Convert to radians
+  const radA = angleA * Math.PI / 180;
+  const radB = angleB * Math.PI / 180;
+  const radC = angleC * Math.PI / 180;
+  
+  // Fixed base for consistency
+  const baseLength = 180;
+  const Ax = 200, Ay = 60;
+  const Bx = 80, By = 250;
+  
+  // Calculate third point using law of sines
+  const sideAB = Math.sqrt((Bx - Ax) ** 2 + (By - Ay) ** 2);
+  const sideBC = sideAB * Math.sin(radA) / Math.sin(radC);
+  
+  // Position C based on angle at B
+  const angleBtoA = Math.atan2(Ay - By, Ax - Bx);
+  const angleBtoC = angleBtoA + radB;
+  
+  const Cx = Bx + sideBC * Math.cos(angleBtoC);
+  const Cy = By + sideBC * Math.sin(angleBtoC);
+  
+  return {
+    A: {x: Ax, y: Ay},
+    B: {x: Bx, y: By},
+    C: {x: Cx, y: Cy}
+  };
+}
+
+function calcAngles() {
+  const ab = Math.sqrt((B.x-A.x)**2 + (B.y-A.y)**2);
+  const bc = Math.sqrt((C.x-B.x)**2 + (C.y-B.y)**2);
+  const ca = Math.sqrt((A.x-C.x)**2 + (A.y-C.y)**2);
+  
+  const angA = Math.acos((ab*ab + ca*ca - bc*bc) / (2*ab*ca)) * 180 / Math.PI;
+  const angB = Math.acos((ab*ab + bc*bc - ca*ca) / (2*ab*bc)) * 180 / Math.PI;
+  const angC = 180 - angA - angB;
+  
+  return {a: angA || 60, b: angB || 60, c: angC || 60};
+}
+
+// Post current state to parent window (for teaching agent integration)
+function postStateToParent() {
+  const ang = calcAngles();
+  const state = {
+    type: 'simulation-state',
+    simulation: 'angle_sum_interactive',
+    parameters: {
+      Cx: Math.round(C.x * 10) / 10,
+      Cy: Math.round(C.y * 10) / 10,
+      Ax: Math.round(A.x * 10) / 10,
+      Ay: Math.round(A.y * 10) / 10,
+      Bx: Math.round(B.x * 10) / 10,
+      By: Math.round(B.y * 10) / 10,
+      angleA: Math.round(ang.a * 10) / 10,
+      angleB: Math.round(ang.b * 10) / 10,
+      angleC: Math.round(ang.c * 10) / 10,
+      angleSum: Math.round((ang.a + ang.b + ang.c) * 10) / 10,
+      hasInteracted: hasInteracted
+    },
+    timestamp: Date.now()
+  };
+  
+  if (window.parent && window.parent !== window) {
+    window.parent.postMessage(state, '*');
+  }
+}
+
+container.innerHTML = `
+<div class="visual" id="visual">
+  <div class="static-hint" id="hint">👆 Drag point C</div>
+  <div class="sum-badge">
+    <div class="label">∠A + ∠B + ∠C</div>
+    <div class="value" id="sumValue">180°</div>
+  </div>
+  <svg viewBox="0 0 400 320" id="svg"></svg>
+</div>
+
+<div class="metrics">
+  <div class="angles-display">
+    <div class="angle-box a">
+      <div class="label">∠A</div>
+      <div class="value" id="angA">60°</div>
+    </div>
+    <div class="angle-box b">
+      <div class="label">∠B</div>
+      <div class="value" id="angB">60°</div>
+    </div>
+    <div class="angle-box c">
+      <div class="label">∠C</div>
+      <div class="value" id="angC">60°</div>
+    </div>
+  </div>
+  <div class="formula-bar">
+    <span class="num" id="f1">60</span>
+    <span class="op">+</span>
+    <span class="num" id="f2">60</span>
+    <span class="op">+</span>
+    <span class="num" id="f3">60</span>
+    <span class="op">=</span>
+    <span class="result" id="f4">180°</span>
+  </div>
+</div>`;
+
+const svg = document.getElementById('svg');
+const visual = document.getElementById('visual');
+
+function arcPath(vertex, p1, p2, radius) {
+  const angle1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+  const angle2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+  
+  let start = angle1, end = angle2;
+  let diff = end - start;
+  if (diff > Math.PI) start += 2 * Math.PI;
+  if (diff < -Math.PI) end += 2 * Math.PI;
+  if (start > end) [start, end] = [end, start];
+  
+  const x1 = vertex.x + radius * Math.cos(start);
+  const y1 = vertex.y + radius * Math.sin(start);
+  const x2 = vertex.x + radius * Math.cos(end);
+  const y2 = vertex.y + radius * Math.sin(end);
+  
+  const largeArc = (end - start) > Math.PI ? 1 : 0;
+  return `M ${vertex.x} ${vertex.y} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+}
+
+function render() {
+  const ang = calcAngles();
+  const sum = ang.a + ang.b + ang.c;
+  
+  // Update handle position
+  dragHandlePos = {x: C.x, y: C.y};
+  
+  // Update displays
+  document.getElementById('angA').textContent = ang.a.toFixed(1) + '°';
+  document.getElementById('angB').textContent = ang.b.toFixed(1) + '°';
+  document.getElementById('angC').textContent = ang.c.toFixed(1) + '°';
+  document.getElementById('sumValue').textContent = sum.toFixed(1) + '°';
+  
+  document.getElementById('f1').textContent = ang.a.toFixed(0);
+  document.getElementById('f2').textContent = ang.b.toFixed(0);
+  document.getElementById('f3').textContent = ang.c.toFixed(0);
+  document.getElementById('f4').textContent = sum.toFixed(0) + '°';
+  
+  const arcR = 28;
+  
+  svg.innerHTML = `
+    <!-- Triangle fill -->
+    <polygon points="${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}" class="triangle-fill"/>
+    
+    <!-- Angle arcs -->
+    <path d="${arcPath(A, B, C, arcR)}" fill="#e74c3c" fill-opacity="0.4" stroke="#e74c3c" stroke-width="2"/>
+    <path d="${arcPath(B, A, C, arcR)}" fill="#3498db" fill-opacity="0.4" stroke="#3498db" stroke-width="2"/>
+    <path d="${arcPath(C, A, B, arcR)}" fill="#27ae60" fill-opacity="0.4" stroke="#27ae60" stroke-width="2"/>
+    
+    <!-- Triangle edges -->
+    <polygon points="${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}" class="triangle-edge"/>
+    
+    <!-- Vertices A and B (fixed) -->
+    <circle cx="${A.x}" cy="${A.y}" r="10" fill="#e74c3c" stroke="white" stroke-width="2"/>
+    <text x="${A.x}" y="${A.y - 18}" text-anchor="middle" font-size="14" fill="#c0392b" font-weight="600">A</text>
+    
+    <circle cx="${B.x}" cy="${B.y}" r="10" fill="#3498db" stroke="white" stroke-width="2"/>
+    <text x="${B.x - 18}" y="${B.y + 5}" text-anchor="middle" font-size="14" fill="#2980b9" font-weight="600">B</text>
+    
+    <!-- Vertex C (draggable) - larger for touch -->
+    <circle cx="${C.x}" cy="${C.y}" r="24" fill="#27ae60" stroke="white" stroke-width="3" class="drag-handle"/>
+    <text x="${C.x}" y="${C.y + 5}" text-anchor="middle" font-size="12" fill="white" font-weight="600" pointer-events="none">C</text>
+  `;
+}
+
+render();
+
+// Convert screen to SVG coordinates
+function screenToSVG(clientX, clientY) {
+  const rect = svg.getBoundingClientRect();
+  return {
+    x: (clientX - rect.left) / rect.width * 400,
+    y: (clientY - rect.top) / rect.height * 320
+  };
+}
+
+function isNearHandle(svgX, svgY) {
+  const dist = Math.hypot(svgX - dragHandlePos.x, svgY - dragHandlePos.y);
+  return dist < 50; // tolerance in SVG units
+}
+
+function updateC(svgX, svgY) {
+  C.x = Math.max(60, Math.min(340, svgX));
+  C.y = Math.max(40, Math.min(280, svgY));
+  render();
+  postStateToParent(); // Send state update to parent
+  
+  if (!hasInteracted) {
+    hasInteracted = true;
+    document.getElementById('hint')?.remove();
+    
+    const takeaway = document.getElementById('takeaway');
+    document.getElementById('takeaway-text').innerHTML = 
+      `No matter where you drag C, the three angles <strong>always add up to 180°</strong>. This is called the <strong>Angle Sum Property</strong> — it works for every triangle!`;
+    takeaway.classList.add('show');
+  }
+}
+
+// Drag handling
+let dragging = false;
+
+// Touch events
+visual.addEventListener('touchstart', (e) => {
+  const touch = e.touches[0];
+  const svgCoords = screenToSVG(touch.clientX, touch.clientY);
+  
+  if (isNearHandle(svgCoords.x, svgCoords.y)) {
+    dragging = true;
+    e.preventDefault();
+  }
+}, {passive: false});
+
+visual.addEventListener('touchmove', (e) => {
+  if (!dragging) return;
+  e.preventDefault();
+  
+  const touch = e.touches[0];
+  const svgCoords = screenToSVG(touch.clientX, touch.clientY);
+  updateC(svgCoords.x, svgCoords.y);
+}, {passive: false});
+
+visual.addEventListener('touchend', () => { dragging = false; });
+visual.addEventListener('touchcancel', () => { dragging = false; });
+
+// Mouse events
+visual.addEventListener('mousedown', (e) => {
+  const svgCoords = screenToSVG(e.clientX, e.clientY);
+  
+  if (isNearHandle(svgCoords.x, svgCoords.y)) {
+    dragging = true;
+    e.preventDefault();
+  }
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!dragging) return;
+  
+  const svgCoords = screenToSVG(e.clientX, e.clientY);
+  updateC(svgCoords.x, svgCoords.y);
+});
+
+document.addEventListener('mouseup', () => { dragging = false; });
+
+// Listen for parameter updates from parent window
+window.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'update-params') {
+    const params = event.data.parameters;
+    
+    // Support angle-based updates (intuitive for students)
+    if (params.angleA !== undefined || params.angleB !== undefined || params.angleC !== undefined) {
+      const angleA = params.angleA !== undefined ? params.angleA : calcAngles().a;
+      const angleB = params.angleB !== undefined ? params.angleB : calcAngles().b;
+      const angleC = params.angleC !== undefined ? params.angleC : calcAngles().c;
+      
+      const result = buildTriangleFromAngles(angleA, angleB, angleC);
+      A = result.A;
+      B = result.B;
+      C = result.C;
+      
+      hasInteracted = true;
+      render();
+      postStateToParent();
+    }
+    // Also support coordinate-based updates (legacy)
+    else if (params.Cx !== undefined || params.Cy !== undefined || 
+             params.Ax !== undefined || params.Ay !== undefined ||
+             params.Bx !== undefined || params.By !== undefined) {
+      if (params.Cx !== undefined) C.x = Math.max(60, Math.min(340, params.Cx));
+      if (params.Cy !== undefined) C.y = Math.max(40, Math.min(280, params.Cy));
+      if (params.Ax !== undefined) A.x = Math.max(50, Math.min(350, params.Ax));
+      if (params.Ay !== undefined) A.y = Math.max(40, Math.min(280, params.Ay));
+      if (params.Bx !== undefined) B.x = Math.max(50, Math.min(350, params.Bx));
+      if (params.By !== undefined) B.y = Math.max(40, Math.min(280, params.By));
+      render();
+      postStateToParent();
+    }
+  }
+});
+
+// Post initial state on load
+postStateToParent();
+</script>
+</body>
+</html>

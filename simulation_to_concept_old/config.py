@@ -6,36 +6,22 @@ Handles LLM setup, environment variables, and constants.
 
 import os
 from dotenv import load_dotenv
-from simulation_to_concept.pathlib import Path
+from pathlib import Path
 from simulation_to_concept.simulations_config import get_simulation, get_simulation_list
+from langchain_google_genai import ChatGoogleGenerativeAI
+from api_tracker_utils.tracker import track_model_call, get_next_available_api_model_pair
 
 # Load environment variables
 ENV_PATH = Path(__file__).parent / ".env"
 load_dotenv(ENV_PATH)
 
 # ═══════════════════════════════════════════════════════════════════════
-# API TRACKER INITIALIZATION
-# ═══════════════════════════════════════════════════════════════════════
-
-# Import API tracker utilities
-from api_tracker_utils.tracker import (
-    get_best_api_key_for_model,
-    track_model_call,
-    get_tracker_stats
-)
-from api_tracker_utils.error import MinuteLimitExhaustedError, DayLimitExhaustedError
-
-# ═══════════════════════════════════════════════════════════════════════
 # LLM CONFIGURATION
 # ═══════════════════════════════════════════════════════════════════════
 
-# Fallback API key (for backward compatibility, but tracker will be used)
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemma-3-27b-it")
 TEMPERATURE = float(os.getenv("TEMPERATURE", "0.7"))
-
-# API Tracker enabled flag
-USE_API_TRACKER = os.getenv("USE_API_TRACKER", "true").lower() == "true"
 
 # ═══════════════════════════════════════════════════════════════════════
 # TEACHING AGENT CONFIGURATION
@@ -88,30 +74,52 @@ SIMULATION_FILE = _current_sim["file"]
 
 def validate_config():
     """Validate that required configuration is present."""
-    if USE_API_TRACKER:
-        # When using tracker, validate that API keys are available
-        try:
-            from api_tracker_utils.tracker import get_available_api_keys
-            keys = get_available_api_keys()
-            print(f"✅ API Tracker enabled: {len(keys)} API keys available")
-        except RuntimeError as e:
-            raise ValueError(f"API Tracker error: {e}")
-    else:
-        # Fallback: validate single API key
-        if not GOOGLE_API_KEY:
-            raise ValueError("GOOGLE_API_KEY is not set in .env file")
-        print(f"✅ Using single API key (tracker disabled)")
-    
-    print(f"✅ Config loaded: Model={GEMINI_MODEL}, MaxExchanges={MAX_EXCHANGES}")
+    print(f"✅ Config loaded: MaxExchanges={MAX_EXCHANGES}")
     print(f"✅ Current Simulation: {TOPIC_TITLE} ({CURRENT_SIMULATION_ID})")
+    print(f"✅ LLM selection handled by api_tracker_utils (GOOGLE_API_KEY_1 ... _7)")
     return True
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# LLM FACTORY (tracker-backed)
+# ═══════════════════════════════════════════════════════════════════════
+
+def get_llm(temperature: float = TEMPERATURE) -> ChatGoogleGenerativeAI:
+    """
+    Get a configured LLM instance using the api_tracker_utils tracker.
+
+    The tracker automatically selects the optimal API key and model
+    from GOOGLE_API_KEY_1 ... GOOGLE_API_KEY_7 based on rate limits
+    and load balancing.
+
+    Args:
+        temperature: Sampling temperature (default from env/config).
+
+    Returns:
+        ChatGoogleGenerativeAI instance ready to call .invoke() on.
+
+    Raises:
+        MinuteLimitExhaustedError: All API-model pairs hit per-minute limit.
+        DayLimitExhaustedError:    All API-model pairs hit daily limit.
+    """
+    selected_api_key, selected_model = get_next_available_api_model_pair()
+    print(f"🔑 [get_llm] Using ...{selected_api_key[-6:]} with model: {selected_model}")
+
+    # Track BEFORE invocation for accurate rate limiting
+    track_model_call(selected_api_key, selected_model)
+
+    return ChatGoogleGenerativeAI(
+        model=selected_model,
+        api_key=selected_api_key,
+        temperature=temperature,
+    )
 
 # ═══════════════════════════════════════════════════════════════════════
 # SIMULATION HOSTING CONFIGURATION
 # ═══════════════════════════════════════════════════════════════════════
 
 # GitHub Pages base URL (set in .env for production, None for local dev)
-GITHUB_PAGES_BASE_URL = os.getenv("GITHUB_PAGES_BASE_URL", None)
+GITHUB_PAGES_BASE_URL = os.getenv("GITHUB_PAGES_BASE_URL", "https://imhv0609.github.io/simulation_to_concept_version3_github")
 
 def get_simulation_base_url(simulation_id: str = None) -> str:
     """
@@ -171,11 +179,6 @@ def build_simulation_url(params: dict, autostart: bool = True, base_url: str = N
         # Get the URL key from parameter info
         info = param_info.get(param_name, {})
         url_key = info.get("url_key", param_name)
-        
-        # Convert Python booleans to lowercase for JavaScript compatibility
-        if isinstance(param_value, bool):
-            param_value = "true" if param_value else "false"
-        
         query_params.append(f"{url_key}={param_value}")
     
     # Add autostart if requested
@@ -184,6 +187,9 @@ def build_simulation_url(params: dict, autostart: bool = True, base_url: str = N
     
     # Construct final URL
     url = f"{base_url}?{'&'.join(query_params)}"
+    print("base url:", base_url)
+    print("params:", query_params)
+    print(f"🔗 Built simulation URL: {url}")
     return url
 
 # Legacy variable for backward compatibility

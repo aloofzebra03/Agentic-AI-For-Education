@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test AngleSumProperty URL Parameters</title>
+</head>
+<body>
+    <h1>Testing URL Parameter Parsing</h1>
+    <div id="results"></div>
+    
+    <script>
+        // Test the same parsing logic as AngleSumProperty.html
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        function getUrlParam(name, defaultValue) {
+            const value = urlParams.get(name);
+            if (value === null) return defaultValue;
+            if (value === 'true') return true;
+            if (value === 'false') return false;
+            const num = parseFloat(value);
+            return isNaN(num) ? defaultValue : num;
+        }
+        
+        const results = {
+            vertexA_x: getUrlParam('vertexA_x', 500),
+            vertexA_y: getUrlParam('vertexA_y', 150),
+            vertexB_x: getUrlParam('vertexB_x', 200),
+            vertexB_y: getUrlParam('vertexB_y', 450),
+            vertexC_x: getUrlParam('vertexC_x', 800),
+            vertexC_y: getUrlParam('vertexC_y', 450),
+            show_proof_lines: getUrlParam('show_proof_lines', false),
+            autoStart: getUrlParam('autoStart', false)
+        };
+        
+        document.getElementById('results').innerHTML = `
+            <h2>Parsed Parameters:</h2>
+            <pre>${JSON.stringify(results, null, 2)}</pre>
+            
+            <h2>Test URL:</h2>
+            <p>Open this page with: <code>?show_proof_lines=true&vertexA_y=300&autoStart=true</code></p>
+            
+            <h2>Expected vs Actual:</h2>
+            <ul>
+                <li>show_proof_lines should be: ${results.show_proof_lines === true ? '✅ true' : '❌ ' + results.show_proof_lines}</li>
+                <li>autoStart should be: ${results.autoStart === true ? '✅ true' : '❌ ' + results.autoStart}</li>
+                <li>vertexA_y should be: ${results.vertexA_y === 300 ? '✅ 300' : '❌ ' + results.vertexA_y}</li>
+            </ul>
+        `;
+    </script>
+</body>
+</html>

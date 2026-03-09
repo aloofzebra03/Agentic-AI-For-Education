@@ -12,23 +12,6 @@ from typing import Dict, Any, Tuple
 
 from simulation_to_concept.config import build_simulation_url, CURRENT_SIMULATION_ID
 from simulation_to_concept.simulations_config import get_simulation, get_simulation_list
-from simulation_to_concept.translation import (
-    translate_api_response,
-    translate_quiz_response,
-    translate_student_input,
-    needs_translation,
-    is_supported_language,
-    SUPPORTED_LANGUAGES,
-    DEFAULT_LANGUAGE
-)
-
-
-# ═══════════════════════════════════════════════════════════════════════
-# SESSION LANGUAGE STORE
-# ═══════════════════════════════════════════════════════════════════════
-# Maps session_id -> language (since language is in graph state, but we
-# need it before reading state in process_student_input)
-_session_languages: dict = {}
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -87,17 +70,25 @@ def format_api_response(thread_id: str, state: Dict[str, Any], simulation_id: st
     # Build current simulation URL with correct simulation_id
     sim_url = build_simulation_url(current_params, autostart=True, simulation_id=simulation_id)
     
-    # Check for parameter changes (metadata only — single simulation URL via html_url)
+    # Check for parameter changes
     param_change = None
     param_history = state.get('parameter_history', [])
     if param_history:
         last_change = param_history[-1]
         
+        # Build before and after URLs with correct simulation_id
+        before_params = current_params.copy()
+        before_params[last_change['parameter']] = last_change['old_value']
+        before_url = build_simulation_url(before_params, autostart=True, simulation_id=simulation_id)
+        after_url = sim_url
+        
         param_change = {
             "parameter": last_change['parameter'],
             "before": last_change['old_value'],
             "after": last_change['new_value'],
-            "reason": last_change.get('reason', 'Parameter adjustment for demonstration')
+            "reason": last_change.get('reason', 'Parameter adjustment for demonstration'),
+            "before_url": before_url,
+            "after_url": after_url
         }
     
     # Format concepts
@@ -183,14 +174,13 @@ def format_api_response(thread_id: str, state: Dict[str, Any], simulation_id: st
 # MAIN API FUNCTIONS
 # ═══════════════════════════════════════════════════════════════════════
 
-def create_teaching_session(simulation_id: str, student_id: str = None, language: str = "english") -> Tuple[str, Dict[str, Any]]:
+def create_teaching_session(simulation_id: str, student_id: str = None) -> Tuple[str, Dict[str, Any]]:
     """
     Create a new teaching session for specified simulation.
     
     Args:
         simulation_id: Which simulation to use
         student_id: Optional student identifier
-        language: Session language ('english' or 'kannada')
         
     Returns:
         Tuple of (session_id, formatted_api_response)
@@ -222,7 +212,6 @@ def create_teaching_session(simulation_id: str, student_id: str = None, language
     print(f"🚀 Creating new teaching session")
     print(f"   Simulation: {simulation_id}")
     print(f"   Topic: {sim_config['title']}")
-    print(f"   Language: {language}")
     if student_id:
         print(f"   Student: {student_id}")
     print(f"{'='*60}")
@@ -237,8 +226,7 @@ def create_teaching_session(simulation_id: str, student_id: str = None, language
     initial_state = create_initial_state(
         topic_description=topic_description,
         initial_params=initial_params.copy(),
-        simulation_id=simulation_id,  # Pass simulation_id for content_loader
-        language=language              # Pass language for translation layer
+        simulation_id=simulation_id  # Pass simulation_id for content_loader
     )
     
     # Start the session - runs until first interrupt
@@ -247,14 +235,8 @@ def create_teaching_session(simulation_id: str, student_id: str = None, language
     print(f"✅ Session created: {thread_id}")
     print(f"📝 Initial message: {state.get('last_teacher_message', '')[:80]}...")
     
-    # Store language for this session
-    _session_languages[thread_id] = language
-    
     # Format for API
     response = format_api_response(thread_id, state, simulation_id)
-    
-    # Translate response if needed
-    response = translate_api_response(response, language)
     
     return thread_id, response
 
@@ -282,13 +264,6 @@ def process_student_input(session_id: str, student_response: str) -> Dict[str, A
     # Get simulation from environment
     simulation_id = os.environ.get('SIMULATION_ID', 'simple_pendulum')
     
-    # Get session language
-    language = _session_languages.get(session_id, DEFAULT_LANGUAGE)
-    
-    # Translate student input to English if needed
-    if needs_translation(language):
-        student_response = translate_student_input(student_response, language)
-    
     # Continue conversation using graph
     state = continue_session(student_response, session_id)
     
@@ -305,9 +280,6 @@ def process_student_input(session_id: str, student_response: str) -> Dict[str, A
     
     # Format for API
     response = format_api_response(session_id, state, simulation_id)
-    
-    # Translate response if needed
-    response = translate_api_response(response, language)
     
     return response
 
@@ -346,10 +318,6 @@ def get_session_info(session_id: str) -> Dict[str, Any]:
     # Format for API
     response = format_api_response(session_id, state, simulation_id)
     
-    # Translate response if needed
-    language = _session_languages.get(session_id, DEFAULT_LANGUAGE)
-    response = translate_api_response(response, language)
-    
     return response
 
 
@@ -359,7 +327,7 @@ def get_session_info(session_id: str) -> Dict[str, Any]:
 
 def get_available_simulations() -> list:
     """Get list of available simulation IDs (just the string IDs)"""
-    from simulation_to_concept.simulations_config import SIMULATIONS
+    from simulations_config import SIMULATIONS
     return list(SIMULATIONS.keys())
 
 
@@ -477,9 +445,5 @@ def submit_quiz_answer(session_id: str, question_id: str, submitted_parameters: 
         "quiz_progress": progress,
         "next_question": next_question
     }
-    
-    # Translate quiz response if needed
-    language = _session_languages.get(session_id, DEFAULT_LANGUAGE)
-    response = translate_quiz_response(response, language)
     
     return response

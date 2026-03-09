@@ -22,36 +22,15 @@ import re
 from typing import Dict, Any
 from datetime import datetime
 
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_core.runnables import RunnableConfig
 
 from simulation_to_concept.config import (
-    GOOGLE_API_KEY, GEMINI_MODEL, TEMPERATURE, USE_API_TRACKER,
-    get_best_api_key_for_model, track_model_call
+    GEMINI_MODEL, TEMPERATURE, CANNOT_DEMONSTRATE,
+    PARAMETER_INFO, TOPIC_TITLE, TOPIC_DESCRIPTION,
+    get_llm
 )
 from simulation_to_concept.state import add_message_to_history
-from simulation_to_concept.simulations_config import get_simulation
 
-
-def get_llm():
-    """Get configured LLM instance with API tracking."""
-    if USE_API_TRACKER:
-        try:
-            # Get best API key for this model from tracker
-            api_key = get_best_api_key_for_model(GEMINI_MODEL)
-            print(f"[TEACHER] Using tracked API key ...{api_key[-6:]} for {GEMINI_MODEL}")
-        except Exception as e:
-            print(f"[TEACHER] Tracker error: {e}, falling back to GOOGLE_API_KEY")
-            api_key = GOOGLE_API_KEY
-    else:
-        api_key = GOOGLE_API_KEY
-    
-    return ChatGoogleGenerativeAI(
-        model=GEMINI_MODEL,
-        google_api_key=api_key,
-        temperature=TEMPERATURE
-    )
 
 
 def is_gemma_model() -> bool:
@@ -59,53 +38,23 @@ def is_gemma_model() -> bool:
     return "gemma" in GEMINI_MODEL.lower()
 
 
-def invoke_llm_with_prompts(llm, system_prompt: str, user_prompt: str, api_key: str = None, metadata: dict = None, parent_config: dict = None):
+def invoke_llm_with_prompts(llm, system_prompt: str, user_prompt: str):
     """
-    Invoke LLM with model-aware message handling, API tracking, and LangSmith metadata.
+    Invoke LLM with model-aware message handling.
     
     Gemma models don't support SystemMessage, so we combine prompts.
     Gemini models support SystemMessage for better results.
-    
-    Args:
-        parent_config: The RunnableConfig from LangGraph node. Must be passed to preserve
-                       tracing callbacks so LangSmith can capture metadata.
     """
-    import langsmith
-    
-    # Build messages based on model type
     if is_gemma_model():
+        # Combine system and user prompt for Gemma
         combined_prompt = f"{system_prompt}\n\n---\n\nNow respond to this:\n\n{user_prompt}"
-        messages = [HumanMessage(content=combined_prompt)]
+        return llm.invoke([HumanMessage(content=combined_prompt)])
     else:
-        messages = [
+        # Use proper system message for Gemini
+        return llm.invoke([
             SystemMessage(content=system_prompt),
             HumanMessage(content=user_prompt)
-        ]
-    
-    # Use langsmith.trace() to create a visible span with our custom metadata.
-    # This ensures metadata (simulation_url, etc.) appears in LangSmith UI
-    # as a child span under the node, with all metadata fields visible.
-    trace_metadata = metadata or {}
-    with langsmith.trace(
-        name="teacher_llm_call",
-        run_type="llm",
-        metadata=trace_metadata,
-        inputs={"system_prompt_length": len(system_prompt), "user_prompt_length": len(user_prompt)},
-    ) as rt:
-        # Also pass parent config to llm.invoke for callback chain continuity
-        config = parent_config or {}
-        response = llm.invoke(messages, config=config)
-        rt.outputs = {"response_length": len(response.content) if response.content else 0}
-    
-    # Track the API call if tracker is enabled
-    if USE_API_TRACKER and api_key:
-        try:
-            track_model_call(api_key, GEMINI_MODEL)
-            print(f"[TEACHER] Tracked API call: ...{api_key[-6:]} + {GEMINI_MODEL}")
-        except Exception as e:
-            print(f"[TEACHER] Warning: Failed to track API call: {e}")
-    
-    return response
+        ])
 
 
 def parse_json_safe(text: str) -> dict:
@@ -162,7 +111,7 @@ def format_conversation_history(history: list, last_n: int = 6) -> str:
     return "\n".join(formatted)
 
 
-def teacher_node(state: Dict[str, Any], config: RunnableConfig) -> Dict[str, Any]:
+def teacher_node(state: Dict[str, Any]) -> Dict[str, Any]:
     """
     Generate a natural, adaptive teacher response.
     
@@ -176,9 +125,6 @@ def teacher_node(state: Dict[str, Any], config: RunnableConfig) -> Dict[str, Any
         - strategy: What teaching strategy to use
         - teacher_mode: encouraging/challenging/simplifying
         - exchange_count: How many exchanges for this concept
-    
-    Args:
-        config: RunnableConfig from LangGraph with tracing callbacks for LangSmith.
         
     Output State:
         - last_teacher_message: The generated response
@@ -190,19 +136,6 @@ def teacher_node(state: Dict[str, Any], config: RunnableConfig) -> Dict[str, Any
     print("\n" + "="*60)
     print("🎓 TEACHER NODE: Generating response")
     print("="*60)
-    
-    # Load simulation config dynamically from state (NOT from cached module imports!)
-    simulation_id = state.get("simulation_id", "simple_pendulum")
-    sim_config = get_simulation(simulation_id)
-    if not sim_config:
-        raise ValueError(f"Unknown simulation: {simulation_id}")
-    
-    TOPIC_TITLE = sim_config["title"]
-    TOPIC_DESCRIPTION = sim_config["description"]
-    CANNOT_DEMONSTRATE = sim_config["cannot_demonstrate"]
-    PARAMETER_INFO = sim_config["parameter_info"]
-    
-    print(f"   🎮 Loaded config for: {TOPIC_TITLE} ({simulation_id})")
     
     # Get current concept
     concepts = state.get("concepts", [])
@@ -236,7 +169,6 @@ def teacher_node(state: Dict[str, Any], config: RunnableConfig) -> Dict[str, Any
     student_requested_param = state.get("student_requested_param", False)
     requested_param = state.get("requested_param", "")
     requested_value = state.get("requested_value", None)
-    student_wants_to_see_simulation = state.get("student_wants_to_see_simulation", False)
     
     print(f"   Concept: {current_concept['title']}")
     print(f"   Strategy: {strategy}")
@@ -246,10 +178,7 @@ def teacher_node(state: Dict[str, Any], config: RunnableConfig) -> Dict[str, Any
     if student_asked_question:
         print(f"   ❓ Student asked: {question_asked}")
     if student_requested_param:
-        if student_wants_to_see_simulation:
-            print(f"   🖥️ Student wants to SEE the simulation")
-        else:
-            print(f"   🎛️ Student requested: {requested_param} = {requested_value}")
+        print(f"   🎛️ Student requested: {requested_param} = {requested_value}")
     if is_factually_wrong:
         print(f"   ❌ Student gave WRONG answer - needs correction")
     if needs_clarification:
@@ -268,22 +197,11 @@ def teacher_node(state: Dict[str, Any], config: RunnableConfig) -> Dict[str, Any
     
     cannot_demonstrate_str = "\n".join([f"- {item}" for item in CANNOT_DEMONSTRATE])
     
-    # Add problem examples if available (for simulations with multiple examples)
-    problem_examples_str = ""
-    if "problem_examples" in sim_config:
-        examples = sim_config["problem_examples"]
-        problem_examples_str = "\n\nAVAILABLE EXAMPLES (problemIndex):\n"
-        for ex in examples:
-            rule_emoji = "➖" if ex["rule"] == "minus" else "➕"
-            problem_examples_str += f"{rule_emoji} {ex['index']}: {ex['expression']} = {ex['result'].split('=')[0].strip()} ({ex['rule'].upper()} before bracket)\n"
-        problem_examples_str += "\n⚠️ CRITICAL: Always check this list to know which problemIndex shows which rule!"
-    
     # Build the teaching prompt
     system_prompt = f"""You are a warm, engaging science teacher named Alex. You're teaching a student about {TOPIC_TITLE} through an interactive simulation.
 
 TOPIC DETAILS:
 {TOPIC_DESCRIPTION}
-{problem_examples_str}
 
 ⚠️ CRITICAL: You MUST respond with ONLY a valid JSON object. No extra text before or after.
 Your response must start with {{ and end with }}.
@@ -381,8 +299,7 @@ PREDICT: What do you think will happen?"
 ```
 """
         else:
-            # Very first concept - just introduce it AND SHOW the simulation
-            suggested_param = current_concept.get('related_params', [None])[0]
+            # Very first concept - just introduce it
             user_prompt = f"""
 CONCEPT TO TEACH:
 Title: {current_concept['title']}
@@ -394,22 +311,17 @@ This is the START of the lesson. The student hasn't said anything yet.
 
 Generate an engaging introduction that:
 1. Introduces what we'll explore
-2. Mentions the current visualization (with parameters: {current_params_str})
-3. Connects to something relatable if possible
-4. Ends with a thought-provoking question OR asks for a prediction with options
-
-⚠️ IMPORTANT: Set suggests_param_change to TRUE so the simulation is VISIBLE from the start!
-You can use the current parameters or make a small adjustment to make it show.
+2. Connects to something relatable if possible
+3. Ends with a thought-provoking question OR asks for a prediction with options
 
 ⚠️ RESPOND WITH ONLY THIS JSON FORMAT (no other text):
 ```json
 {{
-    "teacher_message": "Your warm intro that mentions the visual/simulation...",
-    "suggests_param_change": true,
-    "param_to_change": "{suggested_param}",
-    "new_value": {current_params.get(suggested_param, 0) if suggested_param else 0},
-    "change_reason": "Display initial simulation state",
-    "prediction_question": "What do you notice/expect?"
+    "teacher_message": "Your warm, engaging introduction...",
+    "suggests_param_change": false,
+    "param_to_change": null,
+    "new_value": null,
+    "prediction_question": null
 }}
 ```
 """
@@ -440,39 +352,7 @@ YOUR RESPONSE FORMAT:
         # Build instruction for student's PARAMETER REQUEST
         param_request_instruction = ""
         if student_requested_param and requested_param:
-            if student_wants_to_see_simulation:
-                # Student asked to see/show/display the simulation
-                param_request_instruction =f"""
-🖥️🖥️🖥️ MANDATORY: STUDENT WANTS TO SEE THE SIMULATION 🖥️🖥️🖥️
-The student asked to see, show, or display the simulation.
-
-⚠️ CRITICAL: YOU MUST make this visible to them!
-
-YOU MUST:
-1. ACKNOWLEDGE positively: "Of course!" or "Sure, let me show you!" or "Absolutely!"
-2. DESCRIBE the current simulation state using the CURRENT parameters:
-   {current_params_str}
-3. GUIDE their attention: "Look at..." or "Notice how..." or "Can you see..."
-4. ASK an observation question about what they see
-
-IMPORTANT:
-- Set "suggests_param_change": true (this triggers the visual display)
-- You can choose ANY parameter to "refresh" or use a related param from the concept
-- This makes the simulation visible on their screen!
-
-Example Response:
-{{
-    "teacher_message": "Of course, friend! Right now you're looking at [describe current state with {current_params_str}]. Can you see [ask about a visual element]?",
-    "suggests_param_change": true,
-    "param_to_change": "{list(PARAMETER_INFO.keys())[0] if PARAMETER_INFO else 'parameter'}",
-    "new_value": {current_params.get(list(PARAMETER_INFO.keys())[0] if PARAMETER_INFO else '', 0)},
-    "change_reason": "Display current simulation state",
-    "prediction_question": "What do you observe?"
-}}
-"""
-            else:
-                # Normal parameter change request
-                param_request_instruction = f"""
+            param_request_instruction = f"""
 🎛️🎛️🎛️ MANDATORY: STUDENT REQUESTED PARAMETER CHANGE 🎛️🎛️🎛️
 The student wants to change: {requested_param}
 
@@ -646,66 +526,8 @@ REMEMBER: Output ONLY the JSON object. Start your response with {{ and end with 
 
     llm = get_llm()
     
-    # Get the API key that was used (for tracking)
-    used_api_key = None
-    if USE_API_TRACKER:
-        try:
-            used_api_key = get_best_api_key_for_model(GEMINI_MODEL)
-        except:
-            pass
-    
-    # Build simulation URL for LangSmith metadata
-    # Use the simulation_id from state (already loaded at top of function)
-    # sim_config should already be available from the function scope
-    import os
-    
-    # Build URL with current parameters
-    base_url = sim_config.get("file", "")
-    github_pages_base = os.environ.get("GITHUB_PAGES_BASE_URL", "")
-    if github_pages_base:
-        # Keep the full path including simulations/ directory
-        simulation_url = f"{github_pages_base}/{base_url}"
-    else:
-        simulation_url = base_url
-    
-    # Add parameters to URL
-    param_parts = []
-    for key, value in current_params.items():
-        if value is not None:
-            param_parts.append(f"{key}={value}")
-    
-    if param_parts:
-        simulation_url += "?" + "&".join(param_parts)
-    
-    # Prepare LangSmith metadata
-    langsmith_metadata = {
-        "simulation_url": simulation_url,
-        "simulation_id": simulation_id,
-        "concept": current_concept['title'],
-        "understanding_level": understanding,
-        "strategy": strategy,
-        "teacher_mode": teacher_mode,
-        "exchange_count": exchange_count,
-        "parameters": json.dumps(current_params)
-    }
-    
-    print(f"[TEACHER] 📊 LangSmith metadata: simulation_url={simulation_url}")
-    print(f"[TEACHER] 📊 LangSmith metadata: simulation_id={simulation_id}")
-    
-    # Also try to update the current node run's metadata directly
-    try:
-        from langsmith import get_current_run_tree
-        rt = get_current_run_tree()
-        if rt:
-            rt.metadata = {**(rt.metadata or {}), **langsmith_metadata}
-            print(f"[TEACHER] ✅ Updated current run tree metadata")
-        else:
-            print(f"[TEACHER] ℹ️ No current run tree (metadata will be on child span)")
-    except Exception as e:
-        print(f"[TEACHER] ⚠️ Run tree update: {e}")
-    
     # Use model-aware invocation (handles both Gemma and Gemini)
-    response = invoke_llm_with_prompts(llm, system_prompt, user_prompt, api_key=used_api_key, metadata=langsmith_metadata, parent_config=config)
+    response = invoke_llm_with_prompts(llm, system_prompt, user_prompt)
     
     try:
         result = parse_json_safe(response.content)

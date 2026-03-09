@@ -12,15 +12,15 @@ from typing import Dict, Any
 
 import webbrowser
 
-from simulation_to_concept.config import (
+from config import (
     validate_config, 
     TOPIC_DESCRIPTION, 
     INITIAL_PARAMS,
     MAX_EXCHANGES,
     build_simulation_url
 )
-from simulation_to_concept.state import create_initial_state
-from simulation_to_concept.graph import start_session, continue_session
+from state import create_initial_state
+from graph import start_session, continue_session
 
 
 def print_header():
