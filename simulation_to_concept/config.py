@@ -6,7 +6,7 @@ Handles LLM setup, environment variables, and constants.
 
 import os
 from dotenv import load_dotenv
-from simulation_to_concept.pathlib import Path
+from pathlib import Path
 from simulation_to_concept.simulations_config import get_simulation, get_simulation_list
 
 # Load environment variables

@@ -7,7 +7,7 @@ Handles session management, state synchronization, and response processing.
 
 import sys
 import uuid
-from simulation_to_concept.pathlib import Path
+from pathlib import Path
 from typing import Dict, Any, Optional, Tuple
 
 # Add parent directory to path for backend imports

@@ -9,7 +9,7 @@ FULLY INTEGRATED with the LangGraph backend.
 
 import streamlit as st
 import sys
-from simulation_to_concept.pathlib import Path
+from pathlib import Path
 from datetime import datetime
 
 # Add parent directory to path for backend imports
