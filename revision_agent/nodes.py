@@ -574,7 +574,7 @@ The question should:
 2. Be answerable in 1-2 sentences
 3. Not be the exact same question they failed before
 
-Just ask the question naturally (no need for JSON here, just output the question).
+Just ask the question naturally (no need for JSON here, just output the question).Make sure you keep text to a minimal.
 """
         
         # Add Kannada instruction if needed
