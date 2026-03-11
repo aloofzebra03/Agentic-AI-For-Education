@@ -1,0 +1,83 @@
+{
+"chapter": "Light: Shadows and Reflections",
+"questions": [
+{
+"id": 1,
+"question": "What is the difference between luminous and non-luminous objects? Give one example of each.",
+"expected_answer": "Luminous objects emit their own light (e.g., Sun, firefly, torch). Non-luminous objects do not emit their own light but reflect light from other sources (e.g., Moon, mirror, book).",
+"difficulty": "easy"
+},
+{
+"id": 2,
+"question": "Does the Moon produce its own light? Explain how we are able to see it.",
+"expected_answer": "No, the Moon is a non-luminous object. We see it because it reflects the light emitted by the Sun that falls on it.",
+"difficulty": "easy"
+},
+{
+"id": 3,
+"question": "State the three essential requirements for a shadow to form.",
+"expected_answer": "1) A source of light, 2) an opaque object to block the light, and 3) a screen (like a wall or the ground) for the shadow to form on.",
+"difficulty": "easy"
+},
+{
+"id": 4,
+"question": "How do transparent, translucent, and opaque materials differ in the way they allow light to pass through them?",
+"expected_answer": "Transparent materials let light pass almost completely, translucent materials let light pass only partially, and opaque materials do not let light pass through at all.",
+"difficulty": "easy"
+},
+{
+"id": 5,
+"question": "If you look at a candle flame through a straight hollow pipe, you can see it. If you bend the pipe, the flame disappears. What fundamental property of light does this prove?",
+"expected_answer": "This activity proves that light travels in a straight line.",
+"difficulty": "medium"
+},
+{
+"id": 6,
+"question": "If you shine a torch on a red ball and then on a blue ball of the same size, will their shadows be different colours? Why?",
+"expected_answer": "No, both shadows will be black or dark. Changing the colour of an opaque object does not change the colour of the shadow, because a shadow is simply a dark patch where light is blocked.",
+"difficulty": "medium"
+},
+{
+"id": 7,
+"question": "What is 'lateral inversion' in the context of an image formed by a plane mirror?",
+"expected_answer": "Lateral inversion is the perceived left-right reversal of an image in a mirror. For example, if you raise your left hand, your image appears to raise its right hand.",
+"difficulty": "medium"
+},
+{
+"id": 8,
+"question": "Why is the word 'AMBULANCE' often written in reverse on the front of ambulance vehicles?",
+"expected_answer": "Because of lateral inversion, it reads correctly as 'AMBULANCE' when drivers ahead of it look through their rear-view mirrors.",
+"difficulty": "medium"
+},
+{
+"id": 9,
+"question": "List four main characteristics of an image formed by a plane mirror.",
+"expected_answer": "The image is 1) of the same size as the object, 2) erect (upright), 3) cannot be obtained on a screen, and 4) laterally inverted.",
+"difficulty": "hard"
+},
+{
+"id": 10,
+"question": "What is a pinhole camera, and what is the most surprising feature of the image it creates on the screen?",
+"expected_answer": "A pinhole camera is a simple device where light from an object passes through a tiny hole to form an image on a screen. The most surprising feature is that the image formed is upside down (inverted).",
+"difficulty": "hard"
+},
+{
+"id": 11,
+"question": "How does a periscope work, and where is it commonly used?",
+"expected_answer": "A periscope uses two plane mirrors placed in a Z-shaped box to reflect light. It changes the direction of light, allowing people to see objects not directly in their line of sight. It is used in submarines, tanks, and bunkers.",
+"difficulty": "hard"
+},
+{
+"id": 12,
+"question": "How does a kaleidoscope create continuously changing, beautiful patterns from just a few pieces of broken bangles?",
+"expected_answer": "It uses three rectangular plane mirrors joined in a triangle. These mirrors reflect the bangles and also reflect the reflections (multiple images), creating complex patterns that change every time the tube is turned.",
+"difficulty": "hard"
+},
+{
+"id": 13,
+"question": "A shadow of a bird flying high up in the sky is not seen on the ground, but if the bird swoops down low, its shadow appears. Explain why.",
+"expected_answer": "The shadow depends on the distance between the object and the screen. When the bird is very high, the ground (screen) is too far away to capture the distinct blocked light (umbra). When it swoops low, the object is closer to the screen, allowing a visible shadow to form.",
+"difficulty": "hard"
+}
+]
+}

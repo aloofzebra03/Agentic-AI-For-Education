@@ -1,0 +1,83 @@
+{
+"chapter": "Earth, Moon, and the Sun",
+"questions": [
+{
+"id": 1,
+"question": "What causes the daily cycle of day and night on Earth?",
+"expected_answer": "The rotation of the Earth on its own axis.",
+"difficulty": "easy"
+},
+{
+"id": 2,
+"question": "In which direction does the Earth rotate when viewed from the top of the North Pole?",
+"expected_answer": "The Earth rotates in the anti-clockwise direction, that is, from West to East.",
+"difficulty": "easy"
+},
+{
+"id": 3,
+"question": "Explain the difference between 'rotation' and 'revolution' in the context of the Earth.",
+"expected_answer": "Rotation is the Earth spinning on its own axis (taking about 24 hours), while revolution is the Earth's motion in its orbit around the Sun (taking about 365 days and 6 hours).",
+"difficulty": "easy"
+},
+{
+"id": 4,
+"question": "Why does the Pole Star (Dhruva Tara) appear nearly stationary in the night sky while other stars seem to move?",
+"expected_answer": "Because the Earth's axis of rotation points very close to the Pole Star in the Northern Hemisphere, so it does not appear to move as the Earth spins.",
+"difficulty": "medium"
+},
+{
+"id": 5,
+"question": "What two main scientific factors are responsible for the occurrence of different seasons on Earth?",
+"expected_answer": "The tilt of the Earth's axis of rotation and the spherical shape of the Earth.",
+"difficulty": "medium"
+},
+{
+"id": 6,
+"question": "Why do we see different sets of stars and constellations in the night sky during different months of the year?",
+"expected_answer": "Because the Earth revolves around the Sun continuously. As it moves along its orbit, our view of the night sky changes.",
+"difficulty": "medium"
+},
+{
+"id": 7,
+"question": "During June, why does the Northern Hemisphere experience summer while the Southern Hemisphere experiences winter?",
+"expected_answer": "In June, the Northern Hemisphere is tilted towards the Sun, receiving more intense sunlight for a longer duration (more than 12 hours). The Southern Hemisphere is tilted away, receiving less intense sunlight for a shorter time.",
+"difficulty": "hard"
+},
+{
+"id": 8,
+"question": "What is a solar eclipse?",
+"expected_answer": "A solar eclipse occurs when the Moon comes directly between the Sun and the Earth, obstructing the light from the Sun from reaching the Earth.",
+"difficulty": "easy"
+},
+{
+"id": 9,
+"question": "The Moon is physically much smaller than the Sun. How is it possible for the Moon to completely block out the Sun during a total solar eclipse?",
+"expected_answer": "The apparent size depends on both physical size and distance. Because the Moon is much closer to the Earth compared to the Sun, their apparent sizes in the sky look similar.",
+"difficulty": "hard"
+},
+{
+"id": 10,
+"question": "Why is it strictly advised never to look at a solar eclipse directly with naked eyes?",
+"expected_answer": "Even during an eclipse, the Sun's light is intense enough to severely damage the eyes and cause permanent blindness.",
+"difficulty": "medium"
+},
+{
+"id": 11,
+"question": "What happens during a lunar eclipse?",
+"expected_answer": "The Earth comes in between the Sun and the Moon, blocking sunlight from reaching the Moon, causing the Earth's shadow to fall on the Moon.",
+"difficulty": "easy"
+},
+{
+"id": 12,
+"question": "At the Earth's equator, do the seasons change drastically throughout the year? Why or why not?",
+"expected_answer": "No, the effect of seasons is not very prominent at the equator because it receives about 12 hours of sunlight and 12 hours of darkness year-round, with little difference in sunray intensity.",
+"difficulty": "medium"
+},
+{
+"id": 13,
+"question": "Why is a total solar eclipse visible for only a very few minutes from any specific location on Earth?",
+"expected_answer": "Because of the Earth's rotation and the continuous motion of the Moon in its orbit, the Moon's shadow moves rapidly across the surface of the Earth.",
+"difficulty": "hard"
+}
+]
+}

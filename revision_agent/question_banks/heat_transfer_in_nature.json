@@ -1,0 +1,83 @@
+{
+"chapter": "Heat Transfer in Nature",
+"questions": [
+{
+"id": 1,
+"question": "What is conduction and in which state of matter does it primarily occur?",
+"expected_answer": "Conduction is the process of heat transfer from the hotter part of an object to a colder part where the particles themselves do not move from their positions. It primarily occurs in solids.",
+"difficulty": "easy"
+},
+{
+"id": 2,
+"question": "Name two materials that are poor conductors of heat (insulators) and two that are good conductors.",
+"expected_answer": "The AI should look for two poor conductors (e.g., wood, glass, plastic, air, clay, mud) and two good conductors (e.g., iron, copper, aluminum, steel).",
+"difficulty": "easy"
+},
+{
+"id": 3,
+"question": "Why is it more comfortable to wear light-coloured clothes during the summer and dark-coloured clothes during the winter?",
+"expected_answer": "Light-coloured clothes reflect most of the heat that falls on them keeping us cool, whereas dark-coloured clothes absorb more heat keeping us warm.",
+"difficulty": "easy"
+},
+{
+"id": 4,
+"question": "How do two thin blankets keep you warmer than one thick blanket on a cold winter night?",
+"expected_answer": "Air gets trapped between the two thin blankets. Because air is a poor conductor of heat (an insulator), it reduces heat flow from our bodies to the surroundings.",
+"difficulty": "medium"
+},
+{
+"id": 5,
+"question": "Describe the process of convection when water is heated in a beaker.",
+"expected_answer": "Water at the bottom gets heated, expands, becomes lighter, and rises. Cooler, heavier water from the sides comes down to take its place. This cycle continues until the entire volume is heated by the actual movement of water particles.",
+"difficulty": "medium"
+},
+{
+"id": 6,
+"question": "What causes a 'sea breeze' to occur during the day? ",
+"expected_answer": "During the day, land heats up faster than the sea. The warm air above the land rises, and cooler air from the sea moves towards the land to take its place.",
+"difficulty": "medium"
+},
+{
+"id": 7,
+"question": "What is radiation, and how is it different from conduction and convection?",
+"expected_answer": "Radiation is the transfer of heat from one place to another without the need for any material medium. Conduction and convection both require a medium (particles) to transfer heat.",
+"difficulty": "medium"
+},
+{
+"id": 8,
+"question": "Explain the 'water cycle'. ",
+"expected_answer": "The continuous movement of water-upward as water vapour (through evaporation/transpiration) and downward through precipitation (rain/snow), passing through soil, rocks, and returning to water bodies.",
+"difficulty": "easy"
+},
+{
+"id": 9,
+"question": "In the Himalayan region, traditional houses often use walls made of two wooden layers filled with cow dung and mud. How does this specific construction keep the house warm?",
+"expected_answer": "Wood, cow dung, and mud are all poor conductors of heat (insulators). They prevent the heat inside the house from escaping to the cold outside environment.",
+"difficulty": "hard"
+},
+{
+"id": 10,
+"question": "If you pour water over gravel, sand, and clay, through which material will the water seep the fastest and why?",
+"expected_answer": "Gravel. The spaces between gravel particles are wider, open, and interconnected, allowing water to infiltrate much faster than in the tightly packed sand or clay.",
+"difficulty": "hard"
+},
+{
+"id": 11,
+"question": "What is an aquifer, and how does the process of infiltration help in maintaining it? ",
+"expected_answer": "An aquifer is an underground layer of sediments and rocks that stores water in pore spaces. Infiltration is the process of surface water seeping through the soil and rocks to recharge and replenish this stored groundwater.",
+"difficulty": "hard"
+},
+{
+"id": 12,
+"question": "People in Ladakh build 'Ice Stupas' during winters. What are they, and how do they solve the problem of water scarcity in spring? ",
+"expected_answer": "Ice stupas are tall, cone-shaped structures of ice built by freezing stream water in the winter. They melt slowly during spring, providing a steady water supply for farming before the mountain snow has fully melted.",
+"difficulty": "medium"
+},
+{
+"id": 13,
+"question": "When you heat a pan of water on a gas stove, all three methods of heat transfer (conduction, convection, and radiation) are at work. Identify where each occurs.",
+"expected_answer": "Conduction: Heat from the flame to the metal pan. Convection: Heat circulating within the water in the pan. Radiation: The warmth felt in the air surrounding the flame and hot utensil.",
+"difficulty": "hard"
+}
+]
+}

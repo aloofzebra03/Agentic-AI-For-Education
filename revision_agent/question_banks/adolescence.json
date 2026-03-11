@@ -1,0 +1,83 @@
+{
+"chapter": "Adolescence: A Stage of Growth and Change",
+"questions": [
+{
+"id": 1,
+"question": "What is the general age range for the period of life known as adolescence?",
+"expected_answer": "Adolescence typically occurs between the ages of 10 and 19 years.",
+"difficulty": "easy"
+},
+{
+"id": 2,
+"question": "What is the 'Adam's apple', and in whom does it usually become noticeable during adolescence?",
+"expected_answer": "The Adam's apple is a bump in the throat region caused by the growth of the voice box. It is usually noticeable in adolescent boys.",
+"difficulty": "easy"
+},
+{
+"id": 3,
+"question": "Name two physical changes that occur in BOTH boys and girls during adolescence.",
+"expected_answer": "The AI should accept any two of the following: increase in height, weight gain, appearance of hair in armpits and the pubic region, or emergence of pimples/acne.",
+"difficulty": "easy"
+},
+{
+"id": 4,
+"question": "Why do many teenagers often develop acne or pimples on their faces?",
+"expected_answer": "Acne occurs due to an increase in oily secretions from the skin during adolescence, which can clog skin pores and lead to infections.",
+"difficulty": "medium"
+},
+{
+"id": 5,
+"question": "What are 'secondary sexual characteristics'? Give one example.",
+"expected_answer": "They are characteristic physical changes that help distinguish males from females but are not directly involved in reproduction. Examples include facial/chest hair in boys or breast development in girls.",
+"difficulty": "medium"
+},
+{
+"id": 6,
+"question": "In your own words, define 'puberty'.",
+"expected_answer": "Puberty is the stage in which the body undergoes internal and external changes to develop into an adult that is capable of reproduction.",
+"difficulty": "medium"
+},
+{
+"id": 7,
+"question": "What is menstruation, and approximately how many days does a typical menstrual cycle last?",
+"expected_answer": "Menstruation is the phase of the cycle where blood discharge occurs from the body. A typical menstrual cycle recurs every 28-30 days.",
+"difficulty": "medium"
+},
+{
+"id": 8,
+"question": "What is cyberbullying, and what should you do if you or a friend experience it? ",
+"expected_answer": "Cyberbullying is using digital devices to harass others by spreading rumors, teasing, or sharing personal info without consent. The student should mention seeking help from parents, elders, or teachers instead of feeling scared.",
+"difficulty": "medium"
+},
+{
+"id": 9,
+"question": "During adolescence, your body is growing rapidly. Why is it highly recommended to include iron-rich foods like spinach and kidney beans in your diet?",
+"expected_answer": "Iron is essential for the formation of blood. An iron-rich diet helps manage or prevent blood-related health problems like iron deficiency (anemia) during this rapid growth phase.",
+"difficulty": "hard"
+},
+{
+"id": 10,
+"question": "Besides keeping your body fit, how do regular physical activities and sports help an adolescent cope with the changes of this age?",
+"expected_answer": "The AI should look for the idea that exercise builds stamina, boosts mood, helps manage stress/emotions, and keeps the mind healthy during a confusing time.",
+"difficulty": "hard"
+},
+{
+"id": 11,
+"question": "What does the term 'substance abuse' mean, and why is it particularly dangerous to try substances like tobacco or drugs even 'just one time'?",
+"expected_answer": "Substance abuse is the regular use of harmful substances. It is dangerous because these substances are highly addictive; trying them once can create a strong urge to use them again, leading to severe health and lung damage.",
+"difficulty": "hard"
+},
+{
+"id": 12,
+"question": "All the physical, emotional, and biological changes you experience during adolescence are primarily controlled by what specific chemicals in the body?",
+"expected_answer": "Hormones. The AI should look for 'hormones', which are chemicals released by the body to regulate growth and development.",
+"difficulty": "hard"
+},
+{
+"id": 13,
+"question": "Why is it important to dispose of used sanitary pads properly, and what is a modern, environment-friendly alternative to traditional plastic pads?",
+"expected_answer": "Proper disposal (wrapping in newspaper and throwing in a bin) ensures community health and environmental cleanliness. Biodegradable sanitary pads are a modern, environment-friendly alternative.",
+"difficulty": "hard"
+}
+]
+}

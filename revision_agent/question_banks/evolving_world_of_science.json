@@ -1,0 +1,83 @@
+{
+"chapter": "The Ever-Evolving World of Science",
+"questions": [
+{
+"id": 1,
+"question": "Besides discovering new facts about nature, how does the textbook describe the process of science?",
+"expected_answer": "The AI should look for the concept that science is a 'process' or a 'way of thinking' that welcomes curiosity and asks questions.",
+"difficulty": "easy"
+},
+{
+"id": 2,
+"question": "Give two examples of changes mentioned in the chapter that happen around us.",
+"expected_answer": "The student must mention at least two of the following: batteries running out, ice melting into water, fruits ripening, or rocks breaking into pebbles.",
+"difficulty": "easy"
+},
+{
+"id": 3,
+"question": "What provides the heat that causes water from the seas to evaporate and eventually fall as rain?",
+"expected_answer": "The Sun.",
+"difficulty": "easy"
+},
+{
+"id": 4,
+"question": "Name two essential life processes mentioned in the text that animals need to survive and grow.",
+"expected_answer": "The AI should accept any two of the following: eating, breathing, or blood circulating nutrients from food.",
+"difficulty": "easy"
+},
+{
+"id": 5,
+"question": "How did early humans tell time before the invention of electric clocks or digital watches?",
+"expected_answer": "By observing the shadows of objects cast by the Sun.",
+"difficulty": "easy"
+},
+{
+"id": 6,
+"question": "How did something as simple as observing a paper plane or bird wings inspire real scientific explorations?",
+"expected_answer": "The answer should explain that simple observations and experiments (like studying bird wings) led early inventors and modern engineers to design actual aircraft.",
+"difficulty": "medium"
+},
+{
+"id": 7,
+"question": "Why might we need to classify materials based on their properties, such as identifying metals and non-metals?",
+"expected_answer": "To understand how materials can be used based on their characteristics, such as figuring out what kind of materials are needed to make a lamp glow or conduct electricity.",
+"difficulty": "medium"
+},
+{
+"id": 8,
+"question": "The text states that plants also need food to grow. What two scientific questions does the book prompt us to ask about plants regarding their life processes?",
+"expected_answer": "The AI should look for questions similar to: 'How do plants get their food?' and 'Do plants breathe/How do they breathe?'.",
+"difficulty": "medium"
+},
+{
+"id": 9,
+"question": "Besides being useful for making shadow puppets or telling the time, what large-scale astronomical phenomenon is caused by the Earth and the Moon casting shadows?",
+"expected_answer": "Eclipses.",
+"difficulty": "medium"
+},
+{
+"id": 10,
+"question": "Why is it important for students to participate in the 'Question the Answer' activity instead of just memorizing answers?",
+"expected_answer": "To learn to think like a scientist. The core idea is that great scientists don't just answer questions; they ask amazing, curious, and creative ones.",
+"difficulty": "medium"
+},
+{
+"id": 11,
+"question": "Why is the study of science considered a 'responsibility' and not just about discovery?",
+"expected_answer": "The student must mention that human activities impact the natural world/society, and science plays a vital role in addressing environmental challenges to help create a sustainable world.",
+"difficulty": "hard"
+},
+{
+"id": 12,
+"question": "To fully understand phenomena like day, night, and eclipses, what three specific planetary movements do we need to know about?",
+"expected_answer": "The AI must look for all three: 1) The Earth rotating around its axis, 2) The Moon going around the Earth, and 3) The Earth going around the Sun.",
+"difficulty": "hard"
+},
+{
+"id": 13,
+"question": "The textbook covers physics, chemistry, biology, and earth sciences in different chapters. How does the text describe the relationship between these seemingly different fields?",
+"expected_answer": "The core concept is 'interconnectedness'. The answer should explain that scientific ideas or discoveries in one area often inspire discoveries or allow us to ask questions in another area.",
+"difficulty": "hard"
+}
+]
+}

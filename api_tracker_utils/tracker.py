@@ -31,17 +31,37 @@ from email.mime.multipart import MIMEMultipart
 # API KEY MANAGEMENT
 # ============================================================================
 
+# def get_available_api_keys() -> List[str]:
+#     """Get all 7 available Google API keys from environment."""
+#     api_keys = []
+#     for i in range(1, 9):  # GOOGLE_API_KEY_1 through GOOGLE_API_KEY_8
+#         key = os.getenv(f"GOOGLE_API_KEY_{i}")
+#         if key:
+#             api_keys.append(key)
+    
+#     if not api_keys:
+#         raise RuntimeError("No Google API keys found. Please set GOOGLE_API_KEY_1 through GOOGLE_API_KEY_7 in .env file")
+    
+#     return api_keys
+
+import os
+from typing import List
+
 def get_available_api_keys() -> List[str]:
-    """Get all 7 available Google API keys from environment."""
-    api_keys = []
-    for i in range(1, 9):  # GOOGLE_API_KEY_1 through GOOGLE_API_KEY_8
-        key = os.getenv(f"GOOGLE_API_KEY_{i}")
-        if key:
-            api_keys.append(key)
+    """Get all available Google API keys with prefix GOOGLE_API_KEY_ from environment."""
     
+    api_keys = [
+        value for key, value in os.environ.items()
+        if key.startswith("GOOGLE_API_KEY_") and value
+    ]
+
+    print(f"Found {len(api_keys)} Google API keys")
+
     if not api_keys:
-        raise RuntimeError("No Google API keys found. Please set GOOGLE_API_KEY_1 through GOOGLE_API_KEY_7 in .env file")
-    
+        raise RuntimeError(
+            "No Google API keys found. Please set environment variables with prefix GOOGLE_API_KEY_ in .env file"
+        )
+
     return api_keys
 
 

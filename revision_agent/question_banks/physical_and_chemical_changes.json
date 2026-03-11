@@ -1,0 +1,83 @@
+{
+"chapter": "Changes Around Us: Physical and Chemical",
+"questions": [
+{
+"id": 1,
+"question": "What is a physical change? Give two examples from your daily life.",
+"expected_answer": "A change in which only physical properties like shape, size, and state change, and no new substance is formed. Examples can include melting ice, folding paper, tearing paper, or crushing chalk.",
+"difficulty": "easy"
+},
+{
+"id": 2,
+"question": "How is a chemical change different from a physical change?",
+"expected_answer": "In a chemical change, one or more new substances are formed through a chemical reaction, whereas no new substances are formed in a physical change.",
+"difficulty": "easy"
+},
+{
+"id": 3,
+"question": "If you blow exhaled air into lime water using a straw, what happens to the lime water and why?",
+"expected_answer": "The lime water turns milky (or cloudy). This happens because exhaled air contains carbon dioxide, which reacts with lime water to form a new insoluble white substance called calcium carbonate.",
+"difficulty": "easy"
+},
+{
+"id": 4,
+"question": "What happens when you mix vinegar and baking soda? Is it a physical or a chemical change?",
+"expected_answer": "It produces a fizzing, bubbling sound and forms bubbles of carbon dioxide gas. It is a chemical change because a new substance (carbon dioxide) is formed.",
+"difficulty": "medium"
+},
+{
+"id": 5,
+"question": "What are the three essential requirements for combustion to take place? (Think of the fire triangle)",
+"expected_answer": "The three requirements are: 1) A combustible substance (fuel), 2) Oxygen (usually from the air), and 3) Heat to reach the ignition temperature.",
+"difficulty": "medium"
+},
+{
+"id": 6,
+"question": "If you cover a burning candle with a glass tumbler, it stops burning after some time. Explain the scientific reason behind this.",
+"expected_answer": "The flame gets extinguished because the glass tumbler cuts off the continuous supply of air (specifically oxygen), which is necessary for combustion to continue.",
+"difficulty": "medium"
+},
+{
+"id": 7,
+"question": "Tearing a sheet of paper and burning a sheet of paper are both changes. Are they the same type of change? Explain your reasoning.",
+"expected_answer": "No. Tearing paper is a physical change because only its size and shape change; no new substance is formed. Burning paper is a chemical change because it forms new substances like ash and smoke.",
+"difficulty": "medium"
+},
+{
+"id": 8,
+"question": "Are all physical changes reversible? Provide an example to justify your answer.",
+"expected_answer": "No, not all physical changes are reversible. For example, chopping vegetables or crushing a piece of chalk into powder are physical changes (no new substance is formed), but they cannot be reversed to their original state.",
+"difficulty": "medium"
+},
+{
+"id": 9,
+"question": "When a candle burns, both physical and chemical changes take place. Identify and explain both types of changes.",
+"expected_answer": "Physical change: The melting of solid wax into liquid, its solidification, and its evaporation into vapour. Chemical change: The burning of the wax vapour to produce a flame and new substances like carbon dioxide.",
+"difficulty": "hard"
+},
+{
+"id": 10,
+"question": "What is 'ignition temperature'? How does focusing sunlight through a magnifying glass onto a piece of paper demonstrate this concept?",
+"expected_answer": "Ignition temperature is the minimum temperature at which a substance catches fire. The magnifying glass concentrates heat from the sunrays onto one spot, raising the paper's temperature until it reaches its ignition temperature and starts burning.",
+"difficulty": "hard"
+},
+{
+"id": 11,
+"question": "If a person's clothes accidentally catch fire, wrapping a thick blanket around them is a common way to extinguish it. Why does this method work?",
+"expected_answer": "Wrapping a blanket cuts off the supply of oxygen/air to the fire. Without oxygen, the combustion process cannot continue, and the fire is extinguished.",
+"difficulty": "hard"
+},
+{
+"id": 12,
+"question": "Explain the process of 'weathering of rocks'. Does it involve physical changes, chemical changes, or both?",
+"expected_answer": "Weathering is the breaking down of large rocks into smaller pieces (sediments) and soil. It involves both physical changes (due to temperature, growing roots, or freezing water cracking the rock) and chemical changes (water and chemicals reacting with rock minerals, like iron oxidizing to turn red).",
+"difficulty": "hard"
+},
+{
+"id": 13,
+"question": "A change that is undesirable in one situation might be desirable in another. Give an example from the text involving food.",
+"expected_answer": "The decomposition or rotting of food. It is undesirable when we want to store food to eat, but it is highly desirable when converting food waste into nutrient-rich compost for plants.",
+"difficulty": "medium"
+}
+]
+}

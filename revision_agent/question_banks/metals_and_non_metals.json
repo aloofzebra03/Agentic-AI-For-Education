@@ -1,0 +1,77 @@
+{
+"chapter": "The World of Metals and Non-metals",
+"questions": [
+{
+"id": 1,
+"question": "What does the term 'metallic lustre' refer to?",
+"expected_answer": "The shiny appearance characteristic of metals.",
+"difficulty": "easy"
+},
+{
+"id": 2,
+"question": "Name the property that allows metals like aluminium to be beaten into thin sheets.",
+"expected_answer": "Malleability. The AI should look for the term malleability or the concept of being flattened without breaking.",
+"difficulty": "easy"
+},
+{
+"id": 3,
+"question": "Which specific property of metals allows them to be drawn into thin wires?",
+"expected_answer": "Ductility. The AI should look for the term ductility.",
+"difficulty": "easy"
+},
+{
+"id": 4,
+"question": "Give two examples of non-metals mentioned in the chapter.",
+"expected_answer": "The AI should accept any two non-metals such as sulfur, carbon (coal), oxygen, or nitrogen.",
+"difficulty": "easy"
+},
+{
+"id": 5,
+"question": "Why do metals produce a ringing sound when struck?",
+"expected_answer": "Because they possess the property of sonority (they are sonorous).",
+"difficulty": "easy"
+},
+{
+"id": 6,
+"question": "Why are cooking utensils typically made of metals like copper or aluminium instead of wood or plastic?",
+"expected_answer": "Metals are good conductors of heat, allowing food to cook efficiently, whereas wood and plastic are poor conductors.",
+"difficulty": "medium"
+},
+{
+"id": 7,
+"question": "What two environmental conditions must be present for iron to rust? ",
+"expected_answer": "Both air (specifically oxygen) and water (or moisture) must be present.",
+"difficulty": "medium"
+},
+{
+"id": 8,
+"question": "Why are the handles of screwdrivers and frying pans often made of plastic or wood?",
+"expected_answer": "Plastic and wood are poor conductors (insulators) of heat and electricity, which protects the user from burns and electric shocks.",
+"difficulty": "medium"
+},
+{
+"id": 9,
+"question": "When magnesium burns in the presence of oxygen, it forms magnesium oxide. Is this oxide acidic or basic, and how would it affect litmus paper?",
+"expected_answer": "Magnesium oxide is basic in nature. It will turn red litmus paper to blue.",
+"difficulty": "medium"
+},
+{
+"id": 10,
+"question": "If you test the gas produced by burning sulfur with a moist blue litmus paper, what colour change will you observe and why?",
+"expected_answer": "The blue litmus paper will turn red because sulfur (a non-metal) forms an acidic oxide (sulfur dioxide) when burned.",
+"difficulty": "hard"
+},
+{
+"id": 11,
+"question": "Why does an ironsmith heat a piece of iron in a furnace until it is red hot before beating it into a tool like an axe? ",
+"expected_answer": "Heating makes the iron softer, more flexible, and highly malleable, allowing it to be shaped with a hammer much more easily without breaking.",
+"difficulty": "hard"
+},
+{
+"id": 12,
+"question": "Zinc is used to coat iron to prevent rusting. Could a non-metal like sulfur be used for the same purpose? Justify your answer.",
+"expected_answer": "No. Sulfur is a non-metal, is brittle, and does not form a continuous protective coating to block air and moisture from reaching the iron like a metal such as zinc does.",
+"difficulty": "hard"
+}
+]
+}

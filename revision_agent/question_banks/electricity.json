@@ -1,0 +1,83 @@
+{
+"chapter": "Electricity: Circuits and their Components",
+"questions": [
+{
+"id": 1,
+"question": "What are the two terminals of an electric cell and how are they physically identified on the cell? ",
+"expected_answer": "An electric cell has a positive (+ve) terminal and a negative (-ve) terminal. The metal cap is the positive terminal and the flat metal disc is the negative terminal.",
+"difficulty": "easy"
+},
+{
+"id": 2,
+"question": "What is a battery, and how must the cells be connected to form one? ",
+"expected_answer": "A battery is a combination of two or more cells. To form a battery, the positive terminal of one cell must be connected to the negative terminal of the next cell.",
+"difficulty": "easy"
+},
+{
+"id": 3,
+"question": "Which specific part of an incandescent lamp glows to produce light when an electric current passes through it? ",
+"expected_answer": "The filament, which is a thin wire inside the glass bulb, gets hot and glows.",
+"difficulty": "easy"
+},
+{
+"id": 4,
+"question": "How does a Light Emitting Diode (LED) differ structurally from an incandescent lamp, and how can you identify its positive and negative terminals? ",
+"expected_answer": "Unlike incandescent lamps, LEDs do not have filaments. They have two wires of different lengths; the longer wire is the positive terminal and the shorter wire is the negative terminal.",
+"difficulty": "medium"
+},
+{
+"id": 5,
+"question": "What is the primary function of an electric switch in a circuit?",
+"expected_answer": "A switch is a simple device that either completes (closes) or breaks (opens) a circuit.",
+"difficulty": "medium"
+},
+{
+"id": 6,
+"question": "In a closed electrical circuit, what is the standard direction of the flow of electric current? ",
+"expected_answer": "The direction of electric current is taken to be from the positive terminal to the negative terminal of the electric cell.",
+"difficulty": "medium"
+},
+{
+"id": 7,
+"question": "What is a circuit diagram? ",
+"expected_answer": "A circuit diagram is a representation of an electrical circuit using standard symbols for its components.",
+"difficulty": "easy"
+},
+{
+"id": 8,
+"question": "Define 'conductors of electricity' and name the most common metal used for making electrical wires.",
+"expected_answer": "Conductors are materials through which electric current can flow easily. Copper is mainly used for making electrical wires due to its lower cost and abundant supply.",
+"difficulty": "easy"
+},
+{
+"id": 9,
+"question": "Why are electrical wires and plug tops typically covered with materials like plastic or rubber?",
+"expected_answer": "Plastic and rubber are electrical insulators (poor conductors). They are used to cover wires and plugs to protect people from electric shocks.",
+"difficulty": "medium"
+},
+{
+"id": 10,
+"question": "If you connect an LED in a complete circuit but it fails to glow, what is the most likely connection error?",
+"expected_answer": "The LED terminals are likely connected backwards. Current can pass through an LED in one direction only. It only glows when its positive terminal (longer wire) connects to the battery's positive terminal, and its negative terminal connects to the battery's negative terminal.",
+"difficulty": "hard"
+},
+{
+"id": 11,
+"question": "Sometimes an incandescent lamp does not glow even when properly connected to a working cell. What is the scientific reason for a 'fused' lamp?",
+"expected_answer": "A 'fused' lamp usually has a broken filament. A broken filament breaks the circuit and stops the flow of current, preventing the lamp from glowing.",
+"difficulty": "hard"
+},
+{
+"id": 12,
+"question": "Why do international organizations like the IEC and ANSI create standard symbols for electrical and electronic parts?",
+"expected_answer": "Using the same standard symbols across the world helps people from different countries and industries easily understand each other's circuit diagrams.",
+"difficulty": "hard"
+},
+{
+"id": 13,
+"question": "How does the type of electricity from a portable battery differ from the electricity that comes from a wall socket?",
+"expected_answer": "Electricity from batteries is Direct Current (DC). The electricity from power plants that comes to a wall socket is Alternating Current (AC).",
+"difficulty": "hard"
+}
+]
+}

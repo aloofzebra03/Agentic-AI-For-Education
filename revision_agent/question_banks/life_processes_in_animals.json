@@ -1,0 +1,89 @@
+{
+"chapter": "Life Processes in Animals",
+"questions": [
+{
+"id": 1,
+"question": "What is the primary function of the alimentary canal in humans? ",
+"expected_answer": "It is a long tube where complex food components are broken down into simpler forms, starting from the mouth and ending at the anus.",
+"difficulty": "easy"
+},
+{
+"id": 2,
+"question": "Why does a piece of chapati or boiled rice begin to taste sweet after you chew it for a while?",
+"expected_answer": "The AI should look for the concept that saliva contains a digestive juice that breaks down starch (a complex carbohydrate) into simple sugars.",
+"difficulty": "medium"
+},
+{
+"id": 3,
+"question": "What are the specific roles of the acid and mucus secreted in the stomach?",
+"expected_answer": "The acid helps break down proteins and kills harmful bacteria. The mucus protects the stomach's inner lining from being damaged by this acid.",
+"difficulty": "medium"
+},
+{
+"id": 4,
+"question": "Apart from its own walls, name the two organs that release digestive juices into the small intestine.",
+"expected_answer": "The liver (which secretes bile) and the pancreas (which secretes pancreatic juice).",
+"difficulty": "easy"
+},
+{
+"id": 5,
+"question": "How is the inner lining of the small intestine perfectly designed to absorb digested nutrients into the blood?",
+"expected_answer": "It contains thousands of finger-like projections (villi) that significantly increase the surface area, making nutrient absorption into the blood highly efficient.",
+"difficulty": "hard"
+},
+{
+"id": 6,
+"question": "What happens to the undigested food once it enters the large intestine?",
+"expected_answer": "The large intestine absorbs most of the remaining water and some salts from it, converting the waste into a semi-solid mass called stool.",
+"difficulty": "easy"
+},
+{
+"id": 7,
+"question": "Explain the process of 'rumination' seen in grass-eating animals like cows.",
+"expected_answer": "Ruminants partially chew their food and swallow it into a stomach chamber (rumen). Later, this partially digested food is brought back to the mouth to be chewed thoroughly.",
+"difficulty": "hard"
+},
+{
+"id": 8,
+"question": "Birds do not have teeth. How do they break down the food they eat?",
+"expected_answer": "They have a special chamber called a gizzard. The food is broken down by the contraction and relaxation of the gizzard's walls, often helped by small stones (grit) the bird swallowed.",
+"difficulty": "medium"
+},
+{
+"id": 9,
+"question": "What is the main difference between 'breathing' and 'respiration'?",
+"expected_answer": "Breathing is a physical process of inhaling air (oxygen) and exhaling air (carbon dioxide). Respiration is a chemical process inside the body that uses oxygen to break down glucose and release energy.",
+"difficulty": "medium"
+},
+{
+"id": 10,
+"question": "State the word equation that represents the process of respiration in our bodies.",
+"expected_answer": "Glucose + Oxygen -> Carbon dioxide + Water + Energy. (All components must be present).",
+"difficulty": "hard"
+},
+{
+"id": 11,
+"question": "Trace the pathway of inhaled air from the outside environment to the lungs. ",
+"expected_answer": "Air enters through the nostrils, passes through the nasal passages, goes down the windpipe, and enters the lungs, ending in tiny balloon-like sacs called alveoli.",
+"difficulty": "easy"
+},
+{
+"id": 12,
+"question": "Explain the movement of the rib cage and the diaphragm when we inhale (breathe in).",
+"expected_answer": "During inhalation, the chest expands as the ribs move up and outwards, while the diaphragm moves downwards. This increases the space inside the chest, drawing air into the lungs.",
+"difficulty": "hard"
+},
+{
+"id": 13,
+"question": "How do fish obtain oxygen to survive underwater? ",
+"expected_answer": "Fish use specialised structures called gills. Gills are richly supplied with blood vessels and allow the exchange of oxygen and carbon dioxide between the blood and the gases dissolved in the water.",
+"difficulty": "easy"
+},
+{
+"id": 14,
+"question": "Amphibians like frogs are unique because they live on both land and in water. How do their breathing mechanisms change as they grow?",
+"expected_answer": "As tadpoles, they breathe through gills in water. As adult frogs, they use lungs to breathe on land and can also use their moist skin for gas exchange when in water.",
+"difficulty": "hard"
+}
+]
+}

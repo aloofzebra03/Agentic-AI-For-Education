@@ -1,0 +1,77 @@
+{
+"chapter": "Life Processes in Plants",
+"questions": [
+{
+"id": 1,
+"question": "What are the tiny pores found on the surface of leaves called, and what is their main function? ",
+"expected_answer": "They are called stomata. The AI should look for 'stomata' and their function, which is to help in the exchange of gases (oxygen and carbon dioxide).",
+"difficulty": "easy"
+},
+{
+"id": 2,
+"question": "Which green pigment is essential for capturing sunlight to prepare food in leaves?",
+"expected_answer": "Chlorophyll. The AI should look for the term 'chlorophyll'.",
+"difficulty": "easy"
+},
+{
+"id": 3,
+"question": "What are the two specific tube-like structures responsible for transporting water and food in a plant?",
+"expected_answer": "Xylem and Phloem. The AI must specifically identify 'xylem' (for water and minerals) and 'phloem' (for food).",
+"difficulty": "easy"
+},
+{
+"id": 4,
+"question": "During photosynthesis, what is the initial simple carbohydrate produced before it is converted into starch for storage?",
+"expected_answer": "Glucose. The AI should look for 'glucose'.",
+"difficulty": "easy"
+},
+{
+"id": 5,
+"question": "According to the word equation for photosynthesis, what four things are required for a plant to produce glucose and oxygen?",
+"expected_answer": "The AI should look for all four essential components: carbon dioxide, water, sunlight, and chlorophyll.",
+"difficulty": "medium"
+},
+{
+"id": 6,
+"question": "If a plant with red or brown leaves is tested with an iodine solution, it still shows the presence of starch. What does this tell us about these non-green leaves?",
+"expected_answer": "The AI should look for the concept that these leaves still contain chlorophyll and perform photosynthesis, but the green colour is hidden or masked by the larger amount of red/brown pigments.",
+"difficulty": "medium"
+},
+{
+"id": 7,
+"question": "In a lab experiment, an obliquely cut plant stem is placed in red-coloured water. The next day, the stem and flowers show a red tint. What specific plant process does this demonstrate?",
+"expected_answer": "The AI should look for the explanation that it demonstrates the upward transport of water and dissolved minerals through the thin tube-like structure called the xylem.",
+"difficulty": "medium"
+},
+{
+"id": 8,
+"question": "Why do scientists use boiling alcohol to decolourise a green leaf before testing it for starch with an iodine solution?",
+"expected_answer": "The AI should look for the reasoning that removing the green chlorophyll pigment makes it much easier to clearly observe the blue-black colour change that indicates the presence of starch.",
+"difficulty": "medium"
+},
+{
+"id": 9,
+"question": "State the exact word equation for the process of respiration in plants.",
+"expected_answer": "The AI should look for the correct sequence of the equation: Glucose + Oxygen -> Carbon dioxide + Water + Energy.",
+"difficulty": "hard"
+},
+{
+"id": 10,
+"question": "In an experiment, half a leaf is kept inside a sealed bottle containing caustic soda (sodium hydroxide), and the other half is left outside in the air. After being placed in sunlight, only the outside half tests positive for starch. Why?",
+"expected_answer": "The AI should look for the explanation that caustic soda (sodium hydroxide) absorbs carbon dioxide from the air. Without carbon dioxide inside the bottle, the enclosed half of the leaf could not perform photosynthesis to make starch.",
+"difficulty": "hard"
+},
+{
+"id": 11,
+"question": "How can a plant survive and grow inside a completely sealed transparent bottle (a 'bottle garden') without getting fresh air from the outside?",
+"expected_answer": "The AI should look for the cyclical balance of gases: the plant uses the carbon dioxide produced from its own respiration for photosynthesis, and it uses the oxygen generated from photosynthesis for respiration.",
+"difficulty": "hard"
+},
+{
+"id": 12,
+"question": "Who was Kamala Sohonie, and what was her major contribution to plant science mentioned in the chapter?",
+"expected_answer": "The AI should identify her as an Indian woman scientist who earned a Ph.D. from Cambridge University for her remarkable research on respiration in plants, and note her work on improving the nutritive values of plant foods like Neera.",
+"difficulty": "hard"
+}
+]
+}

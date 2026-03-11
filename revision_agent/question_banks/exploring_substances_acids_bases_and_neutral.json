@@ -1,0 +1,83 @@
+{
+"chapter": "Exploring Substances: Acidic, Basic, and Neutral",
+"questions": [
+{
+"id": 1,
+"question": "What is an acid-base indicator?",
+"expected_answer": "An acid-base indicator is a substance that shows different colours in acidic and basic solutions.",
+"difficulty": "easy"
+},
+{
+"id": 2,
+"question": "What effect do acidic and basic substances have on the colour of litmus paper? ",
+"expected_answer": "Acids turn the colour of blue litmus paper to red. Bases turn the colour of red litmus paper to blue.",
+"difficulty": "easy"
+},
+{
+"id": 3,
+"question": "Name the specific acids present in lemons and tamarind.",
+"expected_answer": "Citric acid is present in lemons. Tartaric acid is present in tamarind.",
+"difficulty": "easy"
+},
+{
+"id": 4,
+"question": "What does it mean if a substance is described as 'neutral'? Give two examples mentioned in the chapter.",
+"expected_answer": "A neutral substance is neither acidic nor basic and does not change the colour of litmus papers. Examples include tap water, sugar solution, and salt solution.",
+"difficulty": "easy"
+},
+{
+"id": 5,
+"question": "How can the extract of a red rose be used to test the nature of substances? Describe the specific colour changes.",
+"expected_answer": "The extract of a red rose acts as an acid-base indicator. It gives a red colour in acidic solutions and a green colour in basic solutions.",
+"difficulty": "medium"
+},
+{
+"id": 6,
+"question": "Besides changing the colour of red litmus paper, what are two common physical properties of basic substances that you might notice through touch or taste?",
+"expected_answer": "Basic substances generally feel soapy or slippery to touch. They also generally taste bitter.",
+"difficulty": "medium"
+},
+{
+"id": 7,
+"question": "If you spill vegetable curry on a white shirt and wash it with soap, the yellow stain turns red. Based on what you learned about indicators, explain why this happens.",
+"expected_answer": "The curry contains turmeric, which acts as a natural indicator. Soap is a basic substance. The yellow colour of turmeric turns red in basic solutions.",
+"difficulty": "medium"
+},
+{
+"id": 8,
+"question": "What exactly happens during a 'neutralisation' reaction? What are the final products?",
+"expected_answer": "In a neutralisation reaction, an acid and a base neutralise each other. This reaction forms salt and water, along with the evolution (release) of heat.",
+"difficulty": "medium"
+},
+{
+"id": 9,
+"question": "Manya is blindfolded and needs to identify if a solution is acidic or basic. Since she cannot see colour changes, what specific type of indicator can she use and how does it work?",
+"expected_answer": "She can use an 'olfactory indicator', such as chopped onions. Olfactory indicators are substances whose odours change depending on whether they are in an acidic or basic medium.",
+"difficulty": "hard"
+},
+{
+"id": 10,
+"question": "Why does rubbing moist baking soda on the skin help relieve the stinging pain of an ant bite?",
+"expected_answer": "When an ant bites, it injects formic acid into the skin. Moist baking soda is a base. The basic baking soda neutralises the effect of the acid injected by the ant, which relieves the pain.",
+"difficulty": "hard"
+},
+{
+"id": 11,
+"question": "A farmer observes that his plants are growing poorly because the excessive use of chemical fertilisers has made the soil too acidic. How can he solve this problem using the concept of neutralisation?",
+"expected_answer": "To fix excessively acidic soil, the farmer should treat it with a base, such as lime. The base will neutralise the acidic nature of the soil.",
+"difficulty": "hard"
+},
+{
+"id": 12,
+"question": "Who is known as the 'Father of Modern Indian Chemistry' , and what was one of his major milestones in the Indian medical field?",
+"expected_answer": "Acharya Prafulla Chandra Ray (P.C. Ray) is known as the 'Father of Modern Indian Chemistry'. He established India's first pharmaceutical company in 1901.",
+"difficulty": "hard"
+},
+{
+"id": 13,
+"question": "How do Hydrangea plants  act as natural indicators in the environment?",
+"expected_answer": "Hydrangea flowers change their colour depending on the nature of the soil they are planted in. They produce blue-coloured flowers in acidic soil, and pink or red flowers in basic soil.",
+"difficulty": "medium"
+}
+]
+}
