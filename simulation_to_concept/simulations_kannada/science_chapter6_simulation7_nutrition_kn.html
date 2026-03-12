@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#43a047">
+<title>ಕೌಮಾರ ವಯಸ್ಕರಿಗೆ ಪೋಷಣೆ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #43a047 0%, #81c784 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #43a047;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.plate-visual {
+  position: relative;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  border-radius: 10px;
+}
+
+.plate {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: #fff;
+  border: 8px solid #e0e0e0;
+  position: relative;
+  overflow: hidden;
+}
+
+.plate-section {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.plate-section:hover { transform: scale(1.1); }
+.plate-section.active { transform: scale(1.15); }
+
+.plate-section.carbs { top: 0; left: 0; background: #fff3e0; border-radius: 100% 0 0 0; }
+.plate-section.protein { top: 0; right: 0; background: #ffebee; border-radius: 0 100% 0 0; }
+.plate-section.veggies { bottom: 0; left: 0; background: #e8f5e9; border-radius: 0 0 0 100%; }
+.plate-section.fats { bottom: 0; right: 0; background: #fff8e1; border-radius: 0 0 100% 0; }
+
+.plate-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #43a047;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.plate-center .emoji { font-size: 20px; }
+.plate-center .text { font-size: 7px; color: #43a047; font-weight: 600; }
+
+.nutrient-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.nutrient-tab {
+  padding: 8px 4px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  text-align: center;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.nutrient-tab:active { transform: scale(0.95); }
+.nutrient-tab.active { border-color: #43a047; background: #e8f5e9; color: #2e7d32; }
+
+.nutrient-tab .emoji { font-size: 18px; display: block; margin-bottom: 2px; }
+
+.nutrient-info {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #43a047;
+}
+
+.nutrient-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 8px; }
+.nutrient-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.food-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.food-tag {
+  padding: 4px 10px;
+  background: #fff;
+  border-radius: 15px;
+  font-size: 10px;
+  color: #333;
+}
+
+.special-needs {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #e91e63;
+}
+
+.special-title { font-size: 12px; font-weight: 700; color: #c2185b; margin-bottom: 6px; }
+.special-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+.takeaway {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🥗 ಕೌಮಾರ ವಯಸ್ಕರಿಗೆ ಪೋಷಣೆ</h1>
+  <p>ನಿಮ್ಮ ಬೆಳೆಯುತ್ತಿರುವ ದೇಹಕ್ಕೆ ಸರಿಯಾದ ಇಂಧನ!</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    A <strong>ಸಮತೋಲಿತ ಆಹಾರ</strong> ಪ್ರೊಟೀನ್‌ಗಳು, ಕಾರ್ಬೋಹೈಡ್ರೇಟ್‌ಗಳು, ಕೊಬ್ಬು, ಜೀವಸತ್ವಗಳು ಮತ್ತು ಖನಿಜಗಳೊಂದಿಗೆs is essential ಕೌಮಾರ್ಯದಲ್ಲಿ. Your body needs extra nutrients for rapid growth!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="plate-visual">
+    <div class="plate">
+      <div class="plate-section carbs" onclick="selectNutrient('carbs', this)">🍚</div>
+      <div class="plate-section protein" onclick="selectNutrient('protein', this)">🍗</div>
+      <div class="plate-section veggies" onclick="selectNutrient('veggies', this)">🥦</div>
+      <div class="plate-section fats" onclick="selectNutrient('fats', this)">🥜</div>
+      <div class="plate-center">
+        <div class="emoji">💪</div>
+        <div class="text">ಸಮತೋಲಿತ</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="nutrient-tabs">
+    <div class="nutrient-tab active" onclick="selectNutrient('carbs', this)">
+      <span class="emoji">🍚</span>
+      ಕಾರ್ಬೋಹೈಡ್ರೇಟ್
+    </div>
+    <div class="nutrient-tab" onclick="selectNutrient('protein', this)">
+      <span class="emoji">🍗</span>
+      ಪ್ರೋಟೀನ್
+    </div>
+    <div class="nutrient-tab" onclick="selectNutrient('veggies', this)">
+      <span class="emoji">🥦</span>
+      ಜೀವಸತ್ವಗಳು
+    </div>
+    <div class="nutrient-tab" onclick="selectNutrient('fats', this)">
+      <span class="emoji">🥜</span>
+      Fats
+    </div>
+  </div>
+</div>
+
+<div class="nutrient-info" id="nutrient-info">
+  <div class="nutrient-title" id="nutrient-title">🍚 Carbohydrates - Energy ಮೂಲ</div>
+  <div class="nutrient-text" id="nutrient-text">
+    ಕಾರ್ಬೋಹೈಡ್ರೇಟ್‌ಗಳು ನಿಮ್ಮ ದೇಹ's main ಮೂಲ of <strong>ಶಕ್ತಿ</strong>. ಕೌಮಾರದಲ್ಲಿ, you need more ಶಕ್ತಿ for growth, studies, ಮತ್ತು physical activities.
+  </div>
+  <div class="food-examples" id="food-examples">
+    <span class="food-tag">🍚 Rice</span>
+    <span class="food-tag">🍞 ರೊಟ್ಟಿ</span>
+    <span class="food-tag">🥔 ಆಲೂಗಡ್ಡೆ</span>
+    <span class="food-tag">🌾 ಜೋಳ</span>
+    <span class="food-tag">🍝 ಪಾಸ್ಟಾ</span>
+  </div>
+</div>
+
+<div class="special-needs">
+  <div class="special-title">👧 ಹುಡುಗಿಯರ ವಿಶೇಷ ಪೋಷಕಾಂಶ ಅಗತ್ಯಗಳು</div>
+  <div class="special-text">
+    <strong>ಕಬ್ಬಿಣ:</strong> ರಕ್ತ ರಚನೆಗೆ ಮುಖ್ಯ, ಋತು ಪ್ರಾರಂಭ ನಂತರ. ಪಾಲಕ್, ಖರ್ಜೂರ, ಬೆಲ್ಲ.<br><br>
+    <strong>ಜೀವಸತ್ವ B12:</strong> ಆರೋಗ್ಯಕರ ರಕ್ತ ಕೋಶಕ್ಕೆ ಅಗತ್ಯ. ಹಾಲು, ಮೊಟ್ಟೆ, ಫೋರ್ಟಿಫೈಡ್ ಆಹಾರ.<br><br>
+    <strong>ಕ್ಯಾಲ್ಸಿಯಂ:</strong> ಬಲವಾದ ಮೂಳೆ. ಹಾಲು, ಮೊಸರು, ಚೀಸ್, ಹಸಿರು ಎಲೆ ತರಕಾರಿ.
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ಆರೋಗ್ಯಕರ ಆಹಾರ ಸಲಹೆಗಳು</div>
+  <div class="takeaway-text">
+    • ಎಲ್ಲ ಗುಂಪುಗಳಿಂದ <strong>ವಿವಿಧ ಆಹಾರ</strong> ತಿನ್ನಿರಿ<br>
+    • <strong>ಉಪಾಹಾರ</strong> ಬಿಡಬೇಡಿ – ಅದು ನಿಮ್ಮ ಬೆಳಿಗ್ಗೆಯನ್ನು ಶಕ್ತೀಕರಿಸುತ್ತದೆ<br>
+    • ಸಾಕಷ್ಟು <strong>ನೀರು</strong> ಕುಡಿಯಿರಿ<br>
+    • ಜಂಕ್ ಆಹಾರ, ಸಕ್ಕರೆ ಪಾನೀಯ, ಸಂಸ್ಕರಿತ ಆಹಾರ ಕಡಿಮೆ<br>
+    • ದೈನಂದಿನ ಹಣ್ಣು ತರಕಾರಿ ತಿನ್ನಿರಿ<br>
+    • ಕ್ಯಾಲ್ಸಿಯಂ ಮತ್ತು ಬಲವಾದ ಮೂಳೆಗೆ <strong>ಹಾಲು</strong> ಒಳಗೊಳ್ಳಿ
+  </div>
+</div>
+
+</div>
+
+<script>
+const nutrients = {
+  carbs: {
+    title: '🍚 Carbohydrates - Energy ಮೂಲ',
+    text: 'ಕಾರ್ಬೋಹೈಡ್ರೇಟ್‌ಗಳು ನಿಮ್ಮ ದೇಹದ <strong>ಶಕ್ತಿ</strong>ಯ ಮುಖ್ಯ ಮೂಲ. ಕೌಮಾರದಲ್ಲಿ ಬೆಳವಣಿಗೆ, ಓದು ಮತ್ತು ಶಾರೀರಿಕ ಚಟುವಟಿಕೆಗಳಿಗೆ ಹೆಚ್ಚು ಶಕ್ತಿ ಬೇಕು. ಸರಳ ಸಕ್ಕರೆಗಿಂತ ಸಂಕೀರ್ಣ ಕಾರ್ಬ್ (ಧಾನ್ಯ) ಆಯ್ಕೆಮಾಡಿ.',
+    foods: ['🍚 ಅನ್ನ', '🍞 ಗೋಧಿ ರೊಟ್ಟಿ', '🥔 ಆಲೂಗಡ್ಡೆ', '🌾 ಜೋಳ (ರಾಗಿ, ಜೋವರ್)', '🌽 ಮೆಕ್ಕೆ ಜೋಳ', '🍌 ಬಾಳೆಹಣ್ಣು']
+  },
+  protein: {
+    title: '🍗 ಪ್ರೊಟೀನ್‌ಗಳು - ದೇಹ ನಿರ್ಮಾಣ',
+    text: 'ಪ್ರೊಟೀನ್‌ಗಳು <strong>ಸ್ನಾಯು</strong>, ಅಂಗಾಂಶ ಮತ್ತು ಅಂಗಗಳ ನಿರ್ಮಾಣ ಮತ್ತು ದುರಸ್ತಿಗೆ ಅಗತ್ಯ. ಬೆಳವಣಿಗೆ ಉಲ್ಬಣದಲ್ಲಿ ಪ್ರೊಟೀನ್ ಅಗತ್ಯ ಗಣನೀಯವಾಗಿ ಏರುತ್ತದೆ. ಹಾರ್ಮೋನ್‌ಗಳು ಮತ್ತು ಕಿಣ್ವಗಳು ರಚನೆಗೂ ಸಹಾಯ.',
+    foods: ['🍗 ಕೋಳಿ/ಮೀನು', '🥚 ಮೊಟ್ಟೆ', '🥛 ಹಾಲು ಮತ್ತು ಪನೀರ್', '🫘 ದಾಲ್ ಮತ್ತು ಕಾಳು', '🥜 ಕಾಯಿ', '🫛 ಸೋಯಾಬೀನ್']
+  },
+  veggies: {
+    title: '🥦 ಜೀವಸತ್ವಗಳು ಮತ್ತು ಖನಿಜ – ಶರೀರ ರಕ್ಷಕಗಳು',
+    text: 'ಜೀವಸತ್ವ ಮತ್ತು ಖನಿಜ ಶರೀರ <strong>ಸರಿಯಾಗಿ ಕೆಲಸ</strong> ಮಾಡಲು, ರೋಗದಿಂದ ಹೋರಾಟ ಮತ್ತು ಬೆಳವಣಿಗೆಗೆ ಅಗತ್ಯ. ಹಣ್ಣು ತರಕಾರಿ ಉತ್ತಮ ಮೂಲ. ಪ್ರತಿ ಬಣ್ಣ ವಿಭಿನ್ನ ಪೋಷಕ!',
+    foods: ['🥦 ಬ್ರೋಕೊಲಿ (ಜೀವಸತ್ವ ಸಿ)', '🥕 ಕ್ಯಾರೆಟ್ (ಜೀವಸತ್ವ ಎ)', '🍊 ಕಿತ್ತಳೆ (ಜೀವಸತ್ವ ಸಿ)', '🥬 ಪಾಲಕ್ (ಕಬ್ಬಿಣ)', '🍅 ಟೊಮೇಟೊ', '🫑 ಬೆಲ್ ಪೆಪ್ಪರ್']
+  },
+  fats: {
+    title: '🥜 ಆರೋಗ್ಯಕರ ಕೊಬ್ಬು - ಮೆದುಳು ಮತ್ತು ಶಕ್ತಿ',
+    text: '<strong>ಮೆದುಳು ವಿಕಾಸ</strong>, ಜೀವಸತ್ವ ಹೀರಿಕೆ ಮತ್ತು ದೀರ್ಘ ಶಕ್ತಿಗೆ ಕೊಬ್ಬು. ಬೀಜ, ಎಣ್ಣೆ ಉತ್ತಮ ಕೊಬ್ಬು. ಟ್ರಾನ್ಸ್ ಫ್ಯಾಟ್ ಮತ್ತು ಅಧಿಕ ಫ್ರೈಡ್ ತಪ್ಪಿಸಿ.',
+    foods: ['🥜 ಬಾದಾಮಿ ಮತ್ತು ಅಕ್ರೋಟ್', '🥑 ಅವಕಾಡೊ', '🫒 ಒಲಿವ್ ಎಣ್ಣೆ', '🐟 ಮೀನು (ಒಮೇಗಾ-೩)', '🌻 ಬೀಜಗಳು', '🥥 ತೆಂಗು']
+  }
+};
+
+const nutrientTitle = document.getElementById('nutrient-title');
+const nutrientText = document.getElementById('nutrient-text');
+const foodExamples = document.getElementById('food-examples');
+
+function selectNutrient(type, element) {
+  // Update tabs
+  document.querySelectorAll('.nutrient-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.plate-section').forEach(s => s.classList.remove('active'));
+  
+  if (element.classList.contains('nutrient-tab')) {
+    element.classList.add('active');
+    document.querySelector(`.plate-section.${type}`).classList.add('active');
+  } else {
+    element.classList.add('active');
+    document.querySelectorAll('.nutrient-tab').forEach((tab, i) => {
+      const types = ['carbs', 'protein', 'veggies', 'fats'];
+      if (types[i] === type) tab.classList.add('active');
+    });
+  }
+  
+  // Update info
+  const nutrient = nutrients[type];
+  nutrientTitle.textContent = nutrient.title;
+  nutrientText.innerHTML = nutrient.text;
+  foodExamples.innerHTML = nutrient.foods.map(f => `<span class="food-tag">${f}</span>`).join('');
+}
+
+// Initialize
+document.querySelector('.plate-section.carbs').classList.add('active');
+
+// ── URL Parameter Support ──────────────────────────────────────────────
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var state = p.get('initialState');
+  var hints = p.get('showHints');
+
+  if (hints === 'false') {
+    var cc = document.querySelector('.concept-card');
+    if (cc) cc.style.display = 'none';
+  }
+
+  var validStates = ['carbs', 'protein', 'veggies', 'fats'];
+  if (state && validStates.indexOf(state) !== -1) {
+    setTimeout(function () {
+      var typeOrder = ['carbs', 'protein', 'veggies', 'fats'];
+      var idx = typeOrder.indexOf(state);
+      var tabs = document.querySelectorAll('.nutrient-tab');
+      if (idx !== -1 && tabs[idx]) {
+        selectNutrient(state, tabs[idx]);
+      }
+    }, 800);
+  }
+}());
+</script>
+</body>
+</html>

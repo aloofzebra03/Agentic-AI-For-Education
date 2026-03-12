@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#7b1fa2">
+<title>ರಾಸಾಯನಿಕ ಬದಲಾವಣೆಗಳು – ಹೊಸ ಪದಾರ್ಥಗಳು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #7b1fa2 0%, #ba68c8 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #7b1fa2;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #7b1fa2; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.experiment-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.exp-tab {
+  flex: 1;
+  padding: 10px 6px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.exp-tab.active { border-color: #7b1fa2; background: #f3e5f5; color: #7b1fa2; }
+
+.visual {
+  position: relative;
+  height: 40vh;
+  min-height: 280px;
+  background: linear-gradient(180deg, #37474f 0%, #455a64 100%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+svg { width: 100%; height: 100%; }
+
+.status-badge {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.controls {
+  margin-top: 10px;
+}
+
+.mix-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, #7b1fa2 0%, #9c27b0 100%);
+  color: white;
+}
+
+.mix-btn:disabled { background: #ccc; }
+
+.equation-box {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  text-align: center;
+  border-left: 4px solid #e91e63;
+}
+
+.equation-title { font-size: 11px; font-weight: 600; color: #c2185b; margin-bottom: 6px; }
+.equation { font-size: 13px; font-weight: 700; color: #37474f; }
+.equation-explain { font-size: 10px; color: #666; margin-top: 6px; }
+
+.learning-panel {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #7b1fa2;
+}
+
+.learning-title { font-size: 12px; font-weight: 700; color: #7b1fa2; margin-bottom: 6px; }
+.learning-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.takeaway {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #f44336;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #c62828; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+@keyframes bubble {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-40px); opacity: 0; }
+}
+
+.bubble { animation: bubble 1s ease-out infinite; }
+
+@keyframes fizz {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.fizz { animation: fizz 0.2s ease infinite; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>⚗️ ರಾಸಾಯನಿಕ ಬದಲಾವಣೆಗಳು</h1>
+  <p>ಹೊಸ ಪದಾರ್ಥಗಳು ರೂಪುಗೊಳ್ಳುವ ಬದಲಾವಣೆಗಳು</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ರಾಸಾಯನಿಕ ಬದಲಾವಣೆ</strong>ಯಲ್ಲಿ ಒಂದು ಅಥವಾ ಹೆಚ್ಚು <strong>ಹೊಸ ಪದಾರ್ಥಗಳು</strong> ರೂಪುಗೊಳ್ಳುತ್ತವೆ. ಮೂಲ ಪದಾರ್ಥಗಳು ರಾಸಾಯನಿಕ ಪ್ರತಿಕ್ರಿಯೆಯಿಂದ ಸಂಪೂರ್ಣವಾಗಿ ಬೇರೆಯದಾಗಿ ಪರಿವರ್ತನೆಯಾಗುತ್ತವೆ.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="experiment-tabs">
+    <button class="exp-tab active" onclick="selectExperiment('vinegar', this)">🧪 ವಿನಿಗರ್ + ಬೇಕಿಂಗ್ ಸೋಡಾ</button>
+    <button class="exp-tab" onclick="selectExperiment('limewater', this)">💨 CO₂ + ಸುಣ್ಣದ ನೀರು</button>
+  </div>
+  
+  <div class="visual">
+    <div class="status-badge" id="status-badge">ಮಿಶ್ರಣ ಮಾಡಲು ಸಿದ್ಧ</div>
+    <svg viewBox="0 0 400 280" id="scene">
+      <!-- ವಿನಿಗರ್ + ಬೇಕಿಂಗ್ ಸೋಡಾ Scene -->
+      <g id="vinegar-scene">
+        <!-- Beaker -->
+        <rect x="140" y="100" width="120" height="140" rx="5" fill="none" stroke="#90a4ae" stroke-width="3"/>
+        <rect x="145" y="180" width="110" height="55" rx="3" fill="#fff" opacity="0.9" id="baking-soda"/>
+        <text x="200" y="210" font-size="10" fill="#666" text-anchor="middle">ಬೇಕಿಂಗ್ ಸೋಡಾ (NaHCO₃)</text>
+        
+        <!-- ವಿನಿಗರ್ bottle -->
+        <g id="vinegar-bottle" transform="translate(300, 80)">
+          <rect x="-20" y="0" width="40" height="80" rx="5" fill="#a5d6a7"/>
+          <rect x="-10" y="-15" width="20" height="20" rx="3" fill="#81c784"/>
+          <text x="0" y="50" font-size="8" fill="#2e7d32" text-anchor="middle">ವಿನಿಗರ್</text>
+          <text x="0" y="60" font-size="7" fill="#2e7d32" text-anchor="middle">(CH₃COOH)</text>
+        </g>
+        
+        <!-- Pouring vinegar (hidden) -->
+        <g id="pour-vinegar" style="display:none">
+          <path d="M 280 100 Q 260 130 240 150" stroke="#a5d6a7" stroke-width="8" fill="none" stroke-linecap="round"/>
+        </g>
+        
+        <!-- Bubbles (hidden) -->
+        <g id="bubbles" style="display:none">
+          <circle cx="170" cy="170" r="5" fill="#e3f2fd" class="bubble"/>
+          <circle cx="190" cy="165" r="4" fill="#e3f2fd" class="bubble" style="animation-delay:0.2s"/>
+          <circle cx="210" cy="175" r="6" fill="#e3f2fd" class="bubble" style="animation-delay:0.4s"/>
+          <circle cx="180" cy="160" r="3" fill="#e3f2fd" class="bubble" style="animation-delay:0.6s"/>
+          <circle cx="220" cy="168" r="5" fill="#e3f2fd" class="bubble" style="animation-delay:0.3s"/>
+          <circle cx="200" cy="155" r="4" fill="#e3f2fd" class="bubble" style="animation-delay:0.5s"/>
+        </g>
+        
+        <!-- Fizzing mixture -->
+        <g id="fizz-mixture" style="display:none">
+          <rect x="145" y="140" width="110" height="95" rx="3" fill="#e8f5e9" class="fizz"/>
+        </g>
+        
+        <!-- CO2 gas rising -->
+        <g id="co2-gas" style="display:none">
+          <text x="160" y="120" font-size="12" fill="#90a4ae">CO₂↑</text>
+          <text x="200" y="110" font-size="12" fill="#90a4ae">CO₂↑</text>
+          <text x="230" y="125" font-size="12" fill="#90a4ae">CO₂↑</text>
+        </g>
+      </g>
+      
+      <!-- ಸುಣ್ಣದ ನೀರು Scene -->
+      <g id="limewater-scene" style="display:none">
+        <!-- Test tube with lime ನೀರು -->
+        <rect x="170" y="80" width="60" height="150" rx="30" fill="none" stroke="#90a4ae" stroke-width="3"/>
+        <rect x="175" y="150" width="50" height="75" rx="25" fill="#e0e0e0" opacity="0.3" id="limewater"/>
+        <text x="200" y="250" font-size="10" fill="#666" text-anchor="middle">ಸುಣ್ಣದ ನೀರು Ca(OH)₂</text>
+        
+        <!-- Straw for blowing -->
+        <g id="straw">
+          <rect x="195" y="20" width="10" height="100" fill="#ffcc80"/>
+          <text x="250" y="60" font-size="10" fill="#fff">← Blow air</text>
+        </g>
+        
+        <!-- Bubbles in lime ನೀರು (hidden) -->
+        <g id="limewater-bubbles" style="display:none">
+          <circle cx="190" cy="180" r="4" fill="#fff" class="bubble"/>
+          <circle cx="200" cy="175" r="3" fill="#fff" class="bubble" style="animation-delay:0.2s"/>
+          <circle cx="210" cy="185" r="4" fill="#fff" class="bubble" style="animation-delay:0.4s"/>
+        </g>
+        
+        <!-- ಹಾಲುy lime ನೀರು -->
+        <g id="milky-limewater" style="display:none">
+          <rect x="175" y="150" width="50" height="75" rx="25" fill="#f5f5f5" opacity="0.9"/>
+          <text x="200" y="190" font-size="9" fill="#666" text-anchor="middle">ಹಾಲುy!</text>
+        </g>
+      </g>
+    </svg>
+  </div>
+  
+  <div class="controls">
+    <button class="mix-btn" id="mix-btn" onclick="performReaction()">🧪 ರಾಸಾಯನಿಕಗಳನ್ನು ಮಿಶ್ರಣ ಮಾಡಿ</button>
+  </div>
+</div>
+
+<div class="equation-box" id="equation-box">
+  <div class="equation-title">⚗️ ರಾಸಾಯನಿಕ ಸಮೀಕರಣ</div>
+  <div class="equation" id="equation">ಸೋಡಿಯಂ ಬೈಕಾರ್ಬನೇಟ್ + ಅಸಿಟಿಕ್ ಆಮ್ಲ → CO₂ + ನೀರು + ಸೋಡಿಯಂ ಅಸಿಟೇಟ್</div>
+  <div class="equation-explain" id="equation-explain">ಬೇಕಿಂಗ್ ಸೋಡಾ + ವಿನಿಗರ್ → ಕಾರ್ಬನ್ ಡೈಆಕ್ಸೈಡ್ + ನೀರು + Sodium Acetate</div>
+</div>
+
+<div class="learning-panel">
+  <div class="learning-title">🔬 ಏನಾಗುತ್ತಿದೆ?</div>
+  <div class="learning-text" id="learning-text">
+    ಈ ಪ್ರಯೋಗ ತೋರಿಸುತ್ತದೆ <strong>ರಾಸಾಯನಿಕ ಬದಲಾವಣೆ</strong>.<br><br>
+    When vinegar (acid) meets ಬೇಕಿಂಗ್ ಸೋಡಾ (base), they react to form <strong>ಸಂಪೂರ್ಣ ಹೊಸ ಪದಾರ್ಥಗಳು</strong>: COâ‚‚ ಅನಿಲ (ಬುರುಡೆಗಳು!), ನೀರು, ಸೋಡಿಯಂ ಅಸಿಟೇಟ್.
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ರಾಸಾಯನಿಕ ಬದಲಾವಣೆಯ ಚಿಹ್ನೆಗಳು</div>
+  <div class="takeaway-text">
+    ಈ ಚಿಹ್ನೆಗಳನ್ನು ನೋಡಿ:<br>
+    • <strong>ಅನಿಲ ಬುರುಡೆಗಳು</strong> ರೂಪಿಸುವುದು<br>
+    • <strong>ಬಣ್ಣ ಬದಲಾವಣೆ</strong><br>
+    • <strong>ಉಷ್ಣತೆ ಬದಲಾವಣೆ</strong> (hot or cold)<br>
+    • <strong>ಅವಕ್ಷೇಪ</strong> (ಘನ) ರೂಪಿಸುವುದು<br>
+    • <strong>ಹೊಸ ವಾಸನೆ</strong><br><br>
+    ರಾಸಾಯನಿಕ ಬದಲಾಗುತ್ತದೆ are usually <strong>ಹಿಮ್ಮುಖವಲ್ಲ</strong>!
+  </div>
+</div>
+
+</div>
+
+<script>
+let currentExperiment = 'vinegar';
+let reactionDone = false;
+
+const statusBadge = document.getElementById('status-badge');
+const mixBtn = document.getElementById('mix-btn');
+const equation = document.getElementById('equation');
+const equationExplain = document.getElementById('equation-explain');
+const learningText = document.getElementById('learning-text');
+
+function selectExperiment(type, btn) {
+  document.querySelectorAll('.exp-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  
+  currentExperiment = type;
+  reactionDone = false;
+  
+  // ಮರುಹೊಂದಿಸಿ scenes
+  document.getElementById('vinegar-scene').style.display = type === 'vinegar' ? 'block' : 'none';
+  document.getElementById('limewater-scene').style.display = type === 'limewater' ? 'block' : 'none';
+  
+  // ಮರುಹೊಂದಿಸಿ vinegar scene
+  document.getElementById('pour-vinegar').style.display = 'none';
+  document.getElementById('bubbles').style.display = 'none';
+  document.getElementById('fizz-mixture').style.display = 'none';
+  document.getElementById('co2-gas').style.display = 'none';
+  document.getElementById('baking-soda').style.display = 'block';
+  
+  // ಮರುಹೊಂದಿಸಿ limewater scene
+  document.getElementById('limewater-bubbles').style.display = 'none';
+  document.getElementById('milky-limewater').style.display = 'none';
+  document.getElementById('limewater').style.display = 'block';
+  
+  mixBtn.disabled = false;
+  
+  if (type === 'vinegar') {
+    mixBtn.textContent = '🧪 Pour ವಿನಿಗರ್ into ಬೇಕಿಂಗ್ ಸೋಡಾ';
+    statusBadge.textContent = 'ಮಿಶ್ರಣ ಮಾಡಲು ಸಿದ್ಧ';
+    equation.textContent = 'ಸೋಡಿಯಂ ಬೈಕಾರ್ಬನೇಟ್ + ಅಸಿಟಿಕ್ ಆಮ್ಲ → CO₂ + ನೀರು + ಸೋಡಿಯಂ ಅಸಿಟೇಟ್';
+    equationExplain.textContent = 'ಬೇಕಿಂಗ್ ಸೋಡಾ + ವಿನಿಗರ್ → ಕಾರ್ಬನ್ ಡೈಆಕ್ಸೈಡ್ + ನೀರು + Sodium Acetate';
+    learningText.innerHTML = `
+      ಈ ಪ್ರಯೋಗ ತೋರಿಸುತ್ತದೆ <strong>ರಾಸಾಯನಿಕ ಬದಲಾವಣೆ</strong>.<br><br>
+      When vinegar (acid) meets ಬೇಕಿಂಗ್ ಸೋಡಾ (base), they react to form <strong>ಸಂಪೂರ್ಣ ಹೊಸ ಪದಾರ್ಥಗಳು</strong>: COâ‚‚ ಅನಿಲ (ಬುರುಡೆಗಳು!), ನೀರು, ಸೋಡಿಯಂ ಅಸಿಟೇಟ್.
+    `;
+  } else {
+    mixBtn.textContent = '💨 ಸುಣ್ಣದ ನೀರಿಗೆ ಗಾಳಿ (CO₂) ಊದಿ';
+    statusBadge.textContent = 'ಸಿದ್ಧ to blow';
+    equation.textContent = 'Ca(OH)₂ + CO₂ → CaCO₃ + H₂O';
+    equationExplain.textContent = 'ಸುಣ್ಣದ ನೀರು + ಕಾರ್ಬನ್ ಡೈಆಕ್ಸೈಡ್ → Calcium Carbite (milky) + ನೀರು';
+    learningText.innerHTML = `
+      This experiment shows how to <strong>test for CO₂ gas</strong>.<br><br>
+      When we blow air into lime ನೀರು, the CO₂ in our breath reacts with calcium hydroxide to form <strong>calcium carbonate</strong> - a white substance that makes the ನೀರು look milky!
+    `;
+  }
+}
+
+function performReaction() {
+  if (reactionDone) return;
+  
+  mixBtn.disabled = true;
+  reactionDone = true;
+  
+  if (currentExperiment === 'vinegar') {
+    // ವಿನಿಗರ್ + ಬೇಕಿಂಗ್ ಸೋಡಾ reaction
+    statusBadge.textContent = '⏳ ವಿನಿಗರ್ ಸುರಿಯುತ್ತಿದೆ...';
+    document.getElementById('pour-vinegar').style.display = 'block';
+    
+    setTimeout(() => {
+      document.getElementById('pour-vinegar').style.display = 'none';
+      document.getElementById('baking-soda').style.display = 'none';
+      document.getElementById('fizz-mixture').style.display = 'block';
+      document.getElementById('bubbles').style.display = 'block';
+      statusBadge.textContent = '🫧 ಪ್ರತಿಕ್ರಿಯೆ ನಡೆಯುತ್ತಿದೆ!';
+    }, 800);
+    
+    setTimeout(() => {
+      document.getElementById('co2-gas').style.display = 'block';
+      statusBadge.textContent = '✅ ರಾಸಾಯನಿಕ ಬದಲಾವಣೆ ಪೂರ್ಣ!';
+      
+      learningText.innerHTML = `
+        <strong style="color:#7b1fa2">✅ ರಾಸಾಯನಿಕ Change Observed!</strong><br><br>
+        <strong>What happened:</strong><br>
+        • Vigorous <strong>bubbling</strong> (CO₂ gas released)<br>
+        • The ಬೇಕಿಂಗ್ ಸೋಡಾ <strong>disappeared</strong><br>
+        • <strong>New substances</strong> formed!<br><br>
+        The original substances (vinegar & ಬೇಕಿಂಗ್ ಸೋಡಾ) are <strong>gone forever</strong> - you can't get them back. This is a ರಾಸಾಯನಿಕ ಬದಲಾವಣೆ!
+      `;
+      
+      mixBtn.textContent = '✅ ಪ್ರತಿಕ್ರಿಯೆ ಪೂರ್ಣ';
+    }, 1500);
+    
+  } else {
+    // Lime ನೀರು + CO2 reaction
+    statusBadge.textContent = '💨 ಗಾಳಿ ಊದುತ್ತಿದೆ...';
+    document.getElementById('limewater-bubbles').style.display = 'block';
+    
+    setTimeout(() => {
+      document.getElementById('limewater').style.display = 'none';
+      document.getElementById('milky-limewater').style.display = 'block';
+      statusBadge.textContent = '✅ ಸುಣ್ಣದ ನೀರು Turned ಹಾಲುy!';
+      
+      learningText.innerHTML = `
+        <strong style="color:#7b1fa2">✅ ರಾಸಾಯನಿಕ Change Observed!</strong><br><br>
+        <strong>What happened:</strong><br>
+        • Clear lime ನೀರು turned <strong>milky white</strong><br>
+        • A new substance (<strong>CaCO₃</strong>) formed<br>
+        • This is how we <strong>test for CO₂</strong>!<br><br>
+        The milkiness is caused by tiny particles of calcium carbonate (chalk!) suspended in ನೀರು. This proves CO₂ was present!
+      `;
+      
+      mixBtn.textContent = '✅ ಪರೀಕ್ಷೆ ಪೂರ್ಣ';
+    }, 1500);
+  }
+}
+
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var showHints = params.get('showHints');
+  if (showHints === 'false') {
+    document.querySelectorAll('.learning-panel, .takeaway, .equation-box').forEach(function (el) { el.style.display = 'none'; });
+  }
+  var state = params.get('initialState');
+  if (!state || state === 'initial') return;
+  if (state === 'vinegar_reacted') {
+    setTimeout(function () {
+      var btn = document.getElementById('mix-btn');
+      if (btn && !btn.disabled) btn.click();
+    }, 800);
+  } else if (state === 'limewater') {
+    setTimeout(function () {
+      var tabs = document.querySelectorAll('.exp-tab');
+      if (tabs[1]) tabs[1].click();
+    }, 800);
+  } else if (state === 'limewater_reacted') {
+    setTimeout(function () {
+      var tabs = document.querySelectorAll('.exp-tab');
+      if (tabs[1]) tabs[1].click();
+      setTimeout(function () {
+        var btn = document.getElementById('mix-btn');
+        if (btn && !btn.disabled) btn.click();
+      }, 1800);
+    }, 800);
+  }
+}());
+</script>
+</body>
+</html>

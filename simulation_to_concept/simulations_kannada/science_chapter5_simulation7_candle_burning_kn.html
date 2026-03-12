@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#795548">
+<title>ಉರಿಯುವ ಮೇಣ – ಭೌತಿಕ ಮತ್ತು ರಾಸಾಯನಿಕ ಬದಲಾವಣೆಗಳು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #795548 0%, #a1887f 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #795548;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #5d4037; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.mode-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.mode-tab {
+  flex: 1;
+  padding: 12px 6px;
+  border: 3px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  background: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.mode-tab:active { transform: scale(0.95); }
+.mode-tab.physical.active { border-color: #2196f3; background: #e3f2fd; color: #1565c0; }
+.mode-tab.chemical.active { border-color: #e91e63; background: #fce4ec; color: #c2185b; }
+
+.visual {
+  position: relative;
+  height: 42vh;
+  min-height: 300px;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+svg { width: 100%; height: 100%; }
+
+.view-label {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+}
+
+.view-label.physical { background: #2196f3; }
+.view-label.chemical { background: #e91e63; }
+
+.result-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.result-badge.same { background: #4caf50; color: white; }
+.result-badge.new { background: #ff5722; color: white; }
+
+.explanation-box {
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.explanation-box.physical {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-left: 4px solid #2196f3;
+}
+
+.explanation-box.chemical {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+  border-left: 4px solid #e91e63;
+}
+
+.exp-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+.exp-title.physical { color: #1565c0; }
+.exp-title.chemical { color: #c2185b; }
+
+.exp-content { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.compare-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.compare-item {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 10px;
+}
+
+.compare-item.before { background: #fff3e0; border: 2px solid #ffcc80; }
+.compare-item.after { background: #e8f5e9; border: 2px solid #a5d6a7; }
+.compare-item .label { font-weight: 600; color: #666; margin-bottom: 4px; }
+.compare-item .value { font-size: 20px; }
+.compare-item .text { font-weight: 600; color: #333; }
+
+.key-ವ್ಯತ್ಯಾಸ {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.key-ವ್ಯತ್ಯಾಸ-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 8px; }
+
+.diff-table {
+  width: 100%;
+  font-size: 10px;
+}
+
+.diff-table td {
+  padding: 6px;
+  border-bottom: 1px solid #ffcc80;
+}
+
+.diff-table td:ಮೊದಲ-child { font-weight: 600; width: 35%; }
+.diff-table .physical-col { color: #1565c0; }
+.diff-table .chemical-col { color: #c2185b; }
+
+@keyframes melt {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes drip {
+  0% { cy: 175; opacity: 1; }
+  100% { cy: 195; opacity: 0; }
+}
+
+@keyframes rise {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-60px); opacity: 0; }
+}
+
+@keyframes flame {
+  0%, 100% { transform: scaleY(1) scaleX(1); }
+  50% { transform: scaleY(1.1) scaleX(0.95); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+.melt-anim { animation: melt 1s ease-in-out infinite; }
+.drip-anim { animation: drip 2s ease-in infinite; }
+.rise-anim { animation: rise 2s ease-out infinite; }
+.flame-anim { animation: flame 0.3s ease-in-out infinite; }
+.pulse-anim { animation: pulse 1s ease-in-out infinite; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🕯️ ಉರಿಯುವ ಮೇಣ</h1>
+  <p>ಎರಡು ಬದಲಾವಣೆಗಳ ನಡುವಿನ ವ್ಯತ್ಯಾಸ ನೋಡಿ!</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪ್ರಶ್ನೆ</div>
+  <div class="concept-text">
+    ಮೇಣ ತೋರಿಸುತ್ತದೆ <strong>both</strong> physical AND chemical ಬದಲಾಗುತ್ತದೆ. But what's the <strong>ವ್ಯತ್ಯಾಸ</strong>? ಪ್ರತಿ ಪ್ರಕ್ರಿಯೆಯ ಜೂಮ್ ನೋಟ ನೋಡಲು ಪ್ರತಿ ಬಟನ್ ಟ್ಯಾಪ್ ಮಾಡಿ!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="mode-tabs">
+    <button class="mode-tab physical active" onclick="showPhysical(this)">
+      💧 PHYSICAL<br><span style="font-size:9px">ಮೇಣ ಕರಗುವಿಕೆ</span>
+    </button>
+    <button class="mode-tab chemical" onclick="showChemical(this)">
+      🔥 ರಾಸಾಯನಿಕ<br><span style="font-size:9px">ಮೇಣ ಉರಿಯುತ್ತಿದೆ</span>
+    </button>
+  </div>
+  
+  <div class="visual">
+    <div class="view-label physical" id="view-label">💧 Physical Change Zone</div>
+    <div class="result-badge same" id="result-badge">✓ ಅದೇ ಪದಾರ್ಥ</div>
+    
+    <!-- Physical Change View -->
+    <svg viewBox="0 0 400 300" id="physical-view">
+      <!-- Background -->
+      <rect x="0" y="0" width="400" height="300" fill="#1a1a2e"/>
+      
+      <!-- Zoomed cಮತ್ತುle top showing melting -->
+      <text x="200" y="25" font-size="11" fill="#90a4ae" text-anchor="middle">🔍 ಜೂಮ್: ಮೇಣದ ಮೇಲ್ಭಾಗ</text>
+      
+      <!-- Heat waves from above -->
+      <g opacity="0.3">
+        <path d="M 150 50 Q 160 60 150 70" stroke="#ff9800" stroke-width="2" fill="none"/>
+        <path d="M 200 45 Q 210 55 200 65" stroke="#ff9800" stroke-width="2" fill="none"/>
+        <path d="M 250 50 Q 260 60 250 70" stroke="#ff9800" stroke-width="2" fill="none"/>
+      </g>
+      <text x="200" y="85" font-size="10" fill="#ff9800" text-anchor="middle">↓ ಜ್ವಾಲೆಯಿಂದ ಉಷ್ಣ ↓</text>
+      
+      <!-- ಮೊದಲು: Solid wax block -->
+      <g id="solid-wax-group">
+        <text x="100" y="110" font-size="10" fill="#64b5f6" text-anchor="middle" font-weight="bold">ಮೊದಲು</text>
+        <rect x="60" y="120" width="80" height="60" rx="5" fill="#fff9c4" stroke="#ffd54f" stroke-width="2"/>
+        <text x="100" y="155" font-size="12" fill="#f57f17" text-anchor="middle" font-weight="bold">ಘನ WAX</text>
+        <!-- Molecule arrangement (ordered) -->
+        <g transform="translate(65, 125)">
+          <circle cx="10" cy="10" r="6" fill="#ffeb3b" stroke="#ffc107" stroke-width="1"/>
+          <circle cx="25" cy="10" r="6" fill="#ffeb3b" stroke="#ffc107" stroke-width="1"/>
+          <circle cx="40" cy="10" r="6" fill="#ffeb3b" stroke="#ffc107" stroke-width="1"/>
+          <circle cx="55" cy="10" r="6" fill="#ffeb3b" stroke="#ffc107" stroke-width="1"/>
+          <circle cx="10" cy="25" r="6" fill="#ffeb3b" stroke="#ffc107" stroke-width="1"/>
+          <circle cx="25" cy="25" r="6" fill="#ffeb3b" stroke="#ffc107" stroke-width="1"/>
+          <circle cx="40" cy="25" r="6" fill="#ffeb3b" stroke="#ffc107" stroke-width="1"/>
+          <circle cx="55" cy="25" r="6" fill="#ffeb3b" stroke="#ffc107" stroke-width="1"/>
+        </g>
+        <text x="100" y="195" font-size="8" fill="#aaa" text-anchor="middle">ಅಣುಗಳು ಬಿಗಿಯಾಗಿ ಜೋಡಣೆ</text>
+      </g>
+      
+      <!-- Arrow -->
+      <g>
+        <line x1="155" y1="150" x2="235" y2="150" stroke="#4caf50" stroke-width="4" marker-end="url(#arrowhead)"/>
+        <text x="195" y="140" font-size="10" fill="#4caf50" text-anchor="middle" font-weight="bold">+ HEAT</text>
+      </g>
+      
+      <!-- ನಂತರ: Liquid wax pool -->
+      <g id="ದ್ರವ-wax-group">
+        <text x="300" y="110" font-size="10" fill="#64b5f6" text-anchor="middle" font-weight="bold">ನಂತರ</text>
+        <ellipse cx="300" cy="160" rx="50" ry="25" fill="#fff9c4" stroke="#ffd54f" stroke-width="2" class="melt-anim"/>
+        <text x="300" y="165" font-size="12" fill="#f57f17" text-anchor="middle" font-weight="bold">ದ್ರವ WAX</text>
+        <!-- Molecule arrangement (loose but same color!) -->
+        <g transform="translate(260, 140)" class="melt-anim">
+          <circle cx="8" cy="5" r="6" fill="#ffeb3b" stroke="#ffc107" stroke-width="1"/>
+          <circle cx="28" cy="12" r="6" fill="#ffeb3b" stroke="#ffc107" stroke-width="1"/>
+          <circle cx="50" cy="8" r="6" fill="#ffeb3b" stroke="#ffc107" stroke-width="1"/>
+          <circle cx="70" cy="15" r="6" fill="#ffeb3b" stroke="#ffc107" stroke-width="1"/>
+          <circle cx="15" cy="28" r="6" fill="#ffeb3b" stroke="#ffc107" stroke-width="1"/>
+          <circle cx="38" cy="32" r="6" fill="#ffeb3b" stroke="#ffc107" stroke-width="1"/>
+          <circle cx="60" cy="25" r="6" fill="#ffeb3b" stroke="#ffc107" stroke-width="1"/>
+        </g>
+        <text x="300" y="200" font-size="8" fill="#aaa" text-anchor="middle">ಅದೇ ಅಣುಗಳು, ಮುಕ್ತವಾಗಿ ಚಲಿಸುತ್ತಿವೆ!</text>
+      </g>
+      
+      <!-- Key point box -->
+      <rect x="80" y="220" width="240" height="55" rx="10" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+      <text x="200" y="240" font-size="11" fill="#1565c0" text-anchor="middle" font-weight="bold">✓ ಅದೇ ಹಳದಿ ಅಣುಗಳು!</text>
+      <text x="200" y="255" font-size="9" fill="#37474f" text-anchor="middle">ಮೇಣ ಇನ್ನೂ ಮೇಣ - ಕೇವಲ ಸ್ಥಿತಿ ಬದಲಾಯಿತು</text>
+      <text x="200" y="268" font-size="9" fill="#4caf50" text-anchor="middle" font-weight="bold">ಹಿಮ್ಮುಖ: ತಂಪು → ಮತ್ತೆ ಘನ!</text>
+      
+      <!-- Arrow marker -->
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#4caf50"/>
+        </marker>
+        <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#f44336"/>
+        </marker>
+      </defs>
+    </svg>
+    
+    <!-- ರಾಸಾಯನಿಕ Change View -->
+    <svg viewBox="0 0 400 300" id="chemical-view" style="display:none">
+      <!-- Background -->
+      <rect x="0" y="0" width="400" height="300" fill="#1a1a2e"/>
+      
+      <!-- Zoomed flame showing burning -->
+      <text x="200" y="25" font-size="11" fill="#90a4ae" text-anchor="middle">🔍 ಜೂಮ್: ಜ್ವಾಲೆಯ ಒಳಗೆ</text>
+      
+      <!-- ಮೊದಲು: Wax vapor molecules -->
+      <g id="wax-vapor-group">
+        <text x="100" y="55" font-size="10" fill="#f48fb1" text-anchor="middle" font-weight="bold">ಮೊದಲು</text>
+        
+        <!-- Wax molecule (hydrocarbon) -->
+        <g transform="translate(60, 70)">
+          <rect x="0" y="0" width="80" height="50" rx="8" fill="#fff9c4" stroke="#ffd54f" stroke-width="2"/>
+          <circle cx="20" cy="25" r="10" fill="#ffeb3b" stroke="#ffc107" stroke-width="2"/>
+          <circle cx="40" cy="25" r="10" fill="#ffeb3b" stroke="#ffc107" stroke-width="2"/>
+          <circle cx="60" cy="25" r="10" fill="#ffeb3b" stroke="#ffc107" stroke-width="2"/>
+          <text x="40" y="30" font-size="8" fill="#795548" text-anchor="middle">C-C-C</text>
+        </g>
+        <text x="100" y="135" font-size="9" fill="#ffd54f" text-anchor="middle" font-weight="bold">ಮೇಣ ಆವಿ</text>
+        <text x="100" y="148" font-size="8" fill="#aaa" text-anchor="middle">(ಜಲವಿದ್ಯುತ್carbons)</text>
+        
+        <!-- Plus sign -->
+        <text x="170" y="100" font-size="24" fill="#fff" font-weight="bold">+</text>
+        
+        <!-- ಆಮ್ಲಜನಕ molecules -->
+        <g transform="translate(190, 70)">
+          <rect x="0" y="0" width="60" height="50" rx="8" fill="#e3f2fd" stroke="#64b5f6" stroke-width="2"/>
+          <circle cx="20" cy="25" r="12" fill="#64b5f6"/>
+          <circle cx="40" cy="25" r="12" fill="#64b5f6"/>
+          <text x="30" y="30" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">O₂</text>
+        </g>
+        <text x="220" y="135" font-size="9" fill="#64b5f6" text-anchor="middle" font-weight="bold">ಆಮ್ಲಜನಕ</text>
+        <text x="220" y="148" font-size="8" fill="#aaa" text-anchor="middle">(From air)</text>
+      </g>
+      
+      <!-- Flame/reaction zone -->
+      <g transform="translate(280, 60)">
+        <ellipse cx="40" cy="35" rx="35" ry="45" fill="#ff9800" opacity="0.6" class="flame-anim"/>
+        <ellipse cx="40" cy="40" rx="25" ry="35" fill="#ffeb3b" opacity="0.8" class="flame-anim"/>
+        <text x="40" y="45" font-size="20" text-anchor="middle">🔥</text>
+        <text x="40" y="100" font-size="8" fill="#ff9800" text-anchor="middle">ಪ್ರತಿಕ್ರಿಯೆ!</text>
+      </g>
+      
+      <!-- Arrow pointing down -->
+      <line x1="200" y1="160" x2="200" y2="190" stroke="#f44336" stroke-width="4" marker-end="url(#arrowhead-red)"/>
+      <text x="200" y="175" font-size="9" fill="#f44336" text-anchor="middle" font-weight="bold" dx="40">ರಾಸಾಯನಿಕ</text>
+      <text x="200" y="185" font-size="9" fill="#f44336" text-anchor="middle" font-weight="bold" dx="40">ಪ್ರತಿಕ್ರಿಯೆ!</text>
+      
+      <!-- ನಂತರ: New products -->
+      <g id="products-group">
+        <text x="200" y="205" font-size="10" fill="#f48fb1" text-anchor="middle" font-weight="bold">ನಂತರ - ಹೊಸ ಪದಾರ್ಥಗಳು!</text>
+        
+        <!-- CO2 molecule -->
+        <g transform="translate(70, 215)" class="rise-anim">
+          <rect x="0" y="0" width="70" height="40" rx="8" fill="#ffebee" stroke="#ef9a9a" stroke-width="2"/>
+          <circle cx="20" cy="20" r="10" fill="#ef5350"/>
+          <circle cx="35" cy="20" r="8" fill="#424242"/>
+          <circle cx="50" cy="20" r="10" fill="#ef5350"/>
+          <text x="35" y="24" font-size="7" fill="#fff" text-anchor="middle">CO₂</text>
+        </g>
+        <text x="105" y="270" font-size="8" fill="#ef5350" text-anchor="middle" font-weight="bold">ಕಾರ್ಬನ್ ಡೈಆಕ್ಸೈಡ್</text>
+        
+        <!-- Plus -->
+        <text x="165" y="240" font-size="18" fill="#fff">+</text>
+        
+        <!-- H2O molecule -->
+        <g transform="translate(185, 215)" class="rise-anim" style="animation-delay:0.5s">
+          <rect x="0" y="0" width="60" height="40" rx="8" fill="#e3f2fd" stroke="#90caf9" stroke-width="2"/>
+          <circle cx="15" cy="20" r="8" fill="#2196f3"/>
+          <circle cx="30" cy="15" r="6" fill="#fff"/>
+          <circle cx="45" cy="20" r="6" fill="#fff"/>
+          <text x="30" y="24" font-size="7" fill="#1565c0" text-anchor="middle">H₂O</text>
+        </g>
+        <text x="215" y="270" font-size="8" fill="#2196f3" text-anchor="middle" font-weight="bold">ನೀರಿನ ಆವಿ</text>
+        
+        <!-- Plus -->
+        <text x="270" y="240" font-size="18" fill="#fff">+</text>
+        
+        <!-- Energy -->
+        <g transform="translate(290, 215)">
+          <rect x="0" y="0" width="60" height="40" rx="8" fill="#fff3e0" stroke="#ffb74d" stroke-width="2" class="pulse-anim"/>
+          <text x="30" y="20" font-size="16" text-anchor="middle">💡🔥</text>
+        </g>
+        <text x="320" y="270" font-size="8" fill="#ff9800" text-anchor="middle" font-weight="bold">ಬೆಳಕು + ಉಷ್ಣ</text>
+      </g>
+      
+      <!-- Key point -->
+      <rect x="60" y="275" width="280" height="20" rx="5" fill="#fce4ec" stroke="#e91e63" stroke-width="2"/>
+      <text x="200" y="289" font-size="9" fill="#c2185b" text-anchor="middle" font-weight="bold">✗ ವಿಭಿನ್ನ ಅಣುಗಳು! ಮೇಣ ಮರಳಿ ಸಿಗುವುದಿಲ್ಲ!</text>
+    </svg>
+  </div>
+</div>
+
+<div class="explanation-box physical" id="explanation-box">
+  <div class="exp-title physical" id="exp-title">💧 Physical Change: ಮೇಣ ಕರಗುವಿಕೆ</div>
+  <div class="exp-content" id="exp-content">
+    ಜ್ವಾಲೆಯಿಂದ ಉಷ್ಣ <strong>ಘನ ಮೇಣ ದ್ರವವಾಗಿ ಕರಗುತ್ತದೆ</strong>. ಅಣುಗಳು ವೇಗವಾಗಿ ಹರಡುತ್ತವೆ, ಆದರೆ ಇನ್ನೂ <strong>ಅದೇ ಮೇಣ ಅಣುಗಳು</strong>!
+  </div>
+  <div class="compare-row">
+    <div class="compare-item before">
+      <div class="label">ಮೊದಲು</div>
+      <div class="value">🟨</div>
+      <div class="text">ಘನ ಮೇಣ</div>
+    </div>
+    <div class="compare-item after">
+      <div class="label">ನಂತರ</div>
+      <div class="value">🟨</div>
+      <div class="text">ದ್ರವ ಮೇಣ</div>
+    </div>
+  </div>
+  <div style="text-align:center; margin-top:8px; font-size:11px; color:#4caf50; font-weight:600;">
+    ✓ ಅದೇ ಬಣ್ಣ = ಅದೇ ಪದಾರ್ಥ! ಹಿಮ್ಮುಖ!
+  </div>
+</div>
+
+<div class="key-ವ್ಯತ್ಯಾಸ">
+  <div class="key-ವ್ಯತ್ಯಾಸ-title">🎯 ಮುಖ್ಯ ವ್ಯತ್ಯಾಸ</div>
+  <table class="diff-table">
+    <tr>
+      <td></td>
+      <td class="physical-col">💧 Physical</td>
+      <td class="chemical-col">🔥 ರಾಸಾಯನಿಕ</td>
+    </tr>
+    <tr>
+      <td>ಏನು ಬದಲಾಗುತ್ತದೆ?</td>
+      <td class="physical-col">ಕೇವಲ ಸ್ಥಿತಿ/ರೂಪ</td>
+      <td class="chemical-col">ಪದಾರ್ಥ ಸ್ವತಃ</td>
+    </tr>
+    <tr>
+      <td>ಹೊಸ ಪದಾರ್ಥ?</td>
+      <td class="physical-col">❌ No</td>
+      <td class="chemical-col">✅ Yes (CO₂, H₂O)</td>
+    </tr>
+    <tr>
+      <td>ಹಿಮ್ಮುಖ?</td>
+      <td class="physical-col">✅ Yes (cool it)</td>
+      <td class="chemical-col">❌ No (wax is gone!)</td>
+    </tr>
+    <tr>
+      <td>ಅಣುಗಳು?</td>
+      <td class="physical-col">ಅದೇ ಅಣುಗಳು</td>
+      <td class="chemical-col">ವಿಭಿನ್ನ ಅಣುಗಳು</td>
+    </tr>
+  </table>
+</div>
+
+</div>
+
+<script>
+const viewLabel = document.getElementById('view-label');
+const resultBadge = document.getElementById('result-badge');
+const physicalView = document.getElementById('physical-view');
+const chemicalView = document.getElementById('chemical-view');
+const explanationBox = document.getElementById('explanation-box');
+const expTitle = document.getElementById('exp-title');
+const expContent = document.getElementById('exp-content');
+
+function showPhysical(btn) {
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  
+  physicalView.style.display = 'block';
+  chemicalView.style.display = 'none';
+  
+  viewLabel.textContent = '💧 Physical Change Zone';
+  viewLabel.className = 'view-label physical';
+  
+  resultBadge.textContent = '✓ ಅದೇ ಪದಾರ್ಥ';
+  resultBadge.className = 'result-badge same';
+  
+  explanationBox.className = 'explanation-box physical';
+  expTitle.className = 'exp-title physical';
+  expTitle.textContent = '💧 Physical Change: ಮೇಣ ಕರಗುವಿಕೆ';
+  expContent.innerHTML = `
+    ಜ್ವಾಲೆಯಿಂದ ಉಷ್ಣ <strong>ಘನ ಮೇಣ ದ್ರವವಾಗಿ ಕರಗುತ್ತದೆ</strong>. ಅಣುಗಳು ವೇಗವಾಗಿ ಹರಡುತ್ತವೆ, ಆದರೆ ಇನ್ನೂ <strong>ಅದೇ ಮೇಣ ಅಣುಗಳು</strong>!
+  `;
+  
+  document.querySelector('.compare-row').innerHTML = `
+    <div class="compare-item before">
+      <div class="label">ಮೊದಲು</div>
+      <div class="value">🟨</div>
+      <div class="text">ಘನ ಮೇಣ</div>
+    </div>
+    <div class="compare-item after">
+      <div class="label">ನಂತರ</div>
+      <div class="value">🟨</div>
+      <div class="text">ದ್ರವ ಮೇಣ</div>
+    </div>
+  `;
+  
+  document.querySelector('.explanation-box div:last-child').innerHTML = '✓ ಅದೇ ಬಣ್ಣ = ಅದೇ ಪದಾರ್ಥ! ಹಿಮ್ಮುಖ!';
+  document.querySelector('.explanation-box div:last-child').style.color = '#4caf50';
+}
+
+function showChemical(btn) {
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  
+  physicalView.style.display = 'none';
+  chemicalView.style.display = 'block';
+  
+  viewLabel.textContent = '🔥 ರಾಸಾಯನಿಕ ಬದಲಾವಣೆ ವಲಯ';
+  viewLabel.className = 'view-label chemical';
+  
+  resultBadge.textContent = '✗ ಹೊಸ ಪದಾರ್ಥಗಳು';
+  resultBadge.className = 'result-badge new';
+  
+  explanationBox.className = 'explanation-box chemical';
+  expTitle.className = 'exp-title chemical';
+  expTitle.textContent = '🔥 ರಾಸಾಯನಿಕ ಬದಲಾವಣೆ: ಮೇಣ ಉರಿಯುತ್ತಿದೆ';
+  expContent.innerHTML = `
+    ಮೇಣದ ಆವಿ ಆಮ್ಲಜನಕದೊಂದಿಗೆ <strong>ರಾಸಾಯನಿಕ ಪ್ರತಿಕ್ರಿಯೆ</strong>ಯಲ್ಲಿ ಪ್ರತಿಕ್ರಿಯಿಸುತ್ತದೆ. ಮೇಣದ ಅಣುಗಳು <strong>ಸಂಪೂರ್ಣವಾಗಿ ರೂಪಾಂತರ</strong>ಗೊಂಡು ವಿಭಿನ್ನ ಪದಾರ್ಥಗಳಾಗುತ್ತವೆ: ಕಾರ್ಬನ್ ಡೈಆಕ್ಸೈಡ್ ಮತ್ತು ನೀರಿನ ಆವಿ!
+  `;
+  
+  document.querySelector('.compare-row').innerHTML = `
+    <div class="compare-item before">
+      <div class="label">ಮೊದಲು</div>
+      <div class="value">🟨 + 🔵</div>
+      <div class="text">ಮೇಣ + O₂</div>
+    </div>
+    <div class="compare-item after">
+      <div class="label">ನಂತರ</div>
+      <div class="value">⚪ + 💧</div>
+      <div class="text">CO₂ + H₂O</div>
+    </div>
+  `;
+  
+  document.querySelector('.explanation-box div:last-child').innerHTML = '✗ ವಿಭಿನ್ನ ಬಣ್ಣ = ವಿಭಿನ್ನ ಪದಾರ್ಥ! ಹಿಮ್ಮುಖವಲ್ಲ!';
+  document.querySelector('.explanation-box div:last-child').style.color = '#c62828';
+}
+
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var showHints = params.get('showHints');
+  if (showHints === 'false') {
+    document.querySelectorAll('.concept-card, .explanation-box').forEach(function (el) { el.style.display = 'none'; });
+  }
+  var state = params.get('initialState');
+  if (!state || state === 'physical') return;
+  if (state === 'chemical') {
+    setTimeout(function () {
+      var btn = document.querySelector('.mode-tab.chemical');
+      if (btn) btn.click();
+    }, 800);
+  }
+}());
+</script>
+</body>
+</html>

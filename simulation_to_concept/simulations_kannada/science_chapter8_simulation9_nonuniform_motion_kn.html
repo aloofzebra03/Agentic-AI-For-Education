@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#9c27b0">
+<title>ಅಸಮ ಚಲನೆ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #9c27b0 0%, #ce93d8 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #9c27b0;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #7b1fa2; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.mode-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 10px 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.mode-btn:active { transform: scale(0.98); }
+.mode-btn.active { border-color: #9c27b0; background: #f3e5f5; color: #7b1fa2; }
+
+.mode-btn .icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+.motion-visual {
+  position: relative;
+  height: 100px;
+  background: linear-gradient(180deg, #87ceeb 0%, #b3e5fc 100%);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.road {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: #424242;
+}
+
+.road-line {
+  position: absolute;
+  bottom: 18px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: repeating-linear-gradient(90deg, #fff 0, #fff 30px, transparent 30px, transparent 60px);
+}
+
+.car {
+  position: absolute;
+  bottom: 25px;
+  left: 20px;
+  font-size: 35px;
+  transition: left 0.1s linear;
+}
+
+.speedometer-mini {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 70px;
+  height: 35px;
+  background: #333;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.speed-display {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4caf50;
+  font-family: monospace;
+}
+
+.speed-unit {
+  font-size: 8px;
+  color: #fff;
+}
+
+.data-display {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.data-item {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+}
+
+.data-label { font-size: 10px; color: #666; }
+.data-value { font-size: 18px; font-weight: 700; color: #9c27b0; margin-top: 4px; }
+
+.controls {
+  display: flex;
+  gap: 10px;
+}
+
+.control-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.start-btn { background: linear-gradient(135deg, #4caf50, #66bb6a); color: #fff; }
+.reset-btn { background: linear-gradient(135deg, #9e9e9e, #bdbdbd); color: #fff; }
+
+.data-table {
+  margin-top: 15px;
+}
+
+.table-title { font-size: 12px; font-weight: 600; color: #333; margin-bottom: 8px; }
+
+.table-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.table-cell {
+  padding: 8px 4px;
+  text-align: center;
+  font-size: 9px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+}
+
+.table-header .table-cell {
+  background: #9c27b0;
+  color: #fff;
+  font-weight: 600;
+}
+
+.table-cell.vary { background: #f3e5f5; color: #7b1fa2; font-weight: 600; }
+
+.graph-section {
+  margin-top: 15px;
+}
+
+.graph-title { font-size: 12px; font-weight: 600; color: #333; margin-bottom: 8px; }
+
+.graph-container {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 15px;
+  height: 180px;
+  position: relative;
+}
+
+.graph-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.comparison-box {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.comp-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 8px; }
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.comp-item {
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+}
+
+.comp-type { font-size: 11px; font-weight: 600; color: #333; margin-bottom: 5px; }
+.comp-desc { font-size: 10px; color: #666; line-height: 1.4; }
+.comp-graph { font-size: 8px; color: #9c27b0; margin-top: 5px; font-weight: 600; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🚗 Non-ಏಕರೂಪ ರೇಖೀಯ ಚಲನೆ</h1>
+  <p>ಚಲನೆಯ ಸಮಯದಲ್ಲಿ ವೇಗ ಬದಲಾವಣೆ</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಅಸಮ ಚಲನೆ ಎಂದರೇನು?</div>
+  <div class="concept-text">
+    In <strong>ಅಸಮ ಚಲನೆ</strong>, ವಸ್ತುವಿನ ವೇಗ <strong>ಬದಲಾಗುತ್ತದೆ</strong> ಕಾಲಕ್ರಮೇಣ. ಅದು ಒಳಗೊಂಡಿದೆ <strong>unಸಮಾನ ಸಮಯದಲ್ಲಿ ಸಮಾನ ದೂರ</strong>. ಹೆಚ್ಚು ನೀಡ ಚಲನೆ ಅಸಮ ಏಕರೂಪ!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="mode-selector">
+    <button class="mode-btn active" onclick="setMode('accelerate', this)">
+      <span class="icon">🚀</span>
+      ತ್ವರಣಗೊಳ್ಳುತ್ತಿದೆ
+    </button>
+    <button class="mode-btn" onclick="setMode('decelerate', this)">
+      <span class="icon">🛑</span>
+      ಬ್ರೇಕ್ ಮಾಡುವುದು
+    </button>
+    <button class="mode-btn" onclick="setMode('traffic', this)">
+      <span class="icon">🚦</span>
+      ನಗರ ಸಂಚಾರ
+    </button>
+  </div>
+  
+  <div class="motion-visual">
+    <div class="speedometer-mini">
+      <div class="speed-display" id="speed-display">0</div>
+      <div class="speed-unit">km/h</div>
+    </div>
+    <div class="road">
+      <div class="road-line"></div>
+    </div>
+    <div class="car" id="car">🚗</div>
+  </div>
+  
+  <div class="data-display">
+    <div class="data-item">
+      <div class="data-label">ಕಳೆದ ಸಮಯ</div>
+      <div class="data-value" id="time-display">0.0 s</div>
+    </div>
+    <div class="data-item">
+      <div class="data-label">ದೂರ ಮುಚ್ಚಲಾಗಿದೆ</div>
+      <div class="data-value" id="distance-display">0 m</div>
+    </div>
+  </div>
+  
+  <div class="controls">
+    <button class="control-btn start-btn" id="start-btn" onclick="startMotion()">▶️ ಪ್ರಾರಂಭ</button>
+    <button class="control-btn reset-btn" onclick="resetMotion()">🔄 ಮರುಹೊಂದಿಸಿ</button>
+  </div>
+  
+  <div class="data-table">
+    <div class="table-title">📊 ದೂರs in Each Second (Non-Uniform!)</div>
+    <div class="table-row table-header">
+      <div class="table-cell">ಮಧ್ಯಂತರ</div>
+      <div class="table-cell">0-1s</div>
+      <div class="table-cell">1-2s</div>
+      <div class="table-cell">2-3s</div>
+      <div class="table-cell">3-4s</div>
+      <div class="table-cell">4-5s</div>
+    </div>
+    <div class="table-row">
+      <div class="table-cell">ದೂರ</div>
+      <div class="table-cell vary" id="int1">--</div>
+      <div class="table-cell vary" id="int2">--</div>
+      <div class="table-cell vary" id="int3">--</div>
+      <div class="table-cell vary" id="int4">--</div>
+      <div class="table-cell vary" id="int5">--</div>
+    </div>
+  </div>
+  
+  <div class="graph-section">
+    <div class="graph-title">📈 ದೂರ-Time Graph (Curved!)</div>
+    <div class="graph-container">
+      <canvas id="graph-canvas" class="graph-canvas"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="comparison-box">
+  <div class="comp-title">🔄 ಏಕರೂಪ ವಿರುದ್ಧ ಅಸಮ ಏಕರೂಪ</div>
+  <div class="comparison-grid">
+    <div class="comp-item">
+      <div class="comp-type">ಏಕರೂಪ ಚಲನೆ</div>
+      <div class="comp-desc">ಸಮಾನ ದೂರ ಸಮಾನ ಸಮಯದಲ್ಲಿ</div>
+      <div class="comp-graph">Graph: Straight line</div>
+    </div>
+    <div class="comp-item">
+      <div class="comp-type">ಅಸಮ ಚಲನೆ</div>
+      <div class="comp-desc">ಸಮಾನ ಸಮಯದಲ್ಲಿ ಅಸಮಾನ ದೂರ</div>
+      <div class="comp-graph">Graph: Curved line</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+let mode = 'accelerate';
+let isMoving = false;
+let animationId;
+let time = 0;
+let speed = 0;
+let position = 0;
+let dataPoints = [];
+let intervalDistances = [0, 0, 0, 0, 0];
+let lastIntervalPos = 0;
+let lastIntervalTime = 0;
+
+const car = document.getElementById('car');
+const canvas = document.getElementById('graph-canvas');
+const ctx = canvas.getContext('2d');
+
+function setMode(newMode, btn) {
+  mode = newMode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  resetMotion();
+}
+
+function getSpeedAtTime(t) {
+  switch(mode) {
+    case 'accelerate':
+      // ತ್ವರಣಗೊಳ್ಳುತ್ತಿದೆ: ವೇಗ increases over time
+      return Math.min(t * 20, 100); // km/h
+    case 'decelerate':
+      // ಬ್ರೇಕ್ ಮಾಡುವುದು: starts fast, slows down
+      return Math.max(100 - t * 20, 0);
+    case 'traffic':
+      // City traffic: ವೇಗ varies (stop-go pattern)
+      const cycle = t % 4;
+      if (cycle < 1) return 0; // stopped
+      if (cycle < 2) return (cycle - 1) * 60; // accelerating
+      if (cycle < 3) return 60; // cruising
+      return (4 - cycle) * 60; // slowing
+  }
+}
+
+function startMotion() {
+  if (isMoving) return;
+  isMoving = true;
+  document.getElementById('start-btn').textContent = '⏸️ ಓಡುತ್ತಿದೆ...';
+  animate();
+}
+
+function animate() {
+  if (!isMoving) return;
+  
+  time += 0.05;
+  
+  // Get current ವೇಗ based on mode
+  speed = getSpeedAtTime(time);
+  
+  // Convert ವೇಗ to m/s ಮತ್ತು calculate position
+  const speedMS = speed / 3.6;
+  position += speedMS * 0.05;
+  
+  // Update displays
+  document.getElementById('speed-display').textContent = speed.toFixed(0);
+  document.getElementById('time-display').textContent = time.toFixed(1) + ' s';
+  document.getElementById('distance-display').textContent = position.toFixed(0) + ' m';
+  
+  // Update car position
+  const maxPosition = 500; // meters for visualization
+  const trackWidth = 340;
+  const carLeft = 20 + (position / maxPosition) * trackWidth;
+  car.style.left = `${Math.min(carLeft, 360)}px`;
+  
+  // Record data point
+  dataPoints.push({ time: time, distance: position, speed: speed });
+  
+  // Record interval distances
+  const currentInterval = Math.floor(time);
+  if (currentInterval >= 1 && currentInterval <= 5 && currentInterval > lastIntervalTime) {
+    intervalDistances[currentInterval - 1] = position - lastIntervalPos;
+    document.getElementById(`int${currentInterval}`).textContent = 
+      intervalDistances[currentInterval - 1].toFixed(0) + ' m';
+    lastIntervalPos = position;
+    lastIntervalTime = currentInterval;
+  }
+  
+  drawGraph();
+  
+  if (time < 6) {
+    animationId = requestAnimationFrame(animate);
+  } else {
+    isMoving = false;
+    document.getElementById('start-btn').textContent = '✓ ಪೂರ್ಣ';
+  }
+}
+
+function resetMotion() {
+  isMoving = false;
+  cancelAnimationFrame(animationId);
+  time = 0;
+  speed = 0;
+  position = 0;
+  dataPoints = [];
+  intervalDistances = [0, 0, 0, 0, 0];
+  lastIntervalPos = 0;
+  lastIntervalTime = 0;
+  
+  car.style.left = '20px';
+  document.getElementById('start-btn').textContent = '▶️ ಪ್ರಾರಂಭ';
+  document.getElementById('speed-display').textContent = '0';
+  document.getElementById('time-display').textContent = '0.0 s';
+  document.getElementById('distance-display').textContent = '0 m';
+  
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById(`int${i}`).textContent = '--';
+  }
+  
+  drawGraph();
+}
+
+function drawGraph() {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  
+  const w = canvas.width;
+  const h = canvas.height;
+  const padding = 25;
+  
+  ctx.clearRect(0, 0, w, h);
+  
+  // Draw axes
+  ctx.strokeStyle = '#333';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(padding, padding);
+  ctx.lineTo(padding, h - padding);
+  ctx.lineTo(w - padding, h - padding);
+  ctx.stroke();
+  
+  // Draw grid
+  ctx.strokeStyle = '#e0e0e0';
+  ctx.lineWidth = 1;
+  for (let i = 1; i <= 5; i++) {
+    const x = padding + (i / 6) * (w - 2 * padding);
+    ctx.beginPath();
+    ctx.moveTo(x, h - padding);
+    ctx.lineTo(x, padding);
+    ctx.stroke();
+  }
+  
+  if (dataPoints.length < 2) return;
+  
+  // Find max distance for scaling
+  const maxDist = Math.max(...dataPoints.map(p => p.distance), 100);
+  const maxTime = 6;
+  
+  // Draw actual curve
+  ctx.strokeStyle = '#9c27b0';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  
+  dataPoints.forEach((point, i) => {
+    const x = padding + (point.time / maxTime) * (w - 2 * padding);
+    const y = h - padding - (point.distance / maxDist) * (h - 2 * padding);
+    
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  });
+  
+  ctx.stroke();
+  
+  // Draw uniform motion line for comparison (dashed)
+  ctx.strokeStyle = '#2196f3';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5, 5]);
+  ctx.beginPath();
+  ctx.moveTo(padding, h - padding);
+  ctx.lineTo(w - padding, padding);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  
+  // Legend
+  ctx.font = '9px sans-serif';
+  ctx.fillStyle = '#9c27b0';
+  ctx.fillText('Non-uniform', w - 70, 20);
+  ctx.fillStyle = '#2196f3';
+  ctx.fillText('ಏಕರೂಪ (ಉಲ್ಲೇಖ)', w - 70, 35);
+}
+
+// Initialize
+drawGraph();
+
+// ── URL Parameter Support ──────────────────────────────────────────
+(function () {
+  var params = new URLSearchParams(window.location.search);
+
+  // showHints: no .insight-box in this sim
+  var showHints = params.get('showHints');
+  if (showHints === 'false') {
+    document.querySelectorAll('.insight-box').forEach(function (el) {
+      el.style.display = 'none';
+    });
+  }
+
+  // initialState maps to the three motion modes:
+  // 'accelerate' → click first mode-btn (ತ್ವರಣಗೊಳ್ಳುತ್ತಿದೆ) — default
+  // 'decelerate' → click second mode-btn (ಬ್ರೇಕ್ ಮಾಡುವುದು)
+  // 'traffic'    → click third mode-btn (ನಗರ ಸಂಚಾರ)
+  // All non-setup states auto-start the animation.
+  var state = (params.get('initialState') || 'accelerate').toLowerCase();
+
+  // Step 1: select the correct mode (800 ms)
+  setTimeout(function () {
+    var modeBtns = document.querySelectorAll('.mode-btn');
+    if (state === 'decelerate') {
+      if (modeBtns[1]) modeBtns[1].click();
+    } else if (state === 'traffic') {
+      if (modeBtns[2]) modeBtns[2].click();
+    } else {
+      // accelerate is already the default, but click to be safe
+      if (modeBtns[0]) modeBtns[0].click();
+    }
+
+    // Step 2: auto-start the animation for all active states (1600 ms total)
+    setTimeout(function () {
+      var btn = document.getElementById('start-btn');
+      if (btn) btn.click();
+    }, 800);
+  }, 800);
+})();
+</script>
+</body>
+</html>

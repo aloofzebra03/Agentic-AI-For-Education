@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#00acc1">
+<title>ಕೌಮಾರದಲ್ಲಿ ವೈಯಕ್ತಿಕ ಶುಚಿತ್ವ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #00acc1 0%, #4dd0e1 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #00acc1;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #00838f; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.checklist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.checklist-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #00838f;
+}
+
+.progress-badge {
+  padding: 6px 12px;
+  background: #e0f7fa;
+  border-radius: 15px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #00838f;
+}
+
+.hygiene-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hygiene-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.hygiene-item:active { transform: scale(0.98); }
+.hygiene-item.checked { background: #e0f7fa; border-color: #4dd0e1; }
+
+.hygiene-checkbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.hygiene-item.checked .hygiene-checkbox {
+  background: #00acc1;
+  border-color: #00acc1;
+  color: white;
+}
+
+.hygiene-icon { font-size: 22px; margin-right: 10px; }
+.hygiene-content { flex: 1; }
+.hygiene-title { font-size: 12px; font-weight: 600; color: #333; }
+.hygiene-desc { font-size: 10px; color: #666; margin-top: 2px; }
+
+.tip-panel {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.tip-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 8px; }
+.tip-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.menstrual-hygiene {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #e91e63;
+}
+
+.menstrual-title { font-size: 12px; font-weight: 700; color: #c2185b; margin-bottom: 8px; }
+.menstrual-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+.product-options {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.product-card {
+  flex: 1;
+  padding: 10px;
+  background: #fff;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.product-card .emoji { font-size: 24px; margin-bottom: 4px; }
+.product-card .name { font-size: 10px; font-weight: 600; color: #333; }
+.product-card .desc { font-size: 8px; color: #666; margin-top: 2px; }
+
+.takeaway {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🧼 ವೈಯಕ್ತಿಕ ಶುಚಿತ್ವ</h1>
+  <p>ಶುಚಿಯಾಗಿ ಇರಿ, ಆರೋಗ್ಯವಾಗಿ ಇರಿ!</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ಕೌಮಾರದಲ್ಲಿ ನಿಮ್ಮ ದೇಹ ಹೆಚ್ಚು ಉತ್ಪಾದಿಸುತ್ತದೆ <strong>ಬೆವರು ಮತ್ತು ತೈಲಗಳು</strong>. ಶುಚಿತ್ವ ಕಾಪಾಡುವುದರಿಂದ ದೇಹದ ವಾಸನೆ, ಚರ್ಮ ಸಮಸ್ಯೆ ತಡೆಯುತ್ತದೆms, ಮತ್ತು infections. Good hygiene habits formed now will last a ಜೀವನtime!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="checklist-header">
+    <div class="checklist-title">📋 ದೈನಂದಿನ ಆರೋಗ್ಯಕರ ಚೆಕ್‌ಲಿಸ್ಟ್</div>
+    <div class="progress-badge" id="progress-badge">0/7 Done</div>
+  </div>
+  
+  <div class="hygiene-list" id="hygiene-list">
+    <div class="hygiene-item" onclick="toggleItem(0, this)">
+      <div class="hygiene-checkbox">✓</div>
+      <div class="hygiene-icon">🚿</div>
+      <div class="hygiene-content">
+        <div class="hygiene-title">ದೈನಂದಿನ ಸ್ನಾನ</div>
+        <div class="hygiene-desc">ಶರೀರವನ್ನು ಚೆನ್ನಾಗಿ ತೊಳೆಯಿರಿ, ವಿಶೇಷವಾಗಿ ಅಂಗಗಳ ಮತ್ತು ಖಾಸಗಿ ಭಾಗ</div>
+      </div>
+    </div>
+    
+    <div class="hygiene-item" onclick="toggleItem(1, this)">
+      <div class="hygiene-checkbox">✓</div>
+      <div class="hygiene-icon">🦷</div>
+      <div class="hygiene-content">
+        <div class="hygiene-title">ದಿನಕ್ಕೆ ಒರಡು ಬಾರಿ ಚಿಕ್ಕಡಿ</div>
+        <div class="hygiene-desc">ಬೆಳಿಗ್ಗೆ ಮತ್ತು before bed to prevent cavities ಮತ್ತು bad breath</div>
+      </div>
+    </div>
+    
+    <div class="hygiene-item" onclick="toggleItem(2, this)">
+      <div class="hygiene-checkbox">✓</div>
+      <div class="hygiene-icon">👕</div>
+      <div class="hygiene-content">
+        <div class="hygiene-title">ದೈನಂದಿನ ಸ್ವಚ್ಛ ಬಟ್ಟೆ</div>
+        <div class="hygiene-desc">ತಾಜಾ ಅಂಡರ್‌ವೇರ್ ಮತ್ತು ಬಟ್ಟೆ ಧರಿಸಿ, ವಿಶೇಷವಾಗಿ ಬೆವರಿದ ನಂತರ</div>
+      </div>
+    </div>
+    
+    <div class="hygiene-item" onclick="toggleItem(3, this)">
+      <div class="hygiene-checkbox">✓</div>
+      <div class="hygiene-icon">🧴</div>
+      <div class="hygiene-content">
+        <div class="hygiene-title">ಡಿಯೋಡರಂಟ್ ಬಳಸಿ</div>
+        <div class="hygiene-desc">ಸ್ನಾನದ ನಂತರ ಲೇಪಿಸಿ ದಿನವಿಡೀ ದೇಹ ವಾಸನೆ ತಡೆ</div>
+      </div>
+    </div>
+    
+    <div class="hygiene-item" onclick="toggleItem(4, this)">
+      <div class="hygiene-checkbox">✓</div>
+      <div class="hygiene-icon">🧴</div>
+      <div class="hygiene-content">
+        <div class="hygiene-title">Wash Face</div>
+        <div class="hygiene-desc">ಮೊಡವೆ ತಡೆಯಲು ದಿನಕ್ಕೆ 2-3 ಬಾರಿ ಮುಖ ತೊಳೆಯಿರಿ</div>
+      </div>
+    </div>
+    
+    <div class="hygiene-item" onclick="toggleItem(5, this)">
+      <div class="hygiene-checkbox">✓</div>
+      <div class="hygiene-icon">✋</div>
+      <div class="hygiene-content">
+        <div class="hygiene-title">ಆಗಾಗ್ಗೆ ಕೈ ತೊಳೆಯಿರಿ</div>
+        <div class="hygiene-desc">ಊಟದ ಮೊದಲು, ಶೌಚಾಲಯ ನಂತರ, ಕೊಳಕು ಮೇಲ್ಮೈ ಸ್ಪರ್ಶ ನಂತರ</div>
+      </div>
+    </div>
+    
+    <div class="hygiene-item" onclick="toggleItem(6, this)">
+      <div class="hygiene-checkbox">✓</div>
+      <div class="hygiene-icon">💅</div>
+      <div class="hygiene-content">
+        <div class="hygiene-title">ವಾರಕ್ಕೊಮ್ಮೆ ಉಗುರು ಕತ್ತರಿಸಿ</div>
+        <div class="hygiene-desc">ಕಿರಿದಾದ, ಸ್ವಚ್ಛ ಉಗುರು ಕೊಳಕು ಮತ್ತು ಸೋಂಕು ತಡೆ</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tip-panel" id="tip-panel">
+  <div class="tip-title">💡 ಆರೋಗ್ಯಕರ ಸಲಹೆ</div>
+  <div class="tip-text" id="tip-text">
+    ವಸ್ತುಗಳನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿ ಚೆಕ್ ಮಾಡಿ! ಅಭ್ಯಾಸವಾದಾಗ ಉತ್ತಮ ಆರೋಗ್ಯಕರ ಸುಲಭ. ಪ್ರತಿದಿನ ಒಂದೇ ಸಮಯದಲ್ಲಿ ಮಾಡಲು ಪ್ರಯತ್ನಿಸಿ.
+  </div>
+</div>
+
+<div class="menstrual-hygiene">
+  <div class="menstrual-title">👧 Menstrual Hygiene (For ಹುಡುಗಿಯರು)</div>
+  <div class="menstrual-text">
+    ಋತುಕಾಲದಲ್ಲಿ ಹೆಚ್ಚುವರಿ ಆರೋಗ್ಯಕರ ಅಗತ್ಯ:<br>
+    • 4-6 ನಲ್ಲಿ ಸ್ಯಾನಿಟರಿ ಉತ್ಪನ್ನಗಳನ್ನು ಬದಲಾಯಿಸಿ ಗಂಟೆಗಳು<br>
+    • Wash the area with ನೀರು during each change<br>
+    • ಉಪಯೋಗಿಸಿದ ಉತ್ಪನ್ನ ಕಾಗದದಲ್ಲಿ ಸುರಕ್ಷಿತವಾಗಿ ತ್ಯಜಿಸಿ<br>
+    • ಹೊರಗೆ ಹೋಗುವಾಗ ಹೆಚ್ಚು ಸಾಮಗ್ರಿ ತೆಗೆದುಕೊಳ್ಳಿ
+  </div>
+  <div class="product-options">
+    <div class="product-card">
+      <div class="emoji">🩹</div>
+      <div class="name">ಸ್ಯಾನಿಟರಿ ಪ್ಯಾಡ್‌ಗಳು</div>
+      <div class="desc">ಅತ್ಯಂತ ಸಾಮಾನ್ಯ, ಬಳಸಲು ಸುಲಭ</div>
+    </div>
+    <div class="product-card">
+      <div class="emoji">♻️</div>
+      <div class="name">ಮರುಬಳಕೆ ಪ್ಯಾಡ್‌ಗಳು</div>
+      <div class="desc">ಪರಿಸರ ಸ್ನೇಹಿ, ಜಲದಿಂದ ತೊಳೆಯಬಹುದು</div>
+    </div>
+    <div class="product-card">
+      <div class="emoji">🌿</div>
+      <div class="name">ಜೈವಿಕ ವಿಘಟನೀಯ</div>
+      <div class="desc">ಪರಿಸರ ಸುರಕ್ಷಿತ ವಿಲೇವಾರಿ</div>
+    </div>
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೆನಪಿಡಿ</div>
+  <div class="takeaway-text">
+    • ಉತ್ತಮ ಆರೋಗ್ಯಕರ ಅಂಗೀಕಾರ ಸೋಂಕು ತಡೆ<br>
+    • ಆತ್ಮವಿಶ್ವಾಸ ಮತ್ತು ಸೌಕರ್ಯ ನೀಡುತ್ತದೆ<br>
+    • ಈ ಅಭ್ಯಾಸಗಳು ನಿಮಗೆ ಲಾಭ ನೀಡುತ್ತವೆ ಉದ್ದಕ್ಕೂ ಜೀವನ<br>
+    • ಚರ್ಮ ಸಮಸ್ಯೆ ಇದ್ದರೆ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ<br>
+    • ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು ಶಾಲೆಗಳಲ್ಲಿ ಉಚಿತ ಸ್ಯಾನಿಟರಿ ಉತ್ಪನ್ನ
+  </div>
+</div>
+
+</div>
+
+<script>
+const tips = [
+  "Bathing daily removes sweat, bacteria, ಮತ್ತು dead skin ಘಟಕಗಳು. Pay special attention to areas that sweat more!",
+  "Brushing for 2 ನಿಮಿಷಗಳು, twice a day, keeps teeth healthy. Don't forget to brush your tongue too!",
+  "Bacteria love dirty clothes, especially underwear. Fresh clothes help you smell good ಮತ್ತು feel confident.",
+  "Deodorant or antiperspirant helps control sweat ಮತ್ತು odor. Apply to clean, dry underarms.",
+  "Washing your face removes excess oil ಮತ್ತು dirt that cause pimples. Use a gentle cleanser suitable for your skin type.",
+  "Handwashing is your best defense against germs! Wash for at least 20 ಸೆಕೆಂಡ್‌ಗಳು with soap.",
+  "ಉದ್ದ ನಖಗಳು ಧೂಳು ಮತ್ತು ಬ್ಯಾಕ್ಟೀರಿಯಾ ಸಂಗ್ರಹಿಸುತ್ತವೆ. ಸ್ವಚ್ಛತೆಗಾಗಿ ಅವುಗಳನ್ನು ಚಿಕ್ಕದಾಗಿ ಮತ್ತು ಸ್ವಚ್ಛವಾಗಿ ಇರಿಸಿ."
+];
+
+let checkedItems = new Array(7).fill(false);
+
+const progressBadge = document.getElementById('progress-badge');
+const tipText = document.getElementById('tip-text');
+
+function toggleItem(index, element) {
+  checkedItems[index] = !checkedItems[index];
+  element.classList.toggle('checked');
+  
+  // Update progress
+  const checkedCount = checkedItems.filter(Boolean).length;
+  progressBadge.textContent = `${checkedCount}/7 Done`;
+  
+  if (checkedCount === 7) {
+    progressBadge.style.background = '#c8e6c9';
+    progressBadge.style.color = '#2e7d32';
+    progressBadge.textContent = '🎉 All Done!';
+  } else {
+    progressBadge.style.background = '#e0f7fa';
+    progressBadge.style.color = '#00838f';
+  }
+  
+  // Show tip for checked item
+  if (checkedItems[index]) {
+    tipText.textContent = tips[index];
+  }
+}
+
+// ── URL Parameter Support ──────────────────────────────────────────────
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var state = p.get('initialState');
+  var hints = p.get('showHints');
+
+  if (hints === 'false') {
+    var cc = document.querySelector('.concept-card');
+    if (cc) cc.style.display = 'none';
+  }
+
+  if (state === 'all_complete') {
+    var items = document.querySelectorAll('.hygiene-item');
+    items.forEach(function (item, idx) {
+      setTimeout(function () {
+        if (!checkedItems[idx]) {
+          toggleItem(idx, item);
+        }
+      }, 800 + idx * 500);
+    });
+  }
+}());
+</script>
+</body>
+</html>

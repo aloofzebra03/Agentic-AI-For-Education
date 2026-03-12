@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#5d4037">
+<title>ವಾತಾವರಣ ಮತ್ತು ಕೊರೆತ – ನಿಧಾನ ನೈಸರ್ಗಿಕ ಬದಲಾವಣೆಗಳು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #5d4037 0%, #8d6e63 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #5d4037;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #5d4037; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.mode-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.mode-tab {
+  flex: 1;
+  padding: 10px 6px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.mode-tab.active { border-color: #5d4037; background: #efebe9; color: #5d4037; }
+
+.visual {
+  position: relative;
+  height: 38vh;
+  min-height: 260px;
+  background: linear-gradient(180deg, #87ceeb 0%, #b0e0e6 30%, #87ceeb 100%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+svg { width: 100%; height: 100%; }
+
+.time-display {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 15px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.controls {
+  margin-top: 10px;
+}
+
+.time-slider {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.time-slider label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #37474f;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.time-slider input[type="range"] {
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #a5d6a7, #fff59d, #ffcc80, #ef9a9a);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.time-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #5d4037;
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.time-markers {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.process-panel {
+  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #00acc1;
+}
+
+.process-title { font-size: 12px; font-weight: 700; color: #00838f; margin-bottom: 6px; }
+.process-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.types-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.type-card {
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.type-card.physical {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border: 2px solid #90caf9;
+}
+
+.type-card.chemical {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+  border: 2px solid #f48fb1;
+}
+
+.type-card .title {
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.type-card.physical .title { color: #1565c0; }
+.type-card.chemical .title { color: #c2185b; }
+
+.type-card .items {
+  font-size: 9px;
+  color: #37474f;
+  line-height: 1.5;
+}
+
+.takeaway {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🏔️ ವಾತಾವರಣ ಮತ್ತು ಕೊರೆತ</h1>
+  <p>ನಮ್ಮ ಭೂಮಿಯನ್ನು ಆಕಾರಗೊಳಿಸುವ ನಿಧಾನ ಬದಲಾವಣೆಗಳು</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ವಾತಾವರಣ</strong> ಕಲ್ಲುಗಳನ್ನು ಚಿಕ್ಕ ತುಂಡುಗಳಾಗಿ ಒಡೆಯುತ್ತದೆ. <strong>ಕೊರೆತ</strong> ಆ ತುಣುಕುಗಳನ್ನು ಹೊಸ ಸ್ಥಳಕ್ಕೆ ಸರಿಸುತ್ತದೆ. ಒಟ್ಟಿಗೆ ಪರ್ವತ, ಕಣಿವೆ ಮತ್ತು ಸಾವಿರಾರು ವರ್ಷದಲ್ಲಿ ಮಣ್ಣು!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="mode-tabs">
+    <button class="mode-tab active" onclick="selectMode('mountain', this)">🏔️ ಪರ್ವತ</button>
+    <button class="mode-tab" onclick="selectMode('river', this)">🌊 ನದಿ ಕಲ್ಲುಗಳು</button>
+    <button class="mode-tab" onclick="selectMode('cliff', this)">🪨 ಸಮುದ್ರ ಬಂಡೆ</button>
+  </div>
+  
+  <div class="visual">
+    <div class="time-display" id="time-display">⏳ ಇಂದಿನ ದಿನ</div>
+    <svg viewBox="0 0 400 260" id="scene">
+      <!-- Mountain Scene -->
+      <g id="mountain-scene">
+        <!-- Sky already from background -->
+        
+        <!-- Sun -->
+        <circle cx="350" cy="40" r="25" fill="#ffeb3b"/>
+        
+        <!-- Distant mountains -->
+        <polygon points="0,200 80,120 160,200" fill="#90a4ae"/>
+        <polygon points="300,200 380,130 400,160 400,200" fill="#90a4ae"/>
+        
+        <!-- Main mountain (ಬದಲಾಗುತ್ತದೆ over time) -->
+        <polygon id="main-mountain" points="100,200 200,60 300,200" fill="#795548"/>
+        
+        <!-- Snow cap -->
+        <polygon id="snow-cap" points="170,90 200,60 230,90 220,95 200,75 180,95" fill="#fff"/>
+        
+        <!-- Cracks (appear over time) -->
+        <g id="cracks" style="display:none">
+          <line x1="180" y1="100" x2="175" y2="130" stroke="#5d4037" stroke-width="2"/>
+          <line x1="220" y1="110" x2="230" y2="140" stroke="#5d4037" stroke-width="2"/>
+        </g>
+        
+        <!-- Fallen rocks (appear over time) -->
+        <g id="fallen-rocks" style="display:none">
+          <circle cx="130" cy="190" r="8" fill="#8d6e63"/>
+          <circle cx="150" cy="195" r="6" fill="#a1887f"/>
+          <circle cx="260" cy="192" r="7" fill="#8d6e63"/>
+          <circle cx="280" cy="188" r="5" fill="#a1887f"/>
+        </g>
+        
+        <!-- Sediment at base -->
+        <ellipse id="sediment" cx="200" cy="200" rx="0" ry="0" fill="#d7ccc8"/>
+        
+        <!-- Ground -->
+        <rect x="0" y="200" width="400" height="60" fill="#a5d6a7"/>
+        
+        <!-- Trees -->
+        <g id="trees">
+          <polygon points="50,200 60,160 70,200" fill="#4caf50"/>
+          <polygon points="330,200 340,170 350,200" fill="#4caf50"/>
+        </g>
+      </g>
+      
+      <!-- River Scene -->
+      <g id="river-scene" style="display:none">
+        <!-- River banks -->
+        <rect x="0" y="0" width="400" height="100" fill="#8d6e63"/>
+        <rect x="0" y="180" width="400" height="80" fill="#8d6e63"/>
+        
+        <!-- River ನೀರು -->
+        <rect x="0" y="100" width="400" height="80" fill="#4fc3f7"/>
+        <path d="M 0 120 Q 100 110 200 120 Q 300 130 400 120" fill="none" stroke="#81d4fa" stroke-width="3"/>
+        <path d="M 0 150 Q 100 160 200 150 Q 300 140 400 150" fill="none" stroke="#81d4fa" stroke-width="3"/>
+        
+        <!-- Rocks that change shape -->
+        <g id="river-rocks">
+          <ellipse id="rock1" cx="100" cy="140" rx="25" ry="20" fill="#757575"/>
+          <ellipse id="rock2" cx="200" cy="130" rx="30" ry="22" fill="#616161"/>
+          <ellipse id="rock3" cx="300" cy="145" rx="22" ry="18" fill="#757575"/>
+        </g>
+        
+        <!-- Pebbles (appear over time) -->
+        <g id="pebbles" style="display:none">
+          <ellipse cx="80" cy="170" rx="6" ry="4" fill="#9e9e9e"/>
+          <ellipse cx="150" cy="165" rx="5" ry="3" fill="#bdbdbd"/>
+          <ellipse cx="220" cy="172" rx="7" ry="4" fill="#9e9e9e"/>
+          <ellipse cx="280" cy="168" rx="4" ry="3" fill="#bdbdbd"/>
+          <ellipse cx="350" cy="170" rx="6" ry="4" fill="#9e9e9e"/>
+        </g>
+        
+        <!-- Sಮತ್ತು deposits -->
+        <ellipse id="sand" cx="200" cy="175" rx="0" ry="0" fill="#fff59d"/>
+      </g>
+      
+      <!-- Cliff Scene -->
+      <g id="cliff-scene" style="display:none">
+        <!-- Ocean -->
+        <rect x="0" y="150" width="400" height="110" fill="#0288d1"/>
+        <path d="M 0 160 Q 50 150 100 160 Q 150 170 200 160 Q 250 150 300 160 Q 350 170 400 160" fill="none" stroke="#4fc3f7" stroke-width="3"/>
+        
+        <!-- Cliff face (erodes over time) -->
+        <polygon id="cliff-face" points="0,50 150,50 180,150 0,150" fill="#8d6e63"/>
+        <polygon points="0,50 150,50 150,0 0,0" fill="#4caf50"/>
+        
+        <!-- Waves hitting cliff -->
+        <g id="waves">
+          <ellipse cx="170" cy="155" rx="15" ry="8" fill="#81d4fa" opacity="0.7"/>
+          <ellipse cx="175" cy="145" rx="10" ry="5" fill="#b3e5fc" opacity="0.8"/>
+        </g>
+        
+        <!-- Cave (forms over time) -->
+        <ellipse id="cave" cx="160" cy="130" rx="0" ry="0" fill="#5d4037"/>
+        
+        <!-- Fallen cliff rocks -->
+        <g id="cliff-rocks" style="display:none">
+          <ellipse cx="200" cy="200" rx="20" ry="12" fill="#8d6e63"/>
+          <ellipse cx="240" cy="210" rx="15" ry="10" fill="#a1887f"/>
+          <ellipse cx="180" cy="220" rx="12" ry="8" fill="#8d6e63"/>
+        </g>
+        
+        <!-- Sea stack (forms over time) -->
+        <rect id="sea-stack" x="250" y="180" width="0" height="0" rx="3" fill="#8d6e63" style="display:none"/>
+      </g>
+    </svg>
+  </div>
+  
+  <div class="controls">
+    <div class="time-slider">
+      <label>⏳ Time Travel: Slide to see ಬದಲಾಗುತ್ತದೆ over time</label>
+      <input type="range" id="time-slider" min="0" max="100" value="0" oninput="updateTime(this.value)">
+      <div class="time-markers">
+        <span>Now</span>
+        <span>1,000 yrs</span>
+        <span>10,000 yrs</span>
+        <span>100,000 yrs</span>
+        <span>1 ಮಿಲಿಯನ್ ವರ್ಷ</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="process-panel">
+  <div class="process-title">🔬 ಏನಾಗುತ್ತಿದೆ?</div>
+  <div class="process-text" id="process-text">
+    ಕಾಲ ಸ್ಲೈಡರ್ ಸರಿಸಿ ಸಾವಿರಾರು-ಲಕ್ಷಾಂತರ ವರ್ಷದಲ್ಲಿ ಹವಾಮಾನ ಮತ್ತು ಸವಕಳಿ ಭೂದೃಶ್ಯವನ್ನು ಹೇಗೆ ರೂಪಾಂತರಿಸುತ್ತದೆ ನೋಡಿ!
+  </div>
+</div>
+
+<div class="types-panel">
+  <div class="type-card physical">
+    <div class="title">⚒️ Physical ವಾತಾವರಣ</div>
+    <div class="items">
+      • Temperature ಬದಲಾಗುತ್ತದೆ crack rocks<br>
+      • ಬಿರುಕುಗಳಲ್ಲಿ ಐಸ್ ವಿಸ್ತರಿಸುತ್ತದೆ<br>
+      • ಸಸ್ಯ ಬೇರುಗಳು ಕಲ್ಲು ಒಡೆಯುತ್ತವೆ<br>
+      • ಗಾಳಿ/ನೀರು wear down surface
+    </div>
+  </div>
+  <div class="type-card chemical">
+    <div class="title">🧪 ರಾಸಾಯನಿಕ ವಾತಾವರಣ</div>
+    <div class="items">
+      • ನೀರು ಖನಿಜ ಕರಗಿಸುತ್ತದೆ<br>
+      • Acid rain reacts with rock<br>
+      • ಆಮ್ಲಜನಕ ಉತ್ಕರ್ಷಣೆ<br>
+      • ಹೊಸ ಪದಾರ್ಥಗಳು ರಚಿಸುತ್ತದೆ
+    </div>
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ಭೂಮಿಯ ನಿಧಾನ ಶಿಲ್ಪಿಗಳು</div>
+  <div class="takeaway-text">
+    ವಾತಾವರಣ ಮತ್ತು ಕೊರೆತ <strong>ಅತ್ಯಂತ ನಿಧಾನ</strong> ಆದರೆ ಶಕ್ತಿಶಾಲಿ!<br><br>
+    • ಗ್ರ್ಯಾಂಡ್ ಕ್ಯಾನಿಯನ್: 5-6 ಮಿಲಿಯನ್ ವರ್ಷ<br>
+    • ನುಣುಪು ನದಿ ಕಲ್ಲು: ಸಾವಿರಾರು ವರ್ಷ<br>
+    • ಮಣ್ಣು ರಚನೆ: ಶತಮಾನಗಳ ಕಲ್ಲು ಒಡೆಯುವಿಕೆ<br><br>
+    These ಹಿಮ್ಮುಖವಲ್ಲ ಬದಲಾಗುತ್ತದೆ continuously reshape our planet!
+  </div>
+</div>
+
+</div>
+
+<script>
+let currentMode = 'mountain';
+
+const timeDisplay = document.getElementById('time-display');
+const processText = document.getElementById('process-text');
+
+function selectMode(mode, btn) {
+  currentMode = mode;
+  
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  
+  document.getElementById('mountain-scene').style.display = mode === 'mountain' ? 'block' : 'none';
+  document.getElementById('river-scene').style.display = mode === 'river' ? 'block' : 'none';
+  document.getElementById('cliff-scene').style.display = mode === 'cliff' ? 'block' : 'none';
+  
+  document.getElementById('time-slider').value = 0;
+  updateTime(0);
+}
+
+function updateTime(value) {
+  value = parseInt(value);
+  
+  // Update time display
+  if (value === 0) {
+    timeDisplay.textContent = '⏳ ಇಂದಿನ ದಿನ';
+  } else if (value < 25) {
+    timeDisplay.textContent = `⏳ ${Math.round(value * 40)} years`;
+  } else if (value < 50) {
+    timeDisplay.textContent = `⏳ ${Math.round((value - 25) * 400)} years`;
+  } else if (value < 75) {
+    timeDisplay.textContent = `⏳ ${Math.round((value - 50) * 4000)} years`;
+  } else {
+    timeDisplay.textContent = `⏳ ${Math.round((value - 75) * 40000)} years`;
+  }
+  
+  if (currentMode === 'mountain') {
+    updateMountain(value);
+  } else if (currentMode === 'river') {
+    updateRiver(value);
+  } else {
+    updateCliff(value);
+  }
+}
+
+function updateMountain(value) {
+  const mountain = document.getElementById('main-mountain');
+  const snowCap = document.getElementById('snow-cap');
+  const cracks = document.getElementById('cracks');
+  const fallenRocks = document.getElementById('fallen-rocks');
+  const sediment = document.getElementById('sediment');
+  
+  // Mountain erodes over time (peak gets lower, base gets wider)
+  const peakY = 60 + (value * 0.8);
+  const baseLeft = 100 - (value * 0.3);
+  const baseRight = 300 + (value * 0.3);
+  mountain.setAttribute('points', `${baseLeft},200 200,${peakY} ${baseRight},200`);
+  
+  // Snow cap shrinks
+  const snowScale = Math.max(0.01, 1 - (value / 80));
+  if (snowScale > 0.05) {
+    snowCap.style.display = 'block';
+    snowCap.setAttribute('transform', `scale(${snowScale}) translate(${200 * (1 - snowScale) / snowScale}, ${70 * (1 - snowScale) / snowScale})`);
+  } else {
+    snowCap.style.display = 'none';
+  }
+  
+  // Cracks appear
+  cracks.style.display = value > 20 ? 'block' : 'none';
+  
+  // Fallen rocks appear
+  fallenRocks.style.display = value > 40 ? 'block' : 'none';
+  
+  // Sediment builds up at base
+  const sedimentScale = value * 0.8;
+  sediment.setAttribute('rx', sedimentScale);
+  sediment.setAttribute('ry', sedimentScale * 0.3);
+  
+  // Update process text
+  if (value < 25) {
+    processText.innerHTML = `
+      <strong>🏔️ ಪರ್ವತ ವಾತಾವರಣ ಪ್ರಾರಂಭ</strong><br><br>
+      • ಉಷ್ಣತೆ ಬದಲಾವಣೆ ಕಲ್ಲುಗಳನ್ನು ವಿಸ್ತರಿಸಿ ಸಂಕುಚಿತಗೊಳಿಸುತ್ತದೆ<br>
+      • ಕಲ್ಲಿನ ಮೇಲ್ಮೈಯಲ್ಲಿ ಚಿಕ್ಕ ಬಿರುಕುಗಳು ರೂಪುಗೊಳ್ಳುತ್ತವೆ<br>
+      • ನೀರು ಬಿರುಕುಗಳೊಳಗೆ ಜಿನುಗಿ ಹೆಪ್ಪುಗಟ್ಟಿ ಅವುಗಳನ್ನು ವಿಸ್ತರಿಸುತ್ತದೆ
+    `;
+  } else if (value < 50) {
+    processText.innerHTML = `
+      <strong>⚒️ ಭೌತಿಕ ವಾತಾವರಣ ವೇಗಗೊಳ್ಳುತ್ತಿದೆ</strong><br><br>
+      • ಹಿಮ ಚೂರು ಮುಂದುವರಿದಂತೆ ಬಿರುಕುಗಳು ಅಗಲವಾಗುತ್ತವೆ<br>
+      • ಕಲ್ಲುಗಳು ಪರ್ವತದಿಂದ ಉದುರಲು ಪ್ರಾರಂಭಿಸುತ್ತವೆ<br>
+      • ಸಸ್ಯ ಬೇರುಗಳು ಬಿರುಕುಗಳೊಳಗೆ ಬೆಳೆದು ಕಲ್ಲುಗಳನ್ನು ಒಡೆಯುತ್ತವೆ
+    `;
+  } else if (value < 75) {
+    processText.innerHTML = `
+      <strong>🪨 ಕೊರೆತ ಪದಾರ್ಥವನ್ನು ಕೆಳಗೆ ಸರಿಸುತ್ತದೆ</strong><br><br>
+      • ಗುರುತ್ವ ಶಿಥಿಲ ಕಲ್ಲುಗಳನ್ನು ಇಳಿಜಾರು ಕೆಳಗೆ ಎಳೆಯುತ್ತದೆ<br>
+      • ಮಳೆ ಚಿಕ್ಕ ಕಣಗಳನ್ನು ತಳಕ್ಕೆ ತೊಳೆಯುತ್ತದೆ<br>
+      • ಸಂಚಯ ಸಂಗ್ರಹವಾಗಿ ಸೌಮ್ಯ ಇಳಿಜಾರು ರೂಪಿಸುತ್ತದೆ
+    `;
+  } else {
+    processText.innerHTML = `
+      <strong>🌄 ಪರ್ವತ ಬಹಳ ಚಿಕ್ಕದಾಗಿದೆ!</strong><br><br>
+      • ಶಿಖರ ಲಕ್ಷಾಂತರ ವರ್ಷಗಳಲ್ಲಿ ಗಣನೀಯವಾಗಿ ಕೊರೆತವಾಗಿದೆ<br>
+      • ಸಂಚಯ ಮೂಲ ಪರ್ವತದಿಂದ ದೂರ ಹರಡಿದೆ<br>
+      • ಅಂತಿಮವಾಗಿ ತೆವಳುವ ಬೆಟ್ಟಗಳು, ನಂತರ ಸಮತಲ ಪ್ರದೇಶ!
+    `;
+  }
+}
+
+function updateRiver(value) {
+  const rock1 = document.getElementById('rock1');
+  const rock2 = document.getElementById('rock2');
+  const rock3 = document.getElementById('rock3');
+  const pebbles = document.getElementById('pebbles');
+  const sandEl = document.getElementById('sand');
+  
+  // Rocks become rounder and smaller
+  const roundness = 1 - (value * 0.005);
+  const size = 1 - (value * 0.004);
+  
+  rock1.setAttribute('rx', 25 * size);
+  rock1.setAttribute('ry', 20 * size * roundness);
+  rock2.setAttribute('rx', 30 * size);
+  rock2.setAttribute('ry', 22 * size * roundness);
+  rock3.setAttribute('rx', 22 * size);
+  rock3.setAttribute('ry', 18 * size * roundness);
+  
+  // Pebbles appear
+  pebbles.style.display = value > 30 ? 'block' : 'none';
+  
+  // Sand accumulates
+  const sandScale = value * 0.6;
+  sandEl.setAttribute('rx', sandScale);
+  sandEl.setAttribute('ry', sandScale * 0.3);
+  
+  if (value < 25) {
+    processText.innerHTML = `
+      <strong>🌊 ನದಿ ಕೊರೆತ ಪ್ರಾರಂಭ</strong><br><br>
+      • ವೇಗವಾಗಿ ಚಲಿಸುವ ನೀರು ಮರಳು ಮತ್ತು ಚಿಕ್ಕ ಕಲ್ಲುಗಳನ್ನು ಸಾಗಿಸುತ್ತದೆ<br>
+      • ಈ ಕಣಗಳು ದೊಡ್ಡ ಕಲ್ಲುಗಳ ಮೇಲೆ ಉಜ್ಜುತ್ತವೆ<br>
+      • ಮೊನಚು ಅಂಚುಗಳು ನಿಧಾನವಾಗಿ ಸವೆಯುತ್ತವೆ
+    `;
+  } else if (value < 50) {
+    processText.innerHTML = `
+      <strong>💧 ಕಲ್ಲುಗಳು ನಯವಾಗುತ್ತಿವೆ</strong><br><br>
+      • ನಿರಂತರ ಉರುಳುವಿಕೆ ಕಲ್ಲುಗಳನ್ನು ಗುಂಡಾಗಿಸುತ್ತದೆ<br>
+      • ಚಿಕ್ಕ ತುಂಡುಗಳು ಉದುರಿ ಜಲ್ಲಿಕಲ್ಲುಗಳಾಗುತ್ತವೆ<br>
+      • ಇದನ್ನು "ಘರ್ಷಣೆ" ಎನ್ನುತ್ತಾರೆ
+    `;
+  } else if (value < 75) {
+    processText.innerHTML = `
+      <strong>🪨 ಜಲ್ಲಿಕಲ್ಲು ಮತ್ತು ಮರಳು ರೂಪ</strong><br><br>
+      • ದೊಡ್ಡ ಕಲ್ಲುಗಳು ಈಗ ನಯವಾದ ಜಲ್ಲಿಕಲ್ಲುಗಳು<br>
+      • ಸೂಕ್ಷ್ಮ ಕಣಗಳು ಮರಳು ಸಂಚಯ ರಚಿಸುತ್ತವೆ<br>
+      • ನದಿ ನಿಧಾನವಾಗಿ ಸಂಚಯ ಸ್ಥಾಪಿಸುತ್ತದೆ
+    `;
+  } else {
+    processText.innerHTML = `
+      <strong>🏖️ ನಯವಾದ ಜಲ್ಲಿಕಲ್ಲು ಪೂರ್ಣ!</strong><br><br>
+      • ಕೋನೀಯ ಕಲ್ಲುಗಳು ಈಗ ನಯವಾದ ಗುಂಡು ಜಲ್ಲಿಕಲ್ಲುಗಳು<br>
+      • ಮರಳು ನದಿತಳದಲ್ಲಿ ಸಂಗ್ರಹವಾಗಿದೆ<br>
+      • ಉಪಕುಲ ಮತ್ತು ನದಿತಳ ಹೀಗೆ ರೂಪುಗೊಳ್ಳುತ್ತವೆ!
+    `;
+  }
+}
+
+function updateCliff(value) {
+  const cliffFace = document.getElementById('cliff-face');
+  const cave = document.getElementById('cave');
+  const cliffRocks = document.getElementById('cliff-rocks');
+  const seaStack = document.getElementById('sea-stack');
+  
+  // Cliff erodes backward
+  const erosion = value * 0.5;
+  cliffFace.setAttribute('points', `0,50 ${150 - erosion},50 ${180 - erosion},150 0,150`);
+  
+  // Cave forms
+  const caveScale = Math.max(0, (value - 20) * 0.4);
+  cave.setAttribute('rx', caveScale);
+  cave.setAttribute('ry', caveScale * 0.7);
+  cave.setAttribute('cx', 160 - erosion);
+  
+  // Fallen rocks appear
+  cliffRocks.style.display = value > 40 ? 'block' : 'none';
+  
+  // Sea stack forms (arch collapses)
+  if (value > 70) {
+    seaStack.style.display = 'block';
+    seaStack.setAttribute('width', '20');
+    seaStack.setAttribute('height', (value - 70) * 1.5);
+    seaStack.setAttribute('y', 200 - (value - 70) * 1.5);
+  } else {
+    seaStack.style.display = 'none';
+  }
+  
+  if (value < 25) {
+    processText.innerHTML = `
+      <strong>🌊 ಅಲೆ ಕೊರೆತ ಪ್ರಾರಂಭ</strong><br><br>
+      • ಅಲೆಗಳು ಕಡಿದಾದ ತಳವನ್ನು ನಿರಂತರ ಹೊಡೆಯುತ್ತವೆ<br>
+      • ಜಲಚಾಲಿತ ಕ್ರಿಯೆ ನೀರನ್ನು ಬಿರುಕುಗಳೊಳಗೆ ತಳ್ಳುತ್ತದೆ<br>
+      • ಉಪ್ಪು ಮತ್ತು ರಾಸಾಯನಿಕಗಳು ಕಲ್ಲನ್ನು ದುರ್ಬಲಗೊಳಿಸುತ್ತವೆ
+    `;
+  } else if (value < 50) {
+    processText.innerHTML = `
+      <strong>🕳️ ಗುಹೆ ರೂಪುಗೊಳ್ಳುತ್ತಿದೆ</strong><br><br>
+      • ಅಲೆಗಳು ತಳದಲ್ಲಿ ಗುಹೆ ಕೊರೆಯುತ್ತವೆ<br>
+      • ಮೃದು ಕಲ್ಲು ಗಟ್ಟಿ ಕಲ್ಲಿಗಿಂತ ವೇಗವಾಗಿ ಕೊರೆತವಾಗುತ್ತದೆ<br>
+      • ಮೇಲಿನ ಕಡಿದು ಈಗ ಆಧಾರವಿಲ್ಲದೆ ಉಳಿದಿದೆ
+    `;
+  } else if (value < 75) {
+    processText.innerHTML = `
+      <strong>💥 ಕಡಿದು ಕುಸಿತ</strong><br><br>
+      • ಗುಹೆ ಛಾವಣಿ ಕುಸಿಯುವವರೆಗೆ ಬೆಳೆಯುತ್ತದೆ<br>
+      • ಕಡಿದಿನ ದೊಡ್ಡ ತುಂಡುಗಳು ಸಮುದ್ರಕ್ಕೆ ಬೀಳುತ್ತವೆ<br>
+      • ಕಡಿದು ರೇಖೆ ಒಳನಾಡಿನ ಕಡೆಗೆ ಹಿಮ್ಮೆಟ್ಟುತ್ತದೆ
+    `;
+  } else {
+    processText.innerHTML = `
+      <strong>🗿 ಸೀ ಸ್ಟಾಕ್ ರೂಪುಗೊಳ್ಳುತ್ತದೆ!</strong><br><br>
+      • ಕಡಿದಿನ ಭಾಗ ಈಗ ಭೂಮಿಯಿಂದ ಪ್ರತ್ಯೇಕವಾಗಿದೆ<br>
+      • ಈ ಕಲ್ಲಿನ ಕಂಬವನ್ನು "ಸೀ ಸ್ಟಾಕ್" ಎನ್ನುತ್ತಾರೆ<br>
+      • ಅಂತಿಮವಾಗಿ ಅದೂ ಸಂಪೂರ್ಣವಾಗಿ ಕೊರೆತವಾಗುತ್ತದೆ!
+    `;
+  }
+}
+
+// Initialize
+updateTime(0);
+
+// ── URL-parameter initialisation ──────────────────────────────────────────
+(function () {
+  var params = new URLSearchParams(window.location.search);
+
+  // showHints: hide .concept-card when false
+  if (params.get('showHints') === 'false') {
+    var card = document.querySelector('.concept-card');
+    if (card) card.style.display = 'none';
+  }
+
+  // initialState: select a scene tab and optionally advance the time slider
+  // States: initial | mountain | river | cliff |
+  //         mountain_aged | river_aged | cliff_aged
+  var state = params.get('initialState');
+  if (!state || state === 'initial') return;
+
+  var sceneMap = {
+    mountain:       { modeIdx: 0, time: 0 },
+    river:          { modeIdx: 1, time: 0 },
+    cliff:          { modeIdx: 2, time: 0 },
+    mountain_aged:  { modeIdx: 0, time: 100 },
+    river_aged:     { modeIdx: 1, time: 100 },
+    cliff_aged:     { modeIdx: 2, time: 100 }
+  };
+
+  var cfg = sceneMap[state];
+  if (!cfg) return;
+
+  setTimeout(function () {
+    var tabs = document.querySelectorAll('.mode-tab');
+    if (tabs[cfg.modeIdx]) tabs[cfg.modeIdx].click();
+    if (cfg.time > 0) {
+      var slider = document.getElementById('time-slider');
+      if (slider) {
+        slider.value = cfg.time;
+        updateTime(cfg.time);
+      }
+    }
+  }, 800);
+})();
+</script>
+</body>
+</html>

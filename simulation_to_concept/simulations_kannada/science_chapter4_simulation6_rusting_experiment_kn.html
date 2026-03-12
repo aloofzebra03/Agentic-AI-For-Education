@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#795548">
+<title>ಕಬ್ಬಿಣದ ತುಕ್ಕು – ಪರಿಸ್ಥಿತಿಗಳು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #795548 0%, #a1887f 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #f9a825;
+}
+
+.concept-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f57f17;
+  margin-bottom: 6px;
+}
+
+.concept-text {
+  font-size: 12px;
+  color: #5d4037;
+  line-height: 1.5;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.tubes-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.tube-wrapper {
+  flex: 1;
+  text-align: center;
+}
+
+.tube {
+  height: 35vh;
+  min-height: 200px;
+  background: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 0 0 50% 50% / 0 0 20% 20%;
+  border: 3px solid #90a4ae;
+  position: relative;
+  overflow: hidden;
+}
+
+.tube-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #37474f;
+  margin-top: 6px;
+}
+
+.tube-condition {
+  font-size: 8px;
+  color: #78909c;
+  margin-top: 2px;
+}
+
+.nail {
+  position: absolute;
+  bottom: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  transition: all 1s ease;
+}
+
+.nail.rusted::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, #bf360c 30%, transparent 70%);
+  border-radius: 50%;
+  animation: rustSpread 2s ease-out forwards;
+}
+
+.ನೀರು-level {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, rgba(33, 150, 243, 0.3) 0%, rgba(33, 150, 243, 0.5) 100%);
+  transition: height 0.5s ease;
+}
+
+.oil-layer {
+  position: absolute;
+  bottom: 60%;
+  left: 0;
+  right: 0;
+  height: 10%;
+  background: linear-gradient(180deg, rgba(255, 193, 7, 0.6) 0%, rgba(255, 152, 0, 0.4) 100%);
+}
+
+.dry-ಸೂಚಕ {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+}
+
+.air-ಸೂಚಕ {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #64b5f6;
+  opacity: 0.7;
+}
+
+.result-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-size: 8px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.result-badge.rusted { background: #ffccbc; color: #bf360c; }
+.result-badge.safe { background: #c8e6c9; color: #2e7d32; }
+
+.days-slider {
+  margin: 15px 0;
+}
+
+.days-slider label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #37474f;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.days-slider input[type="range"] {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: #e0e0e0;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.days-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #795548;
+  cursor: pointer;
+}
+
+.days-display {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #795548;
+  margin-top: 8px;
+}
+
+.equation-box {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.equation-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #c62828;
+  margin-bottom: 8px;
+}
+
+.equation {
+  font-size: 13px;
+  font-weight: 700;
+  color: #37474f;
+  font-family: 'Times New Roman', serif;
+}
+
+.learning-panel {
+  background: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #795548;
+}
+
+.learning-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #5d4037;
+  margin-bottom: 6px;
+}
+
+.learning-text {
+  font-size: 11px;
+  color: #37474f;
+  line-height: 1.6;
+}
+
+.takeaway {
+  background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2e7d32;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1b5e20; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+@keyframes rustSpread {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(2); opacity: 0.8; }
+}
+
+@keyframes bubble {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🔩 ಕಬ್ಬಿಣದ ತುಕ್ಕು</h1>
+  <p>ಕಬ್ಬಿಣ ತುಕ್ಕು ಹಿಡಿಯಲು ಯಾವ ಪರಿಸ್ಥಿತಿಗಳು ಕಾರಣ?</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ತುಕ್ಕು</strong> ಕಬ್ಬಿಣ ಪ್ರತಿಕ್ರಿಯಿಸುವ ರಾಸಾಯನಿಕ ಪ್ರತಿಕ್ರಿಯೆ <strong>ಆಮ್ಲಜನಕ ಮತ್ತು ನೀರು (ಆರ್ದ್ರತೆ)</strong> ಕಬ್ಬಿಣ ಆಕ್ಸೈಡ್ (ತುಕ್ಕು) ರೂಪಿಸಲು. ಗಾಳಿ ಮತ್ತು ನೀರು ಅಗತ್ಯ for rusting.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="tubes-container">
+    <!-- Tube A: Dry air only -->
+    <div class="tube-wrapper">
+      <div class="tube" id="tube-a">
+        <div class="dry-ಸೂಚಕ">🔥 Dry</div>
+        <div class="air-ಸೂಚಕ">O₂ Air</div>
+        <div class="nail" id="nail-a">🔩</div>
+        <div class="result-badge safe" id="result-a" style="display:none">No Rust</div>
+      </div>
+      <div class="tube-label">Tube A</div>
+      <div class="tube-condition">Dry Air Only</div>
+    </div>
+    
+    <!-- Tube B: ನೀರು only (no air) -->
+    <div class="tube-wrapper">
+      <div class="tube" id="tube-b" style="background: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 100%);">
+        <div class="ನೀರು-level" style="height: 70%;"></div>
+        <div class="oil-layer"></div>
+        <div class="nail" id="nail-b">🔩</div>
+        <div class="result-badge safe" id="result-b" style="display:none">No Rust</div>
+      </div>
+      <div class="tube-label">Tube B</div>
+      <div class="tube-condition">Boiled ನೀರು + Oil</div>
+    </div>
+    
+    <!-- Tube C: ಗಾಳಿ + ನೀರು (moist) -->
+    <div class="tube-wrapper">
+      <div class="tube" id="tube-c">
+        <div class="ನೀರು-level" style="height: 30%;"></div>
+        <div class="air-ಸೂಚಕ">O₂ + 💧</div>
+        <div class="nail" id="nail-c">🔩</div>
+        <div class="result-badge rusted" id="result-c" style="display:none">ತುಕ್ಕು!</div>
+      </div>
+      <div class="tube-label">Tube C</div>
+      <div class="tube-condition">ಗಾಳಿ + ನೀರು</div>
+    </div>
+  </div>
+  
+  <div class="days-slider">
+    <label>⏱️ ಸಮಯ ಕಳೆಯುವುದನ್ನು ಅನುಕರಿಸಿ:</label>
+    <input type="range" id="days-slider" min="0" max="7" value="0" oninput="updateDays(this.value)">
+    <div class="days-display" id="days-display">ದಿನ 0</div>
+  </div>
+</div>
+
+<div class="equation-box">
+  <div class="equation-title">⚗️ ರಾಸಾಯನಿಕ Reaction of ತುಕ್ಕು</div>
+  <div class="equation">4Fe + 3O₂ + 6H₂O → 4Fe(OH)₃ → 2Fe₂O₃·3H₂O</div>
+  <div style="font-size: 10px; color: #666; margin-top: 6px;">ಕಬ್ಬಿಣ + ಆಮ್ಲಜನಕ + ನೀರು → ತುಕ್ಕು (ಜಲಯುಕ್ತ ಕಬ್ಬಿಣ ಆಕ್ಸೈಡ್)</div>
+</div>
+
+<div class="learning-panel">
+  <div class="learning-title">🔬 ತುಕ್ಕು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು</div>
+  <div class="learning-text" id="learning-text">
+    ದಿನ ಕಳೆಯುವುದನ್ನು ಅನುಕರಿಸಲು ಸ್ಲೈಡರ್ ಸರಿಸಿ ಯಾವ ಉಗುರ್ ತುಕ್ಕು ನೋಡಿ!<br><br>
+    <strong>Tube A:</strong> ಒಣ ಗಾಳಿ ಮಾತ್ರ (ನೀರು ಇಲ್ಲ)<br>
+    <strong>Tube B:</strong> ಕುದಿಸಿದ ನೀರು + ಎಣ್ಣೆ ಪದರ (ಗಾಳಿ ಇಲ್ಲ)<br>
+    <strong>Tube C:</strong> ಗಾಳಿ ಮತ್ತು ನೀರು ಇರುವುದು
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೀವು ಕಲಿಯುವುದು</div>
+  <div class="takeaway-text">
+    <strong>ಗಾಳಿ (ಆಮ್ಲಜನಕ) ಮತ್ತು ನೀರು ಅಗತ್ಯ</strong> ತುಕ್ಕು ಸಂಭವಿಸಲು.<br><br>
+    <strong>ನಿವಾರಣೆ ವಿಧಾನಗಳು:</strong><br>
+    • ಬಣ್ಣ/ಎಣ್ಣೆ (ಗಾಳಿ ಮತ್ತು ನೀರು ನಿರ್ಬಂಧ)<br>
+    • ಗ್ಯಾಲ್ವನೈಸೇಷನ್ (ಜಿಂಕ್ ಲೇಪನ)<br>
+    • ಮಿಶ್ರಲೋಹ (ಸ್ಟೇನ್ಲೆಸ್ ಸ್ಟೀಲ್)<br><br>
+    <strong>ಆಸಕ್ತಿದಾಯಕ:</strong> ದೆಹಲಿಯ ಕಬ್ಬಿಣ ಸ್ತಂಭ (1600+ ವರ್ಷ) ಅದರ ವಿಶಿಷ್ಟ ಸಂಯೋಜನೆಯಿಂದಾಗಿ ತುಕ್ಕು ಹಿಡಿಯಲಿಲ್ಲ!
+  </div>
+</div>
+
+</div>
+
+<script>
+const nailA = document.getElementById('nail-a');
+const nailB = document.getElementById('nail-b');
+const nailC = document.getElementById('nail-c');
+const resultA = document.getElementById('result-a');
+const resultB = document.getElementById('result-b');
+const resultC = document.getElementById('result-c');
+const daysDisplay = document.getElementById('days-display');
+const learningText = document.getElementById('learning-text');
+
+function updateDays(days) {
+  days = parseInt(days);
+  daysDisplay.textContent = `ದಿನ ${days}`;
+  
+  // ಮರುಹೊಂದಿಸಿ all
+  nailA.className = 'nail';
+  nailB.className = 'nail';
+  nailC.className = 'nail';
+  resultA.style.display = 'none';
+  resultB.style.display = 'none';
+  resultC.style.display = 'none';
+  
+  if (days === 0) {
+    learningText.innerHTML = `
+      <strong>ದಿನ 0 - ಪ್ರಯೋಗ ಪ್ರಾರಂಭ</strong><br><br>
+      ಮೂರು ಕಬ್ಬಿಣದ ಉಗುರುಗಳು ಹೊಳಪು ಮತ್ತು ಹೊಸ. ವಿವಿಧ ಪರಿಸ್ಥಿತಿಗಳಲ್ಲಿ ಕಾಲಾಂತರದಲ್ಲಿ ಏನಾಗುತ್ತದೆ ನೋಡೋಣ!
+    `;
+  } else if (days <= 2) {
+    learningText.innerHTML = `
+      <strong>ದಿನ ${days} - ಆರಂಭಿಕ ಗಮನ</strong><br><br>
+      <strong>Tube A (ಒಣ ಗಾಳಿ):</strong> ಉಗುರು ಇನ್ನೂ ಹೊಳಪು ✓<br>
+      <strong>Tube B (ನೀರು, ಗಾಳಿ ಇಲ್ಲ):</strong> ಉಗುರು ಇನ್ನೂ ಹೊಳಪು ✓<br>
+      <strong>Tube C (ಗಾಳಿ + ನೀರು):</strong> ಸ್ವಲ್ಪ ಬಣ್ಣ ಬದಲಾವಣೆ ಕಾಣಿಸುತ್ತಿದೆ...<br><br>
+      ತುಕ್ಕು ನಿಧಾನ ಪ್ರಕ್ರಿಯೆ!
+    `;
+    nailC.style.opacity = 0.9;
+  } else if (days <= 4) {
+    nailC.style.filter = 'sepia(50%)';
+    learningText.innerHTML = `
+      <strong>ದಿನ ${days} - ತುಕ್ಕು ಆರಂಭ</strong><br><br>
+      <strong>Tube A (ಒಣ ಗಾಳಿ):</strong> ಇನ್ನೂ ತುಕ್ಕು ಇಲ್ಲ - ಗಾಳಿ ಮಾತ್ರ ತುಕ್ಕು ಉಂಟುಮಾಡುವುದಿಲ್ಲ!<br>
+      <strong>Tube B (ನೀರು, ಗಾಳಿ ಇಲ್ಲ):</strong> ಇನ್ನೂ ತುಕ್ಕು ಇಲ್ಲ - ನೀರು ಮಾತ್ರ ತುಕ್ಕು ಉಂಟುಮಾಡುವುದಿಲ್ಲ!<br>
+      <strong>Tube C (ಗಾಳಿ + ನೀರು):</strong> <span style="color:#bf360c">ಕಂದು ಚುಕ್ಕೆಗಳು ಕಾಣಿಸುತ್ತಿವೆ!</span><br><br>
+      ಗಾಳಿ ಮತ್ತು ನೀರು ಎರಡೂ ಇರುವ ಉಗುರು ಮಾತ್ರ ತುಕ್ಕು ಹಿಡಿಯುತ್ತಿದೆ!
+    `;
+  } else if (days <= 6) {
+    nailC.style.filter = 'sepia(80%) saturate(150%)';
+    nailC.classList.add('rusted');
+    resultC.style.display = 'block';
+    
+    learningText.innerHTML = `
+      <strong>ದಿನ ${days} - ಗಮನಾರ್ಹ ತುಕ್ಕು</strong><br><br>
+      <strong>Tube A (ಒಣ ಗಾಳಿ):</strong> ✅ ತುಕ್ಕು ಇಲ್ಲ - ಈರ್ಷ್ಯೆಯಿಂದ ರಕ್ಷಿತ<br>
+      <strong>Tube B (ನೀರು, ಗಾಳಿ ಇಲ್ಲ):</strong> ✅ ತುಕ್ಕು ಇಲ್ಲ - ಎಣ್ಣೆ ಆಮ್ಲಜನಕ ನಿರ್ಬಂಧಿಸುತ್ತದೆ<br>
+      <strong>Tube C (ಗಾಳಿ + ನೀರು):</strong> <span style="color:#bf360c">❌ ಬಹಳ ತುಕ್ಕು!</span><br><br>
+      <strong>ತೀರ್ಮಾನ:</strong> ತುಕ್ಕು ಆಮ್ಲಜನಕ ಮತ್ತು ನೀರು ಎರಡೂ ಅಗತ್ಯ!
+    `;
+  } else {
+    // ದಿನ 7 - ಅಂತಿಮ
+    nailC.style.filter = 'sepia(100%) saturate(200%)';
+    nailC.classList.add('rusted');
+    resultA.style.display = 'block';
+    resultB.style.display = 'block';
+    resultC.style.display = 'block';
+    
+    learningText.innerHTML = `
+      <strong style="color:#2e7d32">ದಿನ 7 - ಪ್ರಯೋಗ ಪೂರ್ಣ! ✅</strong><br><br>
+      <strong>ಫಲಿತಾಂಶಗಳು:</strong><br>
+      • <strong>Tube A:</strong> ತುಕ್ಕು ಇಲ್ಲ (ಗಾಳಿ ಇತ್ತು ನೀರು ಇಲ್ಲ)<br>
+      • <strong>Tube B:</strong> ತುಕ್ಕು ಇಲ್ಲ (ನೀರು ಇತ್ತು ಗಾಳಿ ಇಲ್ಲ)<br>
+      • <strong>Tube C:</strong> <span style="color:#bf360c">ತುಕ್ಕು!</span> (ಗಾಳಿ + ನೀರು ಎರಡೂ ಇತ್ತು)<br><br>
+      <strong>ತೀರ್ಮಾನ:</strong> ಕಬ್ಬಿಣ <strong>ಆಮ್ಲಜನಕ (ಗಾಳಿಯಿಂದ) ಮತ್ತು ನೀರು</strong> ಎರಡೂ ಒಟ್ಟಿಗೆ ಇರುವಾಗ ಮಾತ್ರ ತುಕ್ಕು ಹಿಡಿಯುತ್ತದೆ!
+    `;
+  }
+}
+
+// ── URL-parameter initialisation ──────────────────────────────────────────
+(function () {
+  var params = new URLSearchParams(window.location.search);
+
+  // showHints: hide .concept-card when false
+  if (params.get('showHints') === 'false') {
+    var card = document.querySelector('.concept-card');
+    if (card) card.style.display = 'none';
+  }
+
+  // initialState: auto-advance the days slider
+  var state = params.get('initialState');
+  if (!state || state === 'initial') return;
+
+  var dayMap = { day3: 3, day7: 7 };
+  var dayValue = dayMap[state];
+  if (!dayValue) return;
+
+  setTimeout(function () {
+    var slider = document.getElementById('days-slider');
+    if (slider) {
+      slider.value = dayValue;
+      updateDays(dayValue);
+    }
+  }, 800);
+})();
+</script>
+</body>
+</html>

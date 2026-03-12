@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#2c3e50">
+<title>ಕೈಗಾರಿಕಾ ತ್ಯಾಜ್ಯ ಚಿಕಿತ್ಸೆ – ನಮ್ಮ ನೀರನ್ನು ರಕ್ಷಿಸುವುದು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 8px 4px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 12px;
+}
+
+.visual {
+  position: relative;
+  height: 40vh;
+  min-height: 300px;
+  background: linear-gradient(180deg, #b0bec5 0%, #78909c 40%, #546e7a 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+svg { width: 100%; height: 100%; display: block; }
+
+.static-hint {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 11px;
+  line-height: 1.3;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  z-index: 10;
+}
+
+.status-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  transition: all 0.3s ease;
+}
+
+.status-badge.danger { background: #ffebee; color: #c62828; }
+.status-badge.safe { background: #e8f5e9; color: #2e7d32; }
+
+.metrics {
+  background: #eceff1;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 11px;
+  line-height: 1.6;
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+}
+
+.metric-item { display: flex; justify-content: space-between; }
+.metric-label { color: #666; }
+.metric-value { font-weight: 600; color: #007AFF; }
+.metric-value.danger { color: #c62828; }
+.metric-value.safe { color: #2e7d32; }
+
+.control-btns {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s ease;
+}
+
+.action-btn:active { transform: scale(0.95); }
+.action-btn:disabled { opacity: 0.5; }
+
+.release-btn {
+  background: linear-gradient(135deg, #ef5350 0%, #c62828 100%);
+  color: white;
+}
+
+.treat-btn {
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  color: white;
+}
+
+.reset-btn {
+  background: #f5f5f5;
+  color: #666;
+  flex: 0.5;
+}
+
+.process-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.process-step {
+  text-align: center;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 9px;
+}
+
+.process-step.danger { background: #ffebee; color: #c62828; }
+.process-step.treatment { background: #e8f5e9; color: #2e7d32; }
+.process-step.safe { background: #e3f2fd; color: #1565c0; }
+
+.process-icon { font-size: 20px; margin-bottom: 4px; }
+.process-arrow { font-size: 16px; color: #999; }
+
+.ph-display {
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.ph-value {
+  font-size: 24px;
+  font-weight: bold;
+  transition: color 0.5s ease;
+}
+
+.ph-value.acidic { color: #c62828; }
+.ph-value.neutral { color: #2e7d32; }
+
+.ph-label { font-size: 11px; color: #666; }
+
+.insight-box {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 11px;
+  line-height: 1.5;
+  border-left: 4px solid #2196f3;
+}
+
+.insight-title { font-weight: 600; color: #1565c0; margin-bottom: 4px; }
+
+.takeaway {
+  background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  display: none;
+}
+
+.takeaway.show { display: block; }
+.takeaway-title { font-weight: 600; color: #1b5e20; margin-bottom: 4px; }
+
+@media screen and (max-width: 380px) {
+  .action-btn { padding: 10px; font-size: 10px; }
+  .process-step { padding: 6px; font-size: 8px; }
+}
+
+@supports (padding: max(0px)) {
+  #app {
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+  }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🏭 ಕೈಗಾರಿಕಾ ತ್ಯಾಜ್ಯ ಚಿಕಿತ್ಸೆ</h1>
+  <p>ತಟಸ್ಥೀಕರಣದಿಂದ ಜಲಚರ ಜೀವನ ರಕ್ಷಣೆ!</p>
+</div>
+
+<div class="section-title">ತ್ಯಾಜ್ಯ ಬಿಡುಗಡೆ ಮತ್ತು ಚಿಕಿತ್ಸೆ ಅನುಕರಿಸಿ</div>
+<div class="sim-card" id="sim"></div>
+
+<div class="process-flow">
+  <div class="process-step danger">
+    <div class="process-icon">🏭</div>
+    <div>ಆಮ್ಲೀಯ<br>ತ್ಯಾಜ್ಯ</div>
+  </div>
+  <div class="process-arrow">→</div>
+  <div class="process-step treatment">
+    <div class="process-icon">⚗️</div>
+    <div>ಕ್ಷಾರ ಸೇರಿಸಿ<br>(ತಟಸ್ಥೀಕರಿಸಿ)</div>
+  </div>
+  <div class="process-arrow">→</div>
+  <div class="process-step safe">
+    <div class="process-icon">💧</div>
+    <div>ಸುರಕ್ಷಿತ ನೀರು<br>(pH 7)</div>
+  </div>
+</div>
+
+<div class="ph-display">
+  <div class="ph-value neutral" id="ph-value">pH 7.0</div>
+  <div class="ph-label">ನೀರು pH ಮಟ್ಟ</div>
+</div>
+
+<div class="insight-box">
+  <div class="insight-title">🔑 ಚಿಕಿತ್ಸೆ ಏಕೆ ಮುಖ್ಯ:</div>
+  ಕಾರ್ಖಾನೆ ತ್ಯಾಜ್ಯ ಸಾಮಾನ್ಯವಾಗಿ <strong>ಆಮ್ಲೀಯ</strong>; ಮೀನು ಮತ್ತು ಇತರ ಜಲಚರ ಜೀವಿಗಳನ್ನು ಸಾಯಿಸಬಲ್ಲದು. ಬಿಡುಗಡೆ ಮೊದಲು <strong>ಕ್ಷಾರ</strong> ಸೇರಿಸಿ ಆಮ್ಲವನ್ನು ತಟಸ್ಥೀಕರಿಸಿದರೆ ಪರಿಸರ ರಕ್ಷಣೆಯಾಗುತ್ತದೆ!
+</div>
+
+<div class="takeaway" id="takeaway">
+  <div class="takeaway-title">💡 ನೀವು ಕಂಡುಕೊಂಡದ್ದು:</div>
+  <span id="takeaway-text">ಕೈಗಾರಿಕಾ ತ್ಯಾಜ್ಯ ಚಿಕಿತ್ಸೆ ಆಮ್ಲೀಯ ತ್ಯಾಜ್ಯವನ್ನು ನದಿ ಮತ್ತು ಸರೋವರಗಳಿಗೆ ಸುರಕ್ಷಿತವಾಗಿಸಲು ತಟಸ್ಥೀಕರಣ ಬಳಸುತ್ತದೆ!</span>
+</div>
+
+</div>
+
+<script>
+const container = document.getElementById('sim');
+
+container.innerHTML = `
+<div class="visual">
+  <div class="static-hint">
+    👆 ಚಿಕಿತ್ಸೆ ಜೊತೆ/ಇಲ್ಲದೆ ಏನಾಗುತ್ತದೆ ನೋಡಿ
+  </div>
+  <div class="status-badge" id="status-badge">⏳ ಕಾಯುತ್ತಿದೆ...</div>
+
+  <svg viewBox="0 0 400 320">
+    <!-- Factory -->
+    <g transform="translate(50, 30)">
+      <rect x="0" y="40" width="70" height="80" rx="3" fill="#455a64"/>
+      <rect x="25" y="0" width="20" height="50" fill="#37474f"/>
+      <text x="35" y="-10" text-anchor="middle" font-size="20">💨</text>
+      <text x="35" y="140" text-anchor="middle" font-size="9" fill="#fff">ಕಾರ್ಖಾನೆ</text>
+    </g>
+    
+    <!-- Pipe -->
+    <rect x="120" y="80" width="100" height="15" rx="3" fill="#607d8b"/>
+    <rect x="210" y="80" width="15" height="60" rx="3" fill="#607d8b"/>
+    
+    <!-- ತ್ಯಾಜ್ಯ flow -->
+    <rect x="215" y="140" width="10" height="50" rx="2" id="waste-flow" fill="transparent"/>
+    
+    <!-- Treatment tank -->
+    <g transform="translate(320, 50)">
+      <rect x="-30" y="0" width="60" height="80" rx="5" fill="#eceff1" stroke="#90a4ae" stroke-width="2"/>
+      <rect x="-25" y="20" width="50" height="50" rx="3" fill="#90caf9"/>
+      <text x="0" y="-10" text-anchor="middle" font-size="9" fill="#455a64" font-weight="600">ಚಿಕಿತ್ಸೆ</text>
+      <text x="0" y="100" text-anchor="middle" font-size="8" fill="#666">ಕ್ಷಾರ ದ್ರಾವಣ</text>
+    </g>
+    
+    <!-- River -->
+    <rect x="0" y="200" width="400" height="120" rx="0" id="river" fill="#29b6f6"/>
+    
+    <!-- Fish -->
+    <g id="fish-group">
+      <text x="80" y="250" font-size="30" id="fish1">🐟</text>
+      <text x="200" y="270" font-size="25" id="fish2">🐠</text>
+      <text x="300" y="240" font-size="28" id="fish3">🐟</text>
+    </g>
+    
+    <!-- Warning sign -->
+    <g id="warning-sign" opacity="0" transform="translate(200, 180)">
+      <rect x="-50" y="-12" width="100" height="24" rx="5" fill="#ffc107"/>
+      <text x="0" y="5" text-anchor="middle" font-size="9" fill="#333" font-weight="600">⚠️ ಆಮ್ಲೀಯ ತ್ಯಾಜ್ಯ!</text>
+    </g>
+  </svg>
+</div>
+
+<div class="metrics">
+  <div class="metric-item"><span class="metric-label">ತ್ಯಾಜ್ಯ ರೀತಿ:</span> <span class="metric-value" id="waste-type">—</span></div>
+  <div class="metric-item"><span class="metric-label">ಚಿಕಿತ್ಸೆ:</span> <span class="metric-value" id="treatment-status">—</span></div>
+  <div class="metric-item"><span class="metric-label">ನದಿ ಸ್ಥಿತಿ:</span> <span class="metric-value" id="river-status">ಶುದ್ಧ</span></div>
+  <div class="metric-item"><span class="metric-label">ಮೀನು ಸ್ಥಿತಿ:</span> <span class="metric-value" id="fish-status">ಆರೋಗ್ಯಕರ</span></div>
+</div>
+
+<div class="control-btns">
+  <button class="action-btn release-btn" id="release-btn">🏭 ಚಿಕಿತ್ಸೆ ಇಲ್ಲದೆ ಬಿಡುಗಡೆ</button>
+  <button class="action-btn treat-btn" id="treat-btn" disabled>⚗️ ಮೊದಲು ತಟಸ್ಥೀಕರಿಸಿ</button>
+  <button class="action-btn reset-btn" id="reset-btn">🔄</button>
+</div>`;
+
+let state = 'initial';
+
+const statusBadge = document.getElementById('status-badge');
+const wasteFlow = document.getElementById('waste-flow');
+const river = document.getElementById('river');
+const fish1 = document.getElementById('fish1');
+const fish2 = document.getElementById('fish2');
+const fish3 = document.getElementById('fish3');
+const warnSign = document.getElementById('warning-sign');
+const wasteType = document.getElementById('waste-type');
+const treatmentStatus = document.getElementById('treatment-status');
+const riverStatus = document.getElementById('river-status');
+const fishStatus = document.getElementById('fish-status');
+const phValue = document.getElementById('ph-value');
+const releaseBtn = document.getElementById('release-btn');
+const treatBtn = document.getElementById('treat-btn');
+const resetBtn = document.getElementById('reset-btn');
+const takeaway = document.getElementById('takeaway');
+const takeawayText = document.getElementById('takeaway-text');
+
+releaseBtn.onclick = function() {
+  if (state !== 'initial') return;
+  state = 'polluted';
+  
+  // Show acidic waste flow
+  wasteFlow.style.transition = 'fill 0.3s ease';
+  wasteFlow.style.fill = '#ef5350';
+  warnSign.style.transition = 'opacity 0.3s ease';
+  warnSign.style.opacity = '1';
+  
+  setTimeout(() => {
+    // Pollute river
+    river.style.transition = 'fill 0.8s ease';
+    river.style.fill = '#5d4037';
+    
+    // Kill fish
+    [fish1, fish2, fish3].forEach(fish => {
+      fish.style.transition = 'all 0.5s ease';
+      fish.style.filter = 'grayscale(100%)';
+      fish.style.transform = 'rotate(180deg)';
+    });
+    
+    statusBadge.textContent = '☠️ ಅನಾಹುತ!';
+    statusBadge.className = 'status-badge danger';
+    
+    wasteType.textContent = 'ಆಮ್ಲೀಯ (pH 3)';
+    wasteType.className = 'metric-value danger';
+    treatmentStatus.textContent = 'ಇಲ್ಲ ❌';
+    treatmentStatus.className = 'metric-value danger';
+    riverStatus.textContent = 'ಮಾಲಿನ್ಯ!';
+    riverStatus.className = 'metric-value danger';
+    fishStatus.textContent = 'ಸತ್ತವು ☠️';
+    fishStatus.className = 'metric-value danger';
+    
+    phValue.textContent = 'pH 3.0';
+    phValue.className = 'ph-value acidic';
+    
+    releaseBtn.disabled = true;
+    treatBtn.disabled = false;
+    
+    takeawayText.textContent = 'ಅನಾಹುತ! ಚಿಕಿತ್ಸೆ ಇಲ್ಲದ ಆಮ್ಲೀಯ ತ್ಯಾಜ್ಯ (pH 3) ಮೀನುಗಳನ್ನು ಸಾಯಿಸಿತು! ಆಮ್ಲ ಅವುಗಳ ಕಿವಿರುಗಳನ್ನು ನಾಶಪಡಿಸಿತು. ಅದಕ್ಕೇ ಕಾರ್ಖಾನೆಗಳು ಬಿಡುಗಡೆ ಮೊದಲು ತ್ಯಾಜ್ಯ ತಟಸ್ಥೀಕರಿಸಲೇ ಬೇಕು!';
+    takeaway.classList.add('show');
+  }, 500);
+};
+
+treatBtn.onclick = function() {
+  if (state !== 'polluted') return;
+  state = 'treated';
+  
+  // Show treatment working
+  wasteFlow.style.fill = '#81c784';
+  warnSign.style.opacity = '0';
+  
+  setTimeout(() => {
+    // Clean river
+    river.style.fill = '#29b6f6';
+    
+    // Revive fish (new generation)
+    [fish1, fish2, fish3].forEach(fish => {
+      fish.style.filter = 'none';
+      fish.style.transform = 'rotate(0deg)';
+    });
+    
+    statusBadge.textContent = '✅ ಸುರಕ್ಷಿತ!';
+    statusBadge.className = 'status-badge safe';
+    
+    wasteType.textContent = 'ತಟಸ್ಥೀಕರಣವಾಯಿತು';
+    wasteType.className = 'metric-value safe';
+    treatmentStatus.textContent = 'ಯಶಸ್ಸು ✅';
+    treatmentStatus.className = 'metric-value safe';
+    riverStatus.textContent = 'ಶುದ್ಧ';
+    riverStatus.className = 'metric-value safe';
+    fishStatus.textContent = 'ಆರೋಗ್ಯಕರ';
+    fishStatus.className = 'metric-value safe';
+    
+    phValue.textContent = 'pH 7.0';
+    phValue.className = 'ph-value neutral';
+    
+    treatBtn.disabled = true;
+    
+    takeawayText.textContent = 'ಯಶಸ್ಸು! ಆಮ್ಲೀಯ ತ್ಯಾಜ್ಯ ತಟಸ್ಥೀಕರಿಸಲು ಕ್ಷಾರ ಸೇರಿಸಿ ತಟಸ್ಥೀಕರಣ ಪ್ರತಿಕ್ರಿಯೆ ನಡೆಸಿದೆ. ಚಿಕಿತ್ಸೆ ಮಾಡಿದ ನೀರು (pH 7) ಈಗ ಜಲಚರ ಜೀವನಕ್ಕೆ ಸುರಕ್ಷಿತ!';
+  }, 800);
+};
+
+resetBtn.onclick = function() {
+  state = 'initial';
+  
+  wasteFlow.style.fill = 'transparent';
+  warnSign.style.opacity = '0';
+  river.style.fill = '#29b6f6';
+  
+  [fish1, fish2, fish3].forEach(fish => {
+    fish.style.filter = 'none';
+    fish.style.transform = 'rotate(0deg)';
+  });
+  
+  statusBadge.textContent = '⏳ ಕಾಯುತ್ತಿದೆ...';
+  statusBadge.className = 'status-badge';
+  
+  wasteType.textContent = '—';
+  wasteType.className = 'metric-value';
+  treatmentStatus.textContent = '—';
+  treatmentStatus.className = 'metric-value';
+  riverStatus.textContent = 'ಶುದ್ಧ';
+  riverStatus.className = 'metric-value';
+  fishStatus.textContent = 'ಆರೋಗ್ಯಕರ';
+  fishStatus.className = 'metric-value';
+  
+  phValue.textContent = 'pH 7.0';
+  phValue.className = 'ph-value neutral';
+  
+  releaseBtn.disabled = false;
+  treatBtn.disabled = true;
+  takeaway.classList.remove('show');
+};
+
+// ─── URL Parameter Support (Agent Control) ──────────────────────────────────
+// Allows the teaching agent to set the simulation state via URL query params:
+//   ?initialState=initial   → default clean river (no action)
+//   ?initialState=polluted  → auto-trigger untreated waste release (pH 3, fish die)
+//   ?initialState=treated   → auto-trigger full flow: release → neutralize (pH 7, safe)
+//   ?showHints=false        → hide the insight explanation box
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var initState = (p.get('initialState') || 'initial').toLowerCase();
+  var showHintParam = p.get('showHints');
+
+  // Hide insight box if requested
+  if (showHintParam === 'false') {
+    var box = document.querySelector('.insight-box');
+    if (box) box.style.display = 'none';
+  }
+
+  // Auto-trigger the requested state after DOM is ready
+  if (initState === 'polluted') {
+    // Show: release without treatment → polluted river, dead fish
+    setTimeout(function () {
+      if (!releaseBtn.disabled) releaseBtn.click();
+    }, 800);
+  } else if (initState === 'treated') {
+    // Show: release → then neutralize → safe river
+    setTimeout(function () {
+      if (!releaseBtn.disabled) {
+        releaseBtn.click();
+        setTimeout(function () {
+          if (!treatBtn.disabled) treatBtn.click();
+        }, 1800);
+      }
+    }, 800);
+  }
+  // 'initial' or unrecognised → leave in default clean state
+}());
+</script>
+</body>
+</html>

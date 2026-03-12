@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#00796b">
+<title>ಹಿಮ್ಮುಖ ಮತ್ತು ಅಹಿಮ್ಮುಖ ಬದಲಾವಣೆಗಳು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #00796b 0%, #4db6ac 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #00796b;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #00796b; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.change-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.change-item:active { transform: scale(0.98); }
+.change-item.selected { border-color: #00796b; background: #e0f2f1; }
+.change-item.correct { border-color: #4caf50; background: #e8f5e9; }
+.change-item.wrong { border-color: #f44336; background: #ffebee; }
+
+.change-icon { font-size: 32px; margin-right: 12px; }
+.change-info { flex: 1; }
+.change-name { font-size: 12px; font-weight: 600; color: #333; }
+.change-desc { font-size: 10px; color: #666; margin-top: 2px; }
+
+.buttons-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.choice-btn {
+  flex: 1;
+  padding: 14px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.choice-btn:active { transform: scale(0.95); }
+.choice-btn.reversible { border-color: #4caf50; background: #e8f5e9; color: #2e7d32; }
+.choice-btn.ಹಿಮ್ಮುಖವಲ್ಲ { border-color: #f44336; background: #ffebee; color: #c62828; }
+.choice-btn:disabled { opacity: 0.5; }
+
+.score-panel {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.score-card {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.score-card.rev { background: #e8f5e9; border: 2px solid #a5d6a7; }
+.score-card.irrev { background: #ffebee; border: 2px solid #ef9a9a; }
+.score-card .label { font-size: 10px; font-weight: 600; margin-bottom: 4px; }
+.score-card.rev .label { color: #2e7d32; }
+.score-card.irrev .label { color: #c62828; }
+.score-card .count { font-size: 20px; font-weight: 700; }
+
+.feedback-box {
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 10px;
+  display: none;
+}
+
+.feedback-box.show { display: block; }
+.feedback-box.correct { background: #e8f5e9; border-left: 4px solid #4caf50; }
+.feedback-box.wrong { background: #ffebee; border-left: 4px solid #f44336; }
+.feedback-title { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+.feedback-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+.progress-bar {
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00796b, #4db6ac);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.takeaway {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🔄 ಹಿಮ್ಮುಖ ಮತ್ತು ಅಹಿಮ್ಮುಖ</h1>
+  <p>ನಾವು ಮೂಲ ಪದಾರ್ಥವನ್ನು ಮರಳಿ ಪಡೆಯಬಹುದೇ?</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ಹಿಮ್ಮುಖ ಬದಲಾವಣೆಗಳು</strong> ರದ್ದು ಮಾಡಬಹುದು - ಮೂಲ ಮರಳಿ ಪಡೆಯಬಹುದು.<br>
+    <strong>ಅಹಿಮ್ಮುಖ ಬದಲಾವಣೆಗಳು</strong> ರದ್ದು ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ - ಮೂಲ ಶಾಶ್ವತವಾಗಿ ಕಳೆದುಹೋಗಿದೆ.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+  </div>
+  
+  <div id="question-container">
+    <div class="change-item" id="current-item">
+      <div class="change-icon" id="item-icon">🧊</div>
+      <div class="change-info">
+        <div class="change-name" id="item-name">ಕರಗುತ್ತಿರುವ ಐಸ್</div>
+        <div class="change-desc" id="item-desc">ಐಸ್ ಘನ ನೀರಾಗುತ್ತದೆ</div>
+      </div>
+    </div>
+    
+    <div class="buttons-row">
+      <button class="choice-btn" id="btn-reversible" onclick="checkAnswer(true)">
+        ✅ ಹಿಮ್ಮುಖ<br><span style="font-size:9px">ಹಿಮ್ಮುಖ ಮಾಡಬಹುದು</span>
+      </button>
+      <button class="choice-btn" id="btn-irreversible" onclick="checkAnswer(false)">
+        ❌ ಹಿಮ್ಮುಖವಲ್ಲ<br><span style="font-size:9px">ಹಿಮ್ಮುಖ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ</span>
+      </button>
+    </div>
+  </div>
+  
+  <div class="feedback-box" id="feedback-box">
+    <div class="feedback-title" id="feedback-title">ಸರಿ!</div>
+    <div class="feedback-text" id="feedback-text"></div>
+  </div>
+</div>
+
+<div class="score-panel">
+  <div class="score-card rev">
+    <div class="label">✅ ಹಿಮ್ಮುಖ</div>
+    <div class="count" id="rev-count">0</div>
+  </div>
+  <div class="score-card irrev">
+    <div class="label">❌ ಹಿಮ್ಮುಖವಲ್ಲ</div>
+    <div class="count" id="irrev-count">0</div>
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ತ್ವರಿತ ಮಾರ್ಗದರ್ಶಿ</div>
+  <div class="takeaway-text">
+    <strong>ಸಾಮಾನ್ಯವಾಗಿ ಹಿಮ್ಮುಖ:</strong><br>
+    • ಸ್ಥಿತಿ ಬದಲಾವಣೆ (ಕರಗುವಿಕೆ, ಘನೀಕರಣ, ಕುದಿಯುವಿಕೆ)<br>
+    • ಚಾಚುವುದು, ಬಾಗುವುದು, ಮಡಿಸುವುದು<br>
+    • ಕರಗುವಿಕೆ (ಕೆಲವೊಮ್ಮೆ)<br><br>
+    <strong>ಸಾಮಾನ್ಯವಾಗಿ ಹಿಮ್ಮುಖವಲ್ಲ:</strong><br>
+    • ಉರಿಯುತ್ತಿದೆ, cooking, rusting<br>
+    • ಕತ್ತರಿಸುವುದು, ಒಡೆಯುವುದು, ಪುಡಿಮಾಡುವುದು<br>
+    • ರಾಸಾಯನಿಕ ಪ್ರತಿಕ್ರಿಯೆಗಳು
+  </div>
+</div>
+
+</div>
+
+<script>
+const ಬದಲಾಗುತ್ತದೆ = [
+  { icon: '🧊', name: 'ಕರಗುತ್ತಿರುವ ಐಸ್', desc: 'ಐಸ್ ಘನ ನೀರಾಗುತ್ತದೆ', reversible: true, 
+    explain: 'You can freeze the ನೀರು again to get ice back! Change of state is usually reversible.' },
+  { icon: '📄', name: 'Folding ಕಾಗದ', desc: 'ಕಾಗದ folded into a shape', reversible: true,
+    explain: 'You can unfold the paper to get the flat sheet back. The paper molecules haven\'t changed.' },
+  { icon: '🔥', name: 'ಉರಿಯುತ್ತಿದೆ ಕಾಗದ', desc: 'ಕಾಗದ burns to ash', reversible: false,
+    explain: 'You cannot turn ash back into paper! ಉರಿಯುತ್ತಿದೆ is a ರಾಸಾಯನಿಕ ಬದಲಾವಣೆ that creates new substances.' },
+  { icon: '🥛', name: 'Making ಮೊಸರು', desc: 'ಹಾಲು becomes curd', reversible: false,
+    explain: 'You cannot turn curd back into milk! The milk proteins have changed chemically.' },
+  { icon: '💧', name: 'Boiling ನೀರು', desc: 'ನೀರು turns to steam', reversible: true,
+    explain: 'Steam can condense back to ನೀರು. It\'s still H₂O, just in a different state!' },
+  { icon: '🥕', name: 'Cutting Vegetables', desc: 'Vegetables chopped into pieces', reversible: false,
+    explain: 'You cannot un-chop vegetables! Even though it\'s a physical change, it\'s ಹಿಮ್ಮುಖವಲ್ಲ.' },
+  { icon: '🎈', name: 'Inflating Balloon', desc: 'Balloon fills with air', reversible: true,
+    explain: 'You can deflate the balloon to get it back to original. The rubber hasn\'t changed.' },
+  { icon: '🍳', name: 'Cooking Egg', desc: 'Raw egg becomes cooked', reversible: false,
+    explain: 'A cooked egg cannot become raw again! The proteins have changed permanently.' },
+  { icon: '🧈', name: 'Melting Butter', desc: 'Solid butter melts', reversible: true,
+    explain: 'Put it in the fridge ಮತ್ತು it solidifies again! The butter molecules are the same.' },
+  { icon: '🔩', name: 'ಕಬ್ಬಿಣದ ತುಕ್ಕು', desc: 'ಕಬ್ಬಿಣದ ಉಗುರು ತುಕ್ಕು ಹಿಡಿಯುತ್ತದೆ', reversible: false,
+    explain: 'Rust (iron oxide) cannot easily become iron again. A ರಾಸಾಯನಿಕ ಬದಲಾವಣೆ occurred.' }
+];
+
+let currentIndex = 0;
+let revCount = 0;
+let irrevCount = 0;
+let answered = false;
+
+const itemIcon = document.getElementById('item-icon');
+const itemName = document.getElementById('item-name');
+const itemDesc = document.getElementById('item-desc');
+const btnReversible = document.getElementById('btn-reversible');
+const btnIrreversible = document.getElementById('btn-irreversible');
+const feedbackBox = document.getElementById('feedback-box');
+const feedbackTitle = document.getElementById('feedback-title');
+const feedbackText = document.getElementById('feedback-text');
+const progressFill = document.getElementById('progress-fill');
+
+function loadQuestion() {
+  if (currentIndex >= ಬದಲಾಗುತ್ತದೆ.length) {
+    // Quiz ಪೂರ್ಣ
+    itemName.textContent = '🎉 ಕ್ವಿಜ್ ಪೂರ್ಣ!';
+    itemDesc.textContent = `ನೀವು ${revCount + irrevCount} ಬದಲಾವಣೆಗಳನ್ನು ಸರಿಯಾಗಿ ಗುರುತಿಸಿದ್ದೀರಿ!`;
+    itemIcon.textContent = '🏆';
+    btnReversible.style.display = 'none';
+    btnIrreversible.style.display = 'none';
+    return;
+  }
+  
+  const change = ಬದಲಾಗುತ್ತದೆ[currentIndex];
+  itemIcon.textContent = change.icon;
+  itemName.textContent = change.name;
+  itemDesc.textContent = change.desc;
+  
+  btnReversible.disabled = false;
+  btnIrreversible.disabled = false;
+  btnReversible.classList.remove('reversible', 'ಹಿಮ್ಮುಖವಲ್ಲ');
+  btnIrreversible.classList.remove('reversible', 'ಹಿಮ್ಮುಖವಲ್ಲ');
+  
+  feedbackBox.classList.remove('show', 'correct', 'wrong');
+  answered = false;
+  
+  progressFill.style.width = `${(currentIndex / ಬದಲಾಗುತ್ತದೆ.length) * 100}%`;
+}
+
+function checkAnswer(isReversible) {
+  if (answered) return;
+  answered = true;
+  
+  const change = ಬದಲಾಗುತ್ತದೆ[currentIndex];
+  const correct = change.reversible === isReversible;
+  
+  btnReversible.disabled = true;
+  btnIrreversible.disabled = true;
+  
+  if (correct) {
+    feedbackBox.classList.add('correct');
+    feedbackTitle.textContent = '✅ ಸರಿ!';
+    if (change.reversible) {
+      btnReversible.classList.add('reversible');
+      revCount++;
+    } else {
+      btnIrreversible.classList.add('ಹಿಮ್ಮುಖವಲ್ಲ');
+      irrevCount++;
+    }
+  } else {
+    feedbackBox.classList.add('wrong');
+    feedbackTitle.textContent = '❌ ಸಂಪೂರ್ಣ ಸರಿಯಲ್ಲ!';
+    if (change.reversible) {
+      btnReversible.classList.add('reversible');
+    } else {
+      btnIrreversible.classList.add('ಹಿಮ್ಮುಖವಲ್ಲ');
+    }
+  }
+  
+  feedbackText.textContent = change.explain;
+  feedbackBox.classList.add('show');
+  
+  document.getElementById('rev-count').textContent = revCount;
+  document.getElementById('irrev-count').textContent = irrevCount;
+  
+  // Next question after delay
+  setTimeout(() => {
+    currentIndex++;
+    loadQuestion();
+  }, 2500);
+}
+
+// Initialize
+loadQuestion();
+
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var showHints = params.get('showHints');
+  if (showHints === 'false') {
+    document.querySelectorAll('.takeaway, .concept-card').forEach(function (el) { el.style.display = 'none'; });
+  }
+  var state = params.get('initialState');
+  if (!state || state === 'initial') return;
+  if (state === 'show_reversible') {
+    setTimeout(function () {
+      var btn = document.getElementById('btn-reversible');
+      if (btn && !btn.disabled) btn.click();
+    }, 800);
+  } else if (state === 'show_irreversible') {
+    currentIndex = 2;
+    loadQuestion();
+    setTimeout(function () {
+      var btn = document.getElementById('btn-irreversible');
+      if (btn && !btn.disabled) btn.click();
+    }, 800);
+  }
+}());
+</script>
+</body>
+</html>

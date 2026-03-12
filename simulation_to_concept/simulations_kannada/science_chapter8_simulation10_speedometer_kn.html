@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#37474f">
+<title>ಸ್ಪೀಡೋಮೀಟರ್ ಮತ್ತು ಓಡೋಮೀಟರ್</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #37474f 0%, #607d8b 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #eceff1 0%, #cfd8dc 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #607d8b;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #37474f; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.dashboard {
+  background: linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 100%);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 15px;
+}
+
+.ವೇಗometer {
+  width: 200px;
+  height: 110px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.ವೇಗ-dial {
+  width: 200px;
+  height: 100px;
+  border: 4px solid #444;
+  border-radius: 100px 100px 0 0;
+  background: radial-gradient(circle at 50% 100%, #1a1a1a 0%, #333 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.ವೇಗ-marks {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.ವೇಗ-mark {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  height: 15px;
+  background: #fff;
+  transform-origin: bottom center;
+}
+
+.ವೇಗ-mark.major {
+  height: 20px;
+  width: 3px;
+  background: #4caf50;
+}
+
+.ವೇಗ-label {
+  position: absolute;
+  font-size: 10px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.needle {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 4px;
+  height: 80px;
+  background: linear-gradient(180deg, #f44336, #b71c1c);
+  transform-origin: bottom center;
+  transform: translateX(-50%) rotate(-90deg);
+  transition: transform 0.3s ease-out;
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+}
+
+.needle-cap {
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  background: #333;
+  border-radius: 50%;
+  border: 3px solid #555;
+}
+
+.ವೇಗ-display {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.ವೇಗ-value {
+  font-size: 40px;
+  font-weight: 700;
+  color: #4caf50;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.ವೇಗ-unit {
+  font-size: 14px;
+  color: #888;
+  margin-top: -5px;
+}
+
+.odometer {
+  background: #111;
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.odometer-label {
+  font-size: 11px;
+  color: #888;
+}
+
+.odometer-display {
+  font-family: 'Courier New', monospace;
+  background: #000;
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 3px;
+  border: 2px solid #333;
+}
+
+.trip-display {
+  font-size: 12px;
+  color: #64b5f6;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.pedal {
+  padding: 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gas-pedal {
+  background: linear-gradient(180deg, #4caf50, #2e7d32);
+  color: #fff;
+}
+
+.gas-pedal:active { transform: scale(0.95); background: linear-gradient(180deg, #66bb6a, #4caf50); }
+
+.brake-pedal {
+  background: linear-gradient(180deg, #f44336, #c62828);
+  color: #fff;
+}
+
+.brake-pedal:active { transform: scale(0.95); background: linear-gradient(180deg, #ef5350, #f44336); }
+
+.reset-btn {
+  grid-column: 1 / -1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #607d8b;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.instruction {
+  text-align: center;
+  font-size: 11px;
+  color: #666;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.info-card {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.info-title { font-size: 11px; font-weight: 700; color: #1565c0; margin-bottom: 6px; }
+.info-text { font-size: 10px; color: #37474f; line-height: 1.5; }
+
+.fun-fact {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.fun-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 6px; }
+.fun-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🚗 ಸ್ಪೀಡೋಮೀಟರ್ ಮತ್ತು ಓಡೋಮೀಟರ್</h1>
+  <p>ಸಂವಾದಾತ್ಮಕ ವಾಹನ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಡ್ಯಾಶ್‌ಬೋರ್ಡ್ ಉಪಕರಣಗಳು</div>
+  <div class="concept-text">
+    • <strong>ಸ್ಪೀಡೋಮೀಟರ್:</strong> ಕಿಮೀ/ಗಂ ನಲ್ಲಿ ಪ್ರಸ್ತುತ ವೇಗ ತೋರಿಸುತ್ತದೆ<br>
+    • <strong>ಓಡೋಮೀಟರ್:</strong> ತೋರಿಸುತ್ತದೆ ಒಟ್ಟು ದೂರ traveled (km)
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="dashboard">
+    <div class="ವೇಗometer">
+      <div class="ವೇಗ-dial">
+        <div class="ವೇಗ-marks">
+          <!-- ವೇಗ marks will be added by JS -->
+        </div>
+        <div class="needle" id="needle"></div>
+        <div class="needle-cap"></div>
+        
+        <div class="ವೇಗ-label" style="left: 15px; bottom: 10px;">0</div>
+        <div class="ವೇಗ-label" style="left: 25px; top: 35px;">40</div>
+        <div class="ವೇಗ-label" style="left: 55px; top: 10px;">80</div>
+        <div class="ವೇಗ-label" style="left: 95px; top: 0px;">120</div>
+        <div class="ವೇಗ-label" style="right: 55px; top: 10px;">160</div>
+        <div class="ವೇಗ-label" style="right: 25px; top: 35px;">200</div>
+        <div class="ವೇಗ-label" style="right: 10px; bottom: 10px;">240</div>
+      </div>
+    </div>
+    
+    <div class="ವೇಗ-display">
+      <div class="ವೇಗ-value" id="speed-value">0</div>
+      <div class="ವೇಗ-unit">km/h</div>
+    </div>
+    
+    <div class="odometer">
+      <div>
+        <div class="odometer-label">ಓಡೋಮೀಟರ್</div>
+        <div class="trip-display" id="trip-display">ಅಂತರ: 0.00 km</div>
+      </div>
+      <div class="odometer-display" id="odometer-display">000000</div>
+    </div>
+  </div>
+  
+  <div class="instruction">ವೇಗ ನಿಯಂತ್ರಿಸಲು ಪೆಡಲ್‌ಗಳನ್ನು ಒತ್ತಿ ಹಿಡಿದಿರಿ</div>
+  
+  <div class="controls">
+    <button class="pedal gas-pedal" id="gas-btn">
+      ⬆️ GAS<br>
+      <span style="font-size: 10px;">ತ್ವರಣ</span>
+    </button>
+    <button class="pedal brake-pedal" id="brake-btn">
+      ⬇️ ಬ್ರೇಕ್<br>
+      <span style="font-size: 10px;">Slow Down</span>
+    </button>
+    <button class="reset-btn" onclick="resetTrip()">🔄 ಟ್ರಿಪ್ ಮೀಟರ್ ಮರುಹೊಂದಿಸಿ</button>
+  </div>
+</div>
+
+<div class="info-grid">
+  <div class="info-card">
+    <div class="info-title">📊 ಸ್ಪೀಡೋಮೀಟರ್</div>
+    <div class="info-text">
+      ತೋರಿಸುತ್ತದೆ <strong>ತತ್ಕ್ಷಣ ವೇಗ</strong> - ಈಗ ಎಷ್ಟು ವೇಗವಾಗಿ ಹೋಗುತ್ತಿದ್ದೀರಿ. ಭದ್ರತೆ ಮತ್ತು ವೇಗ ಮಿತಿಗಳಿಗೆ ಮುಖ್ಯ.
+    </div>
+  </div>
+  <div class="info-card">
+    <div class="info-title">📏 ಓಡೋಮೀಟರ್</div>
+    <div class="info-text">
+      <strong>ಒಟ್ಟು ದೂರ</strong> ಚಲಿಸಿದ್ದನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡುತ್ತದೆ. ನಿರ್ವಹಣೆ ಷೆಡ್ಯೂಲ್ ಮತ್ತು ವಾಹನ ಬಳಕೆ ಟ್ರ್ಯಾಕಿಂಗ್‌ಗೆ ಉಪಯೋಗ.
+    </div>
+  </div>
+</div>
+
+<div class="fun-fact">
+  <div class="fun-title">🌟 Did You Know?</div>
+  <div class="fun-text">
+    "ಸ್ಪೀಡೋಮೀಟರ್" "ವೇಗ" + "ಮೀಟರ್". ಆಧುನಿಕ ಕಾರುಗಳಲ್ಲಿ ಜಿಪಿಎಸ್ ನಿಖರ ವಾಚನಕ್ಕೆ ಡಿಜಿಟಲ್ ಸ್ಪೀಡೋಮೀಟರ್!
+  </div>
+</div>
+
+</div>
+
+<script>
+let ವೇಗ = 0;
+let totalDistance = 0;
+let tripDistance = 0;
+let isGasPressed = false;
+let isBrakePressed = false;
+let lastTime = Date.now();
+
+const needle = document.getElementById('needle');
+const ವೇಗValue = document.getElementById('speed-value');
+const odometerDisplay = document.getElementById('odometer-display');
+const tripDisplay = document.getElementById('trip-display');
+
+// Gas pedal events
+const gasBtn = document.getElementById('gas-btn');
+gasBtn.addEventListener('mousedown', () => isGasPressed = true);
+gasBtn.addEventListener('mouseup', () => isGasPressed = false);
+gasBtn.addEventListener('mouseleave', () => isGasPressed = false);
+gasBtn.addEventListener('touchstart', (e) => { e.preventDefault(); isGasPressed = true; });
+gasBtn.addEventListener('touchend', () => isGasPressed = false);
+
+// Brake pedal events
+const brakeBtn = document.getElementById('brake-btn');
+brakeBtn.addEventListener('mousedown', () => isBrakePressed = true);
+brakeBtn.addEventListener('mouseup', () => isBrakePressed = false);
+brakeBtn.addEventListener('mouseleave', () => isBrakePressed = false);
+brakeBtn.addEventListener('touchstart', (e) => { e.preventDefault(); isBrakePressed = true; });
+brakeBtn.addEventListener('touchend', () => isBrakePressed = false);
+
+function updateDashboard() {
+  const currentTime = Date.now();
+  const deltaTime = (currentTime - lastTime) / 1000; // seconds
+  lastTime = currentTime;
+  
+  // Update ವೇಗ based on pedals
+  if (isGasPressed) {
+    ವೇಗ = Math.min(ವೇಗ + 50 * deltaTime, 240); // ತ್ವರಣ
+  } else if (isBrakePressed) {
+    ವೇಗ = Math.max(ವೇಗ - 100 * deltaTime, 0); // Brake
+  } else {
+    // Natural deceleration
+    ವೇಗ = Math.max(ವೇಗ - 10 * deltaTime, 0);
+  }
+  
+  // Update distance (ವೇಗ in km/h, convert to km/s)
+  const distanceDelta = (ವೇಗ / 3600) * deltaTime;
+  totalDistance += distanceDelta;
+  tripDistance += distanceDelta;
+  
+  // Update needle rotation (-90deg = 0, +90deg = 240)
+  const needleAngle = -90 + (ವೇಗ / 240) * 180;
+  needle.style.transform = `translateX(-50%) rotate(${needleAngle}deg)`;
+  
+  // Update ವೇಗ display
+  ವೇಗValue.textContent = Math.round(ವೇಗ);
+  
+  // Update color based on ವೇಗ
+  if (ವೇಗ < 60) {
+    ವೇಗValue.style.color = '#4caf50';
+  } else if (ವೇಗ < 120) {
+    ವೇಗValue.style.color = '#ffeb3b';
+  } else {
+    ವೇಗValue.style.color = '#f44336';
+  }
+  
+  // Update odometer (6 digits)
+  const odometerValue = Math.floor(totalDistance).toString().padStart(6, '0');
+  odometerDisplay.textContent = odometerValue;
+  
+  // Update trip meter
+  tripDisplay.textContent = `ಅಂತರ: ${tripDistance.toFixed(2)} km`;
+  
+  requestAnimationFrame(updateDashboard);
+}
+
+function resetTrip() {
+  tripDistance = 0;
+  tripDisplay.textContent = 'ಅಂತರ: 0.00 km';
+}
+
+// Add ವೇಗ marks to dial
+const marksContainer = document.querySelector('.ವೇಗ-marks');
+for (let i = 0; i <= 12; i++) {
+  const mark = document.createElement('div');
+  mark.className = 'ವೇಗ-mark' + (i % 2 === 0 ? ' major' : '');
+  mark.style.transform = `rotate(${-90 + i * 15}deg)`;
+  marksContainer.appendChild(mark);
+}
+
+// ಪ್ರಾರಂಭ dashboard update loop
+updateDashboard();
+
+// ── URL Parameter Initialisation (IIFE) ───────────────────────────────────
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var initialState = params.get('initialState') || 'stopped';
+  var showHints    = params.get('showHints');
+
+  // Map state to initial speed in km/h
+  var speedMap = { 'stopped': 0, 'slow': 40, 'medium': 100, 'fast': 200 };
+  var targetSpeed = speedMap[initialState];
+  if (targetSpeed !== undefined && targetSpeed > 0) {
+    setTimeout(function () {
+      ವೇಗ = targetSpeed;
+    }, 100);
+  }
+
+  // Hide hints (concept-card + fun-fact)
+  if (showHints === 'false') {
+    document.querySelectorAll('.concept-card, .fun-fact').forEach(function (el) {
+      el.style.display = 'none';
+    });
+  }
+}());
+</script>
+</body>
+</html>

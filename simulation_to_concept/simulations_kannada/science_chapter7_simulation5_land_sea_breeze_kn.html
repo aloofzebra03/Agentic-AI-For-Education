@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#00acc1">
+<title>ಭೂ ಮತ್ತು ಸಮುದ್ರ ಗಾಳಿ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #00acc1 0%, #4dd0e1 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #00acc1;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #00838f; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.time-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.time-btn {
+  flex: 1;
+  padding: 12px;
+  border: 3px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fafafa;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.time-btn:active { transform: scale(0.98); }
+.time-btn.day.active { border-color: #ff9800; background: #fff3e0; color: #e65100; }
+.time-btn.ರಾತ್ರಿ.active { border-color: #5c6bc0; background: #e8eaf6; color: #3949ab; }
+
+.time-btn .emoji { font-size: 24px; display: block; margin-bottom: 4px; }
+
+.breeze-visual {
+  position: relative;
+  height: 220px;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: background 0.5s ease;
+}
+
+.breeze-visual.day-mode {
+  background: linear-gradient(180deg, #87ceeb 0%, #b3e5fc 50%, #e1f5fe 100%);
+}
+
+.breeze-visual.ರಾತ್ರಿ-mode {
+  background: linear-gradient(180deg, #1a237e 0%, #3949ab 50%, #5c6bc0 100%);
+}
+
+.sun {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 50px;
+  background: radial-gradient(circle, #ffeb3b 0%, #ff9800 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 30px #ffeb3b;
+  transition: all 0.5s ease;
+}
+
+.moon {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle at 30% 30%, #fafafa 0%, #e0e0e0 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(255,255,255,0.5);
+  display: none;
+}
+
+.stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  display: none;
+}
+
+.star {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+  animation: twinkle 1.5s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.lಮತ್ತುscape {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  display: flex;
+}
+
+.sea {
+  flex: 1;
+  background: linear-gradient(180deg, #0288d1 0%, #01579b 100%);
+  position: relative;
+}
+
+.sea-label {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #fff;
+  font-weight: 600;
+  background: rgba(0,0,0,0.3);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.lಮತ್ತು {
+  flex: 1;
+  background: linear-gradient(180deg, #8bc34a 0%, #689f38 100%);
+  position: relative;
+}
+
+.land-label {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #fff;
+  font-weight: 600;
+  background: rgba(0,0,0,0.3);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.temp-ಸೂಚಕ {
+  position: absolute;
+  top: 10px;
+  font-size: 20px;
+  transition: all 0.5s ease;
+}
+
+.temp-sea { left: 25%; transform: translateX(-50%); }
+.temp-lಮತ್ತು { right: 25%; transform: translateX(50%); }
+
+.wind-arrows {
+  position: absolute;
+  top: 95px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.wind-arrow {
+  width: 50px;
+  height: 24px;
+  position: relative;
+  animation: windMove 1s ease-in-out infinite;
+}
+
+.wind-arrow svg {
+  width: 100%;
+  height: 100%;
+}
+
+.arrow-right {
+  fill: #ff9800;
+  filter: drop-ನೆರಳು(0 2px 3px rgba(0,0,0,0.3));
+}
+
+.arrow-left {
+  fill: #64b5f6;
+  filter: drop-ನೆರಳು(0 2px 3px rgba(0,0,0,0.3));
+}
+
+@keyframes windMove {
+  0%, 100% { transform: translateX(0); opacity: 0.7; }
+  50% { transform: translateX(10px); opacity: 1; }
+}
+
+.wind-arrow.reverse {
+  animation: windMoveReverse 1s ease-in-out infinite;
+}
+
+@keyframes windMoveReverse {
+  0%, 100% { transform: translateX(0); opacity: 0.7; }
+  50% { transform: translateX(-10px); opacity: 1; }
+}
+
+.breeze-name {
+  position: absolute;
+  top: 75px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 15px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.explanation {
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid;
+  transition: all 0.3s ease;
+}
+
+.explanation.day-exp {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-color: #ff9800;
+}
+
+.explanation.ರಾತ್ರಿ-exp {
+  background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+  border-color: #5c6bc0;
+}
+
+.explanation-title { font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+.day-exp .explanation-title { color: #e65100; }
+.ರಾತ್ರಿ-exp .explanation-title { color: #3949ab; }
+
+.explanation-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.key-point {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: #fff;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.key-point .icon { font-size: 20px; }
+.key-point .text { font-size: 10px; color: #333; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🌊 ಭೂ ಮತ್ತು ಸಮುದ್ರ ಗಾಳಿ</h1>
+  <p>ಕರಾವಳಿ ಬಳಿ ಪ್ರಕೃತಿಯ ಏರ್ ಕಂಡಿಷನಿಂಗ್!</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ಭೂಮಿ ನೀರಿಗಿಂತ ಬಿಸಿ ಮತ್ತು ತಂಪು <strong>ವೇಗವಾಗಿ</strong> ಆಗುತ್ತದೆ. ಈ ವ್ಯತ್ಯಾಸ ಕರಾವಳಿ ಬಳಿ ಗಾಳಿ ವಿನ್ಯಾಸ ಉಂಟುಮಾಡುತ್ತದೆ – <strong>ಸಮುದ್ರ ಗಾಳಿ</strong> ಹಗಲು ಮತ್ತು <strong>ಭೂ ಗಾಳಿ</strong> ರಾತ್ರಿಯಲ್ಲಿ.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="time-toggle">
+    <button class="time-btn day active" onclick="setTime('day', this)">
+      <span class="emoji">☀️</span>
+      ಹಗಲು
+    </button>
+    <button class="time-btn ರಾತ್ರಿ" onclick="setTime('ರಾತ್ರಿ', this)">
+      <span class="emoji">🌙</span>
+      ರಾತ್ರಿ
+    </button>
+  </div>
+  
+  <div class="breeze-visual day-mode" id="breeze-visual">
+    <div class="sun" id="sun"></div>
+    <div class="moon" id="moon"></div>
+    
+    <div class="stars" id="stars">
+      <div class="star" style="top: 20px; left: 30px;"></div>
+      <div class="star" style="top: 40px; left: 80px; animation-delay: 0.5s;"></div>
+      <div class="star" style="top: 15px; left: 150px; animation-delay: 1s;"></div>
+      <div class="star" style="top: 50px; left: 200px; animation-delay: 0.3s;"></div>
+      <div class="star" style="top: 25px; left: 280px; animation-delay: 0.7s;"></div>
+      <div class="star" style="top: 45px; left: 350px; animation-delay: 1.2s;"></div>
+    </div>
+    
+    <div class="breeze-name" id="breeze-name">🌬️ ಸಮುದ್ರ ಗಾಳಿ</div>
+    
+    <div class="wind-arrows" id="wind-arrows">
+      <div class="wind-arrow">
+        <svg viewBox="0 0 50 24"><polygon class="arrow-right" points="0,8 35,8 35,0 50,12 35,24 35,16 0,16"/></svg>
+      </div>
+      <div class="wind-arrow" style="animation-delay: 0.3s;">
+        <svg viewBox="0 0 50 24"><polygon class="arrow-right" points="0,8 35,8 35,0 50,12 35,24 35,16 0,16"/></svg>
+      </div>
+      <div class="wind-arrow" style="animation-delay: 0.6s;">
+        <svg viewBox="0 0 50 24"><polygon class="arrow-right" points="0,8 35,8 35,0 50,12 35,24 35,16 0,16"/></svg>
+      </div>
+    </div>
+    
+    <div class="lಮತ್ತುscape">
+      <div class="sea">
+        <div class="temp-ಸೂಚಕ temp-sea" id="temp-sea">🌊</div>
+        <div class="sea-label">ಸಮುದ್ರ (ತಂಪು)</div>
+      </div>
+      <div class="lಮತ್ತು">
+        <div class="temp-ಸೂಚಕ temp-lಮತ್ತು" id="temp-land">🔥</div>
+        <div class="land-label">ಭೂ (ಬಿಸಿ)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="explanation day-exp" id="explanation">
+  <div class="explanation-title" id="exp-title">☀️ ಸಮುದ್ರ ಬೀಸಣಿಕೆ (ಹಗಲು)</div>
+  <div class="explanation-text" id="exp-text">
+    ಹಗಲು, <strong>ಭೂಮಿ ಸಮುದ್ರಕ್ಕಿಂತ ಬೇಗ ಬಿಸಿಯಾಗುತ್ತದೆ</strong>. ಭೂಮಿ ಮೇಲಿನ ಬಿಸಿ ಗಾಳಿ ಏರುತ್ತದೆ. ಸಮುದ್ರದಿಂದ ತಂಪು ಗಾಳಿ ಅದರ ಸ್ಥಾನ ತುಂಬಲು ಒಳನುಗ್ಗುತ್ತದೆ. ಸಮುದ್ರದಿಂದ ಭೂಮಿಗೆ ಈ ತಂಪು ಗಾಳಿಯೇ <strong>ಸಮುದ್ರ ಗಾಳಿ</strong>.
+  </div>
+  <div class="key-point">
+    <div class="icon">💡</div>
+    <div class="text">ಬಿಸಿ ಮಧ್ಯಾಹ್ನ ತೀರ ಪ್ರದೇಶದಲ್ಲಿ ಸಮುದ್ರ ಗಾಳಿ ಉಷ್ಣ ನಿವಾರಣೆ!</div>
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ಮುಖ್ಯ ವ್ಯತ್ಯಾಸ</div>
+  <div class="takeaway-text">
+    • <strong>ಭೂ</strong> ಬೇಗ ಬಿಸಿ ಮತ್ತು ತಂಪು (ವಿಶಿಷ್ಟ ಉಷ್ಣ ಕಡಿಮೆ)<br>
+    • <strong>ನೀರು</strong> ನಿಧಾನವಾಗಿ ಬಿಸಿ ಮತ್ತು ತಂಪು (ವಿಶಿಷ್ಟ ಉಷ್ಣ ಹೆಚ್ಚು)<br>
+    • ದಿನ: ಭೂಮಿ ಬಿಸಿ → ಗಾಳಿ ಏರುತ್ತದೆ → ಸಮುದ್ರ ಬೀಸಣಿಕೆ ಒಳನುಗ್ಗುತ್ತದೆ<br>
+    • ರಾತ್ರಿ: ಸಮುದ್ರ ಬೆಚ್ಚನೆ → ಗಾಳಿ ಏರುತ್ತದೆ → ಭೂ ಬೀಸಣಿಕೆ ಹೊರಹಾಕುತ್ತದೆ
+  </div>
+</div>
+
+</div>
+
+<script>
+const visual = document.getElementById('breeze-visual');
+const sun = document.getElementById('sun');
+const moon = document.getElementById('moon');
+const stars = document.getElementById('stars');
+const breezeName = document.getElementById('breeze-name');
+const windArrows = document.getElementById('wind-arrows');
+const tempSea = document.getElementById('temp-sea');
+const tempLand = document.getElementById('temp-land');
+const explanation = document.getElementById('explanation');
+const expTitle = document.getElementById('exp-title');
+const expText = document.getElementById('exp-text');
+
+const seaLabel = document.querySelector('.sea-label');
+const landLabel = document.querySelector('.land-label');
+
+function setTime(time, btn) {
+  document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  if (time === 'day') {
+    // Day mode
+    visual.className = 'breeze-visual day-mode';
+    sun.style.display = 'block';
+    moon.style.display = 'none';
+    stars.style.display = 'none';
+    
+    breezeName.textContent = '🌬️ ಸಮುದ್ರ ಗಾಳಿ';
+    
+    // ಗಾಳಿ from sea to lಮತ್ತು (left to right)
+    windArrows.innerHTML = `
+      <div class="wind-arrow">
+        <svg viewBox="0 0 50 24"><polygon class="arrow-right" points="0,8 35,8 35,0 50,12 35,24 35,16 0,16"/></svg>
+      </div>
+      <div class="wind-arrow" style="animation-delay: 0.3s;">
+        <svg viewBox="0 0 50 24"><polygon class="arrow-right" points="0,8 35,8 35,0 50,12 35,24 35,16 0,16"/></svg>
+      </div>
+      <div class="wind-arrow" style="animation-delay: 0.6s;">
+        <svg viewBox="0 0 50 24"><polygon class="arrow-right" points="0,8 35,8 35,0 50,12 35,24 35,16 0,16"/></svg>
+      </div>
+    `;
+    
+    tempSea.textContent = '🌊';
+    tempLand.textContent = '🔥';
+    seaLabel.textContent = 'ಸಮುದ್ರ (ತಂಪು)';
+    landLabel.textContent = 'ಭೂ (ಬಿಸಿ)';
+    
+    explanation.className = 'explanation day-exp';
+    expTitle.textContent = '☀️ ಸಮುದ್ರ ಬೀಸಣಿಕೆ (ಹಗಲು)';
+    expText.innerHTML = 'ಹಗಲು, <strong>ಭೂಮಿ ಸಮುದ್ರಕ್ಕಿಂತ ಬೇಗ ಬಿಸಿಯಾಗುತ್ತದೆ</strong>. ಭೂಮಿ ಮೇಲಿನ ಬಿಸಿ ಗಾಳಿ ಏರುತ್ತದೆ. ಸಮುದ್ರದಿಂದ ತಂಪು ಗಾಳಿ ಅದರ ಸ್ಥಾನ ತುಂಬಲು ಒಳನುಗ್ಗುತ್ತದೆ. ಸಮುದ್ರದಿಂದ ಭೂಮಿಗೆ ಈ ತಂಪು ಗಾಳಿಯೇ <strong>ಸಮುದ್ರ ಗಾಳಿ</strong>.';
+    
+  } else {
+    // Night mode
+    visual.className = 'breeze-visual ರಾತ್ರಿ-mode';
+    sun.style.display = 'none';
+    moon.style.display = 'block';
+    stars.style.display = 'block';
+    
+    breezeName.textContent = '🌬️ ಭೂ ಗಾಳಿ';
+    
+    // ಗಾಳಿ from lಮತ್ತು to sea (right to left)
+    windArrows.innerHTML = `
+      <div class="wind-arrow reverse">
+        <svg viewBox="0 0 50 24"><polygon class="arrow-left" points="50,8 15,8 15,0 0,12 15,24 15,16 50,16"/></svg>
+      </div>
+      <div class="wind-arrow reverse" style="animation-delay: 0.3s;">
+        <svg viewBox="0 0 50 24"><polygon class="arrow-left" points="50,8 15,8 15,0 0,12 15,24 15,16 50,16"/></svg>
+      </div>
+      <div class="wind-arrow reverse" style="animation-delay: 0.6s;">
+        <svg viewBox="0 0 50 24"><polygon class="arrow-left" points="50,8 15,8 15,0 0,12 15,24 15,16 50,16"/></svg>
+      </div>
+    `;
+    
+    tempSea.textContent = '🔥';
+    tempLand.textContent = '❄️';
+    seaLabel.textContent = 'ಸಮುದ್ರ (ಬೆಚ್ಚನೆ)';
+    landLabel.textContent = 'ಭೂ (ತಂಪು)';
+    
+    explanation.className = 'explanation ರಾತ್ರಿ-exp';
+    expTitle.textContent = '🌙 ಭೂ ಬೀಸಣಿಕೆ (ರಾತ್ರಿ)';
+    expText.innerHTML = 'ರಾತ್ರಿಯಲ್ಲಿ, <strong>ಭೂಮಿ ಸಮುದ್ರಕ್ಕಿಂತ ವೇಗವಾಗಿ ತಂಪಾಗುತ್ತದೆ</strong>. ಸಮುದ್ರ ತುಲನಾತ್ಮಕವಾಗಿ ಬೆಚ್ಚನೆಯಾಗಿ ಉಳಿಯುತ್ತದೆ. ಸಮುದ್ರ ಮೇಲಿನ ಬೆಚ್ಚನೆ ಗಾಳಿ ಏರುತ್ತದೆ. ಭೂಮಿಯಿಂದ ತಂಪು ಗಾಳಿ ಸಮುದ್ರದ ಕಡೆಗೆ ಚಲಿಸುತ್ತದೆ. ಭೂಮಿಯಿಂದ ಸಮುದ್ರಕ್ಕೆ ಈ ಗಾಳಿಯೇ <strong>ಭೂ ಗಾಳಿ</strong>.';
+  }
+}
+
+// URL parameter auto-initialisation
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var initialState = params.get('initialState') || 'day';
+  var showHints = params.get('showHints') !== 'false';
+  if (!showHints) {
+    var card = document.querySelector('.concept-card');
+    if (card) card.style.display = 'none';
+  }
+  var timeMap = { 'day': 0, 'night': 1 };
+  var idx = timeMap[initialState];
+  if (idx !== undefined) {
+    setTimeout(function() {
+      var btns = document.querySelectorAll('.time-btn');
+      if (btns[idx]) btns[idx].click();
+    }, 800);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#37474f">
+<title>ಸರ್ಕ್ಯೂಟ್ ಚಿಹ್ನೆಗಳು – ಸರ್ಕ್ಯೂಟ್ ರೇಖಾಚಿತ್ರಗಳು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #37474f 0%, #607d8b 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #f9a825;
+}
+
+.concept-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f57f17;
+  margin-bottom: 6px;
+}
+
+.concept-text {
+  font-size: 12px;
+  color: #5d4037;
+  line-height: 1.5;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.symbols-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.symbol-card {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.symbol-card:active { transform: scale(0.98); }
+.symbol-card.active { border-color: #1976d2; background: #e3f2fd; }
+
+.symbol-visual {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.symbol-visual svg { max-width: 100%; max-height: 100%; }
+
+.symbol-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #333;
+}
+
+.symbol-desc {
+  font-size: 9px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.detail-panel {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #1976d2;
+}
+
+.detail-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1565c0;
+  margin-bottom: 8px;
+}
+
+.detail-content {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.detail-symbol {
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  min-width: 80px;
+  text-align: center;
+}
+
+.detail-text {
+  font-size: 11px;
+  color: #37474f;
+  line-height: 1.6;
+  flex: 1;
+}
+
+.quiz-section {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.quiz-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.quiz-circuit {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 12px;
+}
+
+.quiz-circuit svg { width: 100%; height: auto; }
+
+.quiz-question {
+  font-size: 11px;
+  color: #333;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.quiz-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.quiz-btn {
+  padding: 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quiz-btn:active { transform: scale(0.95); }
+.quiz-btn.correct { border-color: #4caf50; background: #e8f5e9; }
+.quiz-btn.wrong { border-color: #f44336; background: #ffebee; }
+
+.quiz-feedback {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  text-align: center;
+  display: none;
+}
+
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct { background: #e8f5e9; color: #2e7d32; }
+.quiz-feedback.wrong { background: #ffebee; color: #c62828; }
+
+.circuit-example {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.example-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.example-compare {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.example-box {
+  flex: 1;
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+}
+
+.example-box .label {
+  font-size: 9px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.example-arrow {
+  font-size: 20px;
+  color: #1976d2;
+}
+
+.takeaway {
+  background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2e7d32;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1b5e20; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>📊 ಸರ್ಕ್ಯೂಟ್ ಚಿಹ್ನೆಗಳು</h1>
+  <p>ಸರ್ಕ್ಯೂಟ್ ರೇಖಾಚಿತ್ರಗಳನ್ನು ಓದಲು ಮತ್ತು ಬರೆಯಲು ಕಲಿಯಿರಿ</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ವಿದ್ಯುತ್ ಭಾಗಗಳನ್ನು ಸರ್ಕ್ಯೂಟ್ ರೇಖಾಚಿತ್ರಗಳಲ್ಲಿ <strong>ಸಾಮಾನ್ಯ ಚಿಹ್ನೆಗಳಿಂದ</strong> ಪ್ರತಿನಿಧಿಸಲಾಗುತ್ತದೆ. ಈ ಚಿಹ್ನೆಗಳನ್ನು ಜಾಗತಿಕವಾಗಿ ಬಳಸಲಾಗುತ್ತದೆ – ಸರ್ಕ್ಯೂಟ್‌ಗಳನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಲು ಮತ್ತು ಬರೆಯಲು ಸುಲಭ.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="symbols-grid">
+    <div class="symbol-card active" onclick="showSymbol('cell', this)">
+      <div class="symbol-visual">
+        <svg viewBox="0 0 80 40">
+          <line x1="30" y1="10" x2="30" y2="30" stroke="#333" stroke-width="3"/>
+          <line x1="50" y1="15" x2="50" y2="25" stroke="#333" stroke-width="3"/>
+          <line x1="10" y1="20" x2="30" y2="20" stroke="#333" stroke-width="2"/>
+          <line x1="50" y1="20" x2="70" y2="20" stroke="#333" stroke-width="2"/>
+          <text x="25" y="38" font-size="8" fill="#e65100">+</text>
+          <text x="52" y="38" font-size="8" fill="#1565c0">−</text>
+        </svg>
+      </div>
+      <div class="symbol-name">ಕೋಶ</div>
+      <div class="symbol-desc">ಏಕ ಶಕ್ತಿ ಮೂಲ</div>
+    </div>
+    
+    <div class="symbol-card" onclick="showSymbol('ಬ್ಯಾಟರಿ', this)">
+      <div class="symbol-visual">
+        <svg viewBox="0 0 80 40">
+          <line x1="15" y1="10" x2="15" y2="30" stroke="#333" stroke-width="3"/>
+          <line x1="25" y1="15" x2="25" y2="25" stroke="#333" stroke-width="3"/>
+          <line x1="35" y1="10" x2="35" y2="30" stroke="#333" stroke-width="3"/>
+          <line x1="45" y1="15" x2="45" y2="25" stroke="#333" stroke-width="3"/>
+          <line x1="55" y1="10" x2="55" y2="30" stroke="#333" stroke-width="3"/>
+          <line x1="65" y1="15" x2="65" y2="25" stroke="#333" stroke-width="3"/>
+          <line x1="5" y1="20" x2="15" y2="20" stroke="#333" stroke-width="2"/>
+          <line x1="65" y1="20" x2="75" y2="20" stroke="#333" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="symbol-name">ಬ್ಯಾಟರಿ</div>
+      <div class="symbol-desc">ಅನೇಕ ಕೋಶಗಳು</div>
+    </div>
+    
+    <div class="symbol-card" onclick="showSymbol('bulb', this)">
+      <div class="symbol-visual">
+        <svg viewBox="0 0 80 50">
+          <circle cx="40" cy="25" r="15" fill="none" stroke="#333" stroke-width="2"/>
+          <line x1="30" y1="15" x2="50" y2="35" stroke="#333" stroke-width="2"/>
+          <line x1="50" y1="15" x2="30" y2="35" stroke="#333" stroke-width="2"/>
+          <line x1="10" y1="25" x2="25" y2="25" stroke="#333" stroke-width="2"/>
+          <line x1="55" y1="25" x2="70" y2="25" stroke="#333" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="symbol-name">ದೀಪ/ಬಲ್ಬ್</div>
+      <div class="symbol-desc">ಬೆಳಕಿನ ಮೂಲ</div>
+    </div>
+    
+    <div class="symbol-card" onclick="showSymbol('led', this)">
+      <div class="symbol-visual">
+        <svg viewBox="0 0 80 50">
+          <polygon points="25,15 25,35 45,25" fill="none" stroke="#333" stroke-width="2"/>
+          <line x1="45" y1="15" x2="45" y2="35" stroke="#333" stroke-width="2"/>
+          <line x1="10" y1="25" x2="25" y2="25" stroke="#333" stroke-width="2"/>
+          <line x1="45" y1="25" x2="60" y2="25" stroke="#333" stroke-width="2"/>
+          <line x1="50" y1="10" x2="60" y2="5" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="55" y1="15" x2="65" y2="10" stroke="#333" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="symbol-name">LED</div>
+      <div class="symbol-desc">LED</div>
+    </div>
+    
+    <div class="symbol-card" onclick="showSymbol('ಸ್ವಿಚ್-open', this)">
+      <div class="symbol-visual">
+        <svg viewBox="0 0 80 40">
+          <circle cx="20" cy="25" r="4" fill="#333"/>
+          <circle cx="60" cy="25" r="4" fill="#333"/>
+          <line x1="24" y1="25" x2="50" y2="10" stroke="#333" stroke-width="2"/>
+          <line x1="5" y1="25" x2="16" y2="25" stroke="#333" stroke-width="2"/>
+          <line x1="64" y1="25" x2="75" y2="25" stroke="#333" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="symbol-name">ಸ್ವಿಚ್ (ತೆರೆದಿದೆ)</div>
+      <div class="symbol-desc">ಸರ್ಕ್ಯೂಟ್ ಆಫ್ (ನಿಲುಗಡೆ)</div>
+    </div>
+    
+    <div class="symbol-card" onclick="showSymbol('ಸ್ವಿಚ್-closed', this)">
+      <div class="symbol-visual">
+        <svg viewBox="0 0 80 40">
+          <circle cx="20" cy="25" r="4" fill="#333"/>
+          <circle cx="60" cy="25" r="4" fill="#333"/>
+          <line x1="24" y1="25" x2="56" y2="25" stroke="#333" stroke-width="2"/>
+          <line x1="5" y1="25" x2="16" y2="25" stroke="#333" stroke-width="2"/>
+          <line x1="64" y1="25" x2="75" y2="25" stroke="#333" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="symbol-name">ಸ್ವಿಚ್ (ಮುಚ್ಚಿದೆ)</div>
+      <div class="symbol-desc">ಸರ್ಕ್ಯೂಟ್ ಆನ್ (ಚಾಲಿತ)</div>
+    </div>
+    
+    <div class="symbol-card" onclick="showSymbol('wire', this)">
+      <div class="symbol-visual">
+        <svg viewBox="0 0 80 40">
+          <line x1="10" y1="20" x2="70" y2="20" stroke="#333" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="symbol-name">ತಂತಿ</div>
+      <div class="symbol-desc">ವಾಹಕ</div>
+    </div>
+    
+    <div class="symbol-card" onclick="showSymbol('wire-cross', this)">
+      <div class="symbol-visual">
+        <svg viewBox="0 0 80 50">
+          <line x1="10" y1="25" x2="70" y2="25" stroke="#333" stroke-width="2"/>
+          <path d="M 40 10 L 40 20 Q 40 25 45 25" stroke="#333" stroke-width="2" fill="none"/>
+          <line x1="40" y1="30" x2="40" y2="40" stroke="#333" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="symbol-name">ತಂತಿಗಳು ಛೇದನ</div>
+      <div class="symbol-desc">ಸಂಪರ್ಕವಿಲ್ಲ</div>
+    </div>
+  </div>
+</div>
+
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-title" id="detail-title">🔋 ಕೋಶ ಚಿಹ್ನೆ</div>
+  <div class="detail-content">
+    <div class="detail-symbol" id="detail-symbol">
+      <svg viewBox="0 0 60 40" width="60" height="40">
+        <line x1="20" y1="5" x2="20" y2="35" stroke="#333" stroke-width="4"/>
+        <line x1="40" y1="12" x2="40" y2="28" stroke="#333" stroke-width="4"/>
+        <line x1="5" y1="20" x2="20" y2="20" stroke="#333" stroke-width="2"/>
+        <line x1="40" y1="20" x2="55" y2="20" stroke="#333" stroke-width="2"/>
+      </svg>
+    </div>
+    <div class="detail-text" id="detail-text">
+      ಸೆಲ್ ಚಿಹ್ನೆಗಳು ಒರಡು ಲಂಬ ರೇಖೆಗಳು:<br>
+      • <strong>ಉದ್ದ ರೇಖೆ = ಧನ (+)</strong><br>
+      • <strong>ಕಿರಿದಾದ ರೇಖೆ = ಋಣ (−)</strong><br><br>
+      ನೆನಪಿಡಿ: ಉದ್ದ = ಧನ, ಕಿರಿದಾದ = ಋಣ
+    </div>
+  </div>
+</div>
+
+<div class="quiz-section">
+  <div class="quiz-title">🧠 ತ್ವರಿತ ಕ್ವಿಜ್: ಸರ್ಕ್ಯೂಟ್ ಗುರುತಿಸಿ</div>
+  <div class="quiz-circuit">
+    <svg viewBox="0 0 200 100">
+      <!-- Simple circuit with cell, ಸ್ವಿಚ್, ಮತ್ತು bulb -->
+      <line x1="30" y1="30" x2="170" y2="30" stroke="#333" stroke-width="2"/>
+      <line x1="170" y1="30" x2="170" y2="70" stroke="#333" stroke-width="2"/>
+      <line x1="170" y1="70" x2="30" y2="70" stroke="#333" stroke-width="2"/>
+      <line x1="30" y1="70" x2="30" y2="30" stroke="#333" stroke-width="2"/>
+      
+      <!-- Cell -->
+      <line x1="20" y1="40" x2="20" y2="60" stroke="#333" stroke-width="3"/>
+      <line x1="40" y1="45" x2="40" y2="55" stroke="#333" stroke-width="3"/>
+      
+      <!-- ಸ್ವಿಚ್ (open) -->
+      <circle cx="80" cy="30" r="3" fill="#333"/>
+      <circle cx="120" cy="30" r="3" fill="#333"/>
+      <line x1="83" y1="30" x2="110" y2="18" stroke="#333" stroke-width="2"/>
+      
+      <!-- Bulb -->
+      <circle cx="170" cy="50" r="12" fill="none" stroke="#333" stroke-width="2"/>
+      <line x1="162" y1="42" x2="178" y2="58" stroke="#333" stroke-width="2"/>
+      <line x1="178" y1="42" x2="162" y2="58" stroke="#333" stroke-width="2"/>
+    </svg>
+  </div>
+  <div class="quiz-question">ಸ್ವಿಚ್ ಮುಚ್ಚಿದರೆ ಎನಾಗುತ್ತದೆ?</div>
+  <div class="quiz-options">
+    <button class="quiz-btn" onclick="checkQuiz(this, true)">ಬಲ್ಬ್ ಬೆಳಗುತ್ತದೆ</button>
+    <button class="quiz-btn" onclick="checkQuiz(this, false)">ಎನೂ ಆಗುವುದಿಲ್ಲ</button>
+    <button class="quiz-btn" onclick="checkQuiz(this, false)">ಸೆಲ್ ಒಡೆಯುತ್ತದೆ</button>
+    <button class="quiz-btn" onclick="checkQuiz(this, false)">ಸ್ವಿಚ್ ಕರಗುತ್ತದೆ</button>
+  </div>
+  <div class="quiz-feedback" id="quiz-feedback"></div>
+</div>
+
+<div class="circuit-example">
+  <div class="example-title">ನೈಜ ವಸ್ತು ವಿರುದ್ಧ ಚಿಹ್ನೆ ಹೋಲಿಕೆ</div>
+  <div class="example-compare">
+    <div class="example-box">
+      <div class="label">ನೈಜ ಘಟಕ</div>
+      <div style="font-size:30px">🔋</div>
+    </div>
+    <div class="example-arrow">→</div>
+    <div class="example-box">
+      <div class="label">ಸರ್ಕ್ಯೂಟ್ ಚಿಹ್ನೆ</div>
+      <svg viewBox="0 0 50 30" width="50" height="30">
+        <line x1="15" y1="5" x2="15" y2="25" stroke="#333" stroke-width="3"/>
+        <line x1="35" y1="10" x2="35" y2="20" stroke="#333" stroke-width="3"/>
+        <line x1="5" y1="15" x2="15" y2="15" stroke="#333" stroke-width="2"/>
+        <line x1="35" y1="15" x2="45" y2="15" stroke="#333" stroke-width="2"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೀವು ಕಲಿತದ್ದು</div>
+  <div class="takeaway-text">
+    ವಿದ್ಯುತ್ ಘಟಕಗಳನ್ನು ಪ್ರತಿನಿಧಿಸಲು ವಿಶ್ವದಲ್ಲಿ ಪ್ರಮಾಣಿತ ಸರ್ಕ್ಯೂಟ್ ಚಿಹ್ನೆಗಳು. ಮುಖ್ಯ ಚಿಹ್ನೆಗಳು: <strong>ಕೋಶ</strong> (ಉದ್ದ ರೇಖೆ = +), <strong>ಬ್ಯಾಟರಿ</strong> (ಅನೇಕ ಘಟಕಗಳು), <strong>ದೀಪ/ಬಲ್ಬ್</strong> (X ನೊಂದಿಗೆ ವೃತ್ತ), <strong>ಸ್ವಿಚ್</strong> (ತೆರೆದಾಗ ಅಂತರ, ಮುಚ್ಚಿದಾಗ ರೇಖೆ), <strong>ತಂತಿ</strong> (ನೇರ ರೇಖೆ).
+  </div>
+</div>
+
+</div>
+
+<script>
+const symbolData = {
+  'cell': {
+    title: '🔋 ಕೋಶ ಚಿಹ್ನೆ',
+    svg: `<svg viewBox="0 0 60 40" width="60" height="40">
+      <line x1="20" y1="5" x2="20" y2="35" stroke="#333" stroke-width="4"/>
+      <line x1="40" y1="12" x2="40" y2="28" stroke="#333" stroke-width="4"/>
+      <line x1="5" y1="20" x2="20" y2="20" stroke="#333" stroke-width="2"/>
+      <line x1="40" y1="20" x2="55" y2="20" stroke="#333" stroke-width="2"/>
+    </svg>`,
+    text: `ಸೆಲ್ ಚಿಹ್ನೆಗಳು ಒರಡು ಲಂಬ ರೇಖೆಗಳು:<br>
+      • <strong>ಉದ್ದ ರೇಖೆ = ಧನ (+)</strong><br>
+      • <strong>ಕಿರಿದಾದ ರೇಖೆ = ಋಣ (−)</strong><br><br>
+      ನೆನಪಿಡಿ: ಉದ್ದ = ಧನ, ಕಿರಿದಾದ = ಋಣ`
+  },
+  'ಬ್ಯಾಟರಿ': {
+    title: '🔋🔋 ಬ್ಯಾಟರಿ ಚಿಹ್ನೆ',
+    svg: `<svg viewBox="0 0 80 40" width="80" height="40">
+      <line x1="15" y1="5" x2="15" y2="35" stroke="#333" stroke-width="3"/>
+      <line x1="25" y1="12" x2="25" y2="28" stroke="#333" stroke-width="3"/>
+      <line x1="35" y1="5" x2="35" y2="35" stroke="#333" stroke-width="3"/>
+      <line x1="45" y1="12" x2="45" y2="28" stroke="#333" stroke-width="3"/>
+      <line x1="55" y1="5" x2="55" y2="35" stroke="#333" stroke-width="3"/>
+      <line x1="65" y1="12" x2="65" y2="28" stroke="#333" stroke-width="3"/>
+    </svg>`,
+    text: `ಬ್ಯಾಟರಿ ಅನೇಕ ಘಟಕಗಳನ್ನು ಒಟ್ಟಿಗೆ ಸಂಪರ್ಕಿಸಿದ್ದು.<br><br>
+      ಚಿಹ್ನೆಯು ಪುನರಾವರ್ತಿತ ಕೋಶ ಚಿಹ್ನೆಗಳನ್ನು (ಉದ್ದ-ಕಿರಿದಾದ ಜೋಡಿಗಳು) ತೋರಿಸುತ್ತದೆ.<br><br>
+      ಹೆಚ್ಚು ಘಟಕಗಳು = ಹೆಚ್ಚು ವೋಲ್ಟೇಜ್!`
+  },
+  'bulb': {
+    title: '💡 ದೀಪ/ಬಲ್ಬ್ ಚಿಹ್ನೆ',
+    svg: `<svg viewBox="0 0 60 50" width="60" height="50">
+      <circle cx="30" cy="25" r="15" fill="none" stroke="#333" stroke-width="2"/>
+      <line x1="20" y1="15" x2="40" y2="35" stroke="#333" stroke-width="2"/>
+      <line x1="40" y1="15" x2="20" y2="35" stroke="#333" stroke-width="2"/>
+      <line x1="5" y1="25" x2="15" y2="25" stroke="#333" stroke-width="2"/>
+      <line x1="45" y1="25" x2="55" y2="25" stroke="#333" stroke-width="2"/>
+    </svg>`,
+    text: `ಬಲ್ಬ್ ಚಿಹ್ನೆ ಒಳಗೆ X ಇರುವ ವೃತ್ತ.<br><br>
+      • ವೃತ್ತ = ಗಾಜಿನ ಬಲ್ಬ್<br>
+      • X = ಫಿಲಾಮೆಂಟ್ (ಛೇದಿಸುವ ತಂತಿಗಳು)<br><br>
+      ಬಲ್ಬ್ ವಿದ್ಯುತ್ ಶಕ್ತಿಯನ್ನು ಬೆಳಕಿಗೆ ಪರಿವರ್ತಿಸುತ್ತದೆ.`
+  },
+  'led': {
+    title: '🔆 LED ಚಿಹ್ನೆ',
+    svg: `<svg viewBox="0 0 60 50" width="60" height="50">
+      <polygon points="15,10 15,40 40,25" fill="none" stroke="#333" stroke-width="2"/>
+      <line x1="40" y1="10" x2="40" y2="40" stroke="#333" stroke-width="2"/>
+      <line x1="5" y1="25" x2="15" y2="25" stroke="#333" stroke-width="2"/>
+      <line x1="40" y1="25" x2="55" y2="25" stroke="#333" stroke-width="2"/>
+    </svg>`,
+    text: `LED ತ್ರಿಕೋನ ಮತ್ತು ರೇಖಾ ಚಿಹ್ನೆ; ಬಾಣಗಳು ಬೆಳಕನ್ನು ತೋರಿಸುತ್ತವೆ.<br><br>
+      • ತ್ರಿಕೋನ ಪ್ರವಾಹ ದಿಕ್ಕನ್ನು ಸೂಚಿಸುತ್ತದೆ<br>
+      • ಬಾಣಗಳು = ಹೊರಸೂಸುವ ಬೆಳಕು<br><br>
+      <strong>ಮುಖ್ಯ:</strong> LED ಗಳಿಗೆ ಸರಿಯಾದ ಧ್ರುವತೆ ಅಗತ್ಯ!`
+  },
+  'ಸ್ವಿಚ್-open': {
+    title: '🔓 ಸ್ವಿಚ್ (ತೆರೆದಿದೆ/ಆಫ್)',
+    svg: `<svg viewBox="0 0 60 40" width="60" height="40">
+      <circle cx="15" cy="25" r="4" fill="#333"/>
+      <circle cx="45" cy="25" r="4" fill="#333"/>
+      <line x1="19" y1="25" x2="38" y2="10" stroke="#333" stroke-width="2"/>
+      <line x1="5" y1="25" x2="11" y2="25" stroke="#333" stroke-width="2"/>
+      <line x1="49" y1="25" x2="55" y2="25" stroke="#333" stroke-width="2"/>
+    </svg>`,
+    text: `ತೆರೆದ ಸ್ವಿಚ್ ಸರ್ಕ್ಯೂಟ್‌ನಲ್ಲಿ ಅಂತರ ತೋರಿಸುತ್ತದೆ.<br><br>
+      • ಲಿವರ್ ಮೇಲೆತ್ತಲ್ಪಟ್ಟಿದೆ<br>
+      • ಪ್ರವಾಹ ಹರಿಯಲು ಸಾಧ್ಯವಿಲ್ಲ<br>
+      • ಸರ್ಕ್ಯೂಟ್ ಆಫ್<br><br>
+      ಇದು ಸರ್ಕ್ಯೂಟ್ ಮಾರ್ಗವನ್ನು ಮುರಿಯುತ್ತದೆ.`
+  },
+  'ಸ್ವಿಚ್-closed': {
+    title: '🔒 ಸ್ವಿಚ್ (ಮುಚ್ಚಿದೆ/ಆನ್)',
+    svg: `<svg viewBox="0 0 60 40" width="60" height="40">
+      <circle cx="15" cy="25" r="4" fill="#333"/>
+      <circle cx="45" cy="25" r="4" fill="#333"/>
+      <line x1="19" y1="25" x2="41" y2="25" stroke="#333" stroke-width="2"/>
+      <line x1="5" y1="25" x2="11" y2="25" stroke="#333" stroke-width="2"/>
+      <line x1="49" y1="25" x2="55" y2="25" stroke="#333" stroke-width="2"/>
+    </svg>`,
+    text: `ಮುಚ್ಚಿದ ಸ್ವಿಚ್ ಸಂಪರ್ಕಗಳ ನಡುವೆ ಸಂಪರ್ಕ ತೋರಿಸುತ್ತದೆ.<br><br>
+      • ಲಿವರ್ ಎರಡು ಬಿಂದುಗಳನ್ನು ಸಂಪರ್ಕಿಸುತ್ತದೆ<br>
+      • ಪ್ರವಾಹ ಹರಿಯಬಹುದು<br>
+      • ಸರ್ಕ್ಯೂಟ್ ಆನ್<br><br>
+      ಇದು ಸರ್ಕ್ಯೂಟ್ ಮಾರ್ಗವನ್ನು ಪೂರ್ಣಗೊಳಿಸುತ್ತದೆ.`
+  },
+  'wire': {
+    title: '〰️ ತಂತಿ ಚಿಹ್ನೆ',
+    svg: `<svg viewBox="0 0 60 30" width="60" height="30">
+      <line x1="5" y1="15" x2="55" y2="15" stroke="#333" stroke-width="2"/>
+    </svg>`,
+    text: `ಸರಳ ನೇರ ರೇಖೆ ತಂತಿಯನ್ನು ಪ್ರತಿನಿಧಿಸುತ್ತದೆ.<br><br>
+      • ತಂತಿಗಳು ವಾಹಕಗಳು<br>
+      • ಘಟಕಗಳ ನಡುವೆ ಪ್ರವಾಹವನ್ನು ಸಾಗಿಸುತ್ತವೆ<br>
+      • ಲಂಬ ಕೋನಗಳಲ್ಲಿ ನೇರ ರೇಖೆಗಳಾಗಿ ಬರೆಯಿರಿ`
+  },
+  'wire-cross': {
+    title: '✖️ ತಂತಿಗಳು ಛೇದನ (ಸಂಪರ್ಕವಿಲ್ಲ)',
+    svg: `<svg viewBox="0 0 60 50" width="60" height="50">
+      <line x1="5" y1="25" x2="55" y2="25" stroke="#333" stroke-width="2"/>
+      <path d="M 30 5 L 30 20 Q 30 25 35 25" stroke="#333" stroke-width="2" fill="none"/>
+      <line x1="30" y1="30" x2="30" y2="45" stroke="#333" stroke-width="2"/>
+    </svg>`,
+    text: `ತಂತಿಗಳು ಛೇದಿಸಿದರೂ ಸಂಪರ್ಕವಿಲ್ಲದಾಗ ಒಂದು ಇನ್ನೊಂದರ ಮೇಲೆ "ಜಿಗಿದು" ಹೋಗುತ್ತದೆ.<br><br>
+      • ಉಬ್ಬು ವಿದ್ಯುತ್ ಸಂಪರ್ಕವಿಲ್ಲ ಎಂದು ತೋರಿಸುತ್ತದೆ<br>
+      • ಪ್ರವಾಹ ಪ್ರತಿ ತಂತಿಯಲ್ಲಿ ಪ್ರತ್ಯೇಕವಾಗಿ ಮುಂದುವರಿಯುತ್ತದೆ<br><br>
+      ಸಂಪರ್ಕವಿದ್ದರೆ, ಸಂಧಿಯಲ್ಲಿ ಚುಕ್ಕಿ ತೋರಿಸಲಾಗುತ್ತದೆ.`
+  }
+};
+
+function showSymbol(type, element) {
+  document.querySelectorAll('.symbol-card').forEach(card => card.classList.remove('active'));
+  element.classList.add('active');
+  
+  const data = symbolData[type];
+  document.getElementById('detail-title').textContent = data.title;
+  document.getElementById('detail-symbol').innerHTML = data.svg;
+  document.getElementById('detail-text').innerHTML = data.text;
+}
+
+function checkQuiz(btn, isCorrect) {
+  const feedback = document.getElementById('quiz-feedback');
+  document.querySelectorAll('.quiz-btn').forEach(b => {
+    b.classList.remove('correct', 'wrong');
+    b.disabled = true;
+  });
+  
+  if (isCorrect) {
+    btn.classList.add('correct');
+    feedback.className = 'quiz-feedback show correct';
+    feedback.innerHTML = '✅ ಸರಿ! ಸ್ವಿಚ್ ಮುಚ್ಚಿದಾಗ ಸರ್ಕ್ಯೂಟ್ ಪೂರ್ಣವಾಗುತ್ತದೆ ಮತ್ತು ಪ್ರವಾಹ ಬಲ್ಬ್ ಮೂಲಕ ಹರಿದು ಅದನ್ನು ಬೆಳಗಿಸುತ್ತದೆ.';
+  } else {
+    btn.classList.add('wrong');
+    document.querySelector('.quiz-btn:first-child').classList.add('correct');
+    feedback.className = 'quiz-feedback show wrong';
+    feedback.innerHTML = '❌ ಸರಿಯಲ್ಲ. ಸ್ವಿಚ್ ಮುಚ್ಚಿದಾಗ ಅದು ಸರ್ಕ್ಯೂಟ್ ಪೂರ್ಣಗೊಳಿಸುತ್ತದೆ, ಪ್ರವಾಹ ಹರಿಯಲು ಮತ್ತು ಬಲ್ಬ್ ಬೆಳಗಲು ಅನುಮತಿಸುತ್ತದೆ.';
+  }
+}
+
+// ── URL parameter support ──────────────────────────────────────────────
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var state = p.get('initialState') || 'cell';
+  var hints = p.get('showHints');
+
+  if (hints === 'false') {
+    var cc = document.querySelector('.concept-card');
+    if (cc) cc.style.display = 'none';
+  }
+
+  // Map URL state names to symbolData keys and card index
+  var stateIndex = {
+    'cell': 0, 'battery': 1, 'bulb': 2, 'led': 3,
+    'switch_open': 4, 'switch_closed': 5, 'wire': 6, 'wire_cross': 7
+  };
+  var symbolKey = {
+    'cell': 'cell', 'battery': 'ಬ್ಯಾಟರಿ',
+    'bulb': 'bulb', 'led': 'led',
+    'switch_open':   'ಸ್ವಿಚ್-open',
+    'switch_closed': 'ಸ್ವಿಚ್-closed',
+    'wire': 'wire', 'wire_cross': 'wire-cross'
+  };
+
+  var idx = stateIndex[state];
+  var key = symbolKey[state];
+  if (idx !== undefined && key !== undefined) {
+    setTimeout(function () {
+      var cards = document.querySelectorAll('.symbol-card');
+      var el = cards[idx];
+      if (el) {
+        // Deactivate all, activate target
+        Array.prototype.forEach.call(cards, function (c) { c.classList.remove('active'); });
+        el.classList.add('active');
+        showSymbol(key, el);
+      }
+    }, 400);
+  }
+}());
+</script>
+</body>
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#388e3c">
+<title>ಅಪೇಕ್ಷಣೀಯ ಮತ್ತು ಅನಪೇಕ್ಷಿತ ಬದಲಾವಣೆಗಳು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #388e3c 0%, #66bb6a 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #388e3c;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.question-card {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.question-icon { font-size: 40px; margin-right: 15px; }
+.question-info { flex: 1; }
+.question-title { font-size: 13px; font-weight: 600; color: #333; }
+.question-desc { font-size: 11px; color: #666; margin-top: 4px; }
+
+.choice-btns {
+  display: flex;
+  gap: 10px;
+}
+
+.choice-btn {
+  flex: 1;
+  padding: 14px;
+  border: 3px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.choice-btn:active { transform: scale(0.95); }
+.choice-btn.ಅಪೇಕ್ಷಣೀಯ { border-color: #4caf50; background: #e8f5e9; color: #2e7d32; }
+.choice-btn.unಅಪೇಕ್ಷಣೀಯ { border-color: #f44336; background: #ffebee; color: #c62828; }
+.choice-btn:disabled { opacity: 0.6; }
+
+.feedback-panel {
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 10px;
+  display: none;
+}
+
+.feedback-panel.show { display: block; }
+.feedback-panel.correct { background: #e8f5e9; border-left: 4px solid #4caf50; }
+.feedback-panel.wrong { background: #ffebee; border-left: 4px solid #f44336; }
+.feedback-title { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+.feedback-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+.score-bar {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.score-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.score-dot.correct { background: #4caf50; color: white; }
+.score-dot.wrong { background: #f44336; color: white; }
+
+.progress-text {
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.context-panel {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.context-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 6px; }
+.context-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2196f3;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>👍 ಅಪೇಕ್ಷಣೀಯ ಮತ್ತು ಅನಪೇಕ್ಷಿತ</h1>
+  <p>ಎಲ್ಲಾ ಬದಲಾವಣೆಗಳು ನಮಗೆ ಒಳ್ಳೆಯವೇ?</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ಬದಲಾವಣೆಗಳು <strong>ಅಪೇಕ್ಷಣೀಯ</strong> (ಉಪಯುಕ್ತ, ಲಾಭಕರ) ಅಥವಾ <strong>ಅನಪೇಕ್ಷಿತ</strong> (ಹಾನಿಕಾರಕ, ಅನಪೇಕ್ಷಿತ). ಒಂದೇ ಬದಲಾವಣೆ ಒಂದು ಸಂದರ್ಭದಲ್ಲಿ ಅಪೇಕ್ಷಣೀಯ ಮತ್ತು ಇನ್ನೊಂದರಲ್ಲಿ ಅನಪೇಕ್ಷಿತವಾಗಿರಬಹುದು!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="question-card" id="question-card">
+    <div class="question-icon" id="q-icon">🥛</div>
+    <div class="question-info">
+      <div class="question-title" id="q-title">ಹಾಲು turning into ಮೊಸರು</div>
+      <div class="question-desc" id="q-desc">ಬ್ಯಾಕ್ಟೀರಿಯಾ ರಾತ್ರಿಯಲ್ಲಿ ಹಾಲನ್ನು ಮೊಸರು</div>
+    </div>
+  </div>
+  
+  <div class="choice-btns">
+    <button class="choice-btn" id="btn-desirable" onclick="checkAnswer(true)">
+      ✅ ಅಪೇಕ್ಷಣೀಯ<br><span style="font-size:9px">ಉಪಯುಕ್ತ/ಲಾಭಕರ</span>
+    </button>
+    <button class="choice-btn" id="btn-undesirable" onclick="checkAnswer(false)">
+      ❌ ಅನಪೇಕ್ಷಿತ<br><span style="font-size:9px">ಹಾನಿಕಾರಕ/ಅನಪೇಕ್ಷಿತ</span>
+    </button>
+  </div>
+  
+  <div class="feedback-panel" id="feedback-panel">
+    <div class="feedback-title" id="feedback-title">ಸರಿ!</div>
+    <div class="feedback-text" id="feedback-text"></div>
+  </div>
+  
+  <div class="score-bar" id="score-bar"></div>
+  <div class="progress-text" id="progress-text">10 ರಲ್ಲಿ ಪ್ರಶ್ನೆ 1</div>
+</div>
+
+<div class="context-panel">
+  <div class="context-title">🤔 ಸಂದರ್ಭ ಮುಖ್ಯ!</div>
+  <div class="context-text" id="context-text">
+    ಒಂದೇ ಬದಲಾವಣೆಯನ್ನು ಸಂದರ್ಭಾನುಸಾರ ವಿಭಿನ್ನವಾಗಿ ನೋಡಬಹುದು:<br><br>
+    • <strong>ಅಗ್ನಿ:</strong> ಅಡುಗೆಗೆ ಅಪೇಕ್ಷಣೀಯ, ಕಾಡಿನಲ್ಲಿ ಅನಪೇಕ್ಷಿತ<br>
+    • <strong>ವಿಘಟನೆ:</strong> ಕಂಪೋಸ್ಟ್‌ಗೆ ಅಪೇಕ್ಷಣೀಯ, ಆಹಾರಕ್ಕೆ ಅನಪೇಕ್ಷಿತ<br>
+    • <strong>ಮಳೆ:</strong> ಬೆಳೆಗಳಿಗೆ ಅಪೇಕ್ಷಣೀಯ, ಪ್ರವಾಹದಲ್ಲಿ ಅನಪೇಕ್ಷಿತ
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ಮುಖ್ಯ ತಿಳುವಳಿಕೆ</div>
+  <div class="takeaway-text">
+    <strong>ಅಪೇಕ್ಷಣೀಯ ಬದಲಾವಣೆಗಳು</strong> ನಮಗೆ ಅಥವಾ ಪ್ರಕೃತಿಗೆ ಯಾವುದೇ ರೀತಿಯಲ್ಲಿ ಸಹಾಯ.<br>
+    <strong>ಅನಪೇಕ್ಷಿತ ಬದಲಾವಣೆಗಳು</strong> ಹಾನಿ ಅಥವಾ ನಷ್ಟ.<br><br>
+    ಅನಪೇಕ್ಷಿತವೆನಿಸುವ ಅನೇಕ ಬದಲಾವಣೆಗಳು (ವಿಘಟನೆ ಹಾಗೆ) ಪ್ರಕೃತಿಯ ಸಮತೋಲನಕ್ಕೆ ಅಗತ್ಯ!
+  </div>
+</div>
+
+</div>
+
+<script>
+const questions = [
+  { 
+    icon: '🥛', 
+    title: 'ಹಾಲು turning into ಮೊಸರು', 
+    desc: 'ಬ್ಯಾಕ್ಟೀರಿಯಾ ರಾತ್ರಿಯಲ್ಲಿ ಹಾಲನ್ನು ಮೊಸರು',
+    ಅಪೇಕ್ಷಣೀಯ: true,
+    feedback: 'ಮೊಸರು ಪೋಷಕ ಮತ್ತು ರುಚಿಕರ! ಹಾಲಿನಿಂದ ಮೊಸರು ಮಾಡುವುದು ಲಾಭಕರ ರಾಸಾಯನಿಕ ಬದಲಾವಣೆ – ಯೋಗರ್ಟ್, ಲಸ್ಸಿ ಮತ್ತು ಇತರ ಡೈರಿ ಉತ್ಪನ್ನಗಳನ್ನು ನೀಡುತ್ತದೆ.'
+  },
+  { 
+    icon: '🔩', 
+    title: 'ಕಬ್ಬಿಣದ ತುಕ್ಕು', 
+    desc: 'ಕಬ್ಬಿಣದ ವಸ್ತುಗಳು ಕಾಲಕ್ರಮೇಣ ಕಂದು ತುಕ್ಕು ಬೆಳೆಸುತ್ತವೆ',
+    ಅಪೇಕ್ಷಣೀಯ: false,
+    feedback: 'ತುಕ್ಕು ಕಬ್ಬಿಣದ ರಚನೆಗಳನ್ನು ದುರ್ಬಲಗೊಳಿಸುತ್ತದೆ, ಉಪಕರಣಗಳನ್ನು ಹಾಳು ಮಾಡುತ್ತದೆ. ಇದು ನಾವು ತಡೆಯಲು ಯತ್ನಿಸುವ ಅನಪೇಕ್ಷಿತ ರಾಸಾಯನಿಕ ಬದಲಾವಣೆ.'
+  },
+  { 
+    icon: '🍳', 
+    title: 'ಆಹಾರ ಬೇಯಿಸುವುದು', 
+    desc: 'ಕಚ್ಚಾ ಪದಾರ್ಥಗಳು ಬೇಯಿಸಿದ ಊಟವಾಗುತ್ತವೆ',
+    ಅಪೇಕ್ಷಣೀಯ: true,
+    feedback: 'ಅಡುಗೆ ಆಹಾರವನ್ನು ಸುರಕ್ಷಿತ, ರುಚಿಕರ ಮತ್ತು ಜೀರ್ಣಿಸಲು ಸುಲಭವಾಗಿ ಮಾಡುತ್ತದೆ. ಮಾನವರು ಸಾವಿರಾರು ವರ್ಷಗಳಿಂದ ಬಳಸುವ ಅಪೇಕ್ಷಣೀಯ ಬದಲಾವಣೆ!'
+  },
+  { 
+    icon: '🍌', 
+    title: 'ಹಣ್ಣು ಕೊಳೆತ', 
+    desc: 'ತಾಜಾ ಹಣ್ಣುಗಳು ಕೆಟ್ಟು ಉಣ್ಣಲಾಗದಂತಾಗುತ್ತವೆ',
+    ಅಪೇಕ್ಷಣೀಯ: false,
+    feedback: 'ಕೊಳೆತ ಹಣ್ಣು ಆಹಾರ ವ್ಯರ್ಥ ಮಾಡುತ್ತದೆ ಮತ್ತು ಅನಾರೋಗ್ಯ ಉಂಟುಮಾಡಬಹುದು. ಆದರೆ ಪ್ರಕೃತಿಯಲ್ಲಿ ಈ ವಿಘಟನೆ ಪೋಷಕಾಂಶಗಳನ್ನು ಮಣ್ಣಿಗೆ ಮರಳಿಸುತ್ತದೆ!'
+  },
+  { 
+    icon: '🌱', 
+    title: 'ಬೀಜ ಮೊಳಕೆ', 
+    desc: 'ಬೀಜಗಳು ಚಿಕ್ಕ ಸಸ್ಯಗಳಾಗಿ ಮೊಳಕೆಯೊಡೆಯುತ್ತವೆ',
+    ಅಪೇಕ್ಷಣೀಯ: true,
+    feedback: 'ಮೊಳಕೆಯೊಡೆಯುವುದು ಸಸ್ಯಗಳು ಸಂತಾನೋತ್ಪತ್ತಿ ಮಾಡುವ ವಿಧಾನ! ಕೃಷಿ ಮತ್ತು ಪರಿಸರ ಸಮತೋಲನಕ್ಕೆ ಈ ಅಪೇಕ್ಷಣೀಯ ಬದಲಾವಣೆ ಅಗತ್ಯ.'
+  },
+  { 
+    icon: '🏭', 
+    title: 'ವಾಯು ಮಾಲಿನ್ಯ', 
+    desc: 'ಕಾರ್ಖಾನೆಗಳು ಗಾಳಿಗೆ ಹೊಗೆ ಬಿಡುಗಡೆ ಮಾಡುತ್ತವೆ',
+    ಅಪೇಕ್ಷಣೀಯ: false,
+    feedback: 'ವಾಯು ಮಾಲಿನ್ಯ ಆರೋಗ್ಯ ಸಮಸ್ಯೆ ಮತ್ತು ಹವಾಮಾನ ಬದಲಾವಣೆ ಉಂಟುಮಾಡುತ್ತದೆ. ಕಡಿಮೆ ಮಾಡಬೇಕಾದ ಅನಪೇಕ್ಷಿತ ಉಪಉತ್ಪನ್ನ.'
+  },
+  { 
+    icon: '🥬', 
+    title: 'ಕಂಪೋಸ್ಟಿಂಗ್', 
+    desc: 'ಅಡುಗೆ ಮನೆ ಕಸ ಗೊಬ್ಬರವಾಗಿ ಮಾರ್ಪಡುತ್ತದೆ',
+    ಅಪೇಕ್ಷಣೀಯ: true,
+    feedback: 'ಕಂಪೋಸ್ಟಿಂಗ್ ಕಸವನ್ನು ಬೆಲೆಬಾಳುವ ಗೊಬ್ಬರವಾಗಿ ಪರಿವರ್ತಿಸುತ್ತದೆ! ಸಾವಯವ ಪದಾರ್ಥ ಮರುಬಳಕೆ ಮಾಡಲು ಅಪೇಕ್ಷಣೀಯ ಮಾರ್ಗ.'
+  },
+  { 
+    icon: '🦷', 
+    title: 'ಹಲ್ಲು ಕೊಳೆತ', 
+    desc: 'ಬ್ಯಾಕ್ಟೀರಿಯಾ ಕಾಲಕ್ರಮೇಣ ಹಲ್ಲುಗಳನ್ನು ಹಾಳು ಮಾಡುತ್ತದೆ',
+    ಅಪೇಕ್ಷಣೀಯ: false,
+    feedback: 'ಹಲ್ಲು ಕೊಳೆತ ನೋವು ಮತ್ತು ಆರೋಗ್ಯ ಸಮಸ್ಯೆ ಉಂಟುಮಾಡುತ್ತದೆ. ಚಿಕ್ಕು ಮತ್ತು ದಂತ ಚಿಕಿತ್ಸೆಯಿಂದ ತಡೆಯುವ ಅನಪೇಕ್ಷಿತ ಬದಲಾವಣೆ.'
+  },
+  { 
+    icon: '🍞', 
+    title: 'ರಾಟ್ಟಿ ತಯಾರಿ', 
+    desc: 'ಯೀಸ್ಟ್ ಹಿಟ್ಟನ್ನು ಏರಿಸಿ ರೊಟ್ಟಿ ಬೇಯಿಸುತ್ತದೆ',
+    ಅಪೇಕ್ಷಣೀಯ: true,
+    feedback: 'ರೊಟ್ಟಿ ತಯಾರಿ ಹುದುಗುವಿಕೆ (ಯೀಸ್ಟ್ CO₂ ಉತ್ಪಾದಿಸುತ್ತದೆ) ಬಳಸಿ ಮೃದು, ರುಚಿಕರ ರೊಟ್ಟಿ ಮಾಡುತ್ತದೆ. ಅತ್ಯಂತ ಅಪೇಕ್ಷಣೀಯ ಬದಲಾವಣೆ!'
+  },
+  { 
+    icon: '🌡️', 
+    title: 'ಜಾಗತಿಕ ತಾಪಮಾನ ಏರಿಕೆ', 
+    desc: 'ಭೂಮಿಯ ಉಷ್ಣತೆ ಏರುತ್ತಿದೆ',
+    ಅಪೇಕ್ಷಣೀಯ: false,
+    feedback: 'ಜಾಗತಿಕ ತಾಪಮಾನ ಏರಿಕೆ ತೀವ್ರ ಹವಾಮಾನ, ಸಮುದ್ರ ಮಟ್ಟ ಏರಿಕೆ ಮತ್ತು ಪರಿಸರ ಹಾನಿ ಉಂಟುಮಾಡುತ್ತದೆ. ನಮ್ಮ ಗ್ರಹದ ಮುಂದಿರುವ ಪ್ರಮುಖ ಅನಪೇಕ್ಷಿತ ಬದಲಾವಣೆ.'
+  }
+];
+
+let currentIndex = 0;
+let score = 0;
+let answered = false;
+
+const qIcon = document.getElementById('q-icon');
+const qTitle = document.getElementById('q-title');
+const qDesc = document.getElementById('q-desc');
+const btnDesirable = document.getElementById('btn-desirable');
+const btnUndesirable = document.getElementById('btn-undesirable');
+const feedbackPanel = document.getElementById('feedback-panel');
+const feedbackTitle = document.getElementById('feedback-title');
+const feedbackText = document.getElementById('feedback-text');
+const scoreBar = document.getElementById('score-bar');
+const progressText = document.getElementById('progress-text');
+
+function loadQuestion() {
+  if (currentIndex >= questions.length) {
+    qIcon.textContent = '🎉';
+    qTitle.textContent = 'ಕ್ವಿಜ್ ಪೂರ್ಣ!';
+    qDesc.textContent = `ನೀವು ${questions.length} ರಲ್ಲಿ ${score} ಸರಿ ಪಡೆದಿರುವಿರಿ!`;
+    btnDesirable.style.display = 'none';
+    btnUndesirable.style.display = 'none';
+    feedbackPanel.classList.remove('show');
+    return;
+  }
+  
+  const q = questions[currentIndex];
+  qIcon.textContent = q.icon;
+  qTitle.textContent = q.title;
+  qDesc.textContent = q.desc;
+  
+  btnDesirable.disabled = false;
+  btnUndesirable.disabled = false;
+  btnDesirable.classList.remove('ಅಪೇಕ್ಷಣೀಯ', 'unಅಪೇಕ್ಷಣೀಯ');
+  btnUndesirable.classList.remove('ಅಪೇಕ್ಷಣೀಯ', 'unಅಪೇಕ್ಷಣೀಯ');
+  
+  feedbackPanel.classList.remove('show', 'correct', 'wrong');
+  answered = false;
+  
+  progressText.textContent = `ಪ್ರಶ್ನೆ ${currentIndex + 1} / ${questions.length}`;
+}
+
+function checkAnswer(isDesirable) {
+  if (answered) return;
+  answered = true;
+  
+  const q = questions[currentIndex];
+  const correct = q.ಅಪೇಕ್ಷಣೀಯ === isDesirable;
+  
+  btnDesirable.disabled = true;
+  btnUndesirable.disabled = true;
+  
+  // Mark correct answer
+  if (q.ಅಪೇಕ್ಷಣೀಯ) {
+    btnDesirable.classList.add('ಅಪೇಕ್ಷಣೀಯ');
+  } else {
+    btnUndesirable.classList.add('unಅಪೇಕ್ಷಣೀಯ');
+  }
+  
+  // Show feedback
+  if (correct) {
+    feedbackPanel.classList.add('correct');
+    feedbackTitle.textContent = '✅ ಸರಿ!';
+    score++;
+  } else {
+    feedbackPanel.classList.add('wrong');
+    feedbackTitle.textContent = '❌ ಸಂಪೂರ್ಣ ಸರಿಯಲ್ಲ!';
+  }
+  
+  feedbackText.textContent = q.feedback;
+  feedbackPanel.classList.add('show');
+  
+  // Update score bar
+  const dot = document.createElement('div');
+  dot.className = `score-dot ${correct ? 'correct' : 'wrong'}`;
+  dot.textContent = correct ? '✓' : '✗';
+  scoreBar.appendChild(dot);
+  
+  // Next question after delay
+  setTimeout(() => {
+    currentIndex++;
+    loadQuestion();
+  }, 2500);
+}
+
+// Initialize
+loadQuestion();
+
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var showHints = params.get('showHints');
+  if (showHints === 'false') {
+    document.querySelectorAll('.concept-card, .takeaway').forEach(function (el) { el.style.display = 'none'; });
+  }
+  var state = params.get('initialState');
+  if (!state || state === 'initial') return;
+  if (state === 'show_desirable') {
+    setTimeout(function () {
+      var btn = document.getElementById('btn-desirable');
+      if (btn && !btn.disabled) btn.click();
+    }, 800);
+  } else if (state === 'show_undesirable') {
+    setTimeout(function () {
+      var btn = document.getElementById('btn-undesirable');
+      if (btn && !btn.disabled) btn.click();
+    }, 800);
+  }
+}());
+</script>
+</body>
+</html>

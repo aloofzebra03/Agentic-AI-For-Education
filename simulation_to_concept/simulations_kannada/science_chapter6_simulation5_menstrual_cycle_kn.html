@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#e91e63">
+<title>ಋತುಚಕ್ರ ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #e91e63 0%, #f48fb1 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #e91e63;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #c2185b; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.cycle-visual {
+  position: relative;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cycle-circle {
+  position: relative;
+  width: 180px;
+  height: 180px;
+}
+
+.cycle-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 15px solid #e0e0e0;
+}
+
+.cycle-segment {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 15px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cycle-segment.menstruation {
+  border-color: #e91e63 transparent transparent transparent;
+  transform: rotate(-60deg);
+}
+
+.cycle-segment.follicular {
+  border-color: transparent #ff9800 transparent transparent;
+  transform: rotate(30deg);
+}
+
+.cycle-segment.ovulation {
+  border-color: transparent transparent #4caf50 transparent;
+  transform: rotate(120deg);
+}
+
+.cycle-segment.luteal {
+  border-color: transparent transparent transparent #2196f3;
+  transform: rotate(210deg);
+}
+
+.cycle-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.cycle-day { font-size: 24px; font-weight: 700; color: #e91e63; }
+.cycle-phase { font-size: 9px; color: #666; margin-top: 4px; }
+
+.day-slider {
+  margin: 15px 0;
+}
+
+.day-slider label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #37474f;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.day-slider input[type="range"] {
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #e91e63 0%, #ff9800 25%, #4caf50 45%, #4caf50 55%, #2196f3 75%, #e91e63 100%);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.day-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #e91e63;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.phase-legend {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  background: #f5f5f5;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.legend-item.active { background: #fce4ec; }
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.legend-dot.menstruation { background: #e91e63; }
+.legend-dot.follicular { background: #ff9800; }
+.legend-dot.ovulation { background: #4caf50; }
+.legend-dot.luteal { background: #2196f3; }
+
+.legend-text { font-size: 10px; color: #333; }
+.legend-days { font-size: 8px; color: #666; }
+
+.phase-info {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #e91e63;
+}
+
+.phase-title { font-size: 12px; font-weight: 700; color: #c2185b; margin-bottom: 8px; }
+.phase-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.myth-buster {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.myth-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 8px; }
+.myth-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🌸 ಋತುಚಕ್ರ ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು</h1>
+  <p>ಬೆಳವಣಿಗೆಯ ನೈಸರ್ಗಿಕ ಭಾಗ</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ಋತುಚಕ್ರ</strong> (ಪೀರಿಯಡ್ಸ್) ಹುಡುಗಿಯರು/ಮಹಿಳೆಯರ ನೈಸರ್ಗಿಕ ಮಾಸಿಕ ಚಕ್ರ the uterus sheds its lining. It typically begins during puberty (ages 10-15) ಮತ್ತು is a sign of reproductive health.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="cycle-visual">
+    <div class="cycle-circle">
+      <div class="cycle-ring"></div>
+      <div class="cycle-segment menstruation"></div>
+      <div class="cycle-segment follicular"></div>
+      <div class="cycle-segment ovulation"></div>
+      <div class="cycle-segment luteal"></div>
+      <div class="cycle-center">
+        <div class="cycle-day" id="cycle-day">ದಿನ 1</div>
+        <div class="cycle-phase" id="cycle-phase">ಋತುಚಕ್ರ</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="day-slider">
+    <label>📅 ಚಕ್ರ ಅನ್ವೇಷಿಸಿ (28-ದಿನ ಸರಾಸರಿ):</label>
+    <input type="range" id="day-slider" min="1" max="28" value="1" oninput="updateCycle(this.value)">
+  </div>
+  
+  <div class="phase-legend">
+    <div class="legend-item active" onclick="jumpToPhase('menstruation')">
+      <div class="legend-dot menstruation"></div>
+      <div>
+        <div class="legend-text">ಋತುಚಕ್ರ</div>
+        <div class="legend-days">ದಿನ 1-5</div>
+      </div>
+    </div>
+    <div class="legend-item" onclick="jumpToPhase('follicular')">
+      <div class="legend-dot follicular"></div>
+      <div>
+        <div class="legend-text">ಫಾಲಿಕ್ಯುಲರ್ ಹಂತ</div>
+        <div class="legend-days">ದಿನ 6-13</div>
+      </div>
+    </div>
+    <div class="legend-item" onclick="jumpToPhase('ovulation')">
+      <div class="legend-dot ovulation"></div>
+      <div>
+        <div class="legend-text">ಅಂಡೋತ್ಸರ್ಜನ</div>
+        <div class="legend-days">ದಿನ 14</div>
+      </div>
+    </div>
+    <div class="legend-item" onclick="jumpToPhase('luteal')">
+      <div class="legend-dot luteal"></div>
+      <div>
+        <div class="legend-text">ಲ್ಯೂಟಿಯಲ್ ಹಂತ</div>
+        <div class="legend-days">ದಿನ 15-28</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="phase-info" id="phase-info">
+  <div class="phase-title" id="phase-title">🔴 ಋತುಚಕ್ರ (ದಿನ 1-5)</div>
+  <div class="phase-text" id="phase-text">
+    ಗರ್ಭಾಶಯ ಅಂಚು ಉದುರಿ ರಕ್ತಸ್ರಾವing that lasts 3-7 days. It's the start of a new cycle. Using sanitary pads or other menstrual products keeps you comfortable ಮತ್ತು hygienic.
+  </div>
+</div>
+
+<div class="myth-buster">
+  <div class="myth-title">🚫 ಪುರಾಣಗಳನ್ನು ಭಂಗಿಸುವುದು</div>
+  <div class="myth-text">
+    <strong>Myth:</strong> "ಋತುಮತಿ ಹುಡುಗಿಯರು ಅಶುದ್ಧ ಅಥವಾ ಪ್ರತ್ಯೇಕಿಸಬೇಕು"<br>
+    <strong>Fact:</strong> ಋತುಚಕ್ರ is a <strong>ಸಂಪೂರ್ಣ ಸ್ವಾಭಾವಿಕ ಜೈವಿಕ ಪ್ರಕ್ರಿಯೆ</strong>. ಅದರಲ್ಲಿ ಅಶುದ್ಧವೇನೂ ಇಲ್ಲ!<br><br>
+    <strong>Myth:</strong> "ಋತುಕಾಲದಲ್ಲಿ ವ್ಯಾಯಾಮ ಮಾಡಬಾರದು"<br>
+    <strong>Fact:</strong> ಹಗುರ ವ್ಯಾಯಾಮ ಸೆಳೆತ ಕಡಿಮೆ ಮತ್ತು ಮನೋಭಾವ ಸುಧಾರಣೆ!
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ಮುಖ್ಯ ಅಂಶಗಳು</div>
+  <div class="takeaway-text">
+    • ಚಕ್ರ ಉದ್ದ ಬದಲಾಗುತ್ತದೆ (21-35 ದಿನಗಳು ಸಾಮಾನ್ಯ)<br>
+    • ಋತು 3-7 ದಿನ<br>
+    • ಸ್ಯಾನಿಟರಿ ಉತ್ಪನ್ನದಿಂದ ಆರೋಗ್ಯಕರ ನಿರ್ವಹಣೆ<br>
+    • ಋತುಚಕ್ರ stops during pregnancy<br>
+    • 45-55 ವಯಸ್ಸಿನಲ್ಲಿ ಸ್ವಾಭಾವಿಕವಾಗಿ ಕೊನೆ (ರಜೋನಿವೃತ್ತಿ)<br>
+    • ಚಿಂತೆ ಇದ್ದರೆ ತಂದೆತಾಯಿ ಅಥವಾ ವೈದ್ಯರೊಂದಿಗೆ ಮಾತು
+  </div>
+</div>
+
+</div>
+
+<script>
+const phases = {
+  menstruation: {
+    days: [1, 2, 3, 4, 5],
+    title: '🔴 ಋತುಚಕ್ರ (ದಿನ 1-5)',
+    text: 'ಗರ್ಭಾಶಯ ಅಂಚು ಉದುರಿ ರಕ್ತಸ್ರಾವing that lasts 3-7 days. It\'s the start of a new cycle. Using sanitary pads or other menstrual products keeps you comfortable ಮತ್ತು hygienic.',
+    color: '#e91e63'
+  },
+  follicular: {
+    days: [6, 7, 8, 9, 10, 11, 12, 13],
+    title: '🟠 Follicular Phase (Days 6-13)',
+    text: 'ನಂತರ menstruation, the uterine lining begins to thicken again. The body prepares for potential pregnancy. Energy levels often increase during this phase.',
+    color: '#ff9800'
+  },
+  ovulation: {
+    days: [14],
+    title: '🟢 ಅಂಡೋತ್ಪತ್ತಿ (ದಿನ 14)',
+    text: 'An egg is released from the ovary. This is when pregnancy can occur if the egg is fertilized. Some may feel mild discomfort. This phase lasts about 24 ಗಂಟೆಗಳು.',
+    color: '#4caf50'
+  },
+  luteal: {
+    days: [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28],
+    title: '🔵 Luteal Phase (Days 15-28)',
+    text: 'The body continues preparing for possible pregnancy. If no pregnancy occurs, hormone levels drop, ಮತ್ತು the cycle begins again. Some may experience PMS symptoms (mood ಬದಲಾಗುತ್ತದೆ, bloating) in the last few days.',
+    color: '#2196f3'
+  }
+};
+
+const cycleDay = document.getElementById('cycle-day');
+const cyclePhase = document.getElementById('cycle-phase');
+const phaseTitle = document.getElementById('phase-title');
+const phaseText = document.getElementById('phase-text');
+const daySlider = document.getElementById('day-slider');
+
+function getPhase(day) {
+  for (const [name, data] of Object.entries(phases)) {
+    if (data.days.includes(day)) {
+      return { name, ...data };
+    }
+  }
+  return phases.menstruation;
+}
+
+function updateCycle(day) {
+  day = parseInt(day);
+  const phase = getPhase(day);
+  
+  cycleDay.textContent = `ದಿನ ${day}`;
+  cyclePhase.textContent = phase.name.charAt(0).toUpperCase() + phase.name.slice(1);
+  cycleDay.style.color = phase.color;
+  
+  phaseTitle.textContent = phase.title;
+  phaseText.textContent = phase.text;
+  
+  // Update legend highlighting
+  document.querySelectorAll('.legend-item').forEach(item => item.classList.remove('active'));
+  const legendItems = document.querySelectorAll('.legend-item');
+  const phaseIndex = ['menstruation', 'follicular', 'ovulation', 'luteal'].indexOf(phase.name);
+  if (legendItems[phaseIndex]) {
+    legendItems[phaseIndex].classList.add('active');
+  }
+  
+  // Update phase info border color
+  document.getElementById('phase-info').style.borderColor = phase.color;
+}
+
+function jumpToPhase(phaseName) {
+  const phase = phases[phaseName];
+  const day = phase.days[0];
+  daySlider.value = day;
+  updateCycle(day);
+}
+
+// Initialize
+updateCycle(1);
+
+// === URL PARAMETER SUPPORT ===
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var initialState = params.get('initialState');
+  var showHints = params.get('showHints');
+
+  if (showHints === 'false') {
+    document.querySelectorAll('.concept-card, .myth-buster, .takeaway').forEach(function(el) { el.style.display = 'none'; });
+  }
+
+  var validPhases = ['menstruation', 'follicular', 'ovulation', 'luteal'];
+  if (initialState && validPhases.indexOf(initialState) !== -1) {
+    setTimeout(function() {
+      jumpToPhase(initialState);
+    }, 800);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#f093fb">
+<title>ಆಮ್ಲಗಳು ಮತ್ತು ಕ್ಷಾರಗಳ ಗುಣಗಳು – ಹೋಲಿಸಿ ಮತ್ತು ಕಲಿಯಿರಿ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 8px 4px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 12px;
+}
+
+.category-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tab {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.tab:active { transform: scale(0.98); }
+
+.tab.acids { background: #ffebee; color: #c62828; }
+.tab.bases { background: #e3f2fd; color: #1565c0; }
+
+.tab.acids.active {
+  background: linear-gradient(135deg, #ef5350 0%, #c62828 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(239,83,80,0.4);
+}
+
+.tab.bases.active {
+  background: linear-gradient(135deg, #42a5f5 0%, #1565c0 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(66,165,245,0.4);
+}
+
+.ಗುಣಗಳು-panel { display: none; }
+.ಗುಣಗಳು-panel.active { display: block; }
+
+.property-card {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.property-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.property-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.acids-panel .property-icon { background: #ffcdd2; }
+.bases-panel .property-icon { background: #bbdefb; }
+
+.property-title { font-size: 14px; font-weight: 600; color: #333; }
+.property-desc { font-size: 11px; color: #666; line-height: 1.5; margin-bottom: 8px; }
+
+.examples-section {
+  background: white;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.examples-title { font-size: 10px; font-weight: 600; color: #888; margin-bottom: 6px; }
+
+.examples-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.example-tag {
+  background: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  color: #555;
+}
+
+.quiz-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 14px;
+  padding: 15px;
+  color: white;
+}
+
+.quiz-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; text-align: center; }
+
+.substance-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.substance-btn {
+  padding: 10px 6px;
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.1);
+  color: white;
+  font-size: 10px;
+  cursor: pointer;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.substance-btn:active { transform: scale(0.95); }
+.substance-btn.selected {
+  background: white;
+  color: #667eea;
+  border-color: white;
+}
+
+.substance-btn .icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+.quiz-result {
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.quiz-result h4 { font-size: 14px; margin-bottom: 6px; }
+.quiz-result p { font-size: 11px; opacity: 0.9; line-height: 1.4; }
+
+.safety-warning {
+  background: #fff3e0;
+  border-radius: 10px;
+  padding: 12px;
+  border-left: 4px solid #ff9800;
+  font-size: 11px;
+}
+
+.safety-warning h4 {
+  font-size: 12px;
+  color: #e65100;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.safety-warning p { color: #666; line-height: 1.4; }
+
+.comparison-table {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  font-size: 10px;
+}
+
+.table-row.header {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+.table-cell {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+.table-cell.acid { background: #ffebee; color: #c62828; }
+.table-cell.base { background: #e3f2fd; color: #1565c0; }
+
+@media screen and (max-width: 380px) {
+  .substance-grid { gap: 6px; }
+  .substance-btn { padding: 8px 4px; font-size: 9px; }
+  .substance-btn .icon { font-size: 18px; }
+}
+
+@supports (padding: max(0px)) {
+  #app {
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+  }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🔬 ಆಮ್ಲಗಳು ಮತ್ತು ಕ್ಷಾರಗಳ ಗುಣಗಳು</h1>
+  <p>ಅವುಗಳನ್ನು ವಿಭಿನ್ನವಾಗಿ ಮಾಡುವುದನ್ನು ಕಲಿಯಿರಿ!</p>
+</div>
+
+<div class="concept-card" style="background:rgba(255,255,255,0.95); border-radius:12px; padding:12px; margin-bottom:12px; border-left:4px solid #f5576c;">
+  <div class="concept-title" style="font-weight:700; color:#c62828; margin-bottom:6px;">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text" style="font-size:12px; color:#333; line-height:1.5;">ಆಮ್ಲಗಳು ಹುಳಿ ರುಚಿ ಮತ್ತು ನೀಲಿ ಲಿಟ್ಮಸ್ ಕೆಂಪು ಮಾಡುತ್ತವೆ. ಕ್ಷಾರಗಳು ಸೋಪು ರುಚಿ ಮತ್ತು ಕೆಂಪು ಲಿಟ್ಮಸ್ ನೀಲಿ ಮಾಡುತ್ತವೆ. ಕೆಳಗೆ ಟ್ಯಾಬ್ಗಳಿಂದ ಹೋಲಿಸಿ ಕಲಿಯಿರಿ.</div>
+</div>
+
+<div class="sim-card">
+  <div class="category-tabs">
+    <button class="tab acids active" data-panel="acids">🧪 ಆಮ್ಲಗಳು</button>
+    <button class="tab bases" data-panel="bases">🧴 ಕ್ಷಾರಗಳು</button>
+  </div>
+  
+  <!-- Acids Panel -->
+  <div class="ಗುಣಗಳು-panel acids-panel active" id="acids-panel">
+    <div class="property-card">
+      <div class="property-header">
+        <div class="property-icon">😋</div>
+        <div class="property-title">ಹುಳಿ ರುಚಿ</div>
+      </div>
+      <p class="property-desc">ಆಮ್ಲಗಳು ಹುಳಿ ಅಥವಾ ಕಹಿ ರುಚಿ ಹೊಂದಿರುತ್ತವೆ. ಅದಕ್ಕೇ ನಿಂಬೆ, ಕಿತ್ತಳೆ ಮತ್ತು ವಿನಿಗರ್ ಕಹಿ ರುಚಿ ನೀಡುತ್ತವೆ!</p>
+      <div class="examples-section">
+        <div class="examples-title">ಸಾಮಾನ್ಯ ಉದಾಹರಣೆಗಳು</div>
+        <div class="examples-grid">
+          <span class="example-tag">🍋 ಸಿಟ್ರಿಕ್ ಆಮ್ಲ</span>
+          <span class="example-tag">🍊 ಏಸ್ಕಾರ್ಬಿಕ್ ಆಮ್ಲ</span>
+          <span class="example-tag">🫙 ಅಸಿಟಿಕ್ ಆಮ್ಲ</span>
+          <span class="example-tag">🥛 ಲ್ಯಾಕ್ಟಿಕ್ ಆಮ್ಲ</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="property-card">
+      <div class="property-header">
+        <div class="property-icon">📝</div>
+        <div class="property-title">ನೀಲಿ ಲಿಟ್ಮಸ್ ಕೆಂಪು ಮಾಡುತ್ತದೆ</div>
+      </div>
+      <p class="property-desc">ನೀಲಿ ಲಿಟ್ಮಸ್ ಕಾಗದ ಆಮ್ಲವನ್ನು ಸ್ಪರ್ಶಿಸಿದಾಗ ಕೆಂಪಾಗುತ್ತದೆ. ಇದು ಆಮ್ಲಗಳ ಶಾಸ್ತ್ರೀಯ ಪರೀಕ್ಷೆ!</p>
+      <div class="examples-section">
+        <div class="examples-title">ಫಲಿತಾಂಶ</div>
+        <div class="examples-grid">
+          <span class="example-tag">🔵→🔴 ನೀಲಿ → ಕೆಂಪು</span>
+          <span class="example-tag">🔴→🔴 ಕೆಂಪು → ಕೆಂಪು</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="property-card">
+      <div class="property-header">
+        <div class="property-icon">⚗️</div>
+        <div class="property-title">ಅರೆತ ಸ್ವಭಾವ</div>
+      </div>
+      <p class="property-desc">ಬಲವಾದ ಆಮ್ಲಗಳು ಲೋಹಗಳನ್ನು ಅರೆಸಬಲ್ಲವು ಮತ್ತು ಸುಡುವಿಕೆ ಉಂಟುಮಾಡಬಲ್ಲವು. ಲೋಹಗಳೊಂದಿಗೆ ಪ್ರತಿಕ್ರಿಯಿಸಿ ಜಲಜನಕ ಅನಿಲ ಉತ್ಪತ್ತಿ ಮಾಡುತ್ತವೆ.</p>
+      <div class="examples-section">
+        <div class="examples-title">ಉದಾಹರಣೆಗಳು</div>
+        <div class="examples-grid">
+          <span class="example-tag">🔋 ಬ್ಯಾಟರಿ ಆಮ್ಲ</span>
+          <span class="example-tag">🧹 ಶುದ್ಧೀಕರಣ ಆಮ್ಲಗಳು</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bases Panel -->
+  <div class="ಗುಣಗಳು-panel bases-panel" id="bases-panel">
+    <div class="property-card">
+      <div class="property-header">
+        <div class="property-icon">😝</div>
+        <div class="property-title">ಕಹಿ ರುಚಿ</div>
+      </div>
+      <p class="property-desc">ಕ್ಷಾರಗಳು ಸಾಮಾನ್ಯವಾಗಿ ಕಹಿ ರುಚಿ ಹೊಂದಿರುತ್ತವೆ. ಆದರೆ ನೆನಪಿಡಿ: ಕಹಿಯಾಗಿರುವುದೆಲ್ಲ ಕ್ಷಾರವಲ್ಲ (ಉದಾ. ಹಾಗಲಕಾಯಿ)!</p>
+      <div class="examples-section">
+        <div class="examples-title">ಸಾಮಾನ್ಯ ಉದಾಹರಣೆಗಳು</div>
+        <div class="examples-grid">
+          <span class="example-tag">🥄 ಬೇಕಿಂಗ್ ಸೋಡಾ</span>
+          <span class="example-tag">💊 ಆಮ್ಲನಿರೋಧಕಗಳು</span>
+          <span class="example-tag">🧼 ಸಾಬೂನು (ರುಚಿ ನೋಡಬೇಡಿ!)</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="property-card">
+      <div class="property-header">
+        <div class="property-icon">🧴</div>
+        <div class="property-title">ಸಾಬೂನು/ಜಾರುವ ಸ್ಪರ್ಶ</div>
+      </div>
+      <p class="property-desc">ಕ್ಷಾರಗಳು ಜಾರುವ ಅಥವಾ ಸಾಬೂನು ತರಹ ಅನುಭವಿಸುತ್ತವೆ. ಚರ್ಮದ ಎಣ್ಣೆಗಳೊಂದಿಗೆ ಪ್ರತಿಕ್ರಿಯಿಸುವುದರಿಂದ ಹೀಗಾಗುತ್ತದೆ.</p>
+      <div class="examples-section">
+        <div class="examples-title">ಉದಾಹರಣೆಗಳು</div>
+        <div class="examples-grid">
+          <span class="example-tag">🧼 ಸಾಬೂನು ದ್ರಾವಣ</span>
+          <span class="example-tag">🧹 ಡಿಟರ್ಜೆಂಟ್</span>
+          <span class="example-tag">🥄 ಬೇಕಿಂಗ್ ಸೋಡಾ</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="property-card">
+      <div class="property-header">
+        <div class="property-icon">📝</div>
+        <div class="property-title">ಕೆಂಪು ಲಿಟ್ಮಸ್ ನೀಲಿ ಮಾಡುತ್ತದೆ</div>
+      </div>
+      <p class="property-desc">ಕೆಂಪು ಲಿಟ್ಮಸ್ ಕಾಗದ ಕ್ಷಾರವನ್ನು ಸ್ಪರ್ಶಿಸಿದಾಗ ನೀಲಿಯಾಗುತ್ತದೆ. ಇದು ಆಮ್ಲಗಳಿಗೆ ವಿರುದ್ಧ!</p>
+      <div class="examples-section">
+        <div class="examples-title">ಫಲಿತಾಂಶ</div>
+        <div class="examples-grid">
+          <span class="example-tag">🔴→🔵 ಕೆಂಪು → ನೀಲಿ</span>
+          <span class="example-tag">🔵→🔵 ನೀಲಿ → ನೀಲಿ</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="quiz-section">
+  <div class="quiz-title">🎮 ಪದಾರ್ಥ ಗುರುತಿಸಿ</div>
+  <div class="substance-grid">
+    <button class="substance-btn" data-substance="lemon"><span class="icon">🍋</span>ನಿಂಬೆ</button>
+    <button class="substance-btn" data-substance="soap"><span class="icon">🧼</span>ಸಾಬೂನು</button>
+    <button class="substance-btn" data-substance="bitter-gourd"><span class="icon">🥒</span>ಹಾಗಲಕಾಯಿ</button>
+    <button class="substance-btn" data-substance="baking-soda"><span class="icon">🥄</span>ಬೇಕಿಂಗ್ ಸೋಡಾ</button>
+    <button class="substance-btn" data-substance="vinegar"><span class="icon">🫙</span>ವಿನಿಗರ್</button>
+    <button class="substance-btn" data-substance="ನೀರು"><span class="icon">💧</span>ನೀರು</button>
+  </div>
+  <div class="quiz-result" id="quizResult">
+    <p>👆 ಅದರ ಗುಣಗಳನ್ನು ತಿಳಿಯಲು ಒಂದು ಪದಾರ್ಥವನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿ!</p>
+  </div>
+</div>
+
+<div class="comparison-table">
+  <div class="table-row header">
+    <div class="table-cell">ಗುಣಧರ್ಮ</div>
+    <div class="table-cell acid">ಆಮ್ಲಗಳು</div>
+    <div class="table-cell base">ಕ್ಷಾರಗಳು</div>
+  </div>
+  <div class="table-row">
+    <div class="table-cell">ರುಚಿ</div>
+    <div class="table-cell acid">ಹುಳಿ</div>
+    <div class="table-cell base">ಕಹಿ</div>
+  </div>
+  <div class="table-row">
+    <div class="table-cell">ಸ್ಪರ್ಶ</div>
+    <div class="table-cell acid">—</div>
+    <div class="table-cell base">ಸಾಬೂನು ತರಹ</div>
+  </div>
+  <div class="table-row">
+    <div class="table-cell">ನೀಲಿ ಲಿಟ್ಮಸ್</div>
+    <div class="table-cell acid">→ ಕೆಂಪು</div>
+    <div class="table-cell base">ಬದಲಾವಣೆ ಇಲ್ಲ</div>
+  </div>
+  <div class="table-row">
+    <div class="table-cell">ಕೆಂಪು ಲಿಟ್ಮಸ್</div>
+    <div class="table-cell acid">ಬದಲಾವಣೆ ಇಲ್ಲ</div>
+    <div class="table-cell base">→ ನೀಲಿ</div>
+  </div>
+</div>
+
+<div class="safety-warning">
+  <h4>⚠️ ಮೊದಲು ಸುರಕ್ಷತೆ!</h4>
+  <p><strong>ಅಜ್ಞಾತ ಪದಾರ್ಥ ರುಚಿ ನೋಡಬೇಡಿ!</strong> ರುಚಿ ಗುಣಗಳು ಶೈಕ್ಷಣಿಕ ಉದ್ದೇಶಕ್ಕೆ ಮಾತ್ರ. ಸುರಕ್ಷಿತವಾಗಿ ಪರೀಕ್ಷಿಸಲು ಲಿಟ್ಮಸ್ ಕಾಗದದಂತಹ ಸೂಚಕಗಳನ್ನು ಬಳಸಿ.</p>
+</div>
+
+</div>
+
+<script>
+const tabs = document.querySelectorAll('.tab');
+const panels = document.querySelectorAll('.ಗುಣಗಳು-panel');
+const substanceBtns = document.querySelectorAll('.substance-btn');
+const quizResult = document.getElementById('quizResult');
+
+const substanceInfo = {
+  'lemon': {
+    type: 'Acidic',
+    emoji: '🍋',
+    title: 'ನಿಂಬೆ - ಆಮ್ಲೀಯ',
+    desc: 'ಸಿಟ್ರಿಕ್ ಆಮ್ಲ ಹೊಂದಿದೆ, ಹುಳಿ ರುಚಿ ನೀಡುತ್ತದೆ. ನೀಲಿ ಲಿಟ್ಮಸ್ ಕೆಂಪು ಮಾಡುತ್ತದೆ. pH ಸುಮಾರು 2–3.'
+  },
+  'soap': {
+    type: 'ಮೂಲ',
+    emoji: '🧼',
+    title: 'ಸಾಬೂನು - ಕ್ಷಾರೀಯ',
+    desc: 'ಜಾರುವ ಸ್ಪರ್ಶ ಮತ್ತು ಕಹಿ ರುಚಿ. ಕೆಂಪು ಲಿಟ್ಮಸ್ ನೀಲಿ ಮಾಡುತ್ತದೆ. ಎಣ್ಣೆಗಳನ್ನು ಒಡೆದು ಶುದ್ಧೀಕರಣಕ್ಕೆ ಸಹಾಯ ಮಾಡುತ್ತದೆ.'
+  },
+  'bitter-gourd': {
+    type: 'Neither',
+    emoji: '🥒',
+    title: 'ಹಾಗಲಕಾಯಿ - ಕ್ಷಾರವಲ್ಲ!',
+    desc: 'ಕಹಿ ಇದ್ದರೂ ಕ್ಷಾರವಲ್ಲ! ಕಹಿ ಮಾತ್ರವೇ ಕ್ಷಾರ ಎಂದರ್ಥವಲ್ಲ. ಸಾಮಾನ್ಯ ತಪ್ಪು ಕಲ್ಪನೆ!'
+  },
+  'baking-soda': {
+    type: 'ಮೂಲ',
+    emoji: '🥄',
+    title: 'ಬೇಕಿಂಗ್ ಸೋಡಾ - ಕ್ಷಾರೀಯ',
+    desc: 'ಸೋಡಿಯಂ ಬೈಕಾರ್ಬನೇಟ್ ಸೌಮ್ಯ ಕ್ಷಾರ. ಜಾರುವ ಸ್ಪರ್ಶ, ಕಹಿ ರುಚಿ, ಕೆಂಪು ಲಿಟ್ಮಸ್ ನೀಲಿ ಮಾಡುತ್ತದೆ.'
+  },
+  'vinegar': {
+    type: 'Acidic',
+    emoji: '🫙',
+    title: 'ವಿನಿಗರ್ - ಆಮ್ಲೀಯ',
+    desc: 'ಅಸಿಟಿಕ್ ಆಮ್ಲ (~5%) ಹೊಂದಿದೆ. ಹುಳಿ ರುಚಿ, ನೀಲಿ ಲಿಟ್ಮಸ್ ಕೆಂಪು ಮಾಡುತ್ತದೆ. pH ಸುಮಾರು 2–3.'
+  },
+  'ನೀರು': {
+    type: 'Neutral',
+    emoji: '💧',
+    title: 'ನೀರು - ತಟಸ್ಥ',
+    desc: 'ಶುದ್ಧ ನೀರು ತಟಸ್ಥ (pH 7). ಯಾವ ಲಿಟ್ಮಸ್ ಕಾಗದವೂ ಬಣ್ಣ ಬದಲಾಯಿಸುವುದಿಲ್ಲ. H⁺ ಮತ್ತು OH⁻ ಅಯಾನುಗಳ ಸಮತೋಲನ.'
+  }
+};
+
+tabs.forEach(tab => {
+  tab.onclick = () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    panels.forEach(p => p.classList.remove('active'));
+    document.getElementById(`${tab.dataset.panel}-panel`).classList.add('active');
+  };
+});
+
+substanceBtns.forEach(btn => {
+  btn.onclick = () => {
+    substanceBtns.forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    
+    const info = substanceInfo[btn.dataset.substance];
+    let bgColor = 'rgba(255,255,255,0.15)';
+    
+    quizResult.innerHTML = `
+      <h4>${info.emoji} ${info.title}</h4>
+      <p>${info.desc}</p>
+    `;
+  };
+});
+
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var initState = (p.get('initialState') || 'initial').toLowerCase();
+  var showHintParam = p.get('showHints');
+  if (showHintParam === 'false') {
+    var box = document.querySelector('.concept-card');
+    if (box) box.style.display = 'none';
+  }
+  if (initState === 'initial') return;
+  setTimeout(function () {
+    var tab = document.querySelector('.tab[data-panel="' + initState + '"]');
+    if (tab) tab.click();
+  }, 800);
+}());
+</script>
+</body>
+</html>

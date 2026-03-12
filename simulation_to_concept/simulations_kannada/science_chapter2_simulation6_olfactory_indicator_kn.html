@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#8e44ad">
+<title>ಘ್ರಾಣ ಸೂಚಕಗಳು – ವಾಸನಾ ಆಧಾರಿತ ಪರೀಕ್ಷೆ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #8e44ad 0%, #3498db 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 8px 4px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 12px;
+}
+
+.visual {
+  position: relative;
+  height: 36vh;
+  min-height: 270px;
+  background: linear-gradient(145deg, #ede7f6 0%, #d1c4e9 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+svg { width: 100%; height: 100%; display: block; }
+
+.static-hint {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 11px;
+  line-height: 1.3;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  z-index: 10;
+}
+
+.metrics {
+  background: #ede7f6;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 11px;
+  line-height: 1.6;
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+}
+
+.metric-item { display: flex; justify-content: space-between; }
+.metric-label { color: #666; }
+.metric-value { font-weight: 600; color: #007AFF; }
+.metric-value.acidic { color: #e65100; }
+.metric-value.ಮೂಲ { color: #7b1fa2; }
+
+.control-panel {
+  background: #ede7f6;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 8px;
+}
+
+.control-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.solution-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.solution-btn {
+  padding: 12px 8px;
+  border-radius: 10px;
+  border: 2px solid #d1c4e9;
+  font-size: 11px;
+  background: #fff;
+  cursor: pointer;
+  text-align: center;
+  line-height: 1.3;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: transform 0.1s ease;
+}
+
+.solution-btn:active { transform: scale(0.95); }
+.solution-btn.active { border-color: #8e44ad; background: #ede7f6; }
+.solution-btn .icon { font-size: 24px; display: block; margin-bottom: 4px; }
+
+.test-btn {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(142,68,173,0.3);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s ease;
+}
+
+.test-btn:active { transform: scale(0.95); }
+
+.smell-ಸೂಚಕ {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.smell-item {
+  text-align: center;
+  opacity: 0.4;
+  transition: opacity 0.5s ease;
+}
+
+.smell-item.active { opacity: 1; }
+.smell-icon { font-size: 32px; }
+.smell-label { font-size: 10px; color: #666; margin-top: 4px; }
+
+.insight-box {
+  background: linear-gradient(135deg, #ede7f6 0%, #d1c4e9 100%);
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 11px;
+  line-height: 1.5;
+  border-left: 4px solid #8e44ad;
+}
+
+.insight-title { font-weight: 600; color: #6a1b9a; margin-bottom: 4px; }
+
+.real-world {
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.real-world .icon { font-size: 36px; }
+.real-world .text { flex: 1; line-height: 1.4; }
+.real-world .highlight { color: #8e44ad; font-weight: 600; }
+
+.takeaway {
+  background: linear-gradient(135deg, #d1c4e9 0%, #b39ddb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  display: none;
+}
+
+.takeaway.show { display: block; }
+.takeaway-title { font-weight: 600; color: #4a148c; margin-bottom: 4px; }
+
+.how-it-works {
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.how-title { font-size: 11px; font-weight: 600; color: #6a1b9a; margin-bottom: 8px; }
+
+.steps-row {
+  display: flex;
+  justify-content: space-around;
+  gap: 5px;
+}
+
+.step-item {
+  text-align: center;
+  flex: 1;
+}
+
+.step-icon { font-size: 24px; }
+.step-text { font-size: 9px; color: #666; margin-top: 4px; }
+
+@media screen and (max-width: 380px) {
+  .solution-grid { gap: 6px; }
+  .solution-btn { padding: 10px 6px; font-size: 10px; }
+  .solution-btn .icon { font-size: 20px; }
+}
+
+@supports (padding: max(0px)) {
+  #app {
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+  }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>👃 ಘ್ರಾಣ ಸೂಚಕಗಳು</h1>
+  <p>ವಾಸನೆಯಿಂದ ಆಮ್ಲ ಮತ್ತು ಕ್ಷಾರಗಳನ್ನು ಗುರುತಿಸಿ!</p>
+</div>
+
+<div class="section-title">ವಿವಿಧ ದ್ರಾವಣಗಳೊಂದಿಗೆ ಈರುಳ್ಳಿ ಮಿಶ್ರಣ ಮಾಡಿ</div>
+<div class="sim-card" id="sim"></div>
+
+<div class="smell-ಸೂಚಕ">
+  <div class="smell-item" id="smell-strong">
+    <div class="smell-icon">😤</div>
+    <div class="smell-label">ಬಲವಾದ ವಾಸನೆ<br>= ಆಮ್ಲ</div>
+  </div>
+  <div class="smell-item" id="smell-none">
+    <div class="smell-icon">😊</div>
+    <div class="smell-label">ವಾಸನೆ ಇಲ್ಲ<br>= ಕ್ಷಾರ</div>
+  </div>
+</div>
+
+<div class="insight-box">
+  <div class="insight-title">🔑 ಮುಖ್ಯ ಅಂತರ್ದೃಷ್ಟಿ:</div>
+  ಈರುಳ್ಳಿಯಲ್ಲಿ ಗಂಧಕ ಸಂಯುಕ್ತಗಳಿವೆ <strong>ಕಟುವಾದ ವಾಸನೆ</strong>. ಅದರೊಂದಿಗೆ <strong style="color:#7b1fa2">ಕ್ಷಾರ</strong> ಮಿಶ್ರಣ ಮಾಡಿದಾಗ ಈ ಸಂಯುಕ್ತಗಳು ತಟಸ್ಥವಾಗಿ ವಾಸನೆ ಅದೃಶ್ಯವಾಗುತ್ತದೆ! <strong style="color:#e65100">ಆಮ್ಲಗಳ</strong>ೊಂದಿಗೆ ವಾಸನೆ ಉಳಿದಿದೆ.
+</div>
+
+<div class="how-it-works">
+  <div class="how-title">🔬 ಘ್ರಾಣ ಸೂಚಕಗಳು ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತವೆ</div>
+  <div class="steps-row">
+    <div class="step-item">
+      <div class="step-icon">🧅</div>
+      <div class="step-text">ಈರುಳ್ಳಿ ಕತ್ತರಿಸಿ<br>(ಕಟುವಾದ)</div>
+    </div>
+    <div class="step-item">
+      <div class="step-icon">➕</div>
+      <div class="step-text">ಆಮ್ಲ ಅಥವಾ<br>ಕ್ಷಾರ ಸೇರಿಸಿ</div>
+    </div>
+    <div class="step-item">
+      <div class="step-icon">👃</div>
+      <div class="step-text">ವಾಸನೆ ಬದಲಾಗುತ್ತದೆಯೇ<br>ಪರಿಶೀಲಿಸಿ</div>
+    </div>
+    <div class="step-item">
+      <div class="step-icon">✅</div>
+      <div class="step-text">ಪದಾರ್ಥವನ್ನು<br>ಗುರುತಿಸಿ</div>
+    </div>
+  </div>
+</div>
+
+<div class="real-world">
+  <div class="icon">👨‍🍳</div>
+  <div class="text">
+    <strong>ಅಡುಗೆ ಮನೆ ವಿಜ್ಞಾನ:</strong> ಬೇಕಿಂಗ್ ಸೋಡಾದೊಂದಿಗೆ ಈರುಳ್ಳಿ ಬೇಯಿಸಿದಾಗ <span class="highlight">ಕಟುವಾಗುವುದು ಕಡಿಮೆಯಾಗುತ್ತದೆ</span> ಗಮನಿಸಿದ್ದೀರಾ? ಬೇಕಿಂಗ್ ಸೋಡಾ (ಕ್ಷಾರ) ವಾಸನೆಯನ್ನು ತಟಸ್ಥೀಕರಿಸುತ್ತದೆ!
+  </div>
+</div>
+
+<div class="takeaway" id="takeaway">
+  <div class="takeaway-title">💡 ನೀವು ಕಂಡುಕೊಂಡದ್ದು:</div>
+  <span id="takeaway-text">ಘ್ರಾಣ ಸೂಚಕಗಳು ವಾಸನೆ ಬದಲಾವಣೆಗಳನ್ನು ಬಳಸಿ ಆಮ್ಲ ಮತ್ತು ಕ್ಷಾರಗಳನ್ನು ಗುರುತಿಸುತ್ತವೆ!</span>
+</div>
+
+</div>
+
+<script>
+const container = document.getElementById('sim');
+
+const SOLUTIONS = {
+  'tamarind': { name: 'ಹುಣಿಸೆ ನೀರು', icon: '🫙', type: 'acidic', smellRemains: true },
+  'baking': { name: 'ಬೇಕಿಂಗ್ ಸೋಡಾ', icon: '🥄', type: 'ಮೂಲ', smellRemains: false },
+  'vinegar': { name: 'ವಿನಿಗರ್', icon: '🍶', type: 'acidic', smellRemains: true },
+  'soap': { name: 'ಸಾಬೂನು ದ್ರಾವಣ', icon: '🧼', type: 'ಮೂಲ', smellRemains: false }
+};
+
+container.innerHTML = `
+<div class="visual">
+  <div class="static-hint">
+    👆 ದ್ರಾವಣ ಆಯ್ಕೆಮಾಡಿ ಮತ್ತು ಈರುಳ್ಳಿಯೊಂದಿಗೆ ಮಿಶ್ರಣ ಮಾಡಿ
+  </div>
+
+  <svg viewBox="0 0 400 290">
+    <!-- Lab bench -->
+    <rect x="20" y="210" width="360" height="60" rx="4" fill="#8d6e63"/>
+    <rect x="20" y="210" width="360" height="8" rx="2" fill="#6d4c41"/>
+    
+    <!-- Onion container -->
+    <g transform="translate(120, 60)">
+      <ellipse cx="0" cy="80" rx="50" ry="20" fill="#d7ccc8"/>
+      <rect x="-50" y="0" width="100" height="80" rx="4" fill="#efebe9"/>
+      <ellipse cx="0" cy="0" rx="50" ry="20" fill="#d7ccc8"/>
+      <text x="0" y="10" text-anchor="middle" font-size="40" id="onion-icon">🧅</text>
+      <text x="0" y="110" text-anchor="middle" font-size="9" fill="#666">ಕತ್ತರಿಸಿದ ಈರುಳ್ಳಿ</text>
+    </g>
+    
+    <!-- Smell waves -->
+    <g id="smell-waves" transform="translate(120, 30)">
+      <text x="-20" y="0" font-size="16" fill="#9c27b0" opacity="0.8">~</text>
+      <text x="0" y="-10" font-size="16" fill="#9c27b0" opacity="0.6">~</text>
+      <text x="20" y="0" font-size="16" fill="#9c27b0" opacity="0.8">~</text>
+    </g>
+    
+    <!-- No smell ಸೂಚಕ -->
+    <g id="no-smell" transform="translate(120, 15)" opacity="0">
+      <text x="0" y="0" text-anchor="middle" font-size="30">❌</text>
+    </g>
+    
+    <!-- Plus sign -->
+    <text x="200" y="100" text-anchor="middle" font-size="30" fill="#455a64">+</text>
+    
+    <!-- Solution beaker -->
+    <g id="solution-beaker" transform="translate(280, 50)">
+      <path d="M-30,15 L-25,85 Q-25,95 -15,95 L15,95 Q25,95 25,85 L30,15 Z" 
+            fill="rgba(255,255,255,0.4)" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
+      <ellipse cx="0" cy="15" rx="30" ry="7" fill="rgba(255,255,255,0.3)"/>
+      <rect x="-22" y="28" width="44" height="55" rx="2" fill="#a1887f" id="solution-liquid"/>
+      <text x="0" y="-5" text-anchor="middle" font-size="18" id="solution-icon">🫙</text>
+      <text x="0" y="115" text-anchor="middle" font-size="9" fill="#666" id="solution-name">ಹುಣಿಸೆ ನೀರು</text>
+      <text x="0" y="127" text-anchor="middle" font-size="8" fill="#e65100" font-weight="600" id="solution-type">(ಆಮ್ಲ)</text>
+    </g>
+    
+    <!-- ಫಲಿತಾಂಶ ಸೂಚಕ -->
+    <g id="result-box" opacity="0" transform="translate(200, 180)">
+      <rect x="-70" y="-15" width="140" height="30" rx="15" fill="#fff" stroke="#4caf50" stroke-width="2"/>
+      <text x="0" y="5" text-anchor="middle" font-size="11" fill="#4caf50" font-weight="600" id="result-text">ಫಲಿತಾಂಶ</text>
+    </g>
+  </svg>
+
+  <button class="test-btn" id="mix-btn">🧅 ಒಟ್ಟಿಗೆ ಮಿಶ್ರಣ ಮಾಡಿ</button>
+</div>
+
+<div class="metrics">
+  <div class="metric-item"><span class="metric-label">ದ್ರಾವಣ:</span> <span class="metric-value" id="display-solution">ಹುಣಿಸೆ ನೀರು</span></div>
+  <div class="metric-item"><span class="metric-label">ರೀತಿ:</span> <span class="metric-value acidic" id="display-type">ಆಮ್ಲೀಯ</span></div>
+  <div class="metric-item"><span class="metric-label">ಈರುಳ್ಳಿ ವಾಸನೆ:</span> <span class="metric-value" id="display-smell">?</span></div>
+  <div class="metric-item"><span class="metric-label">ತೀರ್ಮಾನ:</span> <span class="metric-value" id="display-conclusion">?</span></div>
+</div>
+
+<div class="control-panel">
+  <div class="control-label">ಪರೀಕ್ಷಿಸಲು ದ್ರಾವಣ ಆಯ್ಕೆಮಾಡಿ:</div>
+  <div class="solution-grid">
+    <button class="solution-btn active" data-solution="tamarind"><span class="icon">🫙</span>ಹುಣಿಸೆ ನೀರು<br><small>(ಆಮ್ಲ)</small></button>
+    <button class="solution-btn" data-solution="baking"><span class="icon">🥄</span>ಬೇಕಿಂಗ್ ಸೋಡಾ<br><small>(ಕ್ಷಾರ)</small></button>
+    <button class="solution-btn" data-solution="vinegar"><span class="icon">🍶</span>ವಿನಿಗರ್<br><small>(ಆಮ್ಲ)</small></button>
+    <button class="solution-btn" data-solution="soap"><span class="icon">🧼</span>ಸಾಬೂನು ದ್ರಾವಣ<br><small>(ಕ್ಷಾರ)</small></button>
+  </div>
+</div>`;
+
+let state = { solution: 'tamarind', tested: false };
+
+const smellWaves = document.getElementById('smell-waves');
+const noSmell = document.getElementById('no-smell');
+const solutionIcon = document.getElementById('solution-icon');
+const solutionName = document.getElementById('solution-name');
+const solutionType = document.getElementById('solution-type');
+const solutionLiquid = document.getElementById('solution-liquid');
+const resultBox = document.getElementById('result-box');
+const resultText = document.getElementById('result-text');
+const displaySolution = document.getElementById('display-solution');
+const displayType = document.getElementById('display-type');
+const displaySmell = document.getElementById('display-smell');
+const displayConclusion = document.getElementById('display-conclusion');
+const mixBtn = document.getElementById('mix-btn');
+const smellStrong = document.getElementById('smell-strong');
+const smellNone = document.getElementById('smell-none');
+const takeaway = document.getElementById('takeaway');
+const takeawayText = document.getElementById('takeaway-text');
+
+function updateDisplay() {
+  const sol = SOLUTIONS[state.solution];
+  solutionIcon.textContent = sol.icon;
+  solutionName.textContent = sol.name;
+  solutionType.textContent = sol.type === 'acidic' ? '(ಆಮ್ಲ)' : '(ಕ್ಷಾರ)';
+  solutionType.style.fill = sol.type === 'acidic' ? '#e65100' : '#7b1fa2';
+  solutionLiquid.style.fill = sol.type === 'acidic' ? '#a1887f' : '#b39ddb';
+  displaySolution.textContent = sol.name;
+  displayType.textContent = sol.type === 'acidic' ? 'ಆಮ್ಲೀಯ' : 'ಕ್ಷಾರೀಯ';
+  displayType.className = `metric-value ${sol.type}`;
+}
+
+function resetTest() {
+  state.tested = false;
+  smellWaves.style.opacity = '1';
+  noSmell.style.opacity = '0';
+  displaySmell.textContent = '?';
+  displayConclusion.textContent = '?';
+  displayConclusion.className = 'metric-value';
+  resultBox.style.opacity = '0';
+  smellStrong.classList.remove('active');
+  smellNone.classList.remove('active');
+  mixBtn.textContent = '🧅 ಒಟ್ಟಿಗೆ ಮಿಶ್ರಣ ಮಾಡಿ';
+}
+
+mixBtn.onclick = function() {
+  if (state.tested) {
+    resetTest();
+    return;
+  }
+  
+  state.tested = true;
+  mixBtn.textContent = '🔄 ಮರುಹೊಂದಿಸಿ';
+  
+  const sol = SOLUTIONS[state.solution];
+  
+  setTimeout(() => {
+    if (sol.smellRemains) {
+      // Acid - smell remains
+      smellWaves.style.transition = 'opacity 0.5s';
+      smellWaves.style.opacity = '1';
+      noSmell.style.opacity = '0';
+      displaySmell.textContent = 'ಇನ್ನೂ ಕಟುವಾಗಿದೆ! 😤';
+      displayConclusion.textContent = 'ಆಮ್ಲೀಯ';
+      displayConclusion.className = 'metric-value acidic';
+      resultText.textContent = '😤 ವಾಸನೆ ಉಳಿದಿದೆ → ಆಮ್ಲ';
+      resultText.style.fill = '#e65100';
+      resultBox.querySelector('rect').setAttribute('stroke', '#e65100');
+      smellStrong.classList.add('active');
+      smellNone.classList.remove('active');
+      takeawayText.textContent = `${sol.name} ಜೊತೆ ಈರುಳ್ಳಿ ವಾಸನೆ ಉಳಿದಿದೆ. ಆಮ್ಲಗಳು ಗಂಧಕ ಸಂಯುಕ್ತಗಳನ್ನು ತಟಸ್ಥೀಕರಿಸುವುದಿಲ್ಲವಾದ್ದರಿಂದ ಇದು ಆಮ್ಲವೆಂದು ದೃಢೀಕರಣ!`;
+    } else {
+      // Base - smell disappears
+      smellWaves.style.transition = 'opacity 0.5s';
+      smellWaves.style.opacity = '0';
+      noSmell.style.transition = 'opacity 0.5s';
+      noSmell.style.opacity = '1';
+      displaySmell.textContent = 'ಅದೃಶ್ಯವಾಯಿತು! 😊';
+      displayConclusion.textContent = 'ಕ್ಷಾರೀಯ';
+      displayConclusion.className = 'metric-value ಮೂಲ';
+      resultText.textContent = '😊 ವಾಸನೆ ಇಲ್ಲ → ಕ್ಷಾರ';
+      resultText.style.fill = '#7b1fa2';
+      resultBox.querySelector('rect').setAttribute('stroke', '#7b1fa2');
+      smellNone.classList.add('active');
+      smellStrong.classList.remove('active');
+      takeawayText.textContent = `${sol.name} ಜೊತೆ ಈರುಳ್ಳಿ ವಾಸನೆ ಅದೃಶ್ಯವಾಯಿತು. ಕ್ಷಾರಗಳು ಗಂಧಕ ಸಂಯುಕ್ತಗಳನ್ನು ತಟಸ್ಥೀಕರಿಸುವುದರಿಂದ ಇದು ಕ್ಷಾರವೆಂದು ದೃಢೀಕರಣ!`;
+    }
+    
+    resultBox.style.transition = 'opacity 0.3s';
+    resultBox.style.opacity = '1';
+    takeaway.classList.add('show');
+  }, 500);
+};
+
+container.querySelectorAll('.solution-btn').forEach(btn => {
+  btn.onclick = () => {
+    container.querySelectorAll('.solution-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.solution = btn.dataset.solution;
+    resetTest();
+    updateDisplay();
+  };
+});
+
+updateDisplay();
+
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var initState = (p.get('initialState') || '').toLowerCase();
+  var showHintParam = p.get('showHints');
+  if (showHintParam === 'false') {
+    var box = document.querySelector('.insight-box');
+    if (box) box.style.display = 'none';
+  }
+  var solutionMap = { 'acidic': 'tamarind', 'basic': 'baking' };
+  var targetSolution = solutionMap[initState];
+  if (!targetSolution) return;
+  setTimeout(function () {
+    var solBtn = document.querySelector('.solution-btn[data-solution="' + targetSolution + '"]');
+    if (solBtn) solBtn.click();
+    setTimeout(function () {
+      var mb = document.getElementById('mix-btn');
+      if (mb) mb.click();
+    }, 600);
+  }, 800);
+}());
+</script>
+</body>
+</html>

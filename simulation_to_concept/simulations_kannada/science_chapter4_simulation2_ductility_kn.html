@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ff6f00">
+<title>ಸೆಳೆತ – ತಂತಿಗಳನ್ನು ಎಳೆಯುವುದು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #ff6f00 0%, #ffa726 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #f9a825;
+}
+
+.concept-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f57f17;
+  margin-bottom: 6px;
+}
+
+.concept-text {
+  font-size: 12px;
+  color: #5d4037;
+  line-height: 1.5;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.visual {
+  position: relative;
+  height: 38vh;
+  min-height: 260px;
+  background: linear-gradient(180deg, #eceff1 0%, #cfd8dc 100%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+svg { width: 100%; height: 100%; }
+
+.result-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.result-badge.ductile { background: #e8f5e9; color: #2e7d32; }
+.result-badge.not-ductile { background: #ffebee; color: #c62828; }
+
+.materials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.material-btn {
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 12px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.material-btn:active { transform: scale(0.95); }
+.material-btn.active { border-color: #ff6f00; background: #fff3e0; }
+.material-btn.tested.ductile { border-color: #4caf50; background: #e8f5e9; }
+.material-btn.tested.not-ductile { border-color: #f44336; background: #ffebee; }
+.material-btn .icon { font-size: 28px; }
+.material-btn .name { font-size: 10px; color: #333; margin-top: 4px; }
+.material-btn .type { font-size: 8px; color: #888; margin-top: 2px; }
+
+.pull-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+  color: white;
+  transition: transform 0.1s ease;
+}
+
+.pull-btn:active { transform: scale(0.98); }
+.pull-btn:disabled { background: #ccc; }
+
+.results-panel {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.result-card {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.result-card.ductile { background: #e8f5e9; border: 2px solid #a5d6a7; }
+.result-card.not-ductile { background: #ffebee; border: 2px solid #ef9a9a; }
+
+.result-card .label { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+.result-card.ductile .label { color: #2e7d32; }
+.result-card.not-ductile .label { color: #c62828; }
+.result-card .items { font-size: 9px; color: #666; min-height: 30px; }
+
+.learning-panel {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #1976d2;
+}
+
+.learning-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1565c0;
+  margin-bottom: 6px;
+}
+
+.learning-text {
+  font-size: 11px;
+  color: #37474f;
+  line-height: 1.6;
+}
+
+.takeaway {
+  background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2e7d32;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1b5e20; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+@keyframes moveRight {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(100px); }
+}
+
+.move-right { animation: moveRight 0.8s ease-out forwards; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🧵 ಸೆಳೆತ</h1>
+  <p>ಈ ಪದಾರ್ಥವನ್ನು ತಂತಿಗಳಾಗಿ ಎಳೆಯಬಹುದೇ?</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ಸೆಳೆತ</strong> ಪದಾರ್ಥಗಳ ಗುಣ <strong>ತೆಳು ತಂತಿಗಳಾಗಿ ಎಳೆಯಬಹುದು</strong> ಮುರಿಯದೆ. ಲೋಹಗಳು ಸೆಳೆತವಾಗಿರುತ್ತವೆ; ಅಲೋಹಗಳು ಅಲ್ಲ.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="visual">
+    <div class="result-badge" id="result-badge" style="display:none"></div>
+    <svg viewBox="0 0 400 260" id="scene">
+      <!-- Die/Drawing plate -->
+      <rect x="180" y="100" width="40" height="80" rx="3" fill="#455a64"/>
+      <ellipse cx="200" cy="140" rx="15" ry="25" fill="#263238"/>
+      <ellipse cx="200" cy="140" rx="8" ry="15" fill="#37474f"/>
+      
+      <!-- ಪದಾರ್ಥ block (before) -->
+      <g id="material-block" transform="translate(80, 115)">
+        <rect id="block-shape" x="0" y="0" width="80" height="50" rx="5" fill="#b0bec5"/>
+        <text id="block-label" x="40" y="70" font-size="10" fill="#666" text-anchor="middle">ಪದಾರ್ಥ</text>
+      </g>
+      
+      <!-- Wire (shown after drawing) -->
+      <g id="wire-result" style="display:none">
+        <line id="wire-line" x1="160" y1="140" x2="350" y2="140" stroke="#b87333" stroke-width="6" stroke-linecap="round"/>
+        <text x="300" y="160" font-size="10" fill="#2e7d32">ತಂತಿ!</text>
+      </g>
+      
+      <!-- Broken pieces -->
+      <g id="broken-pieces" style="display:none">
+        <rect x="100" y="130" width="30" height="20" rx="3" fill="#666" transform="rotate(-10, 115, 140)"/>
+        <rect x="140" y="135" width="25" height="18" rx="3" fill="#555" transform="rotate(5, 152, 144)"/>
+      </g>
+      
+      <!-- ಎಳೆಯುವ ಕೈ -->
+      <g id="pulling-hand" transform="translate(320, 120)" style="display:none">
+        <text x="0" y="25" font-size="30">👋</text>
+      </g>
+      
+      <!-- Arrow showing direction -->
+      <g id="arrow">
+        <line x1="240" y1="140" x2="300" y2="140" stroke="#1976d2" stroke-width="3" marker-end="url(#arrowhead)"/>
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#1976d2"/>
+          </marker>
+        </defs>
+        <text x="270" y="125" font-size="10" fill="#1976d2" text-anchor="middle">ಎಳೆಯಿರಿ</text>
+      </g>
+      
+      <!-- Instructions -->
+      <text x="200" y="40" font-size="12" fill="#333" text-anchor="middle" id="instruction">ಪದಾರ್ಥ ಆಯ್ಕೆಮಾಡಿ ತಂತಿಯಾಗಿ ಎಳೆಯಲು ಪ್ರಯತ್ನಿಸಿ</text>
+    </svg>
+  </div>
+  
+  <div class="materials-grid">
+    <div class="material-btn" onclick="selectMaterial('copper', '🥉', true, '#b87333', this)">
+      <div class="icon">🥉</div>
+      <div class="name">ತಾಮ್ರ</div>
+      <div class="type">ಲೋಹ</div>
+    </div>
+    <div class="material-btn" onclick="selectMaterial('gold', '🥇', true, '#ffd700', this)">
+      <div class="icon">🥇</div>
+      <div class="name">ಚಿನ್ನ</div>
+      <div class="type">ಲೋಹ</div>
+    </div>
+    <div class="material-btn" onclick="selectMaterial('aluminium', '🔘', true, '#bdbdbd', this)">
+      <div class="icon">🔘</div>
+      <div class="name">ಅಲ್ಯೂಮಿನಿಯಂ</div>
+      <div class="type">ಲೋಹ</div>
+    </div>
+    <div class="material-btn" onclick="selectMaterial('coal', '⬛', false, '#263238', this)">
+      <div class="icon">⬛</div>
+      <div class="name">ಕಲ್ಲಿದ್ದಲು</div>
+      <div class="type">ಅಲೋಹ</div>
+    </div>
+    <div class="material-btn" onclick="selectMaterial('sulfur', '🟡', false, '#fdd835', this)">
+      <div class="icon">🟡</div>
+      <div class="name">ಸಲ್ಫರ್</div>
+      <div class="type">ಅಲೋಹ</div>
+    </div>
+    <div class="material-btn" onclick="selectMaterial('wood', '🪵', false, '#8d6e63', this)">
+      <div class="icon">🪵</div>
+      <div class="name">ಮರ</div>
+      <div class="type">ಅಲೋಹ</div>
+    </div>
+  </div>
+  
+  <button class="pull-btn" id="pull-btn" onclick="drawWire()" disabled>
+    ➡️ ಡೈ ಮೂಲಕ ಎಳೆಯಿರಿ
+  </button>
+</div>
+
+<div class="results-panel">
+  <div class="result-card ductile">
+    <div class="label">✅ ಸಾಕರ್ಷಕ</div>
+    <div class="items" id="ductile-items">-</div>
+  </div>
+  <div class="result-card not-ductile">
+    <div class="label">❌ ಸಾಕರ್ಷಕವಲ್ಲ</div>
+    <div class="items" id="not-ductile-items">-</div>
+  </div>
+</div>
+
+<div class="learning-panel">
+  <div class="learning-title">🔬 ಸೆಳೆತ ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು</div>
+  <div class="learning-text" id="learning-text">
+    ಒಂದು ಪದಾರ್ಥ ಆಯ್ಕೆಮಾಡಿ ಡೈ ಮೂಲಕ ಎಳೆದು ತಂತಿಯಾಗಿ ರೂಪಿಸಬಹುದೇ ನೋಡಿ!<br><br>
+    <strong>ಸಾಕರ್ಷಕ ವಸ್ತುಗಳು</strong> ತೆಳು ತಂತಿಗಳಾಗಿ ಚಾಚುತ್ತವೆ.<br>
+    <strong>ಸಾಕರ್ಷಕವಲ್ಲದ ವಸ್ತುಗಳು</strong> ಎಳೆದಾಗ ಒಡೆಯುತ್ತವೆ.
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೀವು ಕಲಿಯುವುದು</div>
+  <div class="takeaway-text">
+    <strong>ಲೋಹಗಳು</strong> ತಾಮ್ರ, ಚಿನ್ನ, ಅಲ್ಯೂಮಿನಿಯಂ ಸಾಕರ್ಷಕ - ತಂತಿ (ವಿದ್ಯುತ್ ತಂತಿ!).<br><br>
+    <strong>ಚಿನ್ನ ಅತ್ಯಂತ ಸಾಕರ್ಷಕ</strong> - 1 ಗ್ರಾಂ 2 ಕಿಮೀ ಉದ್ದದ ತಂತಿಯಾಗಿ ಒಳೆಯಬಹುದು!<br><br>
+    <strong>ಅಲೋಹಗಳು</strong> ಸಾಕರ್ಷಕವಲ್ಲ - ಚಾಚಿದರೆ ಒಡೆಯುತ್ತವೆ.
+  </div>
+</div>
+
+</div>
+
+<script>
+const materialDisplayNames = { copper: 'ತಾಮ್ರ', gold: 'ಚಿನ್ನ', aluminium: 'ಅಲ್ಯೂಮಿನಿಯಂ', coal: 'ಕಲ್ಲಿದ್ದಲು', sulfur: 'ಸಲ್ಫರ್', wood: 'ಮರ' };
+let selectedMaterial = null;
+let selectedBtn = null;
+let isDuctile = false;
+let materialColor = '#b0bec5';
+
+const ductileList = [];
+const notDuctileList = [];
+
+const blockShape = document.getElementById('block-shape');
+const blockLabel = document.getElementById('block-label');
+const materialBlock = document.getElementById('material-block');
+const wireResult = document.getElementById('wire-result');
+const wireLine = document.getElementById('wire-line');
+const brokenPieces = document.getElementById('broken-pieces');
+const pullingHandle = document.getElementById('pulling-hand');
+const pullBtn = document.getElementById('pull-btn');
+const resultBadge = document.getElementById('result-badge');
+const arrow = document.getElementById('arrow');
+const instruction = document.getElementById('instruction');
+const learningText = document.getElementById('learning-text');
+
+function selectMaterial(name, icon, ductile, color, btn) {
+  if (btn.classList.contains('tested')) return;
+  
+  // ಮರುಹೊಂದಿಸಿ previous selection
+  document.querySelectorAll('.material-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  selectedMaterial = name;
+  selectedBtn = btn;
+  isDuctile = ductile;
+  materialColor = color;
+  
+  // ಮರುಹೊಂದಿಸಿ visual - use setAttribute for SVG transform
+  materialBlock.style.display = 'block';
+  materialBlock.setAttribute('transform', 'translate(80, 115)');
+  blockShape.setAttribute('width', '80');
+  blockShape.setAttribute('height', '50');
+  blockShape.style.opacity = '1';
+  wireResult.style.display = 'none';
+  brokenPieces.style.display = 'none';
+  pullingHandle.style.display = 'none';
+  resultBadge.style.display = 'none';
+  arrow.style.display = 'block';
+  
+  // Update material display
+  blockShape.setAttribute('fill', color);
+  blockLabel.textContent = materialDisplayNames[name] || name;
+  
+  // Enable pull button
+  pullBtn.disabled = false;
+  pullBtn.textContent = `➡️ ${materialDisplayNames[name] || name} ಡೈ ಮೂಲಕ ಎಳೆಯಿರಿ`;
+  
+  instruction.textContent = `${icon} ${materialDisplayNames[name] || name} ಸಿದ್ಧ - ಡೈ ಮೂಲಕ ಎಳೆಯಿರಿ!`;
+  
+  learningText.innerHTML = `
+    <strong>${materialDisplayNames[name] || name}</strong> <strong>${ductile ? 'ಲೋಹ' : 'ಅಲೋಹ'}</strong>.<br><br>
+    ಕಿರಿದಾದ ರಂಧ್ರ (ಡೈ) ಮೂಲಕ ಎಳೆದು ತೆಳು ತಂತಿಯಾಗಿ ರೂಪಿಸಬಹುದೇ ನೋಡೋಣ.
+  `;
+}
+
+function drawWire() {
+  if (!selectedMaterial) return;
+  
+  pullBtn.disabled = true;
+  arrow.style.display = 'none';
+  pullingHandle.style.display = 'block';
+  
+  const saveMaterial = selectedMaterial;
+  const saveBtn = selectedBtn;
+  const saveDuctile = isDuctile;
+  const saveColor = materialColor;
+  
+  if (saveDuctile) {
+    // ಲೋಹ - stretches into wire with animated transition
+    let frame = 0;
+    const totalFrames = 20;
+    
+    const animateStretch = () => {
+      frame++;
+      const progress = frame / totalFrames;
+      
+      // Move block right ಮತ್ತು stretch it
+      const newX = 80 + (progress * 80);
+      const newWidth = 80 - (progress * 60);
+      const newHeight = 50 - (progress * 35);
+      
+      materialBlock.setAttribute('transform', `translate(${newX}, ${115 + (progress * 15)})`);
+      blockShape.setAttribute('width', Math.max(newWidth, 20));
+      blockShape.setAttribute('height', Math.max(newHeight, 15));
+      
+      if (frame < totalFrames) {
+        requestAnimationFrame(animateStretch);
+      } else {
+        // Animation ಪೂರ್ಣ - show wire
+        materialBlock.style.display = 'none';
+        wireResult.style.display = 'block';
+        wireLine.setAttribute('stroke', saveColor);
+        
+        resultBadge.textContent = '✅ ಸೆಳೆತ - ತಂತಿ ರೂಪುಗೊಂಡಿದೆ!';
+        resultBadge.className = 'result-badge ductile';
+        resultBadge.style.display = 'block';
+        
+        saveBtn.classList.add('tested', 'ductile');
+        ductileList.push(saveMaterial);
+        
+        instruction.textContent = '✅ ಲೋಹ ತೆಳು ತಂತಿಯಾಗಿ ಎಳೆಯಲಾಗಿದೆ!';
+        
+        learningText.innerHTML = `
+          <strong style="color:#2e7d32">✅ ಸಾಕರ್ಷಕ!</strong><br><br>
+          ಡೈ ಮೂಲಕ ಎಳೆದಾಗ ಈ ಲೋಹ ಮುರಿಯದೆ <strong>ತೆಳು ತಂತಿಯಾಗಿ ಚಾಚಿತು</strong>.<br><br>
+          ಲೋಹದ ಅಣುಗಳು ತಮ್ಮ ಬಂಧಗಳನ್ನು ಉಳಿಸಿಕೊಂಡೇ <strong>ಒಂದರ ಮೇಲೊಂದು ಜಾರಬಲ್ಲವು</strong>.
+        `;
+        
+        updateResults();
+      }
+    };
+    
+    requestAnimationFrame(animateStretch);
+    
+  } else {
+    // ಅಲೋಹ - breaks with shake effect
+    let frame = 0;
+    const totalFrames = 10;
+    
+    const animateBreak = () => {
+      frame++;
+      const shake = (frame % 2 === 0) ? 3 : -3;
+      materialBlock.setAttribute('transform', `translate(${80 + shake}, 115)`);
+      
+      if (frame < totalFrames) {
+        requestAnimationFrame(animateBreak);
+      } else {
+        // Show broken pieces
+        materialBlock.style.display = 'none';
+        brokenPieces.style.display = 'block';
+        brokenPieces.querySelectorAll('rect').forEach(r => r.setAttribute('fill', saveColor));
+        
+        resultBadge.textContent = '❌ ಸೆಳೆತವಲ್ಲ - ಮುರಿದಿದೆ!';
+        resultBadge.className = 'result-badge not-ductile';
+        resultBadge.style.display = 'block';
+        
+        saveBtn.classList.add('tested', 'not-ductile');
+        notDuctileList.push(saveMaterial);
+        
+        instruction.textContent = '❌ ಅಲೋಹ ಎಳೆದಾಗ ಒಡೆದಿದೆ!';
+        
+        learningText.innerHTML = `
+          <strong style="color:#c62828">❌ ಸಾಕರ್ಷಕವಲ್ಲ!</strong><br><br>
+          ಡೈ ಮೂಲಕ ಎಳೆದಾಗ ಈ ಅಲೋಹ ಚಾಚದೆ <strong>ತುಂಡುಗಳಾಗಿ ಒಡೆದಿದೆ</strong>.<br><br>
+          ಅಲೋಹಗಳಲ್ಲಿ <strong>ಗಟ್ಟಿ ಬಂಧಗಳು</strong> ಇವೆ – ಚಾಚಲು ಸಾಧ್ಯವಿಲ್ಲ, ಒತ್ತಡದಲ್ಲಿ ಒಡೆಯುತ್ತವೆ.
+        `;
+        
+        updateResults();
+      }
+    };
+    
+    requestAnimationFrame(animateBreak);
+  }
+  
+  selectedMaterial = null;
+}
+
+function updateResults() {
+  document.getElementById('ductile-items').textContent = ductileList.length ? ductileList.map(m => materialDisplayNames[m] || m).join(', ') : '-';
+  document.getElementById('not-ductile-items').textContent = notDuctileList.length ? notDuctileList.map(m => materialDisplayNames[m] || m).join(', ') : '-';
+  pullBtn.textContent = '➡️ ಇನ್ನೊಂದು ಪದಾರ್ಥ ಆಯ್ಕೆಮಾಡಿ';
+}
+
+// ── URL parameter support ────────────────────────────────
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var state = p.get('initialState') || 'initial';
+  var hints = p.get('showHints');
+
+  if (hints === 'false') {
+    var cc = document.querySelector('.concept-card');
+    if (cc) cc.style.display = 'none';
+  }
+
+  if (state === 'metal_draw' || state === 'nonmetal_draw') {
+    var btns = document.querySelectorAll('.material-btn');
+    var isNonMetal = (state === 'nonmetal_draw');
+    var idx      = isNonMetal ? 3 : 0;
+    var name     = isNonMetal ? 'coal'    : 'copper';
+    var icon     = isNonMetal ? '\u2B1B'  : '\uD83E\uDD49';
+    var ductile  = !isNonMetal;
+    var color    = isNonMetal ? '#263238' : '#b87333';
+    setTimeout(function () {
+      if (btns[idx]) selectMaterial(name, icon, ductile, color, btns[idx]);
+    }, 800);
+    setTimeout(function () {
+      var btn = document.getElementById('pull-btn');
+      if (btn && !btn.disabled) drawWire();
+    }, 2600);
+  }
+}());
+</script>
+</body>
+</html>

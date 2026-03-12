@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#5e35b1">
+<title>ಕೌಮಾರ ವಯಸ್ಕರಿಗೆ ಆರೋಗ್ಯಕರ ಅಭ್ಯಾಸಗಳು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #5e35b1 0%, #7e57c2 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #ede7f6 0%, #d1c4e9 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #5e35b1;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #4527a0; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.habits-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.habit-tab {
+  padding: 10px 4px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  text-align: center;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.habit-tab:active { transform: scale(0.95); }
+.habit-tab.active { border-color: #5e35b1; background: #ede7f6; color: #4527a0; }
+
+.habit-tab .emoji { font-size: 20px; display: block; margin-bottom: 4px; }
+
+.habit-visual {
+  height: 180px;
+  background: linear-gradient(180deg, #ede7f6 0%, #fff 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+}
+
+.habit-icon-large {
+  font-size: 80px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.habit-info {
+  background: linear-gradient(135deg, #ede7f6 0%, #d1c4e9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #5e35b1;
+}
+
+.habit-title { font-size: 13px; font-weight: 700; color: #4527a0; margin-bottom: 8px; }
+.habit-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.benefits-list {
+  margin-top: 10px;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: #fff;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+
+.benefit-item .icon { font-size: 16px; margin-right: 10px; }
+.benefit-item .text { font-size: 10px; color: #333; }
+
+.online-safety {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.online-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 8px; }
+.online-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.tip-card {
+  padding: 10px;
+  background: #fff;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.tip-card .emoji { font-size: 24px; margin-bottom: 4px; }
+.tip-card .text { font-size: 9px; color: #333; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🌟 ಆರೋಗ್ಯಕರ ಅಭ್ಯಾಸಗಳು</h1>
+  <p>ಶಕ್ತ ದೇಹ ಮತ್ತು ಮನಸ್ಸನ್ನು ನಿರ್ಮಿಸಿ!</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ಕೌಮಾರವೇ ನಿರ್ಮಿಸಲು ಸೂಕ್ತ ಸಮಯ <strong>ಆರೋಗ್ಯಕರ ಅಭ್ಯಾಸಗಳು</strong> that will benefit you ಉದ್ದಕ್ಕೂ ಜೀವನ. Physical activity, proper sleep, social connections, ಮತ್ತು safe online behavior all contribute to your wellbeing.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="habits-tabs">
+    <div class="habit-tab active" onclick="selectHabit('exercise', this)">
+      <span class="emoji">⚽</span>
+      ವ್ಯಾಯಾಮ
+    </div>
+    <div class="habit-tab" onclick="selectHabit('sleep', this)">
+      <span class="emoji">😴</span>
+      ನಿದ್ರೆ
+    </div>
+    <div class="habit-tab" onclick="selectHabit('social', this)">
+      <span class="emoji">👥</span>
+      ಸಾಮಾಜಿಕ
+    </div>
+    <div class="habit-tab" onclick="selectHabit('mental', this)">
+      <span class="emoji">🧘</span>
+      ಮಾನಸಿಕ
+    </div>
+  </div>
+  
+  <div class="habit-visual">
+    <div class="habit-icon-large" id="habit-icon">⚽</div>
+  </div>
+</div>
+
+<div class="habit-info" id="habit-info">
+  <div class="habit-title" id="habit-title">⚽ Physical Activity & ವ್ಯಾಯಾಮ</div>
+  <div class="habit-text" id="habit-text">
+    Regular physical activity is essential ಕೌಮಾರ್ಯದಲ್ಲಿ. It helps your body grow strong, improves mood, ಮತ್ತು builds stamina for daily activities.
+  </div>
+  <div class="benefits-list" id="benefits-list">
+    <div class="benefit-item">
+      <div class="icon">💪</div>
+      <div class="text">ಸ್ನಾಯು ಮತ್ತು ಅಸ್ಥಿಗಳನ್ನು ಬಲಪಡಿಸುತ್ತದೆ</div>
+    </div>
+    <div class="benefit-item">
+      <div class="icon">😊</div>
+      <div class="text">ಮನಸ್ಥಿತಿ ಉತ್ತಮಗೊಳಿಸಿ ಒತ್ತಡ ಕಡಿಮೆ</div>
+    </div>
+    <div class="benefit-item">
+      <div class="icon">🧠</div>
+      <div class="text">ಸಾಂದ್ರತೆ ಮತ್ತು ನೆನಪು ಹೆಚ್ಚಿಸುತ್ತದೆ</div>
+    </div>
+    <div class="benefit-item">
+      <div class="icon">⚡</div>
+      <div class="text">ಶಕ್ತಿ ಮಟ್ಟ ಹೆಚ್ಚಿಸುತ್ತದೆ</div>
+    </div>
+  </div>
+</div>
+
+<div class="online-safety">
+  <div class="online-title">📱 ಆನ್‌ಲೈನ್ ಭದ್ರತಾ ಸಲಹೆಗಳು</div>
+  <div class="online-text">
+    ಇಂಟರ್ನೆಟ್ ಉಪಯುಕ್ತ ಆದರೆ ಜವಾಬ್ದಾರಿಯುತ ಬಳಕೆ ಅಗತ್ಯ:
+  </div>
+  <div class="tips-grid">
+    <div class="tip-card">
+      <div class="emoji">🔒</div>
+      <div class="text">ವೈಯಕ್ತಿಕ ಮಾಹಿತಿ ಖಾಸಗಿಯಾಗಿ ಇರಿಸಿ</div>
+    </div>
+    <div class="tip-card">
+      <div class="emoji">🚫</div>
+      <div class="text">ಆನ್‌ಲೈನ್ ಅಪರಿಚಿತರೊಂದಿಗೆ ಮಾತು ಮಾಡಬೇಡಿ</div>
+    </div>
+    <div class="tip-card">
+      <div class="emoji">💬</div>
+      <div class="text">ಸಂದೇಶಗಳಲ್ಲಿ ಗೌರವ</div>
+    </div>
+    <div class="tip-card">
+      <div class="emoji">🆘</div>
+      <div class="text">ಸೈಬರ್ ಬುಲ್ಲಿಯಿಂಗ್ ವರದಿ ಮಾಡಿ</div>
+    </div>
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ದೈನಂದಿನ ಗುರಿಗಳು</div>
+  <div class="takeaway-text">
+    • <strong>60 ನಿಮಿಷ</strong> of physical activity daily<br>
+    • <strong>8-10 ಗಂಟೆಗಳು</strong> ಪ್ರತಿ ರಾತ್ರಿ ನಿದ್ರೆ<br>
+    • <strong>ಸಮತೋಲನ</strong> ಆಟದೊಂದಿಗೆ ಸ್ಕ್ರೀನ್ ಸಮಯ<br>
+    • <strong>ಸಂಪರ್ಕಿಸಿ</strong> ಕುಟುಂಬ ಮತ್ತು ಸ್ನೇಹಿತರೊಂದಿಗೆ<br>
+    • <strong>ವಿರಾಮ ತೆಗೆದುಕೊಳ್ಳಿ</strong> ವಿಶ್ರಾಂತಿ ಮತ್ತು ರಿಚಾರ್ಜ್
+  </div>
+</div>
+
+</div>
+
+<script>
+const habits = {
+  exercise: {
+    icon: '⚽',
+    title: '⚽ Physical Activity & ವ್ಯಾಯಾಮ',
+    text: 'Regular physical activity is essential ಕೌಮಾರ್ಯದಲ್ಲಿ. It helps your body grow strong, improves mood, ಮತ್ತು builds stamina for daily activities.',
+    benefits: [
+      { icon: '💪', text: 'ಸ್ನಾಯು ಮತ್ತು ಅಸ್ಥಿಗಳನ್ನು ಬಲಪಡಿಸುತ್ತದೆ' },
+      { icon: '😊', text: 'ಮನಸ್ಥಿತಿ ಉತ್ತಮಗೊಳಿಸಿ ಒತ್ತಡ ಕಡಿಮೆ' },
+      { icon: '🧠', text: 'ಸಾಂದ್ರತೆ ಮತ್ತು ನೆನಪು ಹೆಚ್ಚಿಸುತ್ತದೆ' },
+      { icon: '⚡', text: 'ಶಕ್ತಿ ಮಟ್ಟ ಹೆಚ್ಚಿಸುತ್ತದೆ' }
+    ]
+  },
+  sleep: {
+    icon: '😴',
+    title: '😴 ಗುಣಮಟ್ಟದ ನಿದ್ರೆ',
+    text: 'ಕೌಮಾರದವರಿಗೆ ರಾತ್ರಿ 8-10 ಗಂಟೆ ನಿದ್ರೆ. ನಿದ್ರೆಯಲ್ಲಿ ಶರೀರ ಸರಿಪಡಿಸುತ್ತದೆ, ಮೆದುಳು ಹಗಲು ಕಲಿತದ್ದನ್ನು ಸಂಸ್ಕರಿಸುತ್ತದೆ.',
+    benefits: [
+      { icon: '📈', text: 'ಬೆಳವಣಿಗೆ ಹಾರ್ಮೋನ್ ಬಿಡುಗಡೆ ಬೆಂಬಲ' },
+      { icon: '🎓', text: 'ಕಲಿಕೆ ಮತ್ತು ನೆನಪು ಸುಧಾರಣೆ' },
+      { icon: '💪', text: 'ರೋಗನಿರೋಧಕ ಶಕ್ತಿ ಹೆಚ್ಚಿಸುತ್ತದೆ' },
+      { icon: '😌', text: 'ಉತ್ತಮ ಭಾವನಾ ನಿಯಂತ್ರಣ' }
+    ]
+  },
+  social: {
+    icon: '👥',
+    title: '👥 Healthy ಸಾಮಾಜಿಕ Life',
+    text: 'ಕುಟುಂಬ ಸ್ನೇಹಿತರೊಂದಿಗೆ ಧನಾತ್ಮಕ ಸಂಬಂಧ. ಉತ್ತಮ ಸಾಮಾಜಿಕ ಸಂಪರ್ಕ ಬೆಂಬಲ, ಆನಂದ ಮತ್ತು ಸಂವಹನ ಕೌಶಲ.',
+    benefits: [
+      { icon: '🤝', text: 'ವಿಶ್ವಾಸ ಮತ್ತು ತಂಡ ಕೆಲಸ' },
+      { icon: '💬', text: 'ಸಂವಹನ ಸಾಮರ್ಥ್ಯ ಸುಧಾರಣೆ' },
+      { icon: '❤️', text: 'ಭಾವನಾತ್ಮಕ ಬೆಂಬಲ' },
+      { icon: '🎉', text: 'ಸಂತೋಷದ ನೆನಪುಗಳು' }
+    ]
+  },
+  mental: {
+    icon: '🧘',
+    title: '🧘 ಮಾನಸಿಕ Wellness',
+    text: 'Taking care of your mental health is just as important as physical health. Practice stress management, mindfulness, ಮತ್ತು seek help when needed.',
+    benefits: [
+      { icon: '🧘', text: 'ಕೆಂಪುuces anxiety ಮತ್ತು stress' },
+      { icon: '🎯', text: 'ಕೇಂದ್ರೀಕರಣ ಮತ್ತು ಸ್ಪಷ್ಟತೆ ಸುಧಾರಣೆ' },
+      { icon: '😊', text: 'ಆತ್ಮವಿಶ್ವಾಸ ಹೆಚ್ಚಿಸುತ್ತದೆ' },
+      { icon: '💭', text: 'ಉತ್ತಮ ನಿರ್ಧಾರ' }
+    ]
+  }
+};
+
+const habitIcon = document.getElementById('habit-icon');
+const habitTitle = document.getElementById('habit-title');
+const habitText = document.getElementById('habit-text');
+const benefitsList = document.getElementById('benefits-list');
+
+function selectHabit(type, btn) {
+  document.querySelectorAll('.habit-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  
+  const habit = habits[type];
+  
+  habitIcon.textContent = habit.icon;
+  habitTitle.textContent = habit.title;
+  habitText.textContent = habit.text;
+  
+  benefitsList.innerHTML = habit.benefits.map(b => `
+    <div class="benefit-item">
+      <div class="icon">${b.icon}</div>
+      <div class="text">${b.text}</div>
+    </div>
+  `).join('');
+}
+
+// ── URL Parameter Support ──────────────────────────────────────────────
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var state = p.get('initialState');
+  var hints = p.get('showHints');
+
+  if (hints === 'false') {
+    var cc = document.querySelector('.concept-card');
+    if (cc) cc.style.display = 'none';
+  }
+
+  var validStates = ['exercise', 'sleep', 'social', 'mental'];
+  if (state && validStates.indexOf(state) !== -1) {
+    setTimeout(function () {
+      var typeOrder = ['exercise', 'sleep', 'social', 'mental'];
+      var idx = typeOrder.indexOf(state);
+      var tabs = document.querySelectorAll('.habit-tab');
+      if (idx !== -1 && tabs[idx]) {
+        selectHabit(state, tabs[idx]);
+      }
+    }, 800);
+  }
+}());
+</script>
+</body>
+</html>

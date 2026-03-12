@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#455a64">
+<title>ವಿದ್ಯುತ್ ಸ್ವಿಚ್ – ಸರ್ಕ್ಯೂಟ್ ನಿಯಂತ್ರಕ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #455a64 0%, #78909c 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #f9a825;
+}
+
+.concept-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f57f17;
+  margin-bottom: 6px;
+}
+
+.concept-text {
+  font-size: 12px;
+  color: #5d4037;
+  line-height: 1.5;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.visual {
+  position: relative;
+  height: 40vh;
+  min-height: 280px;
+  background: linear-gradient(180deg, #263238 0%, #37474f 100%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+svg { width: 100%; height: 100%; }
+
+.tap-hint {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.9);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  color: #333;
+}
+
+.switch-types {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.switch-type-btn {
+  flex: 1;
+  padding: 12px 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fff;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.switch-type-btn:active { transform: scale(0.95); }
+.switch-type-btn.active { border-color: #455a64; background: #eceff1; }
+.switch-type-btn .icon { font-size: 24px; }
+.switch-type-btn .name { font-size: 10px; font-weight: 600; color: #333; margin-top: 4px; }
+
+.state-display {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.state-card {
+  flex: 1;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.state-card.off {
+  background: #ffebee;
+  border: 2px solid #ef9a9a;
+}
+
+.state-card.on {
+  background: #e8f5e9;
+  border: 2px solid #a5d6a7;
+}
+
+.state-card.active.off { border-color: #f44336; }
+.state-card.active.on { border-color: #4caf50; }
+
+.state-card .icon { font-size: 28px; }
+.state-card .label { font-size: 12px; font-weight: 600; margin-top: 4px; }
+.state-card.off .label { color: #c62828; }
+.state-card.on .label { color: #2e7d32; }
+.state-card .desc { font-size: 9px; color: #666; margin-top: 4px; }
+
+.learning-panel {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #1976d2;
+}
+
+.learning-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1565c0;
+  margin-bottom: 6px;
+}
+
+.learning-text {
+  font-size: 11px;
+  color: #37474f;
+  line-height: 1.6;
+}
+
+.diy-section {
+  background: #fff3e0;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #ff9800;
+}
+
+.diy-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #e65100;
+  margin-bottom: 6px;
+}
+
+.diy-text {
+  font-size: 10px;
+  color: #5d4037;
+  line-height: 1.6;
+}
+
+.takeaway {
+  background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2e7d32;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1b5e20; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+@keyframes flow {
+  0% { stroke-dashoffset: 20; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.current-flow { stroke-dasharray: 5 5; animation: flow 0.3s linear infinite; }
+
+@keyframes glow {
+  0%, 100% { filter: drop-ನೆರಳು(0 0 5px rgba(255,235,59,0.8)); }
+  50% { filter: drop-ನೆರಳು(0 0 15px rgba(255,235,59,1)); }
+}
+
+.bulb-glow { animation: glow 1s ease-in-out infinite; }
+
+@keyframes click {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+}
+
+.ಸ್ವಿಚ್-click { animation: click 0.2s ease; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🔘 ವಿದ್ಯುತ್ ಸ್ವಿಚ್</h1>
+  <p>ಸ್ವಿಚ್‌ಗಳು ಸರ್ಕ್ಯೂಟ್‌ಗಳನ್ನು ಹೇಗೆ ನಿಯಂತ್ರಿಸುತ್ತವೆ</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ಸ್ವಿಚ್ ಒಂದು ಸಾಧನ <strong>ಪೂರ್ಣಗೊಳಿಸುತ್ತದೆ ಅಥವಾ ಮುರಿಯುತ್ತದೆ</strong> ವಿದ್ಯುತ್ ಸರ್ಕ್ಯೂಟ್. <strong>ಆನ್ ಸ್ಥಾನ</strong>, ಅದು ಅಂತರ ಮುಚ್ಚಿ ವಿದ್ಯುತ್ ಹರಿಯಲು ಅನುಮತಿಸುತ್ತದೆ. <strong>ಆಫ್ ಸ್ಥಾನ</strong>, ಪ್ರವಾಹ ನಿಲುಗಡೆ ಅಂತರ.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="visual">
+    <div class="tap-hint">👆 ಆನ್/ಆಫ್ ಟಾಗಲ್ ಮಾಡಲು ಸ್ವಿಚ್ ಟ್ಯಾಪ್ ಮಾಡಿ</div>
+    <svg viewBox="0 0 400 280" id="circuit-svg">
+      <!-- Circuit wires -->
+      <path id="wire-top" d="M 80 100 L 200 100" stroke="#4caf50" stroke-width="4"/>
+      <path id="wire-right" d="M 280 100 L 320 100 L 320 180 L 280 180" stroke="#e0e0e0" stroke-width="4"/>
+      <path id="wire-bottom" d="M 200 180 L 80 180 L 80 100" stroke="#4caf50" stroke-width="4"/>
+      
+      <!-- Cell -->
+      <g transform="translate(50, 115)">
+        <rect x="0" y="0" width="60" height="50" rx="5" fill="#1565c0"/>
+        <rect x="-8" y="15" width="12" height="20" rx="2" fill="#757575"/>
+        <rect x="54" y="12" width="12" height="26" rx="2" fill="#ffd600"/>
+        <text x="30" y="32" font-size="10" fill="#fff" text-anchor="middle" font-weight="600">1.5V</text>
+      </g>
+      
+      <!-- ಸ್ವಿಚ್ (interactive) -->
+      <g id="switch-group" transform="translate(180, 85)" style="cursor:pointer" onclick="toggleSwitch()">
+        <!-- ಸ್ವಿಚ್ base -->
+        <rect x="0" y="10" width="100" height="10" rx="3" fill="#455a64"/>
+        
+        <!-- Contact points -->
+        <circle cx="20" cy="15" r="8" fill="#9e9e9e" stroke="#666" stroke-width="2"/>
+        <circle cx="80" cy="15" r="8" fill="#9e9e9e" stroke="#666" stroke-width="2"/>
+        
+        <!-- ಸ್ವಿಚ್ lever -->
+        <g id="ಸ್ವಿಚ್-lever">
+          <line x1="20" y1="15" x2="60" y2="-5" stroke="#78909c" stroke-width="6" stroke-linecap="round" id="lever-line"/>
+          <circle cx="60" cy="-5" r="6" fill="#b0bec5" id="lever-knob"/>
+        </g>
+        
+        <!-- Label -->
+        <text x="50" y="45" font-size="10" fill="#fff" text-anchor="middle" id="switch-label">ಮುಚ್ಚಲು ಟ್ಯಾಪ್ ಮಾಡಿ</text>
+      </g>
+      
+      <!-- Bulb -->
+      <g transform="translate(260, 110)">
+        <circle cx="30" cy="35" r="28" fill="#e0e0e0" id="bulb-glass"/>
+        <circle cx="30" cy="35" r="15" fill="#bdbdbd" id="bulb-filament"/>
+        <rect x="20" y="60" width="20" height="15" rx="2" fill="#666"/>
+        <text x="30" y="95" font-size="9" fill="#fff" text-anchor="middle">ಬಲ್ಬ್</text>
+      </g>
+      
+      <!-- Current flow ಸೂಚಕs -->
+      <g id="current-indicators" style="display:none">
+        <circle cx="100" cy="100" r="4" fill="#ffeb3b"/>
+        <circle cx="320" cy="140" r="4" fill="#ffeb3b"/>
+        <circle cx="100" cy="180" r="4" fill="#ffeb3b"/>
+      </g>
+      
+      <!-- State label -->
+      <rect x="140" y="220" width="120" height="35" rx="8" fill="#fff" id="state-bg"/>
+      <text x="200" y="243" font-size="14" text-anchor="middle" font-weight="700" id="state-text">ಆಫ್</text>
+    </svg>
+  </div>
+  
+  <div class="switch-types">
+    <button class="switch-type-btn active" id="btn-lever" onclick="setSwitchType('lever', this)">
+      <div class="icon">🔘</div>
+      <div class="name">ಲಿವರ್ ಸ್ವಿಚ್</div>
+    </button>
+    <button class="switch-type-btn" id="btn-push" onclick="setSwitchType('push', this)">
+      <div class="icon">🔴</div>
+      <div class="name">ಪುಶ್ ಬಟನ್</div>
+    </button>
+    <button class="switch-type-btn" id="btn-toggle" onclick="setSwitchType('toggle', this)">
+      <div class="icon">📍</div>
+      <div class="name">ಟಾಗಲ್ ಸ್ವಿಚ್</div>
+    </button>
+  </div>
+</div>
+
+<div class="state-display">
+  <div class="state-card off active" id="state-off">
+    <div class="icon">🔓</div>
+    <div class="label">ಆಫ್ (ತೆರೆದಿದೆ)</div>
+    <div class="desc">ಸರ್ಕ್ಯೂಟ್‌ನಲ್ಲಿ ಅಂತರ<br>ಪ್ರವಾಹ ಹರಿಯುವುದಿಲ್ಲ</div>
+  </div>
+  <div class="state-card on" id="state-on">
+    <div class="icon">🔒</div>
+    <div class="label">ಆನ್ (ಮುಚ್ಚಿದೆ)</div>
+    <div class="desc">ಸರ್ಕ್ಯೂಟ್ ಪೂರ್ಣ<br>ಪ್ರವಾಹ ಹರಿಯುತ್ತದೆ</div>
+  </div>
+</div>
+
+<div class="learning-panel">
+  <div class="learning-title">🔬 ಸ್ವಿಚ್ ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ</div>
+  <div class="learning-text" id="learning-text">
+    ಸ್ವಿಚ್ ವಿದ್ಯುತ್ಗೆ <strong>ದ್ವಾರ</strong>ದಂತೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ:<br><br>
+    • <strong>ಆಫ್ (ತೆರೆದಿದೆ)</strong>: ಲಿವರ್ ಎರಡು ಸಂಪರ್ಕ ಸ್ಪರ್ಶಿಸುವುದಿಲ್ಲ, ಅಂತರ. ಪ್ರವಾಹ ಅಂತರ ದಾಟಲು ಸಾಧ್ಯವಿಲ್ಲ, ನಿಲುಗಡೆ.<br><br>
+    • <strong>ಆನ್ (ಮುಚ್ಚಿದೆ)</strong>: ಲಿವರ್ ಎರಡು ಸಂಪರ್ಕ ಸೇರಿಸಿ ಮಾರ್ಗ ಪೂರ್ಣ. ಪ್ರವಾಹ ಸರ್ಕ್ಯೂಟ್ ಮೂಲಕ ಹರಿಯುತ್ತದೆ.<br><br>
+    <em>ಇದನ್ನು ನೋಡಲು ಮೇಲಿನ ಸರ್ಕ್ಯೂಟ್‌ನ ಸ್ವಿಚ್ ಟ್ಯಾಪ್ ಮಾಡಿ!</em>
+  </div>
+</div>
+
+<div class="diy-section">
+  <div class="diy-title">🔧 ನಿಮ್ಮದೇ ಸ್ವಿಚ್ ಮಾಡಿ!</div>
+  <div class="diy-text">
+    ನೀವು ಸರಳ ಸ್ವಿಚ್ ಮಾಡಬಹುದು:<br>
+    • ಕಾರ್ಡ್‌ಬೋರ್ಡ್ ತಳದಲ್ಲಿ ಭದ್ರತಾ ಪಿನ್ ಜೋಡಿಸಿ<br>
+    • ಎರಡು ಡ್ರಾಯಿಂಗ್ ಪಿನ್ ಸಂಪರ್ಕ ಬಿಂದು<br>
+    • ಭದ್ರತಾ ಪಿನ್ ಎರಡು ಡ್ರಾಯಿಂಗ್ ಪಿನ್ ಸ್ಪರ್ಶಿಸಿದರೆ ಸರ್ಕ್ಯೂಟ್ ಮುಚ್ಚುತ್ತದೆ!<br><br>
+    <strong>ಭದ್ರತೆ:</strong> ಬ್ಯಾಟರಿ ಸರ್ಕ್ಯೂಟ್‌ಗಳೊಂದಿಗೆ ಮಾತ್ರ ಬಳಸಿ; ಮುಖ್ಯ ವಿದ್ಯುತ್ ಎಂದಿಗೂ ಬಳಸಬೇಡಿ!
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೀವು ಕಲಿತದ್ದು</div>
+  <div class="takeaway-text">
+    ಸ್ವಿಚ್ ಮುಚ್ಚಿ (ಆನ್) ಅಥವಾ ಮುರಿದು (ಆಫ್) ಪ್ರವಾಹ ನಿಯಂತ್ರಣ. ಆನ್ ಆದಾಗ ಅಂತರ ಮುಚ್ಚಿ ಪ್ರವಾಹ ಹರಿಯುತ್ತದೆ; ಆಫ್ ಆದಾಗ ಅಂತರದಿಂದ ಪ್ರವಾಹ ನಿಲುಗಡೆ. ಈ ತತ್ತ್ವ ಎಲ್ಲ ವಿದ್ಯುತ್ ಸಾಧನದಲ್ಲಿ!
+  </div>
+</div>
+
+</div>
+
+<script>
+let isOn = false;
+let currentType = 'lever';
+
+const leverLine = document.getElementById('lever-line');
+const leverKnob = document.getElementById('lever-knob');
+const ಸ್ವಿಚ್Label = document.getElementById('switch-label');
+const bulbGlass = document.getElementById('bulb-glass');
+const bulbFilament = document.getElementById('bulb-filament');
+const wireRight = document.getElementById('wire-right');
+const stateText = document.getElementById('state-text');
+const stateBg = document.getElementById('state-bg');
+const stateOff = document.getElementById('state-off');
+const stateOn = document.getElementById('state-on');
+const currentIndicators = document.getElementById('current-indicators');
+const learningText = document.getElementById('learning-text');
+const ಸ್ವಿಚ್Group = document.getElementById('switch-group');
+
+function toggleSwitch() {
+  isOn = !isOn;
+  const ಸ್ವಿಚ್Group = document.getElementById('switch-group');
+  ಸ್ವಿಚ್Group.classList.add('ಸ್ವಿಚ್-click');
+  setTimeout(() => ಸ್ವಿಚ್Group.classList.remove('ಸ್ವಿಚ್-click'), 200);
+  
+  // Update ಸ್ವಿಚ್ visual based on current type
+  const activeBtn = document.querySelector('.switch-type-btn.active');
+  if (activeBtn) {
+    setSwitchType(currentType, activeBtn);
+  }
+  
+  if (isOn) {
+    // Complete circuit
+    wireRight.setAttribute('stroke', '#4caf50');
+    wireRight.classList.add('current-flow');
+    document.getElementById('wire-top').classList.add('current-flow');
+    document.getElementById('wire-bottom').classList.add('current-flow');
+    
+    // Light bulb
+    bulbGlass.setAttribute('fill', '#ffeb3b');
+    bulbFilament.setAttribute('fill', '#fff');
+    bulbGlass.classList.add('bulb-glow');
+    
+    // Update state
+    stateText.textContent = 'ಆನ್';
+    stateText.setAttribute('fill', '#2e7d32');
+    stateBg.setAttribute('fill', '#e8f5e9');
+    stateOff.classList.remove('active');
+    stateOn.classList.add('active');
+    
+    // Show current
+    currentIndicators.style.display = 'block';
+    
+    learningText.innerHTML = `
+      <strong style="color:#2e7d32">✅ ಸ್ವಿಚ್ ಮುಚ್ಚಿದೆ (ಆನ್)</strong><br><br>
+      The ಸ್ವಿಚ್ now connects both contact points, completing the circuit path.<br><br>
+      ಪ್ರವಾಹ ಹರಿಯುತ್ತದೆ: <strong>Cell (+) → Wire → ಸ್ವಿಚ್ (closed) → Bulb → Wire → Cell (−)</strong><br><br>
+      The bulb glows because there's no gap - electricity can flow in a ಪೂರ್ಣ loop!
+    `;
+  } else {
+    // Break circuit
+    wireRight.setAttribute('stroke', '#e0e0e0');
+    wireRight.classList.remove('current-flow');
+    document.getElementById('wire-top').classList.remove('current-flow');
+    document.getElementById('wire-bottom').classList.remove('current-flow');
+    
+    // Turn off bulb
+    bulbGlass.setAttribute('fill', '#e0e0e0');
+    bulbFilament.setAttribute('fill', '#bdbdbd');
+    bulbGlass.classList.remove('bulb-glow');
+    
+    // Update state
+    stateText.textContent = 'ಆಫ್';
+    stateText.setAttribute('fill', '#c62828');
+    stateBg.setAttribute('fill', '#ffebee');
+    stateOn.classList.remove('active');
+    stateOff.classList.add('active');
+    
+    // Hide current
+    currentIndicators.style.display = 'none';
+    
+    learningText.innerHTML = `
+      <strong style="color:#c62828">❌ ಸ್ವಿಚ್ ತೆರೆದಿದೆ (ಆಫ್)</strong><br><br>
+      The ಸ್ವಿಚ್ is open, creating a <strong>gap</strong> in the circuit.<br><br>
+      Current cannot jump across the gap - it stops at the ಸ್ವಿಚ್.<br><br>
+      No ಪೂರ್ಣ path = No current flow = Bulb stays off!<br><br>
+      <em>Tap the ಸ್ವಿಚ್ again to close it ಮತ್ತು ಪೂರ್ಣ the circuit.</em>
+    `;
+  }
+}
+
+function setSwitchType(type, btn) {
+  currentType = type;
+  document.querySelectorAll('.switch-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  // Update ಸ್ವಿಚ್ visual based on type
+  const ಸ್ವಿಚ್Group = document.getElementById('switch-group');
+  
+  if (type === 'lever') {
+    ಸ್ವಿಚ್Group.innerHTML = `
+      <rect x="0" y="10" width="100" height="10" rx="3" fill="#455a64"/>
+      <circle cx="20" cy="15" r="8" fill="#9e9e9e" stroke="#666" stroke-width="2"/>
+      <circle cx="80" cy="15" r="8" fill="#9e9e9e" stroke="#666" stroke-width="2"/>
+      <g id="ಸ್ವಿಚ್-lever">
+        <line x1="20" y1="15" x2="${isOn ? '80' : '60'}" y2="${isOn ? '15' : '-5'}" stroke="#78909c" stroke-width="6" stroke-linecap="round" id="lever-line"/>
+        <circle cx="${isOn ? '80' : '60'}" cy="${isOn ? '15' : '-5'}" r="6" fill="#b0bec5" id="lever-knob"/>
+      </g>
+      <text x="50" y="45" font-size="10" fill="#fff" text-anchor="middle" id="switch-label">${isOn ? 'TAP TO OPEN' : 'ಮುಚ್ಚಲು ಟ್ಯಾಪ್ ಮಾಡಿ'}</text>
+    `;
+  } else if (type === 'push') {
+    ಸ್ವಿಚ್Group.innerHTML = `
+      <rect x="20" y="0" width="60" height="30" rx="5" fill="#455a64"/>
+      <circle cx="50" cy="15" r="12" fill="${isOn ? '#4caf50' : '#f44336'}" id="push-btn"/>
+      <circle cx="50" cy="15" r="8" fill="${isOn ? '#81c784' : '#e57373'}"/>
+      <text x="50" y="50" font-size="10" fill="#fff" text-anchor="middle" id="switch-label">${isOn ? 'PRESSED' : 'TAP TO PRESS'}</text>
+    `;
+  } else if (type === 'toggle') {
+    ಸ್ವಿಚ್Group.innerHTML = `
+      <rect x="25" y="5" width="50" height="20" rx="10" fill="#455a64"/>
+      <circle cx="${isOn ? '65' : '35'}" cy="15" r="10" fill="${isOn ? '#4caf50' : '#9e9e9e'}" id="toggle-knob"/>
+      <text x="50" y="45" font-size="10" fill="#fff" text-anchor="middle" id="switch-label">${isOn ? 'ಆನ್' : 'ಆಫ್'}</text>
+    `;
+  }
+  
+  // Re-bind elements
+  updateSwitchElements();
+}
+
+function updateSwitchElements() {
+  // Update references after ಸ್ವಿಚ್ type change
+  window.leverLine = document.getElementById('lever-line');
+  window.leverKnob = document.getElementById('lever-knob');
+  window.ಸ್ವಿಚ್Label = document.getElementById('switch-label');
+}
+
+// ── URL parameter support ──────────────────────────────────────────────
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var state      = p.get('initialState') || 'off';
+  var switchType = p.get('switchType');
+  var hints      = p.get('showHints');
+
+  if (hints === 'false') {
+    var cc = document.querySelector('.concept-card');
+    if (cc) cc.style.display = 'none';
+  }
+
+  // Apply switch type first (lever / push / toggle)
+  var typeToBtn = { 'lever': 'btn-lever', 'push': 'btn-push', 'toggle': 'btn-toggle' };
+  if (switchType && typeToBtn[switchType]) {
+    setTimeout(function () {
+      var btn = document.getElementById(typeToBtn[switchType]);
+      if (btn) btn.click();
+    }, 400);
+  }
+
+  // Apply on/off state
+  if (state === 'on') {
+    setTimeout(function () {
+      if (!isOn) toggleSwitch();
+    }, 800);
+  }
+}());
+</script>
+</body>
+</html>

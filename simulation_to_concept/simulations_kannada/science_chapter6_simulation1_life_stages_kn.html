@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#7b1fa2">
+<title>ಮಾನವ ಜೀವನದ ಹಂತಗಳು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #7b1fa2 0%, #ba68c8 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #7b1fa2;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #7b1fa2; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.timeline {
+  position: relative;
+  padding: 10px 0;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 30px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #e1bee7, #7b1fa2, #4a148c);
+  border-radius: 2px;
+}
+
+.stage-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.stage-item:active { transform: scale(0.98); }
+
+.stage-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  margin-right: 15px;
+  margin-left: 18px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.stage-item.active .stage-dot {
+  background: #7b1fa2;
+  transform: scale(1.2);
+}
+
+.stage-content {
+  flex: 1;
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.stage-item.active .stage-content {
+  background: #f3e5f5;
+  border-color: #7b1fa2;
+}
+
+.stage-item.adolescence .stage-content {
+  background: #fff3e0;
+  border-color: #ff9800;
+}
+
+.stage-item.adolescence .stage-dot {
+  background: #ff9800;
+}
+
+.stage-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.stage-age {
+  font-size: 10px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.stage-desc {
+  font-size: 10px;
+  color: #555;
+  line-height: 1.4;
+}
+
+.detail-panel {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.detail-title { font-size: 13px; font-weight: 700; color: #e65100; margin-bottom: 8px; }
+.detail-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.comparison-box {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.comparison-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 8px; }
+
+.compare-row {
+  display: flex;
+  gap: 8px;
+}
+
+.compare-item {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.compare-item .icon { font-size: 28px; margin-bottom: 4px; }
+.compare-item .label { font-size: 9px; color: #666; }
+.compare-item .text { font-size: 10px; font-weight: 600; color: #333; margin-top: 4px; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2196f3;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🌱 ಮಾನವ ಜೀವನದ ಹಂತಗಳು</h1>
+  <p>ಜನನದಿಂದ ವೃದ್ಧಾಪ್ಯದವರೆಗೆ - ಬೆಳವಣಿಗೆಯ ಪ್ರಯಾಣ</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ಮಾನವ ಜೀವನ ಮುಂದುವರಿಯುತ್ತದೆ <strong>ಐದು ಮುಖ್ಯ ಹಂತಗಳ ಮೂಲಕ</strong>: ಶಿಶು ಅವಧಿ, ಬಾಲ್ಯ, Adolescence, ಪ್ರೌಢಾವಸ್ಥೆ, ಮತ್ತು Old Age. Each stage has unique characteristics ಮತ್ತು ಬದಲಾಗುತ್ತದೆ.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="timeline">
+    <div class="timeline-line"></div>
+    
+    <div class="stage-item" onclick="selectStage(0, this)">
+      <div class="stage-dot">👶</div>
+      <div class="stage-content">
+        <div class="stage-name">ಶಿಶು ಅವಧಿ</div>
+        <div class="stage-age">0-2 ವರ್ಷ</div>
+        <div class="stage-desc">ವೇಗವಾದ ಭೌತಿಕ ಬೆಳವಣಿಗೆ, ನಡೆಯಲು ಮತ್ತು ಮಾತನಾಡಲು ಕಲಿಕೆ</div>
+      </div>
+    </div>
+    
+    <div class="stage-item" onclick="selectStage(1, this)">
+      <div class="stage-dot">🧒</div>
+      <div class="stage-content">
+        <div class="stage-name">ಬಾಲ್ಯ</div>
+        <div class="stage-age">3-9 ವರ್ಷ</div>
+        <div class="stage-desc">ಕಲಿಕೆ, ಆಟ, ಸಾಮಾಜಿಕ ಕೌಶಲ ವಿಕಾಸ</div>
+      </div>
+    </div>
+    
+    <div class="stage-item adolescence" onclick="selectStage(2, this)">
+      <div class="stage-dot">🧑</div>
+      <div class="stage-content">
+        <div class="stage-name">⭐ ಕೌಮಾರ</div>
+        <div class="stage-age">10-19 ವರ್ಷ</div>
+        <div class="stage-desc">ಯೌವನ, ವೇಗವಾದ ಬದಲಾವಣೆಗಳು, ಪ್ರೌಢಾವಸ್ಥೆಗೆ ತಯಾರಿ</div>
+      </div>
+    </div>
+    
+    <div class="stage-item" onclick="selectStage(3, this)">
+      <div class="stage-dot">👨</div>
+      <div class="stage-content">
+        <div class="stage-name">ಪ್ರೌಢಾವಸ್ಥೆ</div>
+        <div class="stage-age">20-60 ವರ್ಷ</div>
+        <div class="stage-desc">ಸ್ವಾತಂತ್ರ್ಯ, ವೃತ್ತಿ, ಕುಟುಂಬ ಜವಾಬ್ದಾರಿ</div>
+      </div>
+    </div>
+    
+    <div class="stage-item" onclick="selectStage(4, this)">
+      <div class="stage-dot">👴</div>
+      <div class="stage-content">
+        <div class="stage-name">ವೃದ್ಧಾವಸ್ಥೆ</div>
+        <div class="stage-age">60+ ವರ್ಷ</div>
+        <div class="stage-desc">ಜ್ಞಾನ, ನಿಧಾನ, ಜೀವನ ಅನುಭವ ಆನಂದ</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-title" id="detail-title">⭐ ಕೌಮಾರ - ಕೇಂದ್ರ ಹಂತ</div>
+  <div class="detail-text" id="detail-text">
+    <strong>ಕೌಮಾರ (10-19 ವರ್ಷ)</strong> ಬಾಲ್ಯ ಮತ್ತು ಪ್ರೌಢಾವಸ್ಥೆಯ ನಡುವಿನ ಪರಿವರ್ತನಾ ಅವಧಿ.<br><br>
+    <strong>ಮುಖ್ಯ ಲಕ್ಷಣಗಳು:</strong><br>
+    • ವೇಗವಾದ ಭೌತಿಕ ಬೆಳವಣಿಗೆ (ಎತ್ತರ, ತೂಕ)<br>
+    • ಪ್ರಜನನ ಸಾಮರ್ಥ್ಯ ವಿಕಾಸ<br>
+    • ಭಾವನಾತ್ಮಕ ಮತ್ತು ಮಾನಸಿಕ ಬದಲಾವಣೆಗಳು<br>
+    • ಗುರುತು ಮತ್ತು ಸ್ವಾತಂತ್ರ್ಯ ವಿಕಾಸ<br><br>
+    ಇದು ನೀವು ಇರುವ ಹಂತ! ಉತ್ತೇಜಕ ಬದಲಾವಣೆ ಮತ್ತು ಬೆಳವಣಿಗೆಯ ಕಾಲ.
+  </div>
+</div>
+
+<div class="comparison-box">
+  <div class="comparison-title">🌿 ಪ್ರಕೃತಿಯಲ್ಲಿ ಬೆಳವಣಿಗೆ - ಅದೇ ಮಾದರಿ!</div>
+  <div class="compare-row">
+    <div class="compare-item">
+      <div class="icon">🌱</div>
+      <div class="label">ಬೀಜ → ಮೊಳಕೆ</div>
+      <div class="text">ಶಿಶು ಅವಧಿಯಂತೆ</div>
+    </div>
+    <div class="compare-item">
+      <div class="icon">🌿</div>
+      <div class="label">ಬೆಳೆಯುತ್ತಿರುವ ಸಸ್ಯ</div>
+      <div class="text">ಬಾಲ್ಯದಂತೆ</div>
+    </div>
+    <div class="compare-item">
+      <div class="icon">🌸</div>
+      <div class="label">ಅರಳುವಿಕೆ</div>
+      <div class="text">ಕೌಮಾರದಂತೆ</div>
+    </div>
+    <div class="compare-item">
+      <div class="icon">🌳</div>
+      <div class="label">ಪಕ್ವ ಮರ</div>
+      <div class="text">ಪ್ರೌಢಾವಸ್ಥೆಯಂತೆ</div>
+    </div>
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೆನಪಿಡಿ</div>
+  <div class="takeaway-text">
+    ಸಸ್ಯಗಳು ಬೀಜ ಉತ್ಪಾದಿಸಲು ಬೆಳೆಯಬೇಕು, ಪ್ರಾಣಿಗಳು ಸಂತಾನೋತ್ಪತ್ತಿಗೆ ಬೆಳೆಯಬೇಕು, <strong>ಮಾನವರು ಕೌಮಾರದ ಮೂಲಕ ಹೋಗುತ್ತಾರೆ</strong> ಶರೀರವನ್ನು ಪ್ರೌಢಾವಸ್ಥೆಗೆ ತಯಾರಿ.<br><br>
+    ಜೀವನದ ಪ್ರತಿ ಹಂತ ಮುಖ್ಯ ಮತ್ತು ಹೊಸ ಅನುಭವ!
+  </div>
+</div>
+
+</div>
+
+<script>
+const stages = [
+  {
+    title: '👶 ಶಿಶು ಅವಧಿ (0-2 ವರ್ಷ)',
+    text: `<strong>ಜೀವನದ ಆರಂಭ!</strong><br><br>
+      <strong>ಭೌತಿಕ:</strong> ಅತಿ ವೇಗದ ಬೆಳವಣಿಗೆ, ಜನನ ತೂಕ ಮೂರರಷ್ಟು<br>
+      <strong>ಚಲನಾ ಕೌಶಲ:</strong> ಊರಿ ನಡೆಯಲು, ನಡೆಯಲು, ವಸ್ತುಗಳನ್ನು ಹಿಡಿಯಲು ಕಲಿಕೆ<br>
+      <strong>ಸಂವಹನ:</strong> ಮೊದಲ ಪದಗಳು, ಕೂಗು, ಅಳುವು<br>
+      <strong>ಅವಲಂಬನೆ:</strong> ಪೋಷಕರ ಮೇಲೆ ಸಂಪೂರ್ಣ ಅವಲಂಬನೆ<br><br>
+      ಶಿಶುಗಳು ಇಂದ್ರಿಯಗಳ ಮೂಲಕ ಜಗತ್ತನ್ನು ಕಲಿಯುತ್ತವೆ!`
+  },
+  {
+    title: '🧒 ಬಾಲ್ಯ (3-9 ವರ್ಷ)',
+    text: `<strong>ಕಲಿಕೆ ಮತ್ತು ಅನ್ವೇಷಣೆ!</strong><br><br>
+      <strong>ಭೌತಿಕ:</strong> ಸ್ಥಿರ ಬೆಳವಣಿಗೆ, ಸಂಯೋಜನೆ ವಿಕಾಸ<br>
+      <strong>ಮಾನಸಿಕ:</strong> ಓದಲು, ಬರೆಯಲು ಮತ್ತು ಸಮಸ್ಯೆಗಳನ್ನು ಪರಿಹರಿಸಲು ಕಲಿಕೆ<br>
+      <strong>ಸಾಮಾಜಿಕ:</strong> ಸ್ನೇಹಿತರನ್ನು ಮಾಡಿಕೊಳ್ಳುವುದು, ಹಂಚಿಕೊಳ್ಳಲು ಕಲಿಕೆ<br>
+      <strong>ಭಾವನಾತ್ಮಕ:</strong> ಸಹಾನುಭೂತಿ ಮತ್ತು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವಿಕೆ ವಿಕಾಸ<br><br>
+      ಮಕ್ಕಳು ಜಿಜ್ಞಾಸು ಮತ್ತು ಸ್ಪಂಜ್‌ನಂತೆ ಜ್ಞಾನ ಹೀರಿಕೊಳ್ಳುತ್ತವೆ!`
+  },
+  {
+    title: '⭐ ಕೌಮಾರ (10-19 ವರ್ಷ)',
+    text: `<strong>ಪರಿವರ್ತನಾ ಹಂತ - ನೀವು ಇಲ್ಲಿದ್ದೀರಿ!</strong><br><br>
+      <strong>ಭೌತಿಕ:</strong> ವೇಗವಾದ ಬೆಳವಣಿಗೆ, ಯೌವನಾರಂಭ ಬದಲಾವಣೆಗಳು<br>
+      <strong>ಭಾವನಾತ್ಮಕ:</strong> ಮನೋಭಾವ ಏರಿಳಿತ, ಬಲವಾದ ಭಾವನೆಗಳು<br>
+      <strong>ಸಾಮಾಜಿಕ:</strong> ಗುರುತು ರೂಪಣೆ, ಸಮವಯಸ್ಕ ಸಂಬಂಧಗಳು<br>
+      <strong>ಜ್ಞಾನಾತ್ಮಕ:</strong> ಅಮೂರ್ತ ಚಿಂತನೆ ವಿಕಾಸ<br><br>
+      ಇದು ಬೆಳವಣಿಗೆಯ ವಿಶೇಷ ಕಾಲ - ಬದಲಾವಣೆಯನ್ನು ಸ್ವೀಕರಿಸಿ!`
+  },
+  {
+    title: '👨 ಪ್ರೌಢಾವಸ್ಥೆ (20-60 ವರ್ಷ)',
+    text: `<strong>ಸ್ವಾತಂತ್ರ್ಯ ಮತ್ತು ಜವಾಬ್ದಾರಿ!</strong><br><br>
+      <strong>ಭೌತಿಕ:</strong> ಶರೀರ ಪೂರ್ಣ ವಿಕಾಸ, ಉಚ್ಚ ಫಿಟ್ನೆಸ್<br>
+      <strong>ವೃತ್ತಿ:</strong> ಕೆಲಸ, ಸಮಾಜಕ್ಕೆ ಕೊಡುಗೆ<br>
+      <strong>ಕುಟುಂಬ:</strong> ಮಕ್ಕಳು, ಜವಾಬ್ದಾರಿಗಳು<br>
+      <strong>ಬೆಳವಣಿಗೆ:</strong> ನಿರಂತರ ಕಲಿಕೆ ಮತ್ತು ವಿಕಾಸ<br><br>
+      ಪ್ರೌಢರು ಹಿಂದಿನ ಹಂತಗಳಲ್ಲಿ ಕಲಿತ ಕೌಶಲಗಳನ್ನು ಬಳಸುತ್ತಾರೆ!`
+  },
+  {
+    title: '👴 ವೃದ್ಧಾವಸ್ಥೆ (60+ ವರ್ಷ)',
+    text: `<strong>ಜ್ಞಾನ ಮತ್ತು ಪ್ರತಿಫಲನ!</strong><br><br>
+      <strong>ಭೌತಿಕ:</strong> ಕ್ರಮೇಣ ನಿಧಾನ, ಬೆಂಬಲ ಅಗತ್ಯವಿರಬಹುದು<br>
+      <strong>ಮಾನಸಿಕ:</strong> ಜೀವನ ಅನುಭವದಿಂದ ಜ್ಞಾನ<br>
+      <strong>ಸಾಮಾಜಿಕ:</strong> ತಾತ/ಅಜ್ಜ, ಕಿರಿಯ ಪೀಳಿಗೆಗೆ ಮಾರ್ಗದರ್ಶಿಗಳು<br>
+      <strong>ವಾರ್ಸಾ:</strong> ಜ್ಞಾನ ಮತ್ತು ಕಥೆಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳುವುದು<br><br>
+      ಹಿರಿಯರು ಅನುಭವ ಮತ್ತು ಜ್ಞಾನದ ನಿಧಿ!`
+  }
+];
+
+const detailTitle = document.getElementById('detail-title');
+const detailText = document.getElementById('detail-text');
+
+function selectStage(index, element) {
+  document.querySelectorAll('.stage-item').forEach(item => item.classList.remove('active'));
+  element.classList.add('active');
+  
+  detailTitle.textContent = stages[index].title;
+  detailText.innerHTML = stages[index].text;
+}
+
+// Initialize with adolescence selected
+document.querySelectorAll('.stage-item')[2].classList.add('active');
+
+// === URL PARAMETER SUPPORT ===
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var initialState = params.get('initialState');
+  var showHints = params.get('showHints');
+
+  if (showHints === 'false') {
+    document.querySelectorAll('.concept-card, .comparison-box, .takeaway').forEach(function(el) { el.style.display = 'none'; });
+  }
+
+  var stageMap = { infant: 0, childhood: 1, adolescence: 2, adulthood: 3, old_age: 4 };
+  if (initialState && stageMap[initialState] !== undefined) {
+    setTimeout(function() {
+      var items = document.querySelectorAll('.stage-item');
+      selectStage(stageMap[initialState], items[stageMap[initialState]]);
+    }, 800);
+  }
+})();
+</script>
+</body>
+</html>

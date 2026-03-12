@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#f57c00">
+<title>ದೀಪ ಪ್ರಕಾರಗಳು – ಇನ್ಕ್ಯಾಂಡಿಸೆಂಟ್ vs LED</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #f57c00 0%, #ffb74d 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #f9a825;
+}
+
+.concept-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f57f17;
+  margin-bottom: 6px;
+}
+
+.concept-text {
+  font-size: 12px;
+  color: #5d4037;
+  line-height: 1.5;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.lamp-compare {
+  display: flex;
+  gap: 10px;
+}
+
+.lamp-box {
+  flex: 1;
+  background: #263238;
+  border-radius: 12px;
+  padding: 15px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 3px solid transparent;
+}
+
+.lamp-box:active { transform: scale(0.98); }
+.lamp-box.active { border-color: #ffeb3b; }
+
+.lamp-visual {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lamp-name {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.lamp-status {
+  color: #bdbdbd;
+  font-size: 10px;
+  margin-top: 4px;
+}
+
+.ಸ್ವಿಚ್-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 12px;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 10px;
+}
+
+.ಸ್ವಿಚ್-label { font-size: 12px; color: #666; }
+.ಸ್ವಿಚ್-label.on { color: #4caf50; font-weight: 600; }
+
+.switch-toggle {
+  width: 60px;
+  height: 32px;
+  background: #e0e0e0;
+  border-radius: 16px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.switch-toggle.on { background: #4caf50; }
+
+.switch-knob {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  border-radius: 50%;
+  transition: left 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.switch-toggle.on .switch-knob { left: 32px; }
+
+.comparison-table {
+  margin-top: 12px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  background: #f5f5f5;
+}
+
+.table-header div {
+  padding: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  color: #333;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-top: 1px solid #e0e0e0;
+}
+
+.table-row div {
+  padding: 10px;
+  font-size: 10px;
+  text-align: center;
+  color: #666;
+}
+
+.table-row div:first-child {
+  background: #fafafa;
+  font-weight: 600;
+  color: #333;
+}
+
+.detail-panel {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #1976d2;
+}
+
+.detail-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1565c0;
+  margin-bottom: 8px;
+}
+
+.detail-text {
+  font-size: 11px;
+  color: #37474f;
+  line-height: 1.6;
+}
+
+.polarity-note {
+  background: #fff3e0;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 10px;
+  border-left: 3px solid #ff9800;
+}
+
+.polarity-note .title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #e65100;
+  margin-bottom: 4px;
+}
+
+.polarity-note .text {
+  font-size: 10px;
+  color: #5d4037;
+  line-height: 1.5;
+}
+
+.takeaway {
+  background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2e7d32;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1b5e20; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+@keyframes glow {
+  0%, 100% { filter: drop-ನೆರಳು(0 0 10px rgba(255,235,59,0.8)); }
+  50% { filter: drop-ನೆರಳು(0 0 20px rgba(255,235,59,1)); }
+}
+
+.bulb-on { animation: glow 1s ease-in-out infinite; }
+
+@keyframes heat {
+  0%, 100% { stroke: #ff5722; }
+  50% { stroke: #ffeb3b; }
+}
+
+.filament-heat { animation: heat 0.5s ease-in-out infinite; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>💡 ದೀಪ ಪ್ರಕಾರಗಳು</h1>
+  <p>ಇನ್ಕ್ಯಾಂಡಿಸೆಂಟ್ ಬಲ್ಬ್ ಮತ್ತು LED ಹೋಲಿಕೆ</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ದೀಪಗಳ ಎರಡು ಮುಖ್ಯ ಪ್ರಕಾರಗಳಿವೆ: <strong>ಇನ್ಕ್ಯಾಂಡಿಸೆಂಟ್</strong> (ಬಿಸಿ ಮಾಡಿದಾಗ ಜ್ವಲಿಸುವ ಫಿಲಾಮೆಂಟ್ ಇದೆ) ಮತ್ತು <strong>LED</strong> (ಫಿಲಾಮೆಂಟ್ ಇಲ್ಲ, ಹೆಚ್ಚು ಕಾರ್ಯಕ್ಷಮ). LED ಗಳಿಗೆ ಸರಿ ಧ್ರುವತೆ ಅಗತ್ಯ!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="lamp-compare">
+    <div class="lamp-box active" id="incandescent-box" onclick="selectLamp('incandescent')">
+      <div class="lamp-visual">
+        <svg viewBox="0 0 100 120" width="80" height="100">
+          <!-- Bulb glass -->
+          <ellipse cx="50" cy="45" rx="35" ry="40" fill="#e0e0e0" id="inc-glass"/>
+          <!-- Filament -->
+          <path d="M 35 45 Q 40 30 45 45 Q 50 60 55 45 Q 60 30 65 45" 
+                stroke="#9e9e9e" stroke-width="2" fill="none" id="inc-filament"/>
+          <!-- Base -->
+          <rect x="35" y="80" width="30" height="25" rx="3" fill="#666"/>
+          <rect x="30" y="85" width="40" height="5" fill="#888"/>
+          <rect x="30" y="95" width="40" height="5" fill="#888"/>
+          <!-- Terminals -->
+          <circle cx="40" cy="110" r="4" fill="#ffd600"/>
+          <circle cx="60" cy="110" r="4" fill="#9e9e9e"/>
+        </svg>
+      </div>
+      <div class="lamp-name">ಇನ್ಕ್ಯಾಂಡಿಸೆಂಟ್ ಬಲ್ಬ್</div>
+      <div class="lamp-status" id="inc-status">ಪರೀಕ್ಷಿಸಲು ಸ್ವಿಚ್ ಟ್ಯಾಪ್ ಮಾಡಿ</div>
+    </div>
+    
+    <div class="lamp-box" id="led-box" onclick="selectLamp('led')">
+      <div class="lamp-visual">
+        <svg viewBox="0 0 100 120" width="80" height="100">
+          <!-- LED dome -->
+          <ellipse cx="50" cy="50" rx="25" ry="30" fill="#e0e0e0" id="led-dome"/>
+          <!-- LED chip inside -->
+          <rect x="40" y="45" width="20" height="15" rx="2" fill="#bdbdbd" id="led-chip"/>
+          <!-- Body -->
+          <rect x="40" y="75" width="20" height="15" fill="#455a64"/>
+          <!-- Legs -->
+          <rect x="35" y="90" width="4" height="25" fill="#9e9e9e"/>
+          <rect x="61" y="90" width="4" height="20" fill="#9e9e9e"/>
+          <!-- Labels -->
+          <text x="37" y="120" font-size="8" fill="#4caf50">+ (ಉದ್ದ)</text>
+          <text x="58" y="115" font-size="8" fill="#f44336">−</text>
+        </svg>
+      </div>
+      <div class="lamp-name">LED</div>
+      <div class="lamp-status" id="led-status">ಪರೀಕ್ಷಿಸಲು ಸ್ವಿಚ್ ಟ್ಯಾಪ್ ಮಾಡಿ</div>
+    </div>
+  </div>
+  
+  <div class="ಸ್ವಿಚ್-row">
+    <span class="ಸ್ವಿಚ್-label">ಆಫ್</span>
+    <div class="switch-toggle" id="switch-toggle" onclick="toggleSwitch()">
+      <div class="switch-knob"></div>
+    </div>
+    <span class="ಸ್ವಿಚ್-label on">ಆನ್</span>
+  </div>
+</div>
+
+<div class="comparison-table">
+  <div class="table-header">
+    <div>ವೈಶಿಷ್ಟ್ಯ</div>
+    <div>💡 ಇನ್ಕ್ಯಾಂಡಿಸೆಂಟ್</div>
+    <div>🔆 LED</div>
+  </div>
+  <div class="table-row">
+    <div>ಅದು ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ</div>
+    <div>ಫಿಲಾಮೆಂಟ್ ಬಿಸಿಯಾಗಿ ಉಜ್ಜ್ವಲ</div>
+    <div>ಸೆಮಿಕಂಡಕ್ಟರ್ ಬೆಳಕು ಹೊರಸೂಸುತ್ತದೆ</div>
+  </div>
+  <div class="table-row">
+    <div>ಕಾರ್ಯಕ್ಷಮತೆ</div>
+    <div>ಕಡಿಮೆ (ಉಷ್ಣ ವ್ಯರ್ಥ)</div>
+    <div>ಅಧಿಕ (ಕಡಿಮೆ ಉಷ್ಣ)</div>
+  </div>
+  <div class="table-row">
+    <div>ಧ್ರುವತೆ</div>
+    <div>ಎರಡೂ ರೀತಿ ಕೆಲಸ</div>
+    <div>ಸರಿ (+/−) ಅಗತ್ಯ</div>
+  </div>
+  <div class="table-row">
+    <div>ಆಯುಷ್ಯ</div>
+    <div>~1000 ಗಂಟೆಗಳು</div>
+    <div>~50,000 ಗಂಟೆಗಳು</div>
+  </div>
+</div>
+
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-title" id="detail-title">💡 ಇನ್ಕ್ಯಾಂಡಿಸೆಂಟ್ ಬಲ್ಬ್</div>
+  <div class="detail-text" id="detail-text">
+    ಇನ್ಕ್ಯಾಂಡಿಸೆಂಟ್ ಬಲ್ಬ್‌ನಲ್ಲಿ ತೆಳುವಾದ ತಂತಿ ಇದೆ, ಅದನ್ನು <strong>ಫಿಲಾಮೆಂಟ್</strong> ಎಂದು ಕರೆಯಲಾಗುತ್ತದೆ. ವಿದ್ಯುತ್ ಪ್ರವಾಹ ಫಿಲಾಮೆಂಟ್ ಮೂಲಕ ಹರಿಯುವಾಗ, ಅದು ಬಹಳ ಬಿಸಿಯಾಗುತ್ತದೆ (ಸುಮಾರು 2500°C) ಮತ್ತು ಬೆಳಗುತ್ತದೆ, ಬೆಳಕನ್ನು ಉತ್ಪಾದಿಸುತ್ತದೆ.<br><br>
+    ಫಿಲಾಮೆಂಟ್ ತಳದ ಎರಡು ಟರ್ಮಿನಲ್‌ಗಳಿಗೆ ಸಂಪರ್ಕವಾಗಿದೆ. ಯಾವ ದಿಕ್ಕಿನಲ್ಲಿ ಸಂಪರ್ಕಿಸಿದರೂ ಕೆಲಸ ಮಾಡುತ್ತದೆ (ಧ್ರುವತೆ ಅಗತ್ಯವಿಲ್ಲ).
+  </div>
+</div>
+
+<div class="polarity-note">
+  <div class="title">⚠️ ಮುಖ್ಯ: LED ಧ್ರುವತೆ</div>
+  <div class="text">
+    LED ಗಳಿಗೆ <strong>ವಿಭಿನ್ನ ಉದ್ದ</strong>ದ ಎರಡು ಕಾಲುಗಳಿವೆ:<br>
+    • <strong>ಉದ್ದ ಕಾಲು = ಧನ (+)</strong> — ಬ್ಯಾಟರಿಯ + ಗೆ ಸಂಪರ್ಕ<br>
+    • <strong>ಕಿರಿದಾದ ಕಾಲು = ಋಣ (−)</strong> — ಬ್ಯಾಟರಿಯ − ಗೆ ಸಂಪರ್ಕ<br><br>
+    ತಪ್ಪು ದಿಕ್ಕಿನಲ್ಲಿ ಸಂಪರ್ಕಿಸಿದರೆ LED ಹೊಳೆಯುವುದಿಲ್ಲ!
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೀವು ಕಲಿತದ್ದು</div>
+  <div class="takeaway-text">
+    <strong>ಇನ್ಕ್ಯಾಂಡಿಸೆಂಟ್ ಬಲ್ಬ್‌ಗಳು</strong> ಬಿಸಿ ಫಿಲಾಮೆಂಟ್ ಬೆಳಕು ಉತ್ಪಾದಿಸಿ ಎರಡೂ ರೀತಿ ಕೆಲಸ ಮಾಡುತ್ತವೆ. <strong>LED</strong> ಗಳು ಹೆಚ್ಚು ಕಾರ್ಯಕ್ಷಮ, ಹೆಚ್ಚು ಕಾಲ ಬಾಳಿಕೆ, ಆದರೆ ಸರಿ ಧ್ರುವತೆ (+ to +, − to −) ಅಗತ್ಯ.
+  </div>
+</div>
+
+</div>
+
+<script>
+let selectedLamp = 'incandescent';
+let isOn = false;
+
+const incGlass = document.getElementById('inc-glass');
+const incFilament = document.getElementById('inc-filament');
+const ledDome = document.getElementById('led-dome');
+const ledChip = document.getElementById('led-chip');
+const incStatus = document.getElementById('inc-status');
+const ledStatus = document.getElementById('led-status');
+const ಸ್ವಿಚ್Toggle = document.getElementById('switch-toggle');
+const detailTitle = document.getElementById('detail-title');
+const detailText = document.getElementById('detail-text');
+
+function selectLamp(type) {
+  selectedLamp = type;
+  document.getElementById('incandescent-box').classList.toggle('active', type === 'incandescent');
+  document.getElementById('led-box').classList.toggle('active', type === 'led');
+  
+  if (type === 'incandescent') {
+    detailTitle.textContent = '💡 ಇನ್ಕ್ಯಾಂಡಿಸೆಂಟ್ ಬಲ್ಬ್';
+    detailText.innerHTML = `
+      ಇನ್ಕ್ಯಾಂಡಿಸೆಂಟ್ ಬಲ್ಬ್‌ನಲ್ಲಿ ತೆಳುವಾದ ತಂತಿ ಇದೆ, ಅದನ್ನು <strong>ಫಿಲಾಮೆಂಟ್</strong> ಎಂದು ಕರೆಯಲಾಗುತ್ತದೆ. ವಿದ್ಯುತ್ ಪ್ರವಾಹ ಫಿಲಾಮೆಂಟ್ ಮೂಲಕ ಹರಿಯುವಾಗ, ಅದು ಬಹಳ ಬಿಸಿಯಾಗುತ್ತದೆ (ಸುಮಾರು 2500°C) ಮತ್ತು ಬೆಳಗುತ್ತದೆ, ಬೆಳಕನ್ನು ಉತ್ಪಾದಿಸುತ್ತದೆ.<br><br>
+      ಫಿಲಾಮೆಂಟ್ ತಳದ ಎರಡು ಟರ್ಮಿನಲ್‌ಗಳಿಗೆ ಸಂಪರ್ಕವಾಗಿದೆ. ಯಾವ ದಿಕ್ಕಿನಲ್ಲಿ ಸಂಪರ್ಕಿಸಿದರೂ ಕೆಲಸ ಮಾಡುತ್ತದೆ (ಧ್ರುವತೆ ಅಗತ್ಯವಿಲ್ಲ).
+    `;
+  } else {
+    detailTitle.textContent = '🔆 LED (LED)';
+    detailText.innerHTML = `
+      An LED has no filament. Instead, it has a <strong>semiconductor chip</strong> that emits light when current flows through it in the correct direction.<br><br>
+      LEDs have two legs: the <strong>longer leg is ಧನ (+)</strong> ಮತ್ತು the <strong>shorter leg is ಋಣ (−)</strong>. They only work when connected with correct polarity!
+    `;
+  }
+}
+
+function toggleSwitch() {
+  isOn = !isOn;
+  ಸ್ವಿಚ್Toggle.classList.toggle('on', isOn);
+  
+  if (isOn) {
+    // Turn on incandescent
+    incGlass.setAttribute('fill', '#ffeb3b');
+    incFilament.setAttribute('stroke', '#ff5722');
+    incFilament.classList.add('filament-heat');
+    incGlass.classList.add('bulb-on');
+    incStatus.textContent = 'ಆನ್ - ಫಿಲಾಮೆಂಟ್ ಜ್ವಲಿಸುತ್ತಿದೆ!';
+    
+    // Turn on LED
+    ledDome.setAttribute('fill', '#4caf50');
+    ledChip.setAttribute('fill', '#69f0ae');
+    ledDome.classList.add('bulb-on');
+    ledStatus.textContent = 'ON - LED emitting light!';
+  } else {
+    // Turn off incandescent
+    incGlass.setAttribute('fill', '#e0e0e0');
+    incFilament.setAttribute('stroke', '#9e9e9e');
+    incFilament.classList.remove('filament-heat');
+    incGlass.classList.remove('bulb-on');
+    incStatus.textContent = 'OFF';
+    
+    // Turn off LED
+    ledDome.setAttribute('fill', '#e0e0e0');
+    ledChip.setAttribute('fill', '#bdbdbd');
+    ledDome.classList.remove('bulb-on');
+    ledStatus.textContent = 'OFF';
+  }
+}
+// ── URL parameter support ──────────────────────────────────────────────
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var state = p.get('initialState') || 'incandescent_off';
+  var hints = p.get('showHints');
+
+  if (hints === 'false') {
+    var cc = document.querySelector('.concept-card');
+    if (cc) cc.style.display = 'none';
+  }
+
+  var stateActions = {
+    'incandescent_off': function () { selectLamp('incandescent'); },
+    'incandescent_on':  function () { selectLamp('incandescent'); setTimeout(function () { if (!isOn) toggleSwitch(); }, 800); },
+    'led_off':          function () { selectLamp('led'); },
+    'led_on':           function () { selectLamp('led'); setTimeout(function () { if (!isOn) toggleSwitch(); }, 800); }
+  };
+
+  var fn = stateActions[state];
+  if (fn) fn();
+}());</script>
+</body>
+</html>

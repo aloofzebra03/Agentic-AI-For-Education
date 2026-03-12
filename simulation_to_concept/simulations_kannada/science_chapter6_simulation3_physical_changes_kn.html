@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#00897b">
+<title>ಯೌವನದಲ್ಲಿ ಭೌತಿಕ ಬದಲಾವಣೆಗಳು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #00897b 0%, #4db6ac 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #00897b;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #00695c; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.category-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.cat-tab {
+  flex: 1;
+  padding: 10px 6px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.cat-tab.active { border-color: #00897b; background: #e0f2f1; color: #00695c; }
+
+.ಬದಲಾಗುತ್ತದೆ-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.change-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.change-item:active { transform: scale(0.98); }
+.change-item.active { background: #e0f2f1; border-color: #00897b; }
+
+.change-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-right: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.change-content { flex: 1; }
+.change-title { font-size: 12px; font-weight: 700; color: #333; margin-bottom: 4px; }
+.change-desc { font-size: 10px; color: #666; line-height: 1.4; }
+
+.detail-panel {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.detail-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 8px; }
+.detail-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.ಸಾಮಾನ್ಯ-badge {
+  display: inline-block;
+  background: #4caf50;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.ಸೆಕೆಂಡ್ary-info {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #7b1fa2;
+}
+
+.ಸೆಕೆಂಡ್ary-title { font-size: 12px; font-weight: 700; color: #7b1fa2; margin-bottom: 6px; }
+.ಸೆಕೆಂಡ್ary-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #00897b;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #00695c; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🌱 ಯೌವನದಲ್ಲಿ ಭೌತಿಕ ಬದಲಾವಣೆಗಳು</h1>
+  <p>ನಿಮ್ಮ ದೇಹದ ಬದಲಾವಣೆಗಳನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ಯೌವನ</strong> ನಿಮ್ಮ ದೇಹ ಮಗುವಿನ ದೇಹದಿಂದ ಬದಲಾಗಲು ಪ್ರಾರಂಭಿಸುವ ಸಮಯ an adult's body. These ಬದಲಾಗುತ್ತದೆ are <strong>ನೈಸರ್ಗಿಕ ಮತ್ತು ಸಾಮಾನ್ಯ</strong> - ಎಲ್ಲರಿಗೂ ಸಂಭವಿಸುತ್ತದೆ!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="category-tabs">
+    <button class="cat-tab active" onclick="selectCategory('common', this)">🔄 ಸಾಮಾನ್ಯ ಬದಲಾವಣೆಗಳು</button>
+    <button class="cat-tab" onclick="selectCategory('boys', this)">👦 ಹುಡುಗರಲ್ಲಿ</button>
+    <button class="cat-tab" onclick="selectCategory('girls', this)">👧 ಹುಡುಗಿಯರಲ್ಲಿ</button>
+  </div>
+  
+  <div class="ಬದಲಾಗುತ್ತದೆ-list" id="changes-list">
+    <!-- Changes will be populated by JavaScript -->
+  </div>
+</div>
+
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-title" id="detail-title">ಇನ್ನಷ್ಟು ತಿಳಿಯಲು ಯಾವುದೇ ಬದಲಾವಣೆಯನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿ</div>
+  <div class="detail-text" id="detail-text">
+    ಮೇಲಿನ ಪಟ್ಟಿಯಿಂದ ಭೌತಿಕ ಬದಲಾವಣೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ ಅದು ಏನು ಉಂಟುಮಾಡುತ್ತದೆ ಮತ್ತು ಅದು ಸಂಪೂರ್ಣವಾಗಿ ಸಾಮಾನ್ಯ ಏಕೆ ಎಂದು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಲು.
+  </div>
+</div>
+
+<div class="ಸೆಕೆಂಡ್ary-info">
+  <div class="ಸೆಕೆಂಡ್ary-title">📖 ದ್ವಿತೀಯಕ ಲೈಂಗಿಕ ಲಕ್ಷಣಗಳು</div>
+  <div class="ಸೆಕೆಂಡ್ary-text">
+    ಈ ಭೌತಿಕ ಬದಲಾವಣೆಗಳನ್ನು <strong>ದ್ವಿತೀಯಕ ಲೈಂಗಿಕ ಲಕ್ಷಣಗಳು</strong> ಎಂದು ಕರೆಯಲಾಗುತ್ತದೆ. ಅವು ಪುರುಷರು ಮತ್ತು ಸ್ತ್ರೀಯನ್ನು ವ್ಯತ್ಯಾಸ ಮಾಡಲು ಸಹಾಯ ಮಾಡುತ್ತವೆ ಆದರೆ ಪ್ರಜನನದಲ್ಲಿ ನೇರವಾಗಿ ಭಾಗವಹಿಸುವುದಿಲ್ಲ.<br><br>
+    <strong>ಉದಾಹರಣೆಗಳು:</strong><br>
+    • ಹುಡುಗರಲ್ಲಿ ಮುಖ ಕೇಶ<br>
+    • ಹುಡುಗಿಯರಲ್ಲಿ ಸ್ತನ ವಿಕಾಸ<br>
+    • Voice ಬದಲಾಗುತ್ತದೆ<br>
+    • ಶರೀರ ಕೇಶ ಬೆಳವಣಿಗೆ
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೆನಪಿಡಿ</div>
+  <div class="takeaway-text">
+    • All these ಬದಲಾಗುತ್ತದೆ are <strong>100% ಸಾಮಾನ್ಯ</strong><br>
+    • ಎಲ್ಲರೂ ವಿಭಿನ್ನ ಸಮಯದಲ್ಲಿ ಅನುಭವಿಸುತ್ತಾರೆ<br>
+    • Some ಬದಲಾಗುತ್ತದೆ may start earlier or later - that's okay!<br>
+    • ಚಿಂತೆ ಇದ್ದರೆ ತಂದೆತಾಯಿ ಅಥವಾ ವೈದ್ಯರೊಂದಿಗೆ ಮಾತು
+  </div>
+</div>
+
+</div>
+
+<script>
+const ಬದಲಾಗುತ್ತದೆData = {
+  common: [
+    { 
+      icon: '📏', 
+      title: 'ವೃದ್ಧಿ ಚಿಗಿತ', 
+      desc: 'Rapid increase in height ಮತ್ತು weight',
+      detail: 'During puberty, your body produces growth ಹಾರ್ಮೋನ್‌ಗಳು that make you grow ವೇಗವಾಗಿ. You might grow 8-12 cm in a single year! This is called a "ಬೆಳವಣಿಗೆ ಉಲ್ಬಣ." Your hಮತ್ತುs ಮತ್ತು feet often grow ಮೊದಲ, which is why you might feel a bit clumsy sometimes.',
+      ಸಾಮಾನ್ಯ: 'This happens to everyone ಕೌಮಾರ್ಯದಲ್ಲಿ!'
+    },
+    { 
+      icon: '🌿', 
+      title: 'Body Hair', 
+      desc: 'Hair grows in new places',
+      detail: 'Hair starts growing in your underarms (armpits) ಮತ್ತು pubic area. This is caused by ಹಾರ್ಮೋನ್‌ಗಳು ಮತ್ತು is a sign that your body is maturing. The amount ಮತ್ತು thickness of hair varies from person to person - all variations are ಸಾಮಾನ್ಯ.',
+      ಸಾಮಾನ್ಯ: 'Body hair is a natural part of growing up!'
+    },
+    { 
+      icon: '😓', 
+      title: 'ಹೆಚ್ಚು ಬೆವರು', 
+      desc: 'Increased perspiration ಮತ್ತು body odor',
+      detail: 'Your sweat glಮತ್ತುs become more active during puberty, especially in the armpits. This can cause body odor. This is why regular bathing ಮತ್ತು using deodorant becomes important ಕೌಮಾರ್ಯದಲ್ಲಿ.',
+      ಸಾಮಾನ್ಯ: 'Just remember to practice good hygiene!'
+    },
+    { 
+      icon: '🔴', 
+      title: 'ಚರ್ಮ ಬದಲಾವಣೆಗಳು', 
+      desc: 'Acne ಮತ್ತು pimples may appear',
+      detail: 'Hormones cause your skin to produce more oil. When pores get clogged with oil ಮತ್ತು dead skin ಘಟಕಗಳು, pimples (acne) can form. This is very common during puberty. Keeping your face clean ಮತ್ತು avoiding touching pimples helps.',
+      ಸಾಮಾನ್ಯ: 'Most teenagers experience acne - it usually improves with time!'
+    }
+  ],
+  boys: [
+    { 
+      icon: '🎤', 
+      title: 'ಸ್ವರ ಆಳ', 
+      desc: 'Voice becomes lower ಮತ್ತು deeper',
+      detail: 'The voice box (larynx) grows larger in boys, making the voice deeper. During this change, the voice might "crack" or squeak sometimes - this is temporary ಮತ್ತು ಪೂರ್ಣly ಸಾಮಾನ್ಯ. You might also notice an "Adam\'s apple" ರೂಪಿಸುವುದು in the throat.',
+      ಸಾಮಾನ್ಯ: 'ಸ್ವರ ಒಡೆಯುವಿಕೆ is just part of the process!'
+    },
+    { 
+      icon: '💪', 
+      title: 'ಅಗಲ ಭುಜ', 
+      desc: 'Shoulders become wider',
+      detail: 'ಹುಡುಗರು develop broader shoulders ಮತ್ತು a more muscular build during puberty. The chest becomes wider ಮತ್ತು muscles start developing more easily. This is due to testosterone, the main male hormone.',
+      ಸಾಮಾನ್ಯ: 'Your body is developing adult proportions!'
+    },
+    { 
+      icon: '🧔', 
+      title: 'ಮುಖ ಕೇಶ', 
+      desc: 'Hair grows on face',
+      detail: 'Hair starts appearing on the upper lip, chin, ಮತ್ತು cheeks. This usually starts light ಮತ್ತು becomes thicker over time. Some boys get facial hair early, others later - everyone is different. Eventually, shaving may be needed.',
+      ಸಾಮಾನ್ಯ: 'Facial hair develops at different rates for everyone!'
+    }
+  ],
+  girls: [
+    { 
+      icon: '📐', 
+      title: 'ದೇಹ ಆಕಾರ ಬದಲಾವಣೆ', 
+      desc: 'Hips become wider',
+      detail: 'ಹುಡುಗಿಯರು develop wider hips ಮತ್ತು a curvier body shape during puberty. This is the body preparing for potential motherhood in the future. Fat distribution ಬದಲಾಗುತ್ತದೆ, with more in the hips ಮತ್ತು thighs.',
+      ಸಾಮಾನ್ಯ: 'These ಬದಲಾಗುತ್ತದೆ are a natural part of female development!'
+    },
+    { 
+      icon: '🌸', 
+      title: 'ಸ್ತನ ವಿಕಾಸ', 
+      desc: 'Breasts begin to develop',
+      detail: 'Breast development is usually the ಮೊದಲ sign of puberty in girls. It starts with breast buds ಮತ್ತು develops over several years. One breast may grow ವೇಗವಾಗಿ than the other at ಮೊದಲ - this is ಸಾಮಾನ್ಯ ಮತ್ತು they usually even out.',
+      ಸಾಮಾನ್ಯ: 'Development happens at different rates - all are ಸಾಮಾನ್ಯ!'
+    },
+    { 
+      icon: '🔄', 
+      title: 'ಋತುಚಕ್ರ Begins', 
+      desc: 'Monthly periods start',
+      detail: 'ಋತುಚಕ್ರ (periods) typically begins 2-3 years after breast development starts. This is when the uterus sheds its lining monthly. It\'s a sign that the reproductive system is maturing. We\'ll learn more about this in another simulation!',
+      ಸಾಮಾನ್ಯ: 'This is a natural part of becoming a woman!'
+    }
+  ]
+};
+
+let currentCategory = 'common';
+
+const ಬದಲಾಗುತ್ತದೆList = document.getElementById('changes-list');
+const detailTitle = document.getElementById('detail-title');
+const detailText = document.getElementById('detail-text');
+const detailPanel = document.getElementById('detail-panel');
+
+function selectCategory(category, btn) {
+  currentCategory = category;
+  
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  
+  renderChanges();
+  
+  // ಮರುಹೊಂದಿಸಿ detail panel
+  detailTitle.textContent = 'ಇನ್ನಷ್ಟು ತಿಳಿಯಲು ಯಾವುದೇ ಬದಲಾವಣೆಯನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿ';
+  detailText.innerHTML = 'ಮೇಲಿನ ಪಟ್ಟಿಯಿಂದ ಒಂದು ಭೌತಿಕ ಬದಲಾವಣೆ ಆಯ್ಕೆಮಾಡಿ – ಅದಕ್ಕೆ ಕಾರಣ ಏನು ಮತ್ತು ಅದು ಸಂಪೂರ್ಣವಾಗಿ ಸಾಮಾನ್ಯ ಏಕೆ ಎಂದು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ.';
+}
+
+function renderChanges() {
+  const ಬದಲಾಗುತ್ತದೆ = ಬದಲಾಗುತ್ತದೆData[currentCategory];
+  
+  ಬದಲಾಗುತ್ತದೆList.innerHTML = ಬದಲಾಗುತ್ತದೆ.map((change, index) => `
+    <div class="change-item" onclick="showDetail(${index}, this)">
+      <div class="change-icon">${change.icon}</div>
+      <div class="change-content">
+        <div class="change-title">${change.title}</div>
+        <div class="change-desc">${change.desc}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showDetail(index, element) {
+  const change = ಬದಲಾಗುತ್ತದೆData[currentCategory][index];
+  
+  document.querySelectorAll('.change-item').forEach(item => item.classList.remove('active'));
+  element.classList.add('active');
+  
+  detailTitle.textContent = `${change.icon} ${change.title}`;
+  detailText.innerHTML = `
+    ${change.detail}<br><br>
+    <span class="ಸಾಮಾನ್ಯ-badge">✓ ${change.ಸಾಮಾನ್ಯ}</span>
+  `;
+}
+
+// Initialize
+renderChanges();
+
+// === URL PARAMETER SUPPORT ===
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var initialState = params.get('initialState');
+  var showHints = params.get('showHints');
+
+  if (showHints === 'false') {
+    document.querySelectorAll('.concept-card, .ಸೆಕೆಂಡ್ary-info, .takeaway').forEach(function(el) { el.style.display = 'none'; });
+  }
+
+  var tabMap = { common: 0, boys: 1, girls: 2 };
+  if (initialState && tabMap[initialState] !== undefined) {
+    setTimeout(function() {
+      var tabs = document.querySelectorAll('.cat-tab');
+      selectCategory(initialState, tabs[tabMap[initialState]]);
+    }, 800);
+  }
+})();
+</script>
+</body>
+</html>

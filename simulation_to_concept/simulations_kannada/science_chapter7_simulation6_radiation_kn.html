@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ff5722">
+<title>ವಿಕಿರಣ - ಸಂವಾದಾತ್ಮಕ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #ff5722 0%, #ff8a65 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fbe9e7 0%, #ffccbc 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #ff5722;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #d84315; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.control-btn {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+.control-btn:active { transform: scale(0.98); }
+.control-btn.active { border-color: #ff5722; background: #fbe9e7; color: #d84315; }
+
+.control-btn .emoji { font-size: 18px; display: block; margin-bottom: 2px; }
+
+.distance-control {
+  margin-bottom: 12px;
+}
+
+.distance-control label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #37474f;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.distance-control input[type="range"] {
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #f44336, #ff9800, #ffeb3b, #c8e6c9);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.distance-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #ff5722;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.distance-value {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.radiation-visual {
+  position: relative;
+  height: 220px;
+  background: linear-gradient(180deg, #263238 0%, #37474f 100%);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.heat-ಮೂಲ {
+  position: absolute;
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.ಮೂಲ-icon {
+  font-size: 50px;
+  filter: drop-ನೆರಳು(0 0 20px #ff9800);
+  animation: glow 1.5s ease-in-out infinite alternate;
+}
+
+.ಮೂಲ-icon.off {
+  filter: none;
+  animation: none;
+  opacity: 0.5;
+}
+
+@keyframes glow {
+  0% { filter: drop-ನೆರಳು(0 0 10px #ff9800); }
+  100% { filter: drop-ನೆರಳು(0 0 30px #ff5722); }
+}
+
+.ಮೂಲ-label {
+  font-size: 10px;
+  color: #ffcc80;
+  margin-top: 5px;
+}
+
+.radiation-waves {
+  position: absolute;
+  left: 90px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 12px;
+}
+
+.wave {
+  width: 10px;
+  height: 80px;
+  background: linear-gradient(180deg, transparent 0%, #ff9800 20%, #f44336 50%, #ff9800 80%, transparent 100%);
+  border-radius: 5px;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.wave.active {
+  animation: wavePulse 1s ease-in-out infinite;
+}
+
+.wave:nth-child(1) { animation-delay: 0s; }
+.wave:nth-child(2) { animation-delay: 0.2s; }
+.wave:nth-child(3) { animation-delay: 0.4s; }
+.wave:nth-child(4) { animation-delay: 0.6s; }
+.wave:nth-child(5) { animation-delay: 0.8s; }
+
+@keyframes wavePulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(0.8); }
+  50% { opacity: 1; transform: scaleY(1); }
+}
+
+.receiver {
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  transition: all 0.5s ease;
+}
+
+.receiver-icon {
+  font-size: 50px;
+  transition: all 0.3s ease;
+}
+
+.receiver-label {
+  font-size: 10px;
+  color: #90caf9;
+  margin-top: 5px;
+  transition: all 0.3s ease;
+}
+
+.temp-ಸೂಚಕ {
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 8px;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.temp-cold { background: #bbdefb; color: #1565c0; }
+.temp-warm { background: #ffe0b2; color: #e65100; }
+.temp-hot { background: #ffcdd2; color: #c62828; }
+
+.intensity-meter {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.9);
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.color-experiment {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.color-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 10px; }
+
+.color-test {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.color-box {
+  width: 80px;
+  padding: 15px 10px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.color-box:hover { transform: scale(1.05); }
+.color-box.selected { box-shadow: 0 0 0 3px #ffeb3b; }
+
+.color-box.dark { background: #333; color: #fff; }
+.color-box.light { background: #f5f5f5; color: #333; border: 2px solid #e0e0e0; }
+
+.color-box .temp { font-size: 24px; margin-bottom: 4px; }
+.color-box .label { font-size: 10px; font-weight: 600; }
+
+.color-result {
+  text-align: center;
+  font-size: 11px;
+  color: #37474f;
+  padding: 10px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.takeaway {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>☀️ ವಿಕಿರಣ</h1>
+  <p>ಸಂವಾದಾತ್ಮಕ - ಉಷ್ಣ ಮೂಲವನ್ನು ನಿಯಂತ್ರಿಸಿ!</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ವಿಕಿರಣ</strong> ಯಾವುದೇ ಮಾಧ್ಯಮವಿಲ್ಲದೆ - ಖಾಲಿ ಜಾಗದ ಮೂಲಕ ಉಷ್ಣ ವರ್ಗಾವಣೆ! Move the slider to see how distance affects heat intensity.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="controls">
+    <button class="control-btn active" onclick="setSource('fire', this)">
+      <span class="emoji">🔥</span>
+      ಅಗ್ನಿಕುಂಡ
+    </button>
+    <button class="control-btn" onclick="setSource('sun', this)">
+      <span class="emoji">☀️</span>
+      ಸೂರ್ಯ
+    </button>
+    <button class="control-btn" onclick="setSource('pan', this)">
+      <span class="emoji">🍳</span>
+      ಬಿಸಿ ಪಾತ್ರೆ
+    </button>
+  </div>
+  
+  <div class="distance-control">
+    <label>📏 ಉಷ್ಣ ಮೂಲದಿಂದ ದೂರ ಸರಿಹೊಂದಿಸಿ:</label>
+    <input type="range" id="distance-slider" min="1" max="10" value="5" oninput="updateDistance(this.value)">
+    <div class="distance-value">
+      <span>🔥 ಮುಚ್ಚಿ</span>
+      <span>ದೂರ 🧊</span>
+    </div>
+  </div>
+  
+  <div class="radiation-visual" id="visual">
+    <div class="heat-ಮೂಲ">
+      <div class="ಮೂಲ-icon" id="source-icon">🔥</div>
+      <div class="ಮೂಲ-label" id="source-label">ಅಗ್ನಿಕುಂಡ</div>
+    </div>
+    
+    <div class="radiation-waves">
+      <div class="wave active"></div>
+      <div class="wave active"></div>
+      <div class="wave active"></div>
+      <div class="wave active"></div>
+      <div class="wave active"></div>
+    </div>
+    
+    <div class="receiver" id="receiver">
+      <div class="receiver-icon" id="receiver-icon">🧍</div>
+      <div class="receiver-label" id="receiver-label">ನೀವು</div>
+      <div class="temp-ಸೂಚಕ temp-warm" id="temp-indicator">🌡️ ಬೆಚ್ಚನೆ</div>
+    </div>
+    
+    <div class="intensity-meter" id="intensity-meter">ತೀವ್ರತೆ: 50%</div>
+  </div>
+</div>
+
+<div class="color-experiment">
+  <div class="color-title">👕 ಪ್ರಯೋಗ: ಗಾಢ ವಿರುದ್ಧ ಒಳ ಬಣ್ಣ</div>
+  <div class="color-test">
+    <div class="color-box dark selected" onclick="selectColor('dark', this)">
+      <div class="temp" id="dark-temp">🔥</div>
+      <div class="label">ಕಪ್ಪು ಶರ್ಟ್</div>
+    </div>
+    <div class="color-box light" onclick="selectColor('light', this)">
+      <div class="temp" id="light-temp">❄️</div>
+      <div class="label">ಬಿಳಿ ಶರ್ಟ್</div>
+    </div>
+  </div>
+  <div class="color-result" id="color-result">
+    <strong>ಗಾಢ ಬಣ್ಣಗಳು ಹೀರಿಕೊಳ್ಳುತ್ತವೆ</strong> ಹೆಚ್ಚು ವಿಕಿರಣ ಉಷ್ಣ → ಹೆಚ್ಚು ಬಿಸಿ!<br>
+    <strong>ಥಳಥಳ ಬಣ್ಣಗಳು ಪ್ರತಿಫಲಿಸುತ್ತವೆ</strong> ವಿಕಿರಣ ಉಷ್ಣ → ತಂಪಾಗಿ ಉಳಿಯಿರಿ!
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೆನಪಿಡಿ</div>
+  <div class="takeaway-text">
+    • ವಿಕಿರಣಕ್ಕೆ <strong>ಮಾಧ್ಯಮ ಬೇಕಿಲ್ಲ</strong><br>
+    • ಉಷ್ಣ ತೀವ್ರತೆ <strong>ದೂರದೊಂದಿಗೆ ಕಡಿಮೆ</strong><br>
+    • <strong>ಗಾಢ ಬಣ್ಣಗಳು ಹೆಚ್ಚು ಉಷ್ಣ ಹೀರಿಕೊಳ್ಳುತ್ತವೆ</strong><br>
+    • <strong>ಒಳ್ಳೆ ಬಣ್ಣಗಳು ಉಷ್ಣ ಪ್ರತಿಫಲಿಸುತ್ತವೆ</strong><br>
+    • ಬೇಸಿಗೆಯಲ್ಲಿ ಬಿಳಿ, ಚಳಿಯಲ್ಲಿ ಗಾಢ ಧರಿಸಿ!
+  </div>
+</div>
+
+</div>
+
+<script>
+let currentSource = 'fire';
+let distance = 5;
+
+const ಮೂಲs = {
+  fire: { icon: '🔥', label: 'ಅಗ್ನಿಕುಂಡ', receiver: '🧍', receiverLabel: 'ನೀವು' },
+  sun: { icon: '☀️', label: 'ಸೂರ್ಯ', receiver: '🌍', receiverLabel: 'ಭೂಮಿ' },
+  pan: { icon: '🍳', label: 'ಬಿಸಿ ಪಾತ್ರೆ', receiver: '✋', receiverLabel: 'ನಿಮ್ಮ ಕೈ' }
+};
+
+const ಮೂಲIcon = document.getElementById('source-icon');
+const ಮೂಲLabel = document.getElementById('source-label');
+const receiverIcon = document.getElementById('receiver-icon');
+const receiverLabel = document.getElementById('receiver-label');
+const tempIndicator = document.getElementById('temp-indicator');
+const intensityMeter = document.getElementById('intensity-meter');
+const receiver = document.getElementById('receiver');
+
+function setSource(type, btn) {
+  currentSource = type;
+  
+  document.querySelectorAll('.control-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  const ಮೂಲ = ಮೂಲs[type];
+  ಮೂಲIcon.textContent = ಮೂಲ.icon;
+  ಮೂಲLabel.textContent = ಮೂಲ.label;
+  receiverIcon.textContent = ಮೂಲ.receiver;
+  receiverLabel.textContent = ಮೂಲ.receiverLabel;
+  
+  updateDistance(distance);
+}
+
+function updateDistance(value) {
+  distance = parseInt(value);
+  
+  // ಲೆಕ್ಕ ಹಾಕಿ intensity (inverse square law simplified)
+  const intensity = Math.max(10, 100 - (distance - 1) * 10);
+  intensityMeter.textContent = `Intensity: ${intensity}%`;
+  
+  // Move receiver
+  const rightPos = 20 + (distance - 1) * 5;
+  receiver.style.right = `${rightPos}px`;
+  
+  // Update temperature ಸೂಚಕ
+  tempIndicator.className = 'temp-ಸೂಚಕ';
+  
+  if (intensity >= 70) {
+    tempIndicator.classList.add('temp-hot');
+    tempIndicator.textContent = '🔥 HOT!';
+  } else if (intensity >= 40) {
+    tempIndicator.classList.add('temp-warm');
+    tempIndicator.textContent = '🌡️ Warm';
+  } else {
+    tempIndicator.classList.add('temp-cold');
+    tempIndicator.textContent = '❄️ Cool';
+  }
+  
+  // Update wave visibility based on distance
+  const waves = document.querySelectorAll('.wave');
+  waves.forEach((wave, i) => {
+    if (i < 5 - Math.floor(distance / 3)) {
+      wave.classList.add('active');
+    } else {
+      wave.classList.remove('active');
+    }
+  });
+}
+
+function selectColor(color, el) {
+  document.querySelectorAll('.color-box').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  
+  const result = document.getElementById('color-result');
+  
+  if (color === 'dark') {
+    result.innerHTML = '<strong>ಗಾಢ ಬಣ್ಣಗಳು ಹೀರಿಕೊಳ್ಳುತ್ತವೆ</strong> ಹೆಚ್ಚು ವಿಕಿರಣ ಉಷ್ಣ → ಹೆಚ್ಚು ಬಿಸಿ!<br>That\'s why black shirts feel warm in sunlight.';
+  } else {
+    result.innerHTML = '<strong>ಥಳಥಳ ಬಣ್ಣಗಳು ಪ್ರತಿಫಲಿಸುತ್ತವೆ</strong> ವಿಕಿರಣ ಉಷ್ಣ → ತಂಪಾಗಿ ಉಳಿಯಿರಿ!<br>That\'s why white clothes are preferred in summer.';
+  }
+}
+
+// Initialize
+updateDistance(5);
+
+// ── URL Parameter Initialisation (IIFE) ───────────────────────────────────
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var initialState = params.get('initialState') || 'fire';
+  var distance     = params.get('distance');
+  var showHints    = params.get('showHints');
+
+  // Map initialState to source button index (0=fire, 1=sun, 2=pan)
+  var sourceIndex = { 'fire': 0, 'sun': 1, 'pan': 2 };
+  var idx = sourceIndex[initialState];
+  if (idx !== undefined && idx > 0) {
+    setTimeout(function () {
+      var btns = document.querySelectorAll('.control-btn');
+      if (btns[idx]) btns[idx].click();
+    }, 800);
+  }
+
+  // Distance slider
+  if (distance !== null && distance !== undefined) {
+    setTimeout(function () {
+      var slider = document.getElementById('distance-slider');
+      if (slider) {
+        slider.value = parseInt(distance, 10);
+        slider.dispatchEvent(new Event('input'));
+      }
+    }, 900);
+  }
+
+  // Hide hints (concept-card + takeaway)
+  if (showHints === 'false') {
+    document.querySelectorAll('.concept-card, .takeaway, .color-experiment').forEach(function (el) {
+      el.style.display = 'none';
+    });
+  }
+}());
+</script>
+</body>
+</html>

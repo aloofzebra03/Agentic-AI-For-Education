@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#795548">
+<title>ಅಂತರ್ಸೇಚನ - ಸಂವಾದಾತ್ಮಕ ಓಟ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #795548 0%, #a1887f 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #795548;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #5d4037; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.control-btn {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.control-btn:active { transform: scale(0.98); }
+.control-btn.active { border-color: #795548; background: #efebe9; color: #5d4037; }
+.control-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.infiltration-race {
+  position: relative;
+  height: 320px;
+  background: linear-gradient(180deg, #87ceeb 0%, #b3e5fc 15%, #b3e5fc 15%);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.rain-cloud {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 40px;
+}
+
+.rain-drops {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 0;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.rain-drop {
+  font-size: 16px;
+  opacity: 0;
+}
+
+.rain-drop.falling {
+  animation: rainFall 0.8s linear infinite;
+}
+
+@keyframes rainFall {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(40px); opacity: 0; }
+}
+
+.ground-line {
+  position: absolute;
+  top: 80px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: #8bc34a;
+}
+
+.soil-columns {
+  position: absolute;
+  top: 86px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: 3px;
+  padding: 0 10px;
+}
+
+.soil-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.soil-column:hover { transform: scale(1.02); }
+.soil-column.selected { box-shadow: 0 0 0 3px #ffeb3b; }
+
+.soil-header {
+  padding: 8px 4px;
+  text-align: center;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.gravel-header { background: #6d4c41; }
+.sand-header { background: #d7ccc8; color: #333; }
+.clay-header { background: #8d6e63; }
+
+.soil-body {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.gravel-body { background: linear-gradient(180deg, #8d6e63 0%, #6d4c41 100%); }
+.sand-body { background: linear-gradient(180deg, #d7ccc8 0%, #bcaaa4 100%); }
+.clay-body { background: linear-gradient(180deg, #a1887f 0%, #8d6e63 100%); }
+
+.particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: flex-start;
+  padding: 5px;
+  gap: 3px;
+}
+
+.particle {
+  border-radius: 50%;
+}
+
+.particle.gravel { width: 12px; height: 12px; background: #5d4037; }
+.particle.sand { width: 5px; height: 5px; background: #ffcc80; }
+.particle.clay { width: 3px; height: 3px; background: #6d4c41; }
+
+.ನೀರು-drop {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(circle, #64b5f6, #1976d2);
+  border-radius: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  opacity: 0;
+  z-index: 10;
+}
+
+.ನೀರು-drop.seeping {
+  opacity: 1;
+}
+
+.aquifer-level {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(180deg, rgba(33,150,243,0.3) 0%, rgba(25,118,210,0.6) 100%);
+}
+
+.aquifer-label {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  color: #fff;
+  background: rgba(0,0,0,0.4);
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.ವೇಗ-badge {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.ವೇಗ-badge.show { opacity: 1; }
+.ವೇಗ-fast { background: #4caf50; }
+.ವೇಗ-medium { background: #ff9800; }
+.ವೇಗ-slow { background: #f44336; }
+
+.timer-display {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  margin-top: 10px;
+}
+
+.results-panel {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.results-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 8px; }
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.result-item {
+  padding: 10px;
+  background: #fff;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.result-item .name { font-size: 11px; font-weight: 600; color: #333; }
+.result-item .time { font-size: 16px; font-weight: 700; margin-top: 4px; }
+.result-item .rank { font-size: 10px; margin-top: 2px; }
+
+.result-item.ಮೊದಲ .time { color: #4caf50; }
+.result-item.ಸೆಕೆಂಡ್ .time { color: #ff9800; }
+.result-item.third .time { color: #f44336; }
+
+.comparison-table {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.table-title { font-size: 12px; font-weight: 700; color: #333; margin-bottom: 10px; text-align: center; }
+
+.table-row {
+  display: flex;
+  margin-bottom: 6px;
+}
+
+.table-cell {
+  flex: 1;
+  padding: 8px;
+  text-align: center;
+  font-size: 9px;
+  background: #fff;
+  border-radius: 4px;
+  margin: 0 2px;
+}
+
+.cell-header { font-weight: 700; background: #e0e0e0; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2196f3;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🌍 ಅಂತರ್ಸೇಚನ ಓಟ</h1>
+  <p>ಯಾವ ಮಣ್ಣು ನೀರನ್ನು ಅತ್ಯಂತ ವೇಗವಾಗಿ ಹಾಯಿಸುತ್ತದೆ?</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ಅಂತರ್ಸೇಚನ</strong> ನೀರು ನೆಲದ ಒಳಗೆ ಜಿನುಗುವುದು. ವೇಗ ಅವಲಂಬಿಸಿರುತ್ತದೆ <strong>ಕಣದ ಗಾತ್ರ</strong> - ದೊಡ್ಡ ಕಣಗಳು = ದೊಡ್ಡ ಅಂತರ = ವೇಗವಾದ ನೀರಿನ ಹರಿವು!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="controls">
+    <button class="control-btn" id="rain-btn" onclick="makeItRain()">
+      🌧️ Make It Rain!
+    </button>
+    <button class="control-btn" onclick="resetRace()">
+      🔄 ಮರುಹೊಂದಿಸಿ
+    </button>
+  </div>
+  
+  <div class="infiltration-race">
+    <div class="rain-cloud" id="rain-cloud">🌧️</div>
+    
+    <div class="rain-drops" id="rain-drops">
+      <span class="rain-drop">💧</span>
+      <span class="rain-drop">💧</span>
+      <span class="rain-drop">💧</span>
+    </div>
+    
+    <div class="ground-line"></div>
+    
+    <div class="soil-columns">
+      <!-- Gravel Column -->
+      <div class="soil-column" onclick="showSoilInfo('gravel')">
+        <div class="soil-header gravel-header">🪨 ಜಲ್ಲಿ</div>
+        <div class="soil-body gravel-body">
+          <div class="particles" id="gravel-particles"></div>
+          <div class="ನೀರು-drop" id="water-gravel"></div>
+          <div class="ವೇಗ-badge ವೇಗ-fast" id="badge-gravel">⚡ FAST!</div>
+          <div class="aquifer-level">
+            <div class="aquifer-label">ಜಲಭೃತ್</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Sಮತ್ತು Column -->
+      <div class="soil-column" onclick="showSoilInfo('sand')">
+        <div class="soil-header sand-header">🏖️ SAND</div>
+        <div class="soil-body sand-body">
+          <div class="particles" id="sand-particles"></div>
+          <div class="ನೀರು-drop" id="water-sand"></div>
+          <div class="ವೇಗ-badge ವೇಗ-medium" id="badge-sand">💧 ಮಧ್ಯಮ</div>
+          <div class="aquifer-level">
+            <div class="aquifer-label">ಜಲಭೃತ್</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Clay Column -->
+      <div class="soil-column" onclick="showSoilInfo('clay')">
+        <div class="soil-header clay-header">🧱 CLAY</div>
+        <div class="soil-body clay-body">
+          <div class="particles" id="clay-particles"></div>
+          <div class="ನೀರು-drop" id="water-clay"></div>
+          <div class="ವೇಗ-badge ವೇಗ-slow" id="badge-clay">🐢 Slow</div>
+          <div class="aquifer-level">
+            <div class="aquifer-label">ಜಲಭೃತ್</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="timer-display" id="timer">⏱️ ಪ್ರಾರಂಭಿಸಲು "ಮಳೆ ಮಾಡಿ" ಟ್ಯಾಪ್ ಮಾಡಿ!</div>
+</div>
+
+<div class="results-panel" id="results" style="display: none;">
+  <div class="results-title">🏆 ಅಂತರ್ಸೇಚನ ಓಟ ಫಲಿತಾಂಶs</div>
+  <div class="results-grid">
+    <div class="result-item ಮೊದಲ">
+      <div class="name">🪨 ಜಲ್ಲಿ</div>
+      <div class="time" id="time-gravel">--</div>
+      <div class="rank">🥇 1ನೇ ಸ್ಥಾನ</div>
+    </div>
+    <div class="result-item ಸೆಕೆಂಡ್">
+      <div class="name">🏖️ Sಮತ್ತು</div>
+      <div class="time" id="time-sand">--</div>
+      <div class="rank">🥈 2ನೇ ಸ್ಥಾನ</div>
+    </div>
+    <div class="result-item third">
+      <div class="name">🧱 ಮಣ್ಣು</div>
+      <div class="time" id="time-clay">--</div>
+      <div class="rank">🥉 3ನೇ ಸ್ಥಾನ</div>
+    </div>
+  </div>
+</div>
+
+<div class="comparison-table">
+  <div class="table-title">📊 ಏಕೆ ವ್ಯತ್ಯಾಸ?</div>
+  <div class="table-row">
+    <div class="table-cell cell-header">Soil</div>
+    <div class="table-cell cell-header">ಕಣ ಗಾತ್ರ</div>
+    <div class="table-cell cell-header">ಅಂತರ ಗಾತ್ರ</div>
+    <div class="table-cell cell-header">ನೀರು ವೇಗ</div>
+  </div>
+  <div class="table-row">
+    <div class="table-cell">🪨 ಜಲ್ಲಿ</div>
+    <div class="table-cell">ದೊಡ್ಡ</div>
+    <div class="table-cell">ದೊಡ್ಡ ಅಂತರಗಳು</div>
+    <div class="table-cell" style="background:#c8e6c9;">⚡ Fast</div>
+  </div>
+  <div class="table-row">
+    <div class="table-cell">🏖️ Sಮತ್ತು</div>
+    <div class="table-cell">ಮಧ್ಯಮ</div>
+    <div class="table-cell">ಮಧ್ಯಮ ಅಂತರ</div>
+    <div class="table-cell" style="background:#fff3e0;">💧 ಮಧ್ಯಮ</div>
+  </div>
+  <div class="table-row">
+    <div class="table-cell">🧱 ಮಣ್ಣು</div>
+    <div class="table-cell">Tiny</div>
+    <div class="table-cell">ಬಹುತೇಕ ಇಲ್ಲ</div>
+    <div class="table-cell" style="background:#ffcdd2;">🐢 Very Slow</div>
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೈಜ ಪ್ರಭಾವ</div>
+  <div class="takeaway-text">
+    • <strong>ಜಲ್ಲಿ ಹಾಸು</strong> ಒಳಚರಂಡಿಗೆ ಬಳಕೆ<br>
+    • <strong>ಮಣ್ಣಿನ ಮಣ್ಣು</strong> ವೈಪ್ಲವ್ಯ ಕಾರಣ (ನೀರು ಒಳಸೇರಲು ಸಾಧ್ಯವಿಲ್ಲ)<br>
+    • <strong>ಕಾಂಕ್ರೀಟ್ ನಗರಗಳು</strong> prevent infiltration → groundನೀರು depletion!
+  </div>
+</div>
+
+</div>
+
+<script>
+let isRaining = false;
+let timer = 0;
+let timerInterval;
+let finishTimes = { gravel: 0, sand: 0, clay: 0 };
+let waterPositions = { gravel: 0, sand: 0, clay: 0 };
+
+// ವೇಗ factors
+const speeds = { gravel: 8, sand: 3, clay: 0.8 };
+
+// Generate soil particles
+function generateParticles() {
+  const gravelEl = document.getElementById('gravel-particles');
+  const sandEl = document.getElementById('sand-particles');
+  const clayEl = document.getElementById('clay-particles');
+  
+  // Gravel - few large particles
+  for (let i = 0; i < 30; i++) {
+    gravelEl.innerHTML += '<div class="particle gravel"></div>';
+  }
+  
+  // Sಮತ್ತು - many medium particles
+  for (let i = 0; i < 100; i++) {
+    sandEl.innerHTML += '<div class="particle sand"></div>';
+  }
+  
+  // Clay - lots of tiny particles
+  for (let i = 0; i < 200; i++) {
+    clayEl.innerHTML += '<div class="particle clay"></div>';
+  }
+}
+
+function makeItRain() {
+  if (isRaining) return;
+  
+  isRaining = true;
+  timer = 0;
+  finishTimes = { gravel: 0, sand: 0, clay: 0 };
+  waterPositions = { gravel: 0, sand: 0, clay: 0 };
+  
+  document.getElementById('rain-btn').disabled = true;
+  document.getElementById('results').style.display = 'none';
+  
+  // ಪ್ರಾರಂಭ rain animation
+  document.querySelectorAll('.rain-drop').forEach(drop => {
+    drop.classList.add('falling');
+  });
+  
+  // Show ನೀರು drops
+  ['gravel', 'sand', 'clay'].forEach(soil => {
+    const drop = document.getElementById(`ನೀರು-${soil}`);
+    drop.classList.add('seeping');
+    drop.style.top = '0px';
+  });
+  
+  // ಪ್ರಾರಂಭ timer
+  timerInterval = setInterval(() => {
+    timer += 0.1;
+    document.getElementById('timer').textContent = `⏱️ ${timer.toFixed(1)} ಸೆಕೆಂಡ್ಗಳು`;
+    
+    // Update ನೀರು positions
+    ['gravel', 'sand', 'clay'].forEach(soil => {
+      if (waterPositions[soil] < 100) {
+        waterPositions[soil] += speeds[soil] * (0.8 + Math.random() * 0.4);
+        
+        const drop = document.getElementById(`ನೀರು-${soil}`);
+        const maxHeight = 150; // pixels
+        const newTop = Math.min(waterPositions[soil], 100) * maxHeight / 100;
+        drop.style.top = `${newTop}px`;
+        
+        if (waterPositions[soil] >= 100 && !finishTimes[soil]) {
+          finishTimes[soil] = timer;
+          document.getElementById(`badge-${soil}`).classList.add('show');
+        }
+      }
+    });
+    
+    // Check if all finished
+    if (Object.values(waterPositions).every(p => p >= 100)) {
+      endRace();
+    }
+  }, 100);
+}
+
+function endRace() {
+  clearInterval(timerInterval);
+  isRaining = false;
+  
+  document.querySelectorAll('.rain-drop').forEach(drop => {
+    drop.classList.remove('falling');
+  });
+  
+  document.getElementById('rain-btn').disabled = false;
+  document.getElementById('results').style.display = 'block';
+  
+  // Update results
+  document.getElementById('time-gravel').textContent = `${finishTimes.gravel.toFixed(1)}s`;
+  document.getElementById('time-sand').textContent = `${finishTimes.sand.toFixed(1)}s`;
+  document.getElementById('time-clay').textContent = `${finishTimes.clay.toFixed(1)}s`;
+}
+
+function resetRace() {
+  clearInterval(timerInterval);
+  isRaining = false;
+  timer = 0;
+  
+  document.querySelectorAll('.rain-drop').forEach(drop => {
+    drop.classList.remove('falling');
+  });
+  
+  ['gravel', 'sand', 'clay'].forEach(soil => {
+    waterPositions[soil] = 0;
+    const drop = document.getElementById(`ನೀರು-${soil}`);
+    drop.classList.remove('seeping');
+    drop.style.top = '0px';
+    document.getElementById(`badge-${soil}`).classList.remove('show');
+  });
+  
+  document.getElementById('timer').textContent = '⏱️ ಪ್ರಾರಂಭಿಸಲು "ಮಳೆ ಮಾಡಿ" ಟ್ಯಾಪ್ ಮಾಡಿ!';
+  document.getElementById('rain-btn').disabled = false;
+  document.getElementById('results').style.display = 'none';
+}
+
+function showSoilInfo(soil) {
+  const info = {
+    gravel: 'ಜಲ್ಲಿ: ದೊಡ್ಡ particles with big gaps between them. ನೀರು flows through easily like going through a wide tunnel!',
+    sand: 'SAND: ಮಧ್ಯಮ particles with moderate gaps. ನೀರು can pass through, but slower than gravel.',
+    clay: 'CLAY: Tiny particles packed tightly together. Almost no gaps! ನೀರು has a very hard time getting through.'
+  };
+  alert(info[soil]);
+}
+
+// Initialize
+generateParticles();
+
+// ── URL Parameter Initialisation (IIFE) ───────────────────────────────────
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var initialState = params.get('initialState') || 'initial';
+  var showHints    = params.get('showHints');
+
+  if (initialState === 'raining') {
+    setTimeout(function () {
+      if (typeof makeItRain === 'function') makeItRain();
+    }, 800);
+  }
+
+  // Hide hints (concept-card)
+  if (showHints === 'false') {
+    document.querySelectorAll('.concept-card').forEach(function (el) {
+      el.style.display = 'none';
+    });
+  }
+}());
+</script>
+</body>
+</html>

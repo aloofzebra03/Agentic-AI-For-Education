@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1976d2">
+<title>ಸರಳ ವಿದ್ಯುತ್ ಸರ್ಕ್ಯೂಟ್ – ನಿರ್ಮಿಸಿ ಮತ್ತು ಕಲಿಯಿರಿ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #1976d2 0%, #64b5f6 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #f9a825;
+}
+
+.concept-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f57f17;
+  margin-bottom: 6px;
+}
+
+.concept-text {
+  font-size: 12px;
+  color: #5d4037;
+  line-height: 1.5;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.visual {
+  position: relative;
+  height: 45vh;
+  min-height: 300px;
+  background: #eceff1;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+svg { width: 100%; height: 100%; }
+
+.status-bar {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.status-bar.success { background: rgba(46,125,50,0.9); }
+.status-bar.error { background: rgba(198,40,40,0.9); }
+
+.components-panel {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.component-btn {
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 8px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.component-btn:active { transform: scale(0.95); }
+.component-btn.placed { border-color: #4caf50; background: #e8f5e9; }
+.component-btn .icon { font-size: 20px; }
+.component-btn .name { font-size: 8px; color: #666; margin-top: 2px; }
+
+.action-btns {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn:active { transform: scale(0.98); }
+
+.test-btn {
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  color: white;
+}
+
+.reset-btn {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.test-btn:disabled {
+  background: #ccc;
+}
+
+.learning-panel {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #1976d2;
+}
+
+.learning-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1565c0;
+  margin-bottom: 6px;
+}
+
+.learning-text {
+  font-size: 11px;
+  color: #37474f;
+  line-height: 1.6;
+}
+
+.circuit-rules {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.rules-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.rule-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 10px;
+  color: #666;
+}
+
+.rule-icon { font-size: 14px; }
+
+.takeaway {
+  background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2e7d32;
+  display: none;
+}
+
+.takeaway.show { display: block; }
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1b5e20; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+@keyframes currentFlow {
+  0% { stroke-dashoffset: 20; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.current-flow { stroke-dasharray: 5 5; animation: currentFlow 0.3s linear infinite; }
+
+@keyframes glow {
+  0%, 100% { filter: drop-ನೆರಳು(0 0 5px rgba(255,235,59,0.8)); }
+  50% { filter: drop-ನೆರಳು(0 0 15px rgba(255,235,59,1)); }
+}
+
+.bulb-glow { animation: glow 1s ease-in-out infinite; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>⚡ ಸರಳ ವಿದ್ಯುತ್ ಸರ್ಕ್ಯೂಟ್</h1>
+  <p>ಬಲ್ಬ್ ಬೆಳಗಿಸಲು ಸಂಪೂರ್ಣ ಸರ್ಕ್ಯೂಟ್ ನಿರ್ಮಿಸಿ!</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ವಿದ್ಯುತ್ ಸರ್ಕ್ಯೂಟ್ ಒಂದು <strong>ಸಂಪೂರ್ಣ ಮುಚ್ಚಿದ ಮಾರ್ಗ</strong> ಇದರ ಮೂಲಕ ವಿದ್ಯುತ್ ಹರಿಯಬಹುದು. ಅಗತ್ಯ: ಒಂದು <strong>ಮೂಲ</strong> (ಕೋಶ), <strong>ಲೋಡ್</strong> (ಬಲ್ಬ್), ಮತ್ತು <strong>ಸಂಪರ್ಕ ತಂತಿಗಳು</strong> ಅಖಂಡ ಲೂಪ್ ರೂಪಿಸುತ್ತದೆ.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="visual">
+    <svg viewBox="0 0 400 300" id="circuit-svg">
+      <!-- Grid dots for guidance -->
+      <defs>
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <circle cx="20" cy="20" r="2" fill="#ccc"/>
+        </pattern>
+      </defs>
+      <rect width="400" height="300" fill="url(#grid)" opacity="0.5"/>
+      
+      <!-- Wire placeholders -->
+      <g id="wires">
+        <line id="wire1" x1="120" y1="100" x2="280" y2="100" stroke="#e0e0e0" stroke-width="4" stroke-dasharray="10 5"/>
+        <line id="wire2" x1="280" y1="100" x2="280" y2="200" stroke="#e0e0e0" stroke-width="4" stroke-dasharray="10 5"/>
+        <line id="wire3" x1="280" y1="200" x2="120" y2="200" stroke="#e0e0e0" stroke-width="4" stroke-dasharray="10 5"/>
+        <line id="wire4" x1="120" y1="200" x2="120" y2="100" stroke="#e0e0e0" stroke-width="4" stroke-dasharray="10 5"/>
+      </g>
+      
+      <!-- Cell placeholder -->
+      <g id="cell-slot" transform="translate(80, 130)">
+        <rect x="0" y="0" width="80" height="40" rx="5" fill="#fff" stroke="#ccc" stroke-width="2" stroke-dasharray="5 3"/>
+        <text x="40" y="25" font-size="10" fill="#999" text-anchor="middle">ಕೋಶ</text>
+      </g>
+      
+      <!-- Bulb placeholder -->
+      <g id="bulb-slot" transform="translate(240, 80)">
+        <circle cx="40" cy="40" r="30" fill="#fff" stroke="#ccc" stroke-width="2" stroke-dasharray="5 3"/>
+        <text x="40" y="45" font-size="10" fill="#999" text-anchor="middle">ಬಲ್ಬ್</text>
+      </g>
+      
+      <!-- ಸ್ವಿಚ್ placeholder -->
+      <g id="switch-slot" transform="translate(170, 180)">
+        <rect x="0" y="0" width="60" height="30" rx="5" fill="#fff" stroke="#ccc" stroke-width="2" stroke-dasharray="5 3"/>
+        <text x="30" y="20" font-size="10" fill="#999" text-anchor="middle">ಸ್ವಿಚ್</text>
+      </g>
+      
+      <!-- Placed components (hidden initially) -->
+      <g id="placed-cell" style="display:none" transform="translate(80, 130)">
+        <rect x="0" y="0" width="80" height="40" rx="5" fill="#1565c0"/>
+        <rect x="-5" y="10" width="10" height="20" rx="2" fill="#757575"/>
+        <rect x="75" y="8" width="12" height="24" rx="2" fill="#ffd600"/>
+        <text x="40" y="28" font-size="10" fill="#fff" text-anchor="middle" font-weight="600">1.5V</text>
+      </g>
+      
+      <g id="placed-bulb" style="display:none" transform="translate(240, 80)">
+        <circle cx="40" cy="40" r="28" fill="#e0e0e0" id="bulb-glass"/>
+        <circle cx="40" cy="40" r="15" fill="#bdbdbd" id="bulb-filament"/>
+        <rect x="30" y="65" width="20" height="15" rx="2" fill="#666"/>
+      </g>
+      
+      <g id="placed-switch" style="display:none" transform="translate(170, 180)">
+        <rect x="0" y="5" width="60" height="20" rx="3" fill="#455a64"/>
+        <circle cx="15" cy="15" r="6" fill="#9e9e9e"/>
+        <circle cx="45" cy="15" r="6" fill="#9e9e9e"/>
+        <line id="switch-lever" x1="15" y1="15" x2="35" y2="5" stroke="#78909c" stroke-width="4" stroke-linecap="round"/>
+      </g>
+      
+      <!-- Current direction arrow (shown when ಪೂರ್ಣ) -->
+      <g id="current-arrow" style="display:none">
+        <text x="200" y="75" font-size="24" text-anchor="middle">⚡</text>
+        <text x="200" y="90" font-size="9" fill="#4caf50" text-anchor="middle" font-weight="600">ಪ್ರವಾಹ ಹರಿಯುತ್ತಿದೆ!</text>
+      </g>
+    </svg>
+    <div class="status-bar" id="status-bar">ಸರ್ಕ್ಯೂಟ್ ಪೂರ್ಣಗೊಳಿಸಲು ಎಲ್ಲಾ ಭಾಗಗಳನ್ನು ಇರಿಸಿ</div>
+  </div>
+  
+  <div class="components-panel">
+    <div class="component-btn" id="btn-cell" onclick="placeComponent('cell')">
+      <div class="icon">🔋</div>
+      <div class="name">ಕೋಶ</div>
+    </div>
+    <div class="component-btn" id="btn-bulb" onclick="placeComponent('bulb')">
+      <div class="icon">💡</div>
+      <div class="name">ಬಲ್ಬ್</div>
+    </div>
+    <div class="component-btn" id="btn-ಸ್ವಿಚ್" onclick="placeComponent('ಸ್ವಿಚ್')">
+      <div class="icon">🔘</div>
+      <div class="name">ಸ್ವಿಚ್</div>
+    </div>
+    <div class="component-btn" id="btn-wire" onclick="placeComponent('wire')">
+      <div class="icon">〰️</div>
+      <div class="name">ತಂತಿಗಳು</div>
+    </div>
+  </div>
+  
+  <div class="action-btns">
+    <button class="action-btn test-btn" id="test-btn" onclick="testCircuit()" disabled>
+      ⚡ ಸರ್ಕ್ಯೂಟ್ ಪರೀಕ್ಷಿಸಿ
+    </button>
+    <button class="action-btn reset-btn" onclick="resetCircuit()">
+      🔄 ಮರುಹೊಂದಿಸಿ
+    </button>
+  </div>
+</div>
+
+<div class="learning-panel" id="learning-panel">
+  <div class="learning-title">🔬 ನಿಮ್ಮ ಸರ್ಕ್ಯೂಟ್ ನಿರ್ಮಿಸಿ</div>
+  <div class="learning-text" id="learning-text">
+    ಪೂರ್ಣ ಸರ್ಕ್ಯೂಟ್ ಅಗತ್ಯ:<br>
+    1. <strong>Cell</strong> - ವಿದ್ಯುತ್ ಶಕ್ತಿ ಒದಗಿಸುತ್ತದೆ<br>
+    2. <strong>Bulb</strong> - ಶಕ್ತಿಯನ್ನು ಬಳಸುತ್ತದೆ (ಲೋಡ್)<br>
+    3. <strong>ಸ್ವಿಚ್</strong> - ಸರ್ಕ್ಯೂಟ್ ನಿಯಂತ್ರಿಸುತ್ತದೆ<br>
+    4. <strong>ತಂತಿಗಳು</strong> - ಎಲ್ಲವನ್ನೂ ಮುಚ್ಚಿದ ಲೂಪ್‌ನಲ್ಲಿ ಸಂಪರ್ಕಿಸಿ<br><br>
+    ಸರ್ಕ್ಯೂಟ್â€Œನಲ್ಲಿ ಇಡಲು ಮೇಲಿನ ಪ್ರತಿ ಘಟಕ ಟ್ಯಾಪ್ ಮಾಡಿ!
+  </div>
+</div>
+
+<div class="circuit-rules">
+  <div class="rules-title">📋 ಸರ್ಕ್ಯೂಟ್ ನಿಯಮಗಳು</div>
+  <div class="rule-item">
+    <span class="rule-icon">✅</span>
+    <span>ಪ್ರವಾಹ ಹರಿಯುವುದು ಮಾತ್ರ <strong>ಸಂಪೂರ್ಣ ಮುಚ್ಚಿದ ಮಾರ್ಗ</strong></span>
+  </div>
+  <div class="rule-item">
+    <span class="rule-icon">✅</span>
+    <span>ಪ್ರವಾಹ ಹರಿಯುತ್ತದೆ ಧನ ಟರ್ಮಿನಲ್‌ನಿಂದ ಸರ್ಕ್ಯೂಟ್ ಮೂಲಕ ಋಣ ಟರ್ಮಿನಲ್‌ಕ್ಕೆ</span>
+  </div>
+  <div class="rule-item">
+    <span class="rule-icon">❌</span>
+    <span>ಎಲ್ಲಿಯಾದರೂ ಅಂತರ ಸರ್ಕ್ಯೂಟ್ ಮುರಿಯುತ್ತದೆ - ಪ್ರವಾಹ ಇಲ್ಲ</span>
+  </div>
+</div>
+
+<div class="takeaway" id="takeaway">
+  <div class="takeaway-title">🎯 ನೀವು ಕಲಿತದ್ದು</div>
+  <div class="takeaway-text">
+    ವಿದ್ಯುತ್ ಸರ್ಕ್ಯೂಟ್ ಪ್ರವಾಹ ಹರಿಯಲು ಒಂದು <strong>ಸಂಪೂರ್ಣ ಮುಚ್ಚಿದ ಮಾರ್ಗ</strong>. ಅಗತ್ಯ: ಮೂಲ (ಕೋಶ), ಲೋಡ್ (ಬಲ್ಬ್) ಮತ್ತು ಸಂಪರ್ಕ ತಂತಿಗಳು. ಸ್ವಿಚ್ ಮಾರ್ಗ ಪೂರ್ಣ (ಆನ್) ಅಥವಾ ಮುರಿದ (ಆಫ್) ಎಂದು ನಿಯಂತ್ರಿಸುತ್ತದೆ.
+  </div>
+</div>
+
+</div>
+
+<script>
+const components = {
+  cell: false,
+  bulb: false,
+  ಸ್ವಿಚ್: false,
+  wire: false
+};
+
+let circuitComplete = false;
+let ಸ್ವಿಚ್On = false;
+
+const statusBar = document.getElementById('status-bar');
+const testBtn = document.getElementById('test-btn');
+const learningText = document.getElementById('learning-text');
+const takeaway = document.getElementById('takeaway');
+
+function placeComponent(type) {
+  if (components[type]) return;
+  
+  components[type] = true;
+  document.getElementById(`btn-${type}`).classList.add('placed');
+  
+  // Show placed component
+  if (type === 'cell') {
+    document.getElementById('placed-cell').style.display = 'block';
+    document.getElementById('cell-slot').style.display = 'none';
+  } else if (type === 'bulb') {
+    document.getElementById('placed-bulb').style.display = 'block';
+    document.getElementById('bulb-slot').style.display = 'none';
+  } else if (type === 'ಸ್ವಿಚ್') {
+    document.getElementById('placed-switch').style.display = 'block';
+    document.getElementById('switch-slot').style.display = 'none';
+  } else if (type === 'wire') {
+    // Connect all wires
+    ['wire1', 'wire2', 'wire3', 'wire4'].forEach(id => {
+      const wire = document.getElementById(id);
+      wire.setAttribute('stroke', '#4caf50');
+      wire.setAttribute('stroke-dasharray', 'none');
+    });
+  }
+  
+  checkCircuit();
+  updateLearning(type);
+}
+
+function checkCircuit() {
+  const allPlaced = Object.values(components).every(v => v);
+  
+  if (allPlaced) {
+    statusBar.textContent = 'ಎಲ್ಲಾ ಭಾಗಗಳು ಇರಿಸಲಾಗಿವೆ! ಸರ್ಕ್ಯೂಟ್ ಪರೀಕ್ಷಿಸಿ';
+    statusBar.className = 'status-bar';
+    testBtn.disabled = false;
+    circuitComplete = true;
+  } else {
+    const remaining = Object.entries(components)
+      .filter(([k, v]) => !v)
+      .map(([k]) => k);
+    statusBar.textContent = `Still need: ${remaining.join(', ')}`;
+  }
+}
+
+function updateLearning(type) {
+  const messages = {
+    cell: `<strong>✅ Cell placed!</strong><br>The cell is the ಶಕ್ತಿ ಮೂಲ. It has + ಮತ್ತು − terminals. Current will flow from + terminal.<br><br>Now add the remaining components!`,
+    bulb: `<strong>✅ Bulb placed!</strong><br>The bulb is the "load" - it uses electrical ಶಕ್ತಿ to produce light.<br><br>Keep adding components!`,
+    ಸ್ವಿಚ್: `<strong>✅ ಸ್ವಿಚ್ placed!</strong><br>The ಸ್ವಿಚ್ controls the circuit. When closed (ON), current can flow. When open (OFF), the circuit is broken.<br><br>Almost there!`,
+    wire: `<strong>✅ ತಂತಿಗಳು connected!</strong><br>The wires ಪೂರ್ಣ the path, connecting all components in a closed loop.<br><br>Your circuit is ready to test!`
+  };
+  
+  learningText.innerHTML = messages[type];
+}
+
+function testCircuit() {
+  if (!circuitComplete) return;
+  
+  ಸ್ವಿಚ್On = !ಸ್ವಿಚ್On;
+  const ಸ್ವಿಚ್Lever = document.getElementById('switch-lever');
+  const bulbGlass = document.getElementById('bulb-glass');
+  const bulbFilament = document.getElementById('bulb-filament');
+  const currentArrow = document.getElementById('current-arrow');
+  
+  if (ಸ್ವಿಚ್On) {
+    // ಮುಚ್ಚಿ ಸ್ವಿಚ್
+    ಸ್ವಿಚ್Lever.setAttribute('x2', '45');
+    ಸ್ವಿಚ್Lever.setAttribute('y2', '15');
+    
+    // Light bulb
+    bulbGlass.setAttribute('fill', '#ffeb3b');
+    bulbFilament.setAttribute('fill', '#fff');
+    bulbGlass.classList.add('bulb-glow');
+    
+    // Show current flow
+    ['wire1', 'wire2', 'wire3', 'wire4'].forEach(id => {
+      document.getElementById(id).classList.add('current-flow');
+    });
+    currentArrow.style.display = 'block';
+    
+    statusBar.textContent = '💡 ಸರ್ಕ್ಯೂಟ್ ಆನ್ - ವಿದ್ಯುತ್ ಹರಿಯುತ್ತಿದೆ - ಬಲ್ಬ್ ಬೆಳಗುತ್ತದೆ!';
+    statusBar.className = 'status-bar success';
+    testBtn.textContent = '🔌 Turn OFF';
+    
+    learningText.innerHTML = `
+      <strong>🎉 Circuit ಪೂರ್ಣ!</strong><br><br>
+      The ಸ್ವಿಚ್ is <span style="color:#4caf50;font-weight:600">CLOSED (ON)</span> - the circuit path is ಪೂರ್ಣ!<br><br>
+      ಪ್ರವಾಹ ಹರಿಯುತ್ತದೆ: <strong>Cell (+) → Wire → Bulb → Wire → ಸ್ವಿಚ್ → Wire → Cell (−)</strong><br><br>
+      The bulb glows because current passes through its filament!
+    `;
+    
+    takeaway.classList.add('show');
+  } else {
+    // Open ಸ್ವಿಚ್
+    ಸ್ವಿಚ್Lever.setAttribute('x2', '35');
+    ಸ್ವಿಚ್Lever.setAttribute('y2', '5');
+    
+    // Turn off bulb
+    bulbGlass.setAttribute('fill', '#e0e0e0');
+    bulbFilament.setAttribute('fill', '#bdbdbd');
+    bulbGlass.classList.remove('bulb-glow');
+    
+    // ನಿಲ್ಲಿಸಿ current flow
+    ['wire1', 'wire2', 'wire3', 'wire4'].forEach(id => {
+      document.getElementById(id).classList.remove('current-flow');
+    });
+    currentArrow.style.display = 'none';
+    
+    statusBar.textContent = 'ಸರ್ಕ್ಯೂಟ್ ಆಫ್ - ಸ್ವಿಚ್ ತೆರೆದಿದೆ - ವಿದ್ಯುತ್ ಇಲ್ಲ';
+    statusBar.className = 'status-bar';
+    testBtn.textContent = '⚡ Turn ON';
+    
+    learningText.innerHTML = `
+      <strong>Circuit Open</strong><br><br>
+      The ಸ್ವಿಚ್ is <span style="color:#c62828;font-weight:600">OPEN (OFF)</span> - there's a gap in the circuit!<br><br>
+      Current cannot flow because the path is broken. The bulb doesn't glow.<br><br>
+      Tap "Turn ON" to close the ಸ್ವಿಚ್ ಮತ್ತು ಪೂರ್ಣ the circuit again.
+    `;
+  }
+}
+
+function resetCircuit() {
+  // ಮರುಹೊಂದಿಸಿ all components
+  Object.keys(components).forEach(k => components[k] = false);
+  
+  // ಮರುಹೊಂದಿಸಿ buttons
+  document.querySelectorAll('.component-btn').forEach(btn => btn.classList.remove('placed'));
+  
+  // Hide placed components
+  document.getElementById('placed-cell').style.display = 'none';
+  document.getElementById('placed-bulb').style.display = 'none';
+  document.getElementById('placed-switch').style.display = 'none';
+  
+  // Show slots
+  document.getElementById('cell-slot').style.display = 'block';
+  document.getElementById('bulb-slot').style.display = 'block';
+  document.getElementById('switch-slot').style.display = 'block';
+  
+  // ಮರುಹೊಂದಿಸಿ wires
+  ['wire1', 'wire2', 'wire3', 'wire4'].forEach(id => {
+    const wire = document.getElementById(id);
+    wire.setAttribute('stroke', '#e0e0e0');
+    wire.setAttribute('stroke-dasharray', '10 5');
+    wire.classList.remove('current-flow');
+  });
+  
+  // ಮರುಹೊಂದಿಸಿ bulb
+  document.getElementById('bulb-glass').setAttribute('fill', '#e0e0e0');
+  document.getElementById('bulb-glass').classList.remove('bulb-glow');
+  
+  // ಮರುಹೊಂದಿಸಿ ಸ್ವಿಚ್
+  document.getElementById('switch-lever').setAttribute('x2', '35');
+  document.getElementById('switch-lever').setAttribute('y2', '5');
+  
+  // Hide current arrow
+  document.getElementById('current-arrow').style.display = 'none';
+  
+  // ಮರುಹೊಂದಿಸಿ state
+  circuitComplete = false;
+  ಸ್ವಿಚ್On = false;
+  testBtn.disabled = true;
+  testBtn.textContent = '⚡ ಸರ್ಕ್ಯೂಟ್ ಪರೀಕ್ಷಿಸಿ';
+  
+  statusBar.textContent = 'ಸರ್ಕ್ಯೂಟ್ ಪೂರ್ಣಗೊಳಿಸಲು ಎಲ್ಲಾ ಭಾಗಗಳನ್ನು ಇರಿಸಿ';
+  statusBar.className = 'status-bar';
+  
+  learningText.innerHTML = `
+    ಪೂರ್ಣ ಸರ್ಕ್ಯೂಟ್ ಅಗತ್ಯ:<br>
+    1. <strong>Cell</strong> - ವಿದ್ಯುತ್ ಶಕ್ತಿ ಒದಗಿಸುತ್ತದೆ<br>
+    2. <strong>Bulb</strong> - ಶಕ್ತಿಯನ್ನು ಬಳಸುತ್ತದೆ (ಲೋಡ್)<br>
+    3. <strong>ಸ್ವಿಚ್</strong> - ಸರ್ಕ್ಯೂಟ್ ನಿಯಂತ್ರಿಸುತ್ತದೆ<br>
+    4. <strong>ತಂತಿಗಳು</strong> - ಎಲ್ಲವನ್ನೂ ಮುಚ್ಚಿದ ಲೂಪ್‌ನಲ್ಲಿ ಸಂಪರ್ಕಿಸಿ<br><br>
+    ಸರ್ಕ್ಯೂಟ್â€Œನಲ್ಲಿ ಇಡಲು ಮೇಲಿನ ಪ್ರತಿ ಘಟಕ ಟ್ಯಾಪ್ ಮಾಡಿ!
+  `;
+  
+  takeaway.classList.remove('show');
+}
+
+// ── URL parameter support ──────────────────────────────────────────────
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var state = p.get('initialState') || 'empty';
+  var hints = p.get('showHints');
+
+  if (hints === 'false') {
+    var cc = document.querySelector('.concept-card');
+    if (cc) cc.style.display = 'none';
+  }
+
+  if (state === 'built' || state === 'tested') {
+    // Auto-place all 4 components with staggered delays (800 ms each)
+    var order = ['btn-cell', 'btn-bulb', 'btn-ಸ್ವಿಚ್', 'btn-wire'];
+    order.forEach(function (id, i) {
+      setTimeout(function () {
+        var btn = document.getElementById(id);
+        if (btn && !btn.classList.contains('placed')) btn.click();
+      }, 800 + i * 800);
+    });
+
+    if (state === 'tested') {
+      // Click Test after all components are placed (800 + 3*800 = 3200 ms + 1200 ms buffer)
+      setTimeout(function () {
+        var tb = document.getElementById('test-btn');
+        if (tb && !tb.disabled) tb.click();
+      }, 4800);
+    }
+  }
+}());
+</script>
+</body>
+</html>

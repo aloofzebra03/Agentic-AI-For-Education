@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#8d6e63">
+<title>ಸಮಯ ಮಾಪನದ ಇತಿಹಾಸ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #8d6e63 0%, #a1887f 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #8d6e63;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #5d4037; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.timeline {
+  position: relative;
+  padding: 10px 0;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 25px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #d7ccc8, #8d6e63, #5d4037);
+  border-radius: 2px;
+}
+
+.clock-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.clock-item:active { transform: scale(0.98); }
+
+.clock-dot {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #8d6e63;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.clock-item.active .clock-dot {
+  background: #8d6e63;
+  transform: scale(1.1);
+}
+
+.clock-content {
+  flex: 1;
+  margin-left: 15px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 12px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.clock-item.active .clock-content {
+  background: #efebe9;
+  border-color: #8d6e63;
+}
+
+.clock-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.clock-era {
+  font-size: 10px;
+  color: #8d6e63;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.clock-desc {
+  font-size: 10px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.demo-area {
+  background: linear-gradient(135deg, #263238 0%, #37474f 100%);
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 10px;
+  min-height: 200px;
+  position: relative;
+  overflow: hidden;
+}
+
+.demo-title {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* ಸೂರ್ಯ ಘಡಿಯಾರ */
+.sundial {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: #d7ccc8;
+  margin: 0 auto;
+  position: relative;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+}
+
+.sundial-gnomon {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  width: 4px;
+  height: 60px;
+  background: #5d4037;
+  transform-origin: bottom center;
+  transform: translateX(-50%) rotate(var(--angle, -45deg));
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.sundial-marks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.sundial-mark {
+  position: absolute;
+  width: 2px;
+  height: 10px;
+  background: #5d4037;
+  left: 50%;
+  transform-origin: bottom center;
+}
+
+/* ನೀರು Clock */
+.ನೀರು-clock {
+  width: 100px;
+  height: 140px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.ನೀರು-vessel {
+  width: 80px;
+  height: 100px;
+  background: linear-gradient(180deg, rgba(139,195,74,0.3), rgba(139,195,74,0.1));
+  border: 3px solid #795548;
+  border-radius: 0 0 20px 20px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.ನೀರು-level {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, #64b5f6, #1976d2);
+  transition: height 0.5s ease;
+}
+
+.ನೀರು-marks {
+  position: absolute;
+  right: 5px;
+  top: 10px;
+  bottom: 10px;
+  width: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 8px;
+  color: #5d4037;
+}
+
+/* ಮರಳು ಗಡಿಯಾರ */
+.hourglass {
+  width: 80px;
+  height: 140px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.hourglass-top, .hourglass-bottom {
+  width: 60px;
+  height: 60px;
+  background: rgba(255,235,59,0.3);
+  border: 3px solid #795548;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.hourglass-top {
+  border-radius: 30px 30px 0 0;
+  clip-path: polygon(0 0, 100% 0, 70% 100%, 30% 100%);
+}
+
+.hourglass-bottom {
+  border-radius: 0 0 30px 30px;
+  clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%);
+}
+
+.sಮತ್ತು-top {
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  background: #ffb74d;
+  transition: height 1s linear;
+}
+
+.sಮತ್ತು-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  right: 10%;
+  background: #ffb74d;
+  transition: height 1s linear;
+}
+
+.sಮತ್ತು-flow {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 20px;
+  background: #ffb74d;
+  opacity: 0;
+}
+
+.sಮತ್ತು-flow.flowing { opacity: 1; }
+
+/* ಮೇಣ ಗಡಿಯಾರ */
+.cಮತ್ತುle-clock {
+  width: 40px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.cಮತ್ತುle {
+  width: 30px;
+  height: 100px;
+  background: linear-gradient(180deg, #fff8e1, #ffecb3);
+  border-radius: 3px;
+  margin: 0 auto;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.cಮತ್ತುle-marks {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cಮತ್ತುle-mark {
+  height: 2px;
+  background: #d84315;
+}
+
+.cಮತ್ತುle-flame {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20px;
+  animation: flicker 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes flicker {
+  0% { transform: translateX(-50%) scale(1); }
+  100% { transform: translateX(-50%) scale(1.1); }
+}
+
+.cಮತ್ತುle-burned {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.2);
+  transition: height 1s linear;
+}
+
+/* Modern clocks */
+.modern-clock {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #fff;
+  margin: 0 auto;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.clock-face {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  border-radius: 50%;
+  border: 2px solid #333;
+}
+
+.clock-hand {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  transform-origin: bottom center;
+  background: #333;
+  border-radius: 2px;
+}
+
+.hour-hand { width: 4px; height: 30px; transform: translateX(-50%) rotate(var(--hour, 0deg)); }
+.minute-hand { width: 3px; height: 40px; background: #666; transform: translateX(-50%) rotate(var(--minute, 0deg)); }
+.second-hand { width: 2px; height: 45px; background: #f44336; transform: translateX(-50%) rotate(var(--second, 0deg)); }
+
+.clock-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #333;
+}
+
+.demo-label {
+  text-align: center;
+  color: #fff;
+  font-size: 11px;
+  margin-top: 10px;
+}
+
+.play-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #4caf50, #66bb6a);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.takeaway {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2196f3;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>⏰ ಸಮಯ ಮಾಪನದ ಇತಿಹಾಸ</h1>
+  <p>ಪ್ರಾಚೀನ ಸೂರ್ಯ ಘಡಿಯಾರದಿಂದ ಪರಮಾಣು ಗಡಿಯಾರಗಳವರೆಗೆ</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ಮಾನವರು ಯಾವಾಗಲೂ ಸಮಯ ಅಳೆಯಲು ಬಯಸಿದ್ದಾರೆ. ಆರಂಭದ ವಿಧಾನಗಳು used <strong>ಪುನರಾವರ್ತಿತ ನೈಸರ್ಗಿಕ ಘಟನೆಗಳನ್ನು</strong> (ಸೂರ್ಯ, ಚಂದ್ರ, ಋತುಗಳು). ನಂತರದ ಆವಿಷ್ಕಾರಗಳು <strong>ಪುನರಾವರ್ತನೆ ಪ್ರಕ್ರಿಯೆಗಳು</strong> (ಊಸರವಳಿಗಳು, ಕಂಪನಗಳು).
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="timeline">
+    <div class="timeline-line"></div>
+    
+    <div class="clock-item active" onclick="selectClock('sundial', this)">
+      <div class="clock-dot">☀️</div>
+      <div class="clock-content">
+        <div class="clock-name">ಸೂರ್ಯ ಘಡಿಯಾರ</div>
+        <div class="clock-era">~ಕ್ರಿ.ಪೂ 3500 - ಪ್ರಾಚೀನ ಈಜಿಪ್ಟ್</div>
+        <div class="clock-desc">ಸೂರ್ಯನ ನೆರಳನ್ನು ಬಳಸಿ ಸಮಯ ತೋರಿಸುತ್ತದೆ</div>
+      </div>
+    </div>
+    
+    <div class="clock-item" onclick="selectClock('ನೀರು', this)">
+      <div class="clock-dot">💧</div>
+      <div class="clock-content">
+        <div class="clock-name">ನೀರು ಗಡಿಯಾರ (ಕ್ಲೆಪ್ಸಿಡ್ರಾ)</div>
+        <div class="clock-era">~ಕ್ರಿ.ಪೂ 1500 - ಪ್ರಾಚೀನ ಭಾರತ (ಘಟಿಕಾ-ಯಂತ್ರ)</div>
+        <div class="clock-desc">ನೀರು ಹರಿವು ಸಮಯ ಮಧ್ಯಂತರ ಅಳೆಯುತ್ತದೆ</div>
+      </div>
+    </div>
+    
+    <div class="clock-item" onclick="selectClock('hourglass', this)">
+      <div class="clock-dot">⏳</div>
+      <div class="clock-content">
+        <div class="clock-name">ಮರಳು ಗಡಿಯಾರ</div>
+        <div class="clock-era">~8ನೇ ಶತಮಾನ</div>
+        <div class="clock-desc">ಇಸುಕು ಕಿರಿದಾದ ಕಂಠದ ಮೂಲಕ ಹರಿಯುತ್ತದೆ</div>
+      </div>
+    </div>
+    
+    <div class="clock-item" onclick="selectClock('candle', this)">
+      <div class="clock-dot">🕯️</div>
+      <div class="clock-content">
+        <div class="clock-name">ಮೇಣ ಗಡಿಯಾರ</div>
+        <div class="clock-era">~9ನೇ ಶತಮಾನ</div>
+        <div class="clock-desc">ಗುರುತು ಮೇಣ ಸ್ಥಿರ ದರದಲ್ಲಿ ಉರಿಯುತ್ತದೆ</div>
+      </div>
+    </div>
+    
+    <div class="clock-item" onclick="selectClock('pendulum', this)">
+      <div class="clock-dot">🕰️</div>
+      <div class="clock-content">
+        <div class="clock-name">ಊಸರವಳಿ ಗಡಿಯಾರ</div>
+        <div class="clock-era">1656 CE - ಕ್ರಿಶ್ಚಿಯನ್ ಹ್ಯೂಜೆನ್ಸ್</div>
+        <div class="clock-desc">ನಿಯಮಿತ ಊಸರವಳಿ ಸಮಯ ಇಡುತ್ತದೆ</div>
+      </div>
+    </div>
+    
+    <div class="clock-item" onclick="selectClock('quartz', this)">
+      <div class="clock-dot">⌚</div>
+      <div class="clock-content">
+        <div class="clock-name">ಕ್ವಾರ್ಟ್ಜ್ ಗಡಿಯಾರ</div>
+        <div class="clock-era">1927 CE - ಆಧುನಿಕ ಯುಗ</div>
+        <div class="clock-desc">ಕ್ರಿಸ್ಟಲ್ ಕಂಪನ (32,768 Hz)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="demo-area" id="demo-area">
+  <div class="demo-title" id="demo-title">☀️ ಸೂರ್ಯ ಘಡಿಯಾರ ಡೆಮೋ</div>
+  <div id="demo-content">
+    <div class="sundial" id="sundial">
+      <div class="sundial-gnomon" id="sundial-gnomon"></div>
+    </div>
+  </div>
+  <div class="demo-label" id="demo-label">ಸೂರ್ಯ ಆಕಾಶದಾದ್ಯಂತ ಚಲಿಸಿದಂತೆ ನೆರಳು ಚಲಿಸುತ್ತದೆ</div>
+  <button class="play-btn" id="play-btn" onclick="playDemo()">▶️ ಅನಿಮೇಟ್</button>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನಿಖರತೆಯ ವಿಕಾಸ</div>
+  <div class="takeaway-text">
+    • <strong>ಸೂರ್ಯ ಘಡಿಯಾರ:</strong> ನಿಖರತೆ ~15-30 ನಿಮಿಷ<br>
+    • <strong>ಊಸರವಳಿ:</strong> ನಿಖರತೆ ~15 ಸೆಕೆಂಡ್/ದಿನ<br>
+    • <strong>ಕ್ವಾರ್ಟ್ಜ್:</strong> ನಿಖರತೆ ~1 ಸೆಕೆಂಡ್/ದಿನ<br>
+    • <strong>ಅಣು:</strong> ನಿಖರತೆ ಲಕ್ಷಾಂತರ ವರ್ಷದಲ್ಲಿ ~1 ಸೆಕೆಂಡ್!
+  </div>
+</div>
+
+</div>
+
+<script>
+let currentClock = 'sundial';
+let animationInterval;
+
+const demos = {
+  sundial: {
+    title: '☀️ ಸೂರ್ಯ ಘಡಿಯಾರ ಡೆಮೋ',
+    label: 'ಸೂರ್ಯ ಆಕಾಶದಾದ್ಯಂತ ಚಲಿಸಿದಂತೆ ನೆರಳು ಚಲಿಸುತ್ತದೆ',
+    html: `<div class="sundial" id="sundial"><div class="sundial-gnomon" id="sundial-gnomon"></div></div>`
+  },
+  ನೀರು: {
+    title: '💧 ನೀರು ಗಡಿಯಾರ ಡೆಮೋ',
+    label: 'ನೀರು ಸ್ಥಿರ ದರದಲ್ಲಿ ಹರಿದು ಗುರುತುಗಳು ಸಮಯ ತೋರಿಸುತ್ತವೆ',
+    html: `<div class="ನೀರು-clock"><div class="ನೀರು-vessel"><div class="ನೀರು-level" id="water-level" style="height: 80%;"></div></div><div class="ನೀರು-marks"><span>1h</span><span>2h</span><span>3h</span><span>4h</span></div></div>`
+  },
+  hourglass: {
+    title: '⏳ ಮರಳು ಗಡಿಯಾರ Demo',
+    label: 'ಇಸುಕು ಕಿರಿದಾದ ಕಂಠದ ಮೂಲಕ ಹರಿಯುತ್ತದೆ',
+    html: `<div class="hourglass"><div class="hourglass-top"><div class="sಮತ್ತು-top" id="sand-top" style="height: 80%;"></div></div><div class="sಮತ್ತು-flow" id="sand-flow"></div><div class="hourglass-bottom"><div class="sಮತ್ತು-bottom" id="sand-bottom" style="height: 10%;"></div></div></div>`
+  },
+  cಮತ್ತುle: {
+    title: '🕯️ ಮೇಣ ಗಡಿಯಾರ Demo',
+    label: 'ಮೇಣ ಗಂಟೆ ಗುರುತುಗಳ ಮೂಲಕ ಸುಡುತ್ತದೆ',
+    html: `<div class="cಮತ್ತುle-clock"><div class="cಮತ್ತುle"><div class="cಮತ್ತುle-flame">🔥</div><div class="cಮತ್ತುle-marks"><div class="cಮತ್ತುle-mark"></div><div class="cಮತ್ತುle-mark"></div><div class="cಮತ್ತುle-mark"></div><div class="cಮತ್ತುle-mark"></div></div><div class="cಮತ್ತುle-burned" id="candle-burned" style="height: 10%;"></div></div></div>`
+  },
+  pendulum: {
+    title: '🕰️ ಊಸರವಳಿ ಗಡಿಯಾರ Demo',
+    label: 'ಊಸರವಳಿ ಸ್ಥಿರ ದರದಲ್ಲಿ ಊಘಾಡುತ್ತದೆ',
+    html: `<div class="modern-clock" id="pendulum-clock"><div class="clock-face"></div><div class="clock-hand hour-hand"></div><div class="clock-hand minute-hand"></div><div class="clock-hand second-hand" id="second-hand"></div><div class="clock-center"></div></div>`
+  },
+  quartz: {
+    title: '⌚ ಕ್ವಾರ್ಟ್ಜ್ ಗಡಿಯಾರ Demo',
+    label: 'ಕ್ರಿಸ್ಟಲ್ ಸೆಕೆಂಡಿಗೆ 32,768 ಬಾರಿ ಕಂಪಿಸುತ್ತದೆ!',
+    html: `<div class="modern-clock"><div class="clock-face"></div><div class="clock-hand hour-hand"></div><div class="clock-hand minute-hand"></div><div class="clock-hand second-hand" id="second-hand"></div><div class="clock-center"></div></div>`
+  }
+};
+
+function selectClock(type, element) {
+  currentClock = type;
+  clearInterval(animationInterval);
+  
+  document.querySelectorAll('.clock-item').forEach(item => item.classList.remove('active'));
+  element.classList.add('active');
+  
+  const demo = demos[type];
+  document.getElementById('demo-title').textContent = demo.title;
+  document.getElementById('demo-content').innerHTML = demo.html;
+  document.getElementById('demo-label').textContent = demo.label;
+  document.getElementById('play-btn').textContent = '▶️ ಅನಿಮೇಟ್';
+}
+
+function playDemo() {
+  clearInterval(animationInterval);
+  const btn = document.getElementById('play-btn');
+  
+  if (btn.textContent.includes('▶️')) {
+    btn.textContent = '⏸️ ಇಡಿ';
+    
+    switch(currentClock) {
+      case 'sundial':
+        let angle = -90;
+        animationInterval = setInterval(() => {
+          angle += 2;
+          if (angle > 90) angle = -90;
+          document.getElementById('sundial-gnomon').style.setProperty('--angle', angle + 'deg');
+        }, 100);
+        break;
+        
+      case 'ನೀರು':
+        let ನೀರುLevel = 80;
+        animationInterval = setInterval(() => {
+          ನೀರುLevel -= 1;
+          if (ನೀರುLevel < 10) ನೀರುLevel = 80;
+          document.getElementById('water-level').style.height = ನೀರುLevel + '%';
+        }, 100);
+        break;
+        
+      case 'hourglass':
+        let sandTop = 80, sandBottom = 10;
+        document.getElementById('sand-flow').classList.add('flowing');
+        animationInterval = setInterval(() => {
+          sandTop -= 1;
+          sandBottom += 1;
+          if (sandTop < 10) { sandTop = 80; sandBottom = 10; }
+          document.getElementById('sand-top').style.height = sandTop + '%';
+          document.getElementById('sand-bottom').style.height = sandBottom + '%';
+        }, 100);
+        break;
+        
+      case 'candle':
+        let burned = 10;
+        animationInterval = setInterval(() => {
+          burned += 1;
+          if (burned > 90) burned = 10;
+          document.getElementById('candle-burned').style.height = burned + '%';
+        }, 150);
+        break;
+        
+      case 'pendulum':
+      case 'quartz':
+        let secondsDeg = 0;
+        animationInterval = setInterval(() => {
+          secondsDeg += 6;
+          if (secondsDeg >= 360) secondsDeg = 0;
+          document.getElementById('second-hand').style.setProperty('--second', secondsDeg + 'deg');
+        }, 1000);
+        break;
+    }
+  } else {
+    btn.textContent = '▶️ ಅನಿಮೇಟ್';
+    if (currentClock === 'hourglass') {
+      document.getElementById('sand-flow')?.classList.remove('flowing');
+    }
+  }
+}
+
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var initialState = params.get('initialState');
+  var showHints = params.get('showHints');
+
+  if (initialState && initialState !== 'sundial') {
+    // Map URL-friendly names to JS keys used by selectClock()
+    var urlToJs = {
+      water: 'ನೀರು',
+      hourglass: 'hourglass',
+      candle: 'candle',
+      pendulum: 'pendulum',
+      quartz: 'quartz'
+    };
+    var jsKey = urlToJs.hasOwnProperty(initialState) ? urlToJs[initialState] : initialState;
+    // clock-item order: sundial(0), water(1), hourglass(2), candle(3), pendulum(4), quartz(5)
+    var orderMap = { sundial: 0, ನೀರು: 1, hourglass: 2, candle: 3, pendulum: 4, quartz: 5 };
+    var idx = orderMap[jsKey];
+    var items = document.querySelectorAll('.clock-item');
+    if (idx !== undefined && items[idx]) {
+      selectClock(jsKey, items[idx]);
+    }
+  }
+
+  if (showHints === 'false') {
+    var cc = document.querySelector('.concept-card');
+    var tw = document.querySelector('.takeaway');
+    if (cc) cc.style.display = 'none';
+    if (tw) tw.style.display = 'none';
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1a237e">
+<title>ವಿದ್ಯುತ್ ಬಳಕೆಗಳು – ಸಂವಾದಾತ್ಮಕ ವರ್ಗೀಕರಣ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #f9a825;
+}
+
+.concept-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f57f17;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.concept-text {
+  font-size: 12px;
+  color: #5d4037;
+  line-height: 1.5;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.instruction {
+  background: #e3f2fd;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 11px;
+  color: #1565c0;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.categories {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.category {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 8px;
+  text-align: center;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.category.selected {
+  border-color: #1976d2;
+  background: #e3f2fd;
+}
+
+.category .icon { font-size: 24px; margin-bottom: 4px; }
+.category .name { font-size: 9px; font-weight: 600; color: #333; }
+.category .count { font-size: 8px; color: #666; margin-top: 2px; }
+
+.appliances {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.appliance {
+  background: #fafafa;
+  border-radius: 10px;
+  padding: 10px 6px;
+  text-align: center;
+  border: 2px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.appliance:active { transform: scale(0.95); }
+.appliance.sorted { opacity: 0.5; pointer-events: none; }
+.appliance.correct { border-color: #4caf50; background: #e8f5e9; }
+.appliance.wrong { border-color: #f44336; background: #ffebee; animation: shake 0.3s; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.appliance .icon { font-size: 26px; }
+.appliance .name { font-size: 8px; color: #666; margin-top: 4px; }
+
+.score-bar {
+  background: #e0e0e0;
+  border-radius: 10px;
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #8bc34a);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.score-text {
+  text-align: center;
+  font-size: 11px;
+  color: #666;
+}
+
+.result-card {
+  background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  display: none;
+}
+
+.result-card.show { display: block; }
+
+.result-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1b5e20;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.result-category {
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+}
+
+.result-category .icon { font-size: 18px; }
+.result-category .name { font-size: 9px; font-weight: 600; margin: 4px 0; }
+.result-category .items { font-size: 8px; color: #666; line-height: 1.4; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #3f51b5;
+  display: none;
+}
+
+.takeaway.show { display: block; }
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1a237e; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+@media screen and (max-width: 360px) {
+  .categories { grid-template-columns: repeat(2, 1fr); }
+  .appliances { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>⚡ ವಿದ್ಯುತ್ ಬಳಕೆಗಳು</h1>
+  <p>ಉಪಕರಣಗಳನ್ನು ವಿದ್ಯುತ್ ಬಳಕೆಯಿಂದ ವರ್ಗೀಕರಿಸಿ</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ವಿದ್ಯುತ್ ದೈನಂದಿನ ಜೀವನದ ಅನೇಕ ಕ್ಷೇತ್ರಗಳಲ್ಲಿ ಬಳಕೆಯಾಗುತ್ತದೆ. ವಿದ್ಯುತ್ ಉಪಕರಣಗಳನ್ನು ಅವುಗಳ <strong>ಮುಖ್ಯ ಉದ್ದೇಶ</strong>ದಿಂದ ವರ್ಗೀಕರಿಸಬಹುದು: ಅಡುಗೆ, ಬೆಳಕು, ತಂಪು, ಸಂವಹನ, ಮನರಂಜನೆ ಮತ್ತು ಸಾರಿಗೆ.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="instruction">
+    👆 ಮೊದಲು ವರ್ಗ ಆಯ್ಕೆ, ನಂತರ ಅದಕ್ಕೆ ಸೇರಿದ ಉಪಕರಣ ಟ್ಯಾಪ್ ಮಾಡಿ!
+  </div>
+  
+  <div class="categories" id="categories"></div>
+  
+  <div class="appliances" id="appliances"></div>
+  
+  <div class="score-bar">
+    <div class="score-fill" id="score-fill" style="width: 0%"></div>
+  </div>
+  <div class="score-text" id="score-text">0 / 12 ಉಪಕರಣಗಳು ವರ್ಗೀಕರಿಸಲಾಗಿದೆ</div>
+</div>
+
+<div class="result-card" id="result-card">
+  <div class="result-title">🎉 ಎಲ್ಲ ಉಪಕರಣ ವರ್ಗೀಕೃತ!</div>
+  <div class="result-grid" id="result-grid"></div>
+</div>
+
+<div class="takeaway" id="takeaway">
+  <div class="takeaway-title">🎯 ನೀವು ಕಲಿತದ್ದು</div>
+  <div class="takeaway-text">
+    ವಿದ್ಯುತ್ ನಮ್ಮ ದೈನಂದಿನ ಜೀವನದಲ್ಲಿ ಅನೇಕ ರೀತಿಯ ಸಾಧನಗಳಿಗೆ ಶಕ್ತಿ ನೀಡುತ್ತದೆ. ಪ್ರತಿ ಉಪಕರಣದ <strong>ಉದ್ದೇಶ</strong> ಅರ್ಥಮಾಡಿಕೊಂಡರೆ ಅಡುಗೆ, ಬೆಳಕು, ತಂಪು, ಸಂವಹನ, ಮನರಂಜನೆ ಮತ್ತು ಸಾರಿಗೆಯಲ್ಲಿ ಜೀವನ ಸುಲಭ!
+  </div>
+</div>
+
+</div>
+
+<script>
+const categoriesData = [
+  { id: 'cooking', name: 'ಅಡುಗೆ', icon: '🍳', items: [] },
+  { id: 'lighting', name: 'ಬೆಳಕು', icon: '💡', items: [] },
+  { id: 'cooling', name: 'ತಂಪು/ಬಿಸಿ', icon: '❄️', items: [] },
+  { id: 'communication', name: 'ಸಂವಹನ', icon: '📱', items: [] },
+  { id: 'entertainment', name: 'ಮನರಂಜನೆ', icon: '🎮', items: [] },
+  { id: 'transport', name: 'ಸಾರಿಗೆ', icon: '🚃', items: [] }
+];
+
+const appliances = [
+  { name: 'ವಿದ್ಯುತ್ ಕೆಟಲ್', icon: '🫖', category: 'cooking' },
+  { name: 'ಮೈಕ್ರೋವೇವ್', icon: '📦', category: 'cooking' },
+  { name: 'ಬಲ್ಬ್', icon: '💡', category: 'lighting' },
+  { name: 'ಟ್ಯೂಬ್ ಲೈಟ್', icon: '🔦', category: 'lighting' },
+  { name: 'ಫ್ಯಾನ್', icon: '🌀', category: 'cooling' },
+  { name: 'ಎಸಿ', icon: '❄️', category: 'cooling' },
+  { name: 'ಮೊಬೈಲ್ ಫೋನ್', icon: '📱', category: 'communication' },
+  { name: 'ಟೆಲಿಫೋನ್', icon: '☎️', category: 'communication' },
+  { name: 'ಟೆಲಿವಿಷನ್', icon: '📺', category: 'entertainment' },
+  { name: 'ಕಂಪ್ಯೂಟರ್', icon: '💻', category: 'entertainment' },
+  { name: 'ವಿದ್ಯುತ್ ರೈಲು', icon: '🚃', category: 'transport' },
+  { name: 'ವಿದ್ಯುತ್ ಕಾರ್', icon: '🚗', category: 'transport' }
+];
+
+let selectedCategory = null;
+let sortedCount = 0;
+
+const categoriesEl = document.getElementById('categories');
+const appliancesEl = document.getElementById('appliances');
+const scoreFill = document.getElementById('score-fill');
+const scoreText = document.getElementById('score-text');
+const resultCard = document.getElementById('result-card');
+const resultGrid = document.getElementById('result-grid');
+const takeaway = document.getElementById('takeaway');
+
+// Render categories
+categoriesData.forEach(cat => {
+  const div = document.createElement('div');
+  div.className = 'category';
+  div.dataset.id = cat.id;
+  div.innerHTML = `
+    <div class="icon">${cat.icon}</div>
+    <div class="name">${cat.name}</div>
+    <div class="count" id="count-${cat.id}">0 ವಸ್ತುಗಳು</div>
+  `;
+  div.onclick = () => selectCategory(cat.id);
+  categoriesEl.appendChild(div);
+});
+
+// Shuffle ಮತ್ತು render appliances
+const shuffled = [...appliances].sort(() => Math.random() - 0.5);
+shuffled.forEach((app, idx) => {
+  const div = document.createElement('div');
+  div.className = 'appliance';
+  div.dataset.category = app.category;
+  div.dataset.idx = idx;
+  div.innerHTML = `
+    <div class="icon">${app.icon}</div>
+    <div class="name">${app.name}</div>
+  `;
+  div.onclick = () => sortAppliance(div, app);
+  appliancesEl.appendChild(div);
+});
+
+function selectCategory(id) {
+  selectedCategory = id;
+  document.querySelectorAll('.category').forEach(el => {
+    el.classList.toggle('selected', el.dataset.id === id);
+  });
+}
+
+function sortAppliance(el, app) {
+  if (!selectedCategory || el.classList.contains('sorted')) return;
+  
+  if (app.category === selectedCategory) {
+    el.classList.add('correct', 'sorted');
+    const cat = categoriesData.find(c => c.id === selectedCategory);
+    cat.items.push(app.name);
+    document.getElementById(`count-${selectedCategory}`).textContent = `${cat.items.length} ವಸ್ತುಗಳು`;
+    sortedCount++;
+    updateScore();
+  } else {
+    el.classList.add('wrong');
+    setTimeout(() => el.classList.remove('wrong'), 300);
+  }
+}
+
+function updateScore() {
+  const percent = (sortedCount / appliances.length) * 100;
+  scoreFill.style.width = `${percent}%`;
+  scoreText.textContent = `${sortedCount} / ${appliances.length} ಉಪಕರಣಗಳು ವರ್ಗೀಕರಿಸಲಾಗಿದೆ`;
+  
+  if (sortedCount === appliances.length) {
+    showSources();
+  }
+}
+
+function showSources() {
+  resultGrid.innerHTML = '';
+  categoriesData.forEach(cat => {
+    const div = document.createElement('div');
+    div.className = 'result-category';
+    div.innerHTML = `
+      <div class="icon">${cat.icon}</div>
+      <div class="name">${cat.name}</div>
+      <div class="items">${cat.items.join(', ')}</div>
+    `;
+    resultGrid.appendChild(div);
+  });
+  resultCard.classList.add('show');
+  takeaway.classList.add('show');
+}
+
+// Auto-select ಮೊದಲ category
+selectCategory('cooking');
+
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var state = params.get('initialState');
+  var hints = params.get('showHints');
+
+  if (hints === 'false') {
+    document.querySelectorAll('.concept-card').forEach(function(el) { el.style.display = 'none'; });
+  }
+
+  var validStates = ['cooking','lighting','cooling','communication','entertainment','transport'];
+  if (state && validStates.indexOf(state) > -1) {
+    selectCategory(state);
+  }
+})();
+</script>
+</body>
+</html>

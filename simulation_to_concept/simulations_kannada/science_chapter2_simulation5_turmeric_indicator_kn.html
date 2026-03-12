@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#f9a825">
+<title>ಸೂಚಕವಾಗಿ ಹಲ್ದಿ – ನೈಸರ್ಗಿಕ ಆಮ್ಲ-ಕ್ಷಾರ ಪರೀಕ್ಷೆ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #f9a825 0%, #ff8f00 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 8px 4px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 12px;
+}
+
+.visual {
+  position: relative;
+  height: 38vh;
+  min-height: 280px;
+  background: linear-gradient(145deg, #fffde7 0%, #fff8e1 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+svg { width: 100%; height: 100%; display: block; }
+
+.static-hint {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  line-height: 1.3;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  z-index: 10;
+}
+
+.metrics {
+  background: #fff8e1;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 11px;
+  line-height: 1.6;
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+}
+
+.metric-item { display: flex; justify-content: space-between; }
+.metric-label { color: #666; }
+.metric-value { font-weight: 600; color: #007AFF; }
+.metric-value.ಮೂಲ { color: #d32f2f; }
+.metric-value.acidic-neutral { color: #f9a825; }
+
+.control-panel {
+  background: #fff8e1;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.control-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.solution-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.solution-btn {
+  padding: 10px 6px;
+  border-radius: 10px;
+  border: 2px solid #fff3e0;
+  font-size: 10px;
+  background: #fff;
+  cursor: pointer;
+  text-align: center;
+  line-height: 1.3;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: transform 0.1s ease;
+}
+
+.solution-btn:active { transform: scale(0.95); }
+.solution-btn.active { border-color: #ff8f00; background: #fff3e0; }
+.solution-btn .icon { font-size: 20px; display: block; margin-bottom: 3px; }
+
+.test-btn {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background: linear-gradient(135deg, #ff8f00 0%, #ffa726 100%);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 12px 20px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255,143,0,0.3);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s ease;
+}
+
+.test-btn:active { transform: scale(0.95); }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 10px;
+  margin-top: 12px;
+  font-size: 11px;
+}
+
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-color { width: 24px; height: 14px; border-radius: 4px; }
+.legend-color.original { background: #f9a825; }
+.legend-color.ಮೂಲ { background: #d32f2f; }
+.legend-color.unchanged { background: #fdd835; }
+
+.insight-box {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-left: 4px solid #f9a825;
+}
+
+.insight-title { font-weight: 600; color: #e65100; margin-bottom: 6px; }
+
+.real-world {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.real-world .icon { font-size: 40px; }
+.real-world .text { flex: 1; line-height: 1.5; }
+.real-world .highlight { color: #d32f2f; font-weight: 600; }
+
+.takeaway {
+  background: linear-gradient(135deg, #ffe0b2 0%, #ffcc80 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  display: none;
+}
+
+.takeaway.show { display: block; }
+.takeaway-title { font-weight: 600; color: #e65100; margin-bottom: 6px; }
+
+.limitation-box {
+  margin-top: 12px;
+  padding: 12px;
+  background: #eceff1;
+  border-radius: 10px;
+  border-left: 4px solid #607d8b;
+  font-size: 11px;
+}
+
+.limitation-box h4 { font-size: 12px; color: #455a64; margin-bottom: 6px; }
+.limitation-box p { color: #666; line-height: 1.5; }
+
+.prep-info {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 11px;
+}
+
+.prep-title { font-weight: 600; color: #e65100; margin-bottom: 8px; }
+
+.prep-steps {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.prep-steps::-webkit-scrollbar { display: none; }
+.prep-step { flex-shrink: 0; text-align: center; width: 60px; }
+.prep-step .icon { font-size: 24px; }
+.prep-step .text { font-size: 9px; color: #666; margin-top: 4px; }
+
+@media screen and (max-width: 380px) {
+  .solution-grid { gap: 6px; }
+  .solution-btn { padding: 8px 4px; font-size: 9px; }
+  .solution-btn .icon { font-size: 18px; }
+}
+
+@supports (padding: max(0px)) {
+  #app {
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+  }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🟡 ಹಲ್ದಿ ಸೂಚಕ</h1>
+  <p>ಕ್ಷಾರಗಳನ್ನು ಗುರುತಿಸುವ ಸುವರ್ಣ ಮಸಾಲೆ!</p>
+</div>
+
+<div class="section-title">ಹಲ್ದಿ ಕಾಗದದಿಂದ ದ್ರಾವಣಗಳನ್ನು ಪರೀಕ್ಷಿಸಿ</div>
+<div class="sim-card" id="sim"></div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-color original"></div> ಮೂಲ (ಹಳದಿ)</div>
+  <div class="legend-item"><div class="legend-color ಮೂಲ"></div> ಕ್ಷಾರೀಯ → ಕೆಂಪು/ಕಂದು</div>
+  <div class="legend-item"><div class="legend-color unchanged"></div> ಆಮ್ಲೀಯ/ತಟಸ್ಥ → ಹಳದಿ</div>
+</div>
+
+<div class="insight-box">
+  <div class="insight-title">🔑 ಮುಖ್ಯ ಅಂತರ್ದೃಷ್ಟಿ:</div>
+  ಹಲ್ದಿ <strong>ಕ್ಷಾರ ಪದಾರ್ಥಗಳನ್ನು</strong> ಗುರುತಿಸಬಲ್ಲದು (ಕೆಂಪು/ಕಂದು ಆಗುತ್ತದೆ), ಆದರೆ <strong>ಆಮ್ಲ ಮತ್ತು ತಟಸ್ಥ ಪದಾರ್ಥಗಳ ನಡುವೆ ವ್ಯತ್ಯಾಸ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ</strong> (ಎರಡೂ ಹಳದಿ ಉಳಿಯುತ್ತದೆ). ಅದಕ್ಕೇ ಇದು ಭಾಗಶಃ ಸೂಚಕ!
+</div>
+
+<div class="limitation-box">
+  <h4>⚠️ ಹಲ್ದಿ ಸೂಚಕದ ಮಿತಿ</h4>
+  <p>ಹಲ್ದಿ ಕಾಗದವು <strong>ಆಮ್ಲಗಳು ಮತ್ತು ತಟಸ್ಥ ಪದಾರ್ಥಗಳ ನಡುವೆ ವ್ಯತ್ಯಾಸ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ</strong> — ಎರಡೂ ಸಂದರ್ಭಗಳಲ್ಲಿ ಹಳದಿ ಉಳಿಯುತ್ತದೆ. ಕ್ಷಾರವನ್ನು ಸ್ಪರ್ಶಿಸಿದಾಗ ಮಾತ್ರ ಬಣ್ಣ ಬದಲಾಗುತ್ತದೆ (ಕೆಂಪಾಗುತ್ತದೆ).</p>
+</div>
+
+<div class="real-world">
+  <div class="icon">👕</div>
+  <div class="text">
+    <strong>ನೈಜ ಜೀವನ ಅವಲೋಕನ:</strong> ಸಾಬೂನು ಹಾಕಿದಾಗ <span class="highlight">ಕರಿ ಕಲೆ ಕೆಂಪಾಗುವುದು</span> ಗಮನಿಸಿದ್ದೀರಾ? ಸಾಬೂನು ಕ್ಷಾರ ಮತ್ತು ಕರಿಯಲ್ಲಿನ ಹಲ್ದಿ ಬಣ್ಣ ಬದಲಾಗುತ್ತದೆ!
+  </div>
+</div>
+
+<div class="prep-info">
+  <div class="prep-title">🧪 ಅರಿಸಿನ ಕಾಗದ ತಯಾರಿ:</div>
+  <div class="prep-steps">
+    <div class="prep-step"><div class="icon">🟡</div><div class="text">ಅರಿಸಿನ ಪುಡಿ</div></div>
+    <div class="prep-step"><div class="icon">💧</div><div class="text">ಪೇಸ್ಟ್ ಮಾಡಿ</div></div>
+    <div class="prep-step"><div class="icon">📄</div><div class="text">ಫಿಲ್ಟರ್ ಕಾಗದ ಮುಳುಗಿಸಿ</div></div>
+    <div class="prep-step"><div class="icon">☀️</div><div class="text">ಒಣಗಲಿ ಬಿಡಿ</div></div>
+    <div class="prep-step"><div class="icon">✂️</div><div class="text">ಪಟ್ಟಿಗಳಾಗಿ ಕತ್ತರಿಸಿ</div></div>
+  </div>
+</div>
+
+<div class="takeaway" id="takeaway">
+  <div class="takeaway-title">💡 ನೀವು ಕಂಡುಕೊಂಡದ್ದು:</div>
+  <span id="takeaway-text">ಹಲ್ದಿ ಭಾಗಶಃ ಸೂಚಕ — ಕ್ಷಾರಗಳನ್ನು ಮಾತ್ರ ಗುರುತಿಸುತ್ತದೆ!</span>
+</div>
+
+</div>
+
+<script>
+const SOLUTIONS = {
+  'lemon': { name: 'ನಿಂಬೆ ರಸ', icon: '🍋', type: 'acidic', resultColor: '#fdd835', colorName: 'ಹಳದಿ (ಬದಲಾವಣೆ ಇಲ್ಲ)', ಬದಲಾಗುತ್ತದೆ: false },
+  'vinegar': { name: 'ವಿನಿಗರ್', icon: '🍶', type: 'acidic', resultColor: '#f9a825', colorName: 'ಹಳದಿ (ಬದಲಾವಣೆ ಇಲ್ಲ)', ಬದಲಾಗುತ್ತದೆ: false },
+  'amla': { name: 'ನೆಲ್ಲಿ ರಸ', icon: '🫒', type: 'acidic', resultColor: '#fbc02d', colorName: 'ಹಳದಿ (ಬದಲಾವಣೆ ಇಲ್ಲ)', ಬದಲಾಗುತ್ತದೆ: false },
+  'soap': { name: 'ಸಾಬೂನು ದ್ರಾವಣ', icon: '🧼', type: 'ಮೂಲ', resultColor: '#c62828', colorName: 'ಕೆಂಪು/ಕಂದು', ಬದಲಾಗುತ್ತದೆ: true },
+  'baking': { name: 'ಬೇಕಿಂಗ್ ಸೋಡಾ', icon: '🥄', type: 'ಮೂಲ', resultColor: '#d32f2f', colorName: 'ಕೆಂಪು', ಬದಲಾಗುತ್ತದೆ: true },
+  'lime': { name: 'ಸುಣ್ಣದ ನೀರು', icon: '💧', type: 'ಮೂಲ', resultColor: '#b71c1c', colorName: 'ಗಾಢ ಕೆಂಪು', ಬದಲಾಗುತ್ತದೆ: true },
+  'ನೀರು': { name: 'ನಳ ನೀರು', icon: '🚰', type: 'neutral', resultColor: '#fdd835', colorName: 'ಹಳದಿ (ಬದಲಾವಣೆ ಇಲ್ಲ)', ಬದಲಾಗುತ್ತದೆ: false },
+  'sugar': { name: 'ಸಕ್ಕರೆ ದ್ರಾವಣ', icon: '🍬', type: 'neutral', resultColor: '#ffeb3b', colorName: 'ಹಳದಿ (ಬದಲಾವಣೆ ಇಲ್ಲ)', ಬದಲಾಗುತ್ತದೆ: false },
+  'salt': { name: 'ಉಪ್ಪು ದ್ರಾವಣ', icon: '🧂', type: 'neutral', resultColor: '#fdd835', colorName: 'ಹಳದಿ (ಬದಲಾವಣೆ ಇಲ್ಲ)', ಬದಲಾಗುತ್ತದೆ: false }
+};
+
+const container = document.getElementById('sim');
+const defaultSolution = 'soap';
+
+container.innerHTML = `
+<div class="visual">
+  <div class="static-hint">👆 ದ್ರಾವಣ ಆಯ್ಕೆಮಾಡಿ, «ಹನಿ» ಒತ್ತಿ</div>
+
+  <svg viewBox="0 0 400 300">
+    <!-- White tile background -->
+    <rect x="50" y="130" width="300" height="110" rx="6" fill="#eceff1" stroke="#cfd8dc" stroke-width="2"/>
+    <text x="200" y="255" text-anchor="middle" font-size="10" fill="#90a4ae">ಬಿಳಿ ಟೈಲ್</text>
+    
+    <!-- Turmeric paper strips -->
+    <rect x="80" y="145" width="50" height="80" rx="3" fill="#f9a825" id="paper1" stroke="#fbc02d" stroke-width="1"/>
+    <text x="105" y="240" text-anchor="middle" font-size="9" fill="#666" id="label1">ನಮೂನೆ 1</text>
+    
+    <rect x="175" y="145" width="50" height="80" rx="3" fill="#f9a825" id="paper2" stroke="#fbc02d" stroke-width="1"/>
+    <text x="200" y="240" text-anchor="middle" font-size="9" fill="#666" id="label2">ನಮೂನೆ 2</text>
+    
+    <rect x="270" y="145" width="50" height="80" rx="3" fill="#f9a825" id="paper3" stroke="#fbc02d" stroke-width="1"/>
+    <text x="295" y="240" text-anchor="middle" font-size="9" fill="#666" id="label3">ನಮೂನೆ 3</text>
+    
+    <!-- Dropper -->
+    <g id="dropper" transform="translate(200, 30)">
+      <rect x="-12" y="0" width="24" height="40" rx="4" fill="#ffb74d"/>
+      <ellipse cx="0" cy="0" rx="16" ry="10" fill="#ef6c00"/>
+      <rect x="-6" y="40" width="12" height="30" fill="#90a4ae"/>
+      <circle cx="0" cy="75" r="6" fill="#64b5f6" id="drop" opacity="0"/>
+      <text x="0" y="-18" text-anchor="middle" font-size="14" id="dropper-icon">${SOLUTIONS[defaultSolution].icon}</text>
+    </g>
+    
+    <!-- ಅರಿಸಿನ ಪುಡಿ icon -->
+    <g transform="translate(25, 40)">
+      <text x="0" y="0" font-size="35">🟡</text>
+      <text x="17" y="45" font-size="9" fill="#888">ಹಲ್ದಿ</text>
+    </g>
+    
+    <!-- ಫಲಿತಾಂಶ ಸೂಚಕ -->
+    <g id="result-arrow" opacity="0" transform="translate(200, 115)">
+      <polygon points="0,0 -10,18 10,18" fill="#4caf50"/>
+      <text x="0" y="-8" text-anchor="middle" font-size="11" fill="#4caf50" font-weight="600" id="result-text">✓</text>
+    </g>
+  </svg>
+
+  <button class="test-btn" id="test-btn">💧 ಹನಿ ಸೇರಿಸಿ</button>
+</div>
+
+<div class="metrics">
+  <div class="metric-item"><span class="metric-label">ದ್ರಾವಣ:</span> <span class="metric-value" id="solution-name">${SOLUTIONS[defaultSolution].name}</span></div>
+  <div class="metric-item"><span class="metric-label">ಕಾಗದ ಬಣ್ಣ:</span> <span class="metric-value" id="color-status">ಹಳದಿ</span></div>
+  <div class="metric-item"><span class="metric-label">ಬದಲಾವಣೆ:</span> <span class="metric-value" id="changes-display">?</span></div>
+  <div class="metric-item"><span class="metric-label">ಗುರುತಿಸಿದ್ದು:</span> <span class="metric-value" id="detected-display">?</span></div>
+</div>
+
+<div class="control-panel">
+  <div class="control-label">ಪರೀಕ್ಷಿಸಲು ದ್ರಾವಣ ಆಯ್ಕೆಮಾಡಿ:</div>
+  <div class="solution-grid">
+    <button class="solution-btn" data-solution="lemon"><span class="icon">🍋</span>ನಿಂಬೆ</button>
+    <button class="solution-btn" data-solution="vinegar"><span class="icon">🍶</span>ವಿನಿಗರ್</button>
+    <button class="solution-btn" data-solution="amla"><span class="icon">🫒</span>ನೆಲ್ಲಿ</button>
+    <button class="solution-btn active" data-solution="soap"><span class="icon">🧼</span>ಸಾಬೂನು</button>
+    <button class="solution-btn" data-solution="baking"><span class="icon">🥄</span>ಬೇಕಿಂಗ್ ಸೋಡಾ</button>
+    <button class="solution-btn" data-solution="lime"><span class="icon">💧</span>ಸುಣ್ಣದ ನೀರು</button>
+    <button class="solution-btn" data-solution="ನೀರು"><span class="icon">🚰</span>ನಳ ನೀರು</button>
+    <button class="solution-btn" data-solution="sugar"><span class="icon">🍬</span>ಸಕ್ಕರೆ</button>
+    <button class="solution-btn" data-solution="salt"><span class="icon">🧂</span>ಉಪ್ಪು</button>
+  </div>
+</div>`;
+
+let state = { solution: 'soap', currentPaper: 1, animating: false };
+
+const papers = [document.getElementById('paper1'), document.getElementById('paper2'), document.getElementById('paper3')];
+const labels = [document.getElementById('label1'), document.getElementById('label2'), document.getElementById('label3')];
+const positions = [105, 200, 295];
+const drop = document.getElementById('drop');
+const dropper = document.getElementById('dropper');
+const dropperIcon = document.getElementById('dropper-icon');
+const solutionName = document.getElementById('solution-name');
+const colorStatus = document.getElementById('color-status');
+const ಬದಲಾಗುತ್ತದೆDisplay = document.getElementById('changes-display');
+const detectedDisplay = document.getElementById('detected-display');
+const resultArrow = document.getElementById('result-arrow');
+const resultText = document.getElementById('result-text');
+const testBtn = document.getElementById('test-btn');
+const takeaway = document.getElementById('takeaway');
+const takeawayText = document.getElementById('takeaway-text');
+
+function updateDisplay() {
+  const sol = SOLUTIONS[state.solution];
+  dropperIcon.textContent = sol.icon;
+  solutionName.textContent = sol.name;
+}
+
+function animateDrop(callback) {
+  const sol = SOLUTIONS[state.solution];
+  const targetX = positions[state.currentPaper - 1];
+  
+  dropper.style.transition = 'transform 0.4s ease';
+  dropper.setAttribute('transform', `translate(${targetX}, 30)`);
+  
+  setTimeout(() => {
+    drop.setAttribute('fill', sol.resultColor);
+    drop.setAttribute('opacity', '1');
+    drop.setAttribute('cy', '75');
+    
+    let cy = 75;
+    const dropInterval = setInterval(() => {
+      cy += 6;
+      drop.setAttribute('cy', cy);
+      if (cy > 120) {
+        clearInterval(dropInterval);
+        drop.setAttribute('opacity', '0');
+        callback();
+      }
+    }, 25);
+  }, 400);
+}
+
+function runTest() {
+  if (state.animating) return;
+  state.animating = true;
+  
+  const sol = SOLUTIONS[state.solution];
+
+  animateDrop(() => {
+    const currentPaper = papers[state.currentPaper - 1];
+    const currentLabel = labels[state.currentPaper - 1];
+    
+    currentPaper.style.transition = 'fill 0.6s ease';
+    currentPaper.setAttribute('fill', sol.resultColor);
+    currentLabel.textContent = sol.name;
+
+    colorStatus.textContent = sol.colorName;
+    colorStatus.className = `metric-value ${sol.ಬದಲಾಗುತ್ತದೆ ? 'ಮೂಲ' : 'acidic-neutral'}`;
+    
+    ಬದಲಾಗುತ್ತದೆDisplay.textContent = sol.ಬದಲಾಗುತ್ತದೆ ? 'ಹೌದು ✓' : 'ಇಲ್ಲ';
+    ಬದಲಾಗುತ್ತದೆDisplay.className = `metric-value ${sol.ಬದಲಾಗುತ್ತದೆ ? 'ಮೂಲ' : ''}`;
+    
+    if (sol.ಬದಲಾಗುತ್ತದೆ) {
+      detectedDisplay.textContent = 'ಕ್ಷಾರೀಯ ✓';
+      detectedDisplay.className = 'metric-value ಮೂಲ';
+      takeawayText.textContent = `${sol.name} ಹಲ್ದಿಯನ್ನು ಕೆಂಪಾಗಿಸಿತು — ಕ್ಷಾರವೆಂದು ದೃಢೀಕರಣ! ಹಲ್ದಿ ಅದನ್ನು ಗುರುತಿಸಿತು.`;
+    } else {
+      detectedDisplay.textContent = 'ಆಮ್ಲೀಯ ಅಥವಾ ತಟಸ್ಥ';
+      detectedDisplay.className = 'metric-value acidic-neutral';
+      takeawayText.textContent = `${sol.name} ಹಲ್ದಿಯನ್ನು ಹಳದಿ ಉಳಿಸಿತು. ಇದು ಆಮ್ಲೀಯ ಅಥವಾ ತಟಸ್ಥ — ಹಲ್ದಿ ವ್ಯತ್ಯಾಸ ಹೇಳಲಾರದು!`;
+    }
+
+    resultArrow.style.transition = 'opacity 0.3s';
+    resultArrow.setAttribute('opacity', '1');
+    resultArrow.setAttribute('transform', `translate(${positions[state.currentPaper - 1]}, 115)`);
+    resultText.textContent = sol.ಬದಲಾಗುತ್ತದೆ ? '✓ ಮೂಲ' : '— ಬದಲಾವಣೆ ಇಲ್ಲ';
+    resultText.setAttribute('fill', sol.ಬದಲಾಗುತ್ತದೆ ? '#4caf50' : '#9e9e9e');
+
+    state.currentPaper = (state.currentPaper % 3) + 1;
+    takeaway.classList.add('show');
+    state.animating = false;
+  });
+}
+
+function resetTest() {
+  if (state.animating) return;
+  state.currentPaper = 1;
+  
+  papers.forEach((p, i) => {
+    p.setAttribute('fill', '#f9a825');
+    labels[i].textContent = `ನಮೂನೆ ${i + 1}`;
+  });
+  
+  dropper.setAttribute('transform', 'translate(200, 30)');
+  colorStatus.textContent = 'ಹಳದಿ';
+  colorStatus.className = 'metric-value';
+  ಬದಲಾಗುತ್ತದೆDisplay.textContent = '?';
+  ಬದಲಾಗುತ್ತದೆDisplay.className = 'metric-value';
+  detectedDisplay.textContent = '?';
+  detectedDisplay.className = 'metric-value';
+  resultArrow.setAttribute('opacity', '0');
+}
+
+testBtn.onclick = runTest;
+
+container.querySelectorAll('.solution-btn').forEach(btn => {
+  btn.onclick = () => {
+    if (state.animating) return;
+    container.querySelectorAll('.solution-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.solution = btn.dataset.solution;
+    resetTest();
+    updateDisplay();
+  };
+});
+
+updateDisplay();
+
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var initState = (p.get('initialState') || '').toLowerCase();
+  var showHintParam = p.get('showHints');
+  if (showHintParam === 'false') {
+    var box = document.querySelector('.insight-box');
+    if (box) box.style.display = 'none';
+    var lim = document.querySelector('.limitation-box');
+    if (lim) lim.style.display = 'none';
+  }
+  var solutionMap = { 'acidic': 'lemon', 'basic': 'soap', 'neutral': '\u0ca8\u0cc0\u0cb0\u0cc1' };
+  var targetSolution = solutionMap[initState];
+  if (!targetSolution) return;
+  setTimeout(function () {
+    var solBtn = document.querySelector('.solution-btn[data-solution="' + targetSolution + '"]');
+    if (solBtn) solBtn.click();
+    setTimeout(function () {
+      var tb = document.getElementById('test-btn');
+      if (tb) tb.click();
+    }, 600);
+  }, 800);
+}());
+</script>
+</body>
+</html>

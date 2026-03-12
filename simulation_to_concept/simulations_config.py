@@ -2537,3 +2537,25 @@ What can be demonstrated:
 def get_quiz_questions(simulation_id: str) -> list:
     """Get quiz questions for a specific simulation."""
     return QUIZ_QUESTIONS.get(simulation_id, [])
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# KANNADA SIMULATIONS — Load and merge at runtime
+# ═══════════════════════════════════════════════════════════════════════
+# simulations_config_kannada.py lives in the same directory and follows
+# the exact same schema. Merging here means ALL existing helper functions
+# (get_simulation, get_quiz_questions, get_simulation_list, etc.) work
+# transparently for Kannada simulations without any code changes elsewhere.
+
+try:
+    from simulation_to_concept.simulations_config_kannada import SIMULATIONS_KN, QUIZ_QUESTIONS_KN
+    SIMULATIONS.update(SIMULATIONS_KN)
+    QUIZ_QUESTIONS.update(QUIZ_QUESTIONS_KN)
+    print(f"[simulations_config] ✅ Loaded {len(SIMULATIONS_KN)} Kannada simulation(s): "
+          f"{', '.join(SIMULATIONS_KN.keys())}")
+except ImportError:
+    print("[simulations_config] ⚠️ Kannada simulations not found - skipping")
+    raise ImportError("Kannada simulations not found")
+except Exception as _kn_err:
+    print(f"[simulations_config] ⚠️  Could not load Kannada simulations: {_kn_err}")
+    raise Exception("Failed to load Kannada simulations")

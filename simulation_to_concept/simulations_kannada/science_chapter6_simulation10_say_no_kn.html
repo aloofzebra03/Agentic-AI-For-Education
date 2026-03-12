@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#d32f2f">
+<title>ಹಾನಿಕಾರಕ ಪದಾರ್ಥಗಳಿಗೆ ಒಪ್ಪಿಗೆ ನೀಡಬೇಡಿ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #d32f2f 0%, #ef5350 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #d32f2f;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #c62828; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.scenario-box {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.scenario-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.scenario-text {
+  font-size: 11px;
+  color: #666;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.response-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.response-btn {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.response-btn:active { transform: scale(0.98); }
+.response-btn.correct { border-color: #4caf50; background: #e8f5e9; }
+.response-btn.wrong { border-color: #f44336; background: #ffebee; }
+
+.response-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  font-size: 20px;
+}
+
+.response-btn.yes .response-icon { background: #ffebee; }
+.response-btn.no .response-icon { background: #e8f5e9; }
+
+.response-text {
+  flex: 1;
+  font-size: 11px;
+  color: #333;
+}
+
+.feedback-panel {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  border-left: 4px solid #4caf50;
+  display: none;
+}
+
+.feedback-panel.show { display: block; }
+.feedback-panel.wrong-feedback {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-color: #f44336;
+}
+
+.feedback-title { font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+.feedback-panel.wrong-feedback .feedback-title { color: #c62828; }
+.feedback-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.next-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  display: none;
+}
+
+.next-btn.show { display: block; }
+
+.progress-bar {
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #66bb6a);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.substances-info {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #d32f2f;
+}
+
+.substances-title { font-size: 12px; font-weight: 700; color: #c62828; margin-bottom: 8px; }
+
+.substance-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.substance-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.substance-item .icon { font-size: 20px; margin-right: 8px; }
+.substance-item .text { font-size: 10px; color: #333; }
+.substance-item .danger { font-size: 8px; color: #c62828; font-weight: 600; }
+
+.helpline {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2196f3;
+  text-align: center;
+}
+
+.helpline-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 6px; }
+.helpline-number { font-size: 20px; font-weight: 700; color: #1976d2; }
+.helpline-text { font-size: 10px; color: #666; margin-top: 4px; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🚫 ಹಾನಿಕಾರಕ ಪದಾರ್ಥಗಳಿಗೆ ಒಪ್ಪಿಗೆ ನೀಡಬೇಡಿ</h1>
+  <p>ನಿಮ್ಮ ಆರೋಗ್ಯ ಮತ್ತು ಭವಿಷ್ಯವನ್ನು ರಕ್ಷಿಸಿ</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ಸಿಗರೇಟ್, ಮದ್ಯ ಮತ್ತು ಮಾದಕ ದ್ರವ್ಯಗಳು <strong>ವ್ಯಸನಕಾರಿ</strong> ಮತ್ತು ಬೆಳೆಯುತ್ತಿರುವ ಶರೀರ ಮನಸ್ಸಿಗೆ ಹಾನಿ. ನಿರಾಕರಣೆ ಕಲಿಯುವುದು ಜೀವನ ಕೌಶಲ. ನಿರಾಕರಿಸಲು ಸರಿ - ಆರೋಗ್ಯ ಮುಖ್ಯ!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="scenario-box" id="scenario-box">
+    <div class="scenario-title" id="scenario-title">ಸನ್ನಿವೇಶ 1: ಸಮವಯಸ್ಕ ಒತ್ತಡ</div>
+    <div class="scenario-text" id="scenario-text">
+      "ಸ್ನೇಹಿತ ಪಾರ್ಟಿಯಲ್ಲಿ ಸಿಗರೇಟ್ ನೀಡಿ 'ಎಲ್ಲರೂ ಮಾಡುತ್ತಾರೆ, ಬೋರ್ ಆಗಬೇಡ!' ಎಂದರೆ ನೀವೇನು ಮಾಡುತ್ತೀರಿ?"
+    </div>
+  </div>
+  
+  <div class="response-options" id="response-options">
+    <div class="response-btn yes" onclick="selectResponse(false, this)">
+      <div class="response-icon">😟</div>
+      <div class="response-text">ಹೊಂದಿಕೊಳ್ಳಲು ಸೇರಿಕೊಳ್ಳಿ - ಅನ್ಕೂಲ್ ಕಾಣಬೇಡಿ</div>
+    </div>
+    <div class="response-btn no" onclick="selectResponse(true, this)">
+      <div class="response-icon">💪</div>
+      <div class="response-text">"ಇಲ್ಲ ಧನ್ಯವಾದ, ನನಗೆ ಸರಿ" ಎಂದು ಆತ್ಮವಿಶ್ವಾಸದಿಂದ ಇರಿ</div>
+    </div>
+  </div>
+  
+  <div class="feedback-panel" id="feedback-panel">
+    <div class="feedback-title" id="feedback-title">✅ ಉತ್ತಮ ಆಯ್ಕೆ!</div>
+    <div class="feedback-text" id="feedback-text"></div>
+  </div>
+  
+  <button class="next-btn" id="next-btn" onclick="nextScenario()">ಮುಂದಿನ ಸನ್ನಿವೇಶ →</button>
+  
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+  </div>
+</div>
+
+<div class="substances-info">
+  <div class="substances-title">⚠️ ತಪ್ಪಿಸಬೇಕಾದ ಹಾನಿಕಾರಕ ಪದಾರ್ಥಗಳು</div>
+  <div class="substance-list">
+    <div class="substance-item">
+      <div class="icon">🚬</div>
+      <div>
+        <div class="text">ಅಗರೆ/ಸಿಗರೇಟ್</div>
+        <div class="danger">ಕ್ಯಾನ್ಸರ್, ಶ್ವಾಸಕೋಶ ರೋಗ</div>
+      </div>
+    </div>
+    <div class="substance-item">
+      <div class="icon">🍺</div>
+      <div>
+        <div class="text">ಆಲ್ಕೊಹಾಲ್</div>
+        <div class="danger">ಯಕೃತ್ತು, ಮೆದುಳಿಗೆ ಹಾನಿ</div>
+      </div>
+    </div>
+    <div class="substance-item">
+      <div class="icon">💊</div>
+      <div>
+        <div class="text">ಮಾದಕ ವಸ್ತು</div>
+        <div class="danger">Highly ವ್ಯಸನಕಾರಿ, deadly</div>
+      </div>
+    </div>
+    <div class="substance-item">
+      <div class="icon">☁️</div>
+      <div>
+        <div class="text">ವೇಪಿಂಗ್/ಇ-ಸಿಗರೇಟ್</div>
+        <div class="danger">ಹಾನಿಕಾರಕ ರಾಸಾಯನಿಕ</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="helpline">
+  <div class="helpline-title">🆘 Need Help? Call</div>
+  <div class="helpline-number">📞 14446</div>
+  <div class="helpline-text">ರಾಷ್ಟ್ರೀಯ ನಶಾ ಮುಕ್ತಿ ಹೆಲ್ಪ್‌ಲೈನ್ (ಟೋಲ್-ಫ್ರೀ, 24/7)<br>ನಶಾ ಮುಕ್ತ ಭಾರತ ಅಭಿಯಾನ</div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ಒಪ್ಪಿಗೆ ನೀಡಬೇಡಿ ಹೇಳುವ ವಿಧಾನಗಳು</div>
+  <div class="takeaway-text">
+    • <strong>"ಇಲ್ಲ ಧನ್ಯವಾದ, ನನಗೆ ಸರಿ"</strong> - ಸರಳ ಮತ್ತು ನೇರ<br>
+    • <strong>"I have to go now"</strong> - ಪರಿಸ್ಥಿತಿಯಿಂದ ಹೊರಬನ್ನಿ<br>
+    • <strong>"ನನ್ನ ತಂದೆತಾಯಿಗಳು ಅಸಮಾಧಾನಗೊಳ್ಳುತ್ತಾರೆ"</strong> - ಬೇರೆಯವರನ್ನು ದೂಷಿಸಿ<br>
+    • <strong>"ನಾನು ಕ್ರೀಡೆ ಮಾಡುತ್ತೇನೆ, ಅಪಾಯಕ್ಕೆ ಒಳಗಾಗಲಾರೆ"</strong> - ಕಾರಣ ನೀಡಿ<br>
+    • <strong>Just walk away</strong> - ನೀವು ವಿವರಣೆ ಕೊಡಬೇಕಾಗಿಲ್ಲ
+  </div>
+</div>
+
+</div>
+
+<script>
+const scenarios = [
+  {
+    title: 'ಸನ್ನಿವೇಶ 1: ಸಮವಯಸ್ಕ ಒತ್ತಡ',
+    text: '"A friend offers you a cigarette at a party ಮತ್ತು says \'Everyone\'s doing it, don\'t be boring!\' What do you do?"',
+    correct: 'Saying NO takes courage ಮತ್ತು is the smart choice! Real friends will respect your decision. Cigarettes contain nicotine which is highly ವ್ಯಸನಕಾರಿ ಮತ್ತು causes serious health problems.',
+    wrong: 'Taking it to fit in might seem easier, but it puts your health at risk. One cigarette can lead to addiction. True friends won\'t pressure you into harmful choices.'
+  },
+  {
+    title: 'ದೃಶ್ಯ 2: ಜಿಜ್ಞಾಸೆ',
+    text: '"An older student says alcohol makes you feel cool ಮತ್ತು confident. They offer you some from a bottle. What do you say?"',
+    correct: 'Great decision! ಆಲ್ಕೊಹಾಲ್ affects the developing brain ಮತ್ತು can lead to poor decisions, accidents, ಮತ್ತು addiction. Confidence comes from within, not from a bottle!',
+    wrong: 'ಆಲ್ಕೊಹಾಲ್ might seem harmless, but it\'s dangerous for adolescents. It affects your brain development, judgment, ಮತ್ತು can be ವ್ಯಸನಕಾರಿ. Real confidence comes from your achievements, not substances.'
+  },
+  {
+    title: 'ದೃಶ್ಯ 3: ಆನ್‌ಲೈನ್ ಪ್ರಭಾವ',
+    text: '"You see influencers online making vaping look cool. A classmate has a vape ಮತ್ತು offers you a try. What do you do?"',
+    correct: 'Smart choice! Vaping is NOT safe - it contains nicotine ಮತ್ತು harmful chemicals. Many young people become addicted. Don\'t believe everything you see online!',
+    wrong: 'Vaping is marketed to look cool but is very harmful. It contains ವ್ಯಸನಕಾರಿ nicotine ಮತ್ತು chemicals that damage lungs. What looks cool online can destroy your health in real ಜೀವನ.'
+  },
+  {
+    title: 'ದೃಶ್ಯ 4: ಒತ್ತಡ ನಿವಾರಣೆ',
+    text: '"A friend says taking certain pills helps them relax during exams. They offer you some. What\'s your response?"',
+    correct: 'Excellent choice! Taking unknown pills is extremely dangerous ಮತ್ತು illegal. There are healthy ways to manage stress - exercise, talking to someone, or getting help from a counselor.',
+    wrong: 'Taking pills not prescribed for you is dangerous ಮತ್ತು illegal. They can be ವ್ಯಸನಕಾರಿ or even fatal. There are safe ways to hಮತ್ತುle stress - talk to parents, teachers, or call a helpline.'
+  },
+  {
+    title: 'ದೃಶ್ಯ 5: ಕುಟುಂಬ ಪರಿಸ್ಥಿತಿ',
+    text: '"At a family gathering, a relative offers you a sip of alcohol saying \'a little won\'t hurt.\' What do you do?"',
+    correct: 'Perfect response! Even small amounts of alcohol are harmful for adolescents. Politely declining ಮತ್ತು changing the subject is the mature thing to do.',
+    wrong: 'Even a sip can be harmful for a developing body ಮತ್ತು might ಸಾಮಾನ್ಯize drinking. It\'s okay to politely say no to family members too - your health is more important than pleasing others.'
+  }
+];
+
+let currentScenario = 0;
+let answered = false;
+
+const scenarioTitle = document.getElementById('scenario-title');
+const scenarioText = document.getElementById('scenario-text');
+const responseOptions = document.getElementById('response-options');
+const feedbackPanel = document.getElementById('feedback-panel');
+const feedbackTitle = document.getElementById('feedback-title');
+const feedbackText = document.getElementById('feedback-text');
+const nextBtn = document.getElementById('next-btn');
+const progressFill = document.getElementById('progress-fill');
+
+function loadScenario() {
+  const scenario = scenarios[currentScenario];
+  scenarioTitle.textContent = scenario.title;
+  scenarioText.textContent = scenario.text;
+  
+  // ಮರುಹೊಂದಿಸಿ
+  answered = false;
+  feedbackPanel.classList.remove('show', 'wrong-feedback');
+  nextBtn.classList.remove('show');
+  
+  responseOptions.innerHTML = `
+    <div class="response-btn yes" onclick="selectResponse(false, this)">
+      <div class="response-icon">😟</div>
+      <div class="response-text">Go along with it to avoid conflict</div>
+    </div>
+    <div class="response-btn no" onclick="selectResponse(true, this)">
+      <div class="response-icon">💪</div>
+      <div class="response-text">Say "No thanks" ಮತ್ತು stay firm</div>
+    </div>
+  `;
+  
+  progressFill.style.width = `${(currentScenario / scenarios.length) * 100}%`;
+}
+
+function selectResponse(isCorrect, btn) {
+  if (answered) return;
+  answered = true;
+  
+  const scenario = scenarios[currentScenario];
+  
+  document.querySelectorAll('.response-btn').forEach(b => {
+    b.style.pointerEvents = 'none';
+  });
+  
+  if (isCorrect) {
+    btn.classList.add('correct');
+    feedbackTitle.textContent = '✅ ಉತ್ತಮ ಆಯ್ಕೆ!';
+    feedbackText.textContent = scenario.correct;
+    feedbackPanel.classList.remove('wrong-feedback');
+  } else {
+    btn.classList.add('wrong');
+    document.querySelector('.response-btn.no').classList.add('correct');
+    feedbackTitle.textContent = '⚠️ Think again...';
+    feedbackText.textContent = scenario.wrong;
+    feedbackPanel.classList.add('wrong-feedback');
+  }
+  
+  feedbackPanel.classList.add('show');
+  nextBtn.classList.add('show');
+}
+
+function nextScenario() {
+  currentScenario++;
+  
+  if (currentScenario >= scenarios.length) {
+    scenarioTitle.textContent = '🎉 ಅಭಿನಂದನೆಗಳು!';
+    scenarioText.textContent = 'You\'ve learned important ways to say NO to harmful substances. ನೆನಪಿಡಿ, protecting your health is always the right choice!';
+    responseOptions.innerHTML = '';
+    feedbackPanel.classList.remove('show');
+    nextBtn.classList.remove('show');
+    progressFill.style.width = '100%';
+    return;
+  }
+  
+  loadScenario();
+}
+
+// Initialize
+loadScenario();
+
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var showHints = params.get('showHints');
+  if (showHints === 'false') {
+    document.querySelectorAll('.concept-card, .takeaway').forEach(function (el) { el.style.display = 'none'; });
+  }
+  var state = params.get('initialState');
+  if (!state || state === 'initial') return;
+  if (state === 'show_no') {
+    setTimeout(function () {
+      var btn = document.querySelector('.response-btn.no');
+      if (btn) btn.click();
+    }, 800);
+  } else if (state === 'show_yes') {
+    setTimeout(function () {
+      var btn = document.querySelector('.response-btn.yes');
+      if (btn) btn.click();
+    }, 800);
+  }
+}());
+</script>
+</body>
+</html>

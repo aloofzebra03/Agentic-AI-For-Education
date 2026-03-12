@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0288d1">
+<title>ಜಲ ಚಕ್ರ - ಸಂವಾದಾತ್ಮಕ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #0288d1 0%, #4fc3f7 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #0288d1;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #01579b; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.control-btn {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.control-btn:active { transform: scale(0.98); }
+.control-btn.active { border-color: #0288d1; background: #e1f5fe; color: #01579b; }
+.control-btn .icon { font-size: 16px; }
+
+.cycle-visual {
+  position: relative;
+  height: 320px;
+  background: linear-gradient(180deg, #87ceeb 0%, #b3e5fc 40%, #e1f5fe 100%);
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.instruction-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  padding: 15px 25px;
+  border-radius: 10px;
+  font-size: 12px;
+  text-align: center;
+  z-index: 100;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.instruction-overlay.hidden { opacity: 0; }
+
+/* Interactive elements */
+.clickable {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.clickable:hover { transform: scale(1.1); }
+.clickable.highlighted { 
+  filter: drop-ನೆರಳು(0 0 10px #ffeb3b) drop-ನೆರಳು(0 0 20px #ff9800);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* Sun */
+.sun {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  width: 55px;
+  height: 55px;
+  background: radial-gradient(circle, #ffeb3b 0%, #ff9800 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 30px #ffeb3b;
+}
+
+.sun.active {
+  animation: sunPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes sunPulse {
+  0%, 100% { box-shadow: 0 0 30px #ffeb3b; }
+  50% { box-shadow: 0 0 50px #ff9800, 0 0 80px #ffeb3b; }
+}
+
+/* Clouds */
+.cloud {
+  position: absolute;
+  background: #fff;
+  border-radius: 50px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.cloud-1 {
+  top: 50px;
+  left: 20px;
+  width: 70px;
+  height: 30px;
+}
+
+.cloud-1::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 12px;
+  width: 30px;
+  height: 30px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.cloud-1::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 35px;
+  width: 22px;
+  height: 22px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.cloud-2 {
+  top: 35px;
+  left: 120px;
+  width: 90px;
+  height: 35px;
+  background: #e0e0e0;
+}
+
+.cloud-2::before {
+  content: '';
+  position: absolute;
+  top: -18px;
+  left: 18px;
+  width: 40px;
+  height: 40px;
+  background: #e0e0e0;
+  border-radius: 50%;
+}
+
+.cloud-2::after {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50px;
+  width: 30px;
+  height: 30px;
+  background: #e0e0e0;
+  border-radius: 50%;
+}
+
+.cloud-2.raining {
+  background: #9e9e9e;
+}
+
+.cloud-2.raining::before, .cloud-2.raining::after {
+  background: #9e9e9e;
+}
+
+/* Mountain */
+.mountain {
+  position: absolute;
+  bottom: 70px;
+  right: 30px;
+  width: 0;
+  height: 0;
+  border-left: 50px solid transparent;
+  border-right: 50px solid transparent;
+  border-bottom: 90px solid #5d4037;
+}
+
+.snow-cap {
+  position: absolute;
+  bottom: 70px;
+  right: 55px;
+  width: 0;
+  height: 0;
+  border-left: 25px solid transparent;
+  border-right: 25px solid transparent;
+  border-bottom: 35px solid #fff;
+}
+
+/* Ocean */
+.ocean {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 55%;
+  height: 70px;
+  background: linear-gradient(180deg, #0288d1 0%, #01579b 100%);
+  border-radius: 0 40px 0 0;
+}
+
+.ocean-waves {
+  position: absolute;
+  top: 5px;
+  left: 0;
+  right: 0;
+  height: 20px;
+  overflow: hidden;
+}
+
+.wave {
+  position: absolute;
+  width: 200%;
+  height: 20px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120'%3E%3Cpath fill='rgba(255,255,255,0.3)' d='M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 L1200,120 L0,120 Z'/%3E%3C/svg%3E");
+  animation: waveMove 3s linear infinite;
+}
+
+@keyframes waveMove {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ocean-label {
+  position: absolute;
+  bottom: 15px;
+  left: 25%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Lಮತ್ತು */
+.lಮತ್ತು {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 55%;
+  height: 70px;
+  background: linear-gradient(180deg, #8bc34a 0%, #689f38 100%);
+  border-radius: 40px 0 0 0;
+}
+
+.tree {
+  position: absolute;
+  bottom: 70px;
+  font-size: 35px;
+}
+
+/* ಆವಿಯಾಗುವಿಕೆ arrows */
+.evap-container {
+  position: absolute;
+  bottom: 90px;
+  left: 15%;
+}
+
+.evap-arrow {
+  position: absolute;
+  width: 20px;
+  height: 30px;
+  opacity: 0;
+}
+
+.evap-arrow svg {
+  width: 100%;
+  height: 100%;
+}
+
+.evap-arrow polygon { fill: #ff9800; }
+
+.evap-container.active .evap-arrow {
+  animation: evapRise 2.5s ease-out infinite;
+}
+
+.evap-container.active .evap-arrow:nth-child(1) { animation-delay: 0s; }
+.evap-container.active .evap-arrow:nth-child(2) { left: 25px; animation-delay: 0.5s; }
+.evap-container.active .evap-arrow:nth-child(3) { left: 50px; animation-delay: 1s; }
+
+@keyframes evapRise {
+  0% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(-80px); opacity: 0; }
+}
+
+/* Rain drops */
+.rain-container {
+  position: absolute;
+  top: 80px;
+  left: 140px;
+  width: 70px;
+  height: 100px;
+}
+
+.raindrop {
+  position: absolute;
+  width: 8px;
+  height: 16px;
+  background: linear-gradient(180deg, #64b5f6, #1976d2);
+  border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+  opacity: 0;
+}
+
+.rain-container.active .raindrop {
+  animation: rainFall 1.2s linear infinite;
+}
+
+.rain-container.active .raindrop:nth-child(1) { left: 5px; animation-delay: 0s; }
+.rain-container.active .raindrop:nth-child(2) { left: 20px; animation-delay: 0.2s; }
+.rain-container.active .raindrop:nth-child(3) { left: 35px; animation-delay: 0.4s; }
+.rain-container.active .raindrop:nth-child(4) { left: 50px; animation-delay: 0.6s; }
+.rain-container.active .raindrop:nth-child(5) { left: 15px; animation-delay: 0.8s; }
+.rain-container.active .raindrop:nth-child(6) { left: 40px; animation-delay: 1s; }
+
+@keyframes rainFall {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(120px); opacity: 0; }
+}
+
+/* Runoff arrow */
+.runoff-container {
+  position: absolute;
+  bottom: 85px;
+  right: 100px;
+}
+
+.runoff-arrow {
+  width: 60px;
+  height: 25px;
+  opacity: 0;
+}
+
+.runoff-arrow svg { width: 100%; height: 100%; }
+.runoff-arrow polygon { fill: #4caf50; }
+
+.runoff-container.active .runoff-arrow {
+  animation: runoffFlow 2s ease-in-out infinite;
+}
+
+@keyframes runoffFlow {
+  0%, 100% { opacity: 0; transform: translateX(0); }
+  50% { opacity: 1; transform: translateX(-20px); }
+}
+
+/* Stage labels */
+.stage-label {
+  position: absolute;
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.stage-label:hover { transform: scale(1.1); }
+.stage-label.active { animation: labelPulse 1s ease-in-out infinite; }
+
+@keyframes labelPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.label-evap { bottom: 150px; left: 10px; background: #ff9800; }
+.label-cond { top: 25px; left: 80px; background: #9e9e9e; }
+.label-precip { top: 90px; left: 180px; background: #1976d2; }
+.label-runoff { bottom: 100px; right: 60px; background: #4caf50; }
+.label-collect { bottom: 25px; left: 50%; transform: translateX(-50%); background: #01579b; }
+
+/* Info popup */
+.info-popup {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  z-index: 50;
+}
+
+.info-popup.show { transform: translateY(0); }
+
+.info-popup-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #01579b;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-popup-text {
+  font-size: 11px;
+  color: #37474f;
+  line-height: 1.5;
+}
+
+.close-popup {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #999;
+}
+
+/* Step ಸೂಚಕ */
+.step-ಸೂಚಕ {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.step-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.step-dot.active { background: #0288d1; transform: scale(1.2); }
+.step-dot.ಪೂರ್ಣ { background: #4caf50; }
+
+.step-dot:hover { transform: scale(1.3); }
+
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.nav-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.nav-btn.prev { background: #e0e0e0; color: #333; }
+.nav-btn.next { background: linear-gradient(135deg, #0288d1, #4fc3f7); color: #fff; }
+.nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>💧 ಜಲ ಚಕ್ರ</h1>
+  <p>ಸಂವಾದಾತ್ಮಕ ಅನುಕರಣೆ - ಅನ್ವೇಷಿಸಲು ಅಂಶಗಳನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿ!</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    The <strong>Sun's heat</strong> ಜಲ ಚಕ್ರ ಚಾಲನೆ. ಸೂರ್ಯ, ಮೇಘ, ಮಳೆ ಟ್ಯಾಪ್ ಮಾಡಿ labels to learn about each stage!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="controls">
+    <button class="control-btn" id="play-btn" onclick="toggleAnimation()">
+      <span class="icon" id="play-icon">▶️</span>
+      <span id="play-text">Play All</span>
+    </button>
+    <button class="control-btn" id="guided-btn" onclick="startGuidedMode()">
+      <span class="icon">📖</span>
+      Step-by-Step
+    </button>
+    <button class="control-btn" onclick="resetSimulation()">
+      <span class="icon">🔄</span>
+      ಮರುಹೊಂದಿಸಿ
+    </button>
+  </div>
+  
+  <div class="cycle-visual" id="cycle-visual">
+    <div class="instruction-overlay" id="instruction">👆 ಅಂಶಗಳನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿ ಅಥವಾ ಮೇಲಿನ ನಿಯಂತ್ರಣಗಳನ್ನು ಬಳಸಿ</div>
+    
+    <!-- Sun -->
+    <div class="sun clickable" id="sun" onclick="showInfo('sun')"></div>
+    
+    <!-- Clouds -->
+    <div class="cloud cloud-1 clickable" onclick="showInfo('condensation')"></div>
+    <div class="cloud cloud-2 clickable" id="rain-cloud" onclick="showInfo('condensation')"></div>
+    
+    <!-- ಆವಿಯಾಗುವಿಕೆ arrows -->
+    <div class="evap-container" id="evap-container">
+      <div class="evap-arrow">
+        <svg viewBox="0 0 20 30"><polygon points="10,0 20,15 15,15 15,30 5,30 5,15 0,15"/></svg>
+      </div>
+      <div class="evap-arrow">
+        <svg viewBox="0 0 20 30"><polygon points="10,0 20,15 15,15 15,30 5,30 5,15 0,15"/></svg>
+      </div>
+      <div class="evap-arrow">
+        <svg viewBox="0 0 20 30"><polygon points="10,0 20,15 15,15 15,30 5,30 5,15 0,15"/></svg>
+      </div>
+    </div>
+    
+    <!-- Rain -->
+    <div class="rain-container" id="rain-container">
+      <div class="raindrop"></div>
+      <div class="raindrop"></div>
+      <div class="raindrop"></div>
+      <div class="raindrop"></div>
+      <div class="raindrop"></div>
+      <div class="raindrop"></div>
+    </div>
+    
+    <!-- Mountain -->
+    <div class="mountain"></div>
+    <div class="snow-cap"></div>
+    
+    <!-- Runoff -->
+    <div class="runoff-container" id="runoff-container">
+      <div class="runoff-arrow">
+        <svg viewBox="0 0 60 25"><polygon points="0,8 40,8 40,0 60,12.5 40,25 40,17 0,17"/></svg>
+      </div>
+    </div>
+    
+    <!-- Ocean -->
+    <div class="ocean clickable" onclick="showInfo('collection')">
+      <div class="ocean-waves"><div class="wave"></div></div>
+      <div class="ocean-label">ಮಹಾಸಾಗರ</div>
+    </div>
+    
+    <!-- Lಮತ್ತು -->
+    <div class="land clickable" onclick="showInfo('runoff')">
+      <div class="tree" style="right: 90px;">🌳</div>
+      <div class="tree" style="right: 50px;">🌲</div>
+    </div>
+    
+    <!-- Stage Labels -->
+    <div class="stage-label label-evap" onclick="showInfo('evaporation')">☀️ ಆವಿಯಾಗುವಿಕೆ</div>
+    <div class="stage-label label-cond" onclick="showInfo('condensation')">☁️ ಘನೀಕರಣ</div>
+    <div class="stage-label label-precip" onclick="showInfo('precipitation')">🌧️ ಅವಕ್ಷೇಪಣ</div>
+    <div class="stage-label label-runoff" onclick="showInfo('runoff')">🏞️ ಹರಿವು</div>
+    <div class="stage-label label-collect" onclick="showInfo('collection')">💧 ಸಂಗ್ರಹ</div>
+    
+    <!-- Info Popup -->
+    <div class="info-popup" id="info-popup">
+      <button class="close-popup" onclick="hideInfo()">✕</button>
+      <div class="info-popup-title" id="popup-title">☀️ ಆವಿಯಾಗುವಿಕೆ</div>
+      <div class="info-popup-text" id="popup-text">
+        ಸೂರ್ಯನ ಉಷ್ಣ ಸಮುದ್ರ, ನದಿ, ಸರೋವರದ ನೀರು ಆವಿಯಾಗುತ್ತದೆ.
+      </div>
+    </div>
+  </div>
+  
+  <!-- Guided mode elements -->
+  <div class="step-ಸೂಚಕ" id="step-indicator" style="display: none;">
+    <div class="step-dot" data-step="0" onclick="goToStep(0)"></div>
+    <div class="step-dot" data-step="1" onclick="goToStep(1)"></div>
+    <div class="step-dot" data-step="2" onclick="goToStep(2)"></div>
+    <div class="step-dot" data-step="3" onclick="goToStep(3)"></div>
+    <div class="step-dot" data-step="4" onclick="goToStep(4)"></div>
+  </div>
+  
+  <div class="nav-buttons" id="nav-buttons" style="display: none;">
+    <button class="nav-btn prev" id="prev-btn" onclick="prevStep()">← ಹಿಂದಿನ</button>
+    <button class="nav-btn next" id="next-btn" onclick="nextStep()">ಮುಂದೆ →</button>
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ಚಕ್ರ ಎಂದಿಗೂ ನಿಲ್ಲುವುದಿಲ್ಲ!</div>
+  <div class="takeaway-text">
+    • <strong>ಆವಿಯಾಗುವಿಕೆ:</strong> ನೀರು → ನೀರಿನ ಆವಿ (ಸೂರ್ಯ ಬಿಸಿ)<br>
+    • <strong>ಘನೀಕರಣ:</strong> ಆವಿ → ಮೋಡ (ತಂಪಾಗುವಿಕೆ)<br>
+    • <strong>ಅವಕ್ಷೇಪಣ:</strong> ಮಳೆ, ಹಿಮ, ಆಲಿಕಲ್ಲು ಬೀಳುತ್ತದೆ<br>
+    • <strong>ಸಂಗ್ರಹ:</strong> ನೀರು ಸಮುದ್ರ ಮತ್ತು ಭೂಮಿಗೆ ಮರಳುತ್ತದೆ
+  </div>
+</div>
+
+</div>
+
+<script>
+const stageInfo = {
+  sun: {
+    title: '☀️ ಸೂರ್ಯ - ಶಕ್ತಿ ಮೂಲ',
+    text: 'ಸೂರ್ಯ <strong>ಉಷ್ಣ ಶಕ್ತಿ</strong> ನೀಡಿ ಸಂಪೂರ್ಣ ನೀರು ಚಕ್ರ ಚಾಲನೆ ಮಾಡುತ್ತದೆ. ಸೂರ್ಯ ಇಲ್ಲದೆ ನೀರು ಆವಿಯಾಗುವುದಿಲ್ಲ ಮತ್ತು ಚಕ್ರ ನಿಲುಗಡೆಯಾಗುತ್ತದೆ!'
+  },
+  evaporation: {
+    title: '☀️ ಆವಿಯಾಗುವಿಕೆ',
+    text: 'ಸೂರ್ಯನ ಉಷ್ಣ ಸಮುದ್ರ, ನದಿ, ಸರೋವರ ಮತ್ತು ಒದ್ದೆ ಮಣ್ಣಿನ ನೀರನ್ನು <strong>ಆವಿಯಾಗಿಸುತ್ತದೆ</strong> (ಅದೃಶ್ಯ ನೀರಿನ ಆವಿ). ಸಸ್ಯಗಳು <strong>ಬಾಷ್ಪೋತ್ಸರ್ಜನ</strong>ದಿಂದ ನೀರಿನ ಆವಿ ಬಿಡುಗಡೆ ಮಾಡುತ್ತವೆ.'
+  },
+  condensation: {
+    title: '☁️ ಘನೀಕರಣ',
+    text: 'ನೀರಿನ ಆವಿ ಏರಿದಾಗ <strong>ತಂಪಾಗುತ್ತದೆ</strong>. ತಂಪು ಗಾಳಿ ಹೆಚ್ಚು ಶೇಷವನ್ನು ಹಿಡಿದಿಡಲು ಸಾಧ್ಯವಿಲ್ಲ, ಆದ್ದರಿಂದ ಆವಿ <strong>ಘನೀಕರಣ</strong>ಗೊಂಡು ಸಣ್ಣ ನೀರು ಬಿಂದುಗಳಾಗಿ ಮೋಡ ರೂಪಿಸುತ್ತದೆ.'
+  },
+  precipitation: {
+    title: '🌧️ ಅವಕ್ಷೇಪಣ',
+    text: 'ಮೋಡದ ನೀರಿನ ಬಿಂದುಗಳು ಭಾರವಾದಾಗ <strong>ಅವಕ್ಷೇಪಣ</strong> - ಮಳೆ, ಹಿಮ, ಸ್ಲೀಟ್ ಅಥವಾ ಆಲಿಕಲ್ಲು ಉಷ್ಣತೆ ಅನುಸಾರ.'
+  },
+  runoff: {
+    title: '🏞️ ಹರಿವು & ಅಂತರ್ಸೇಚನ',
+    text: 'ಭೂಮಿಯ ಮೇಲೆ ಬೀಳುವ ನೀರು <strong>ಹರಿದು</strong> ಜಲಸ್ರೋತ/ನದಿ ಅಥವಾ <strong>ಒಳಸೇರುತ್ತದೆ</strong> ಭೂಜಲ.'
+  },
+  collection: {
+    title: '💧 ಸಂಗ್ರಹ',
+    text: 'ನೀರು <strong>ಸಮುದ್ರ, ಸರೋವರ, ನದಿ</strong> ಅಥವಾ ಭೂಜಲ. ಇಲ್ಲಿಂದ ಚಕ್ರ ಮತ್ತೆ!'
+  }
+};
+
+const steps = ['evaporation', 'condensation', 'precipitation', 'runoff', 'collection'];
+
+let isPlaying = false;
+let isGuidedMode = false;
+let currentStep = 0;
+
+const instruction = document.getElementById('instruction');
+const infoPopup = document.getElementById('info-popup');
+const popupTitle = document.getElementById('popup-title');
+const popupText = document.getElementById('popup-text');
+const sun = document.getElementById('sun');
+const evapContainer = document.getElementById('evap-container');
+const rainContainer = document.getElementById('rain-container');
+const rainCloud = document.getElementById('rain-cloud');
+const runoffContainer = document.getElementById('runoff-container');
+const stepIndicator = document.getElementById('step-indicator');
+const navButtons = document.getElementById('nav-buttons');
+const playBtn = document.getElementById('play-btn');
+const guidedBtn = document.getElementById('guided-btn');
+
+function showInfo(stage) {
+  instruction.classList.add('hidden');
+  
+  const info = stageInfo[stage];
+  popupTitle.innerHTML = info.title;
+  popupText.innerHTML = info.text;
+  infoPopup.classList.add('show');
+  
+  // Highlight relevant elements
+  clearHighlights();
+  
+  if (stage === 'sun' || stage === 'evaporation') {
+    sun.classList.add('active');
+    evapContainer.classList.add('active');
+    document.querySelector('.label-evap').classList.add('active');
+  } else if (stage === 'condensation') {
+    document.querySelector('.label-cond').classList.add('active');
+  } else if (stage === 'precipitation') {
+    rainCloud.classList.add('raining');
+    rainContainer.classList.add('active');
+    document.querySelector('.label-precip').classList.add('active');
+  } else if (stage === 'runoff') {
+    runoffContainer.classList.add('active');
+    document.querySelector('.label-runoff').classList.add('active');
+  } else if (stage === 'collection') {
+    document.querySelector('.label-collect').classList.add('active');
+  }
+}
+
+function hideInfo() {
+  infoPopup.classList.remove('show');
+  if (!isPlaying && !isGuidedMode) {
+    clearHighlights();
+  }
+}
+
+function clearHighlights() {
+  sun.classList.remove('active');
+  evapContainer.classList.remove('active');
+  rainCloud.classList.remove('raining');
+  rainContainer.classList.remove('active');
+  runoffContainer.classList.remove('active');
+  document.querySelectorAll('.stage-label').forEach(l => l.classList.remove('active'));
+}
+
+function toggleAnimation() {
+  isPlaying = !isPlaying;
+  
+  if (isPlaying) {
+    instruction.classList.add('hidden');
+    playBtn.classList.add('active');
+    document.getElementById('play-icon').textContent = '⏸️';
+    document.getElementById('play-text').textContent = 'ಇಡಿ';
+    
+    // Activate all animations
+    sun.classList.add('active');
+    evapContainer.classList.add('active');
+    rainCloud.classList.add('raining');
+    rainContainer.classList.add('active');
+    runoffContainer.classList.add('active');
+  } else {
+    playBtn.classList.remove('active');
+    document.getElementById('play-icon').textContent = '▶️';
+    document.getElementById('play-text').textContent = 'ಎಲ್ಲಾ ಚಲಾಯಿಸಿ';
+    
+    clearHighlights();
+  }
+}
+
+function startGuidedMode() {
+  isGuidedMode = true;
+  isPlaying = false;
+  currentStep = 0;
+  
+  instruction.classList.add('hidden');
+  guidedBtn.classList.add('active');
+  playBtn.classList.remove('active');
+  document.getElementById('play-icon').textContent = '▶️';
+  document.getElementById('play-text').textContent = 'ಎಲ್ಲಾ ಚಲಾಯಿಸಿ';
+  
+  stepIndicator.style.display = 'flex';
+  navButtons.style.display = 'flex';
+  
+  updateGuidedStep();
+}
+
+function exitGuidedMode() {
+  isGuidedMode = false;
+  guidedBtn.classList.remove('active');
+  stepIndicator.style.display = 'none';
+  navButtons.style.display = 'none';
+  hideInfo();
+  clearHighlights();
+}
+
+function updateGuidedStep() {
+  clearHighlights();
+  
+  // Update step dots
+  document.querySelectorAll('.step-dot').forEach((dot, i) => {
+    dot.classList.remove('active', 'ಪೂರ್ಣ');
+    if (i < currentStep) dot.classList.add('ಪೂರ್ಣ');
+    if (i === currentStep) dot.classList.add('active');
+  });
+  
+  // Update navigation buttons
+  document.getElementById('prev-btn').disabled = currentStep === 0;
+  document.getElementById('next-btn').textContent = currentStep === steps.length - 1 ? 'ಪೂರ್ಣ ✓' : 'ಮುಂದೆ →';
+  
+  // Show info for current step
+  showInfo(steps[currentStep]);
+}
+
+function nextStep() {
+  if (currentStep < steps.length - 1) {
+    currentStep++;
+    updateGuidedStep();
+  } else {
+    exitGuidedMode();
+  }
+}
+
+function prevStep() {
+  if (currentStep > 0) {
+    currentStep--;
+    updateGuidedStep();
+  }
+}
+
+function goToStep(step) {
+  currentStep = step;
+  updateGuidedStep();
+}
+
+function resetSimulation() {
+  isPlaying = false;
+  isGuidedMode = false;
+  currentStep = 0;
+  
+  playBtn.classList.remove('active');
+  guidedBtn.classList.remove('active');
+  document.getElementById('play-icon').textContent = '▶️';
+  document.getElementById('play-text').textContent = 'ಎಲ್ಲಾ ಚಲಾಯಿಸಿ';
+  
+  stepIndicator.style.display = 'none';
+  navButtons.style.display = 'none';
+  
+  instruction.classList.remove('hidden');
+  hideInfo();
+  clearHighlights();
+}
+
+// Hide instruction after ಮೊದಲ interaction
+document.getElementById('cycle-visual').addEventListener('click', function(e) {
+  if (e.target.classList.contains('cycle-visual')) {
+    instruction.classList.add('hidden');
+  }
+}, { once: true });
+
+// ── URL Parameter Initialisation (IIFE) ───────────────────────────────────
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var initialState = params.get('initialState') || 'initial';
+  var showHints    = params.get('showHints');
+
+  var informStages = [
+    'sun', 'evaporation', 'condensation', 'precipitation', 'runoff', 'collection'
+  ];
+
+  if (initialState === 'playing') {
+    setTimeout(function () {
+      if (typeof toggleAnimation === 'function') toggleAnimation();
+    }, 800);
+  } else if (informStages.indexOf(initialState) !== -1) {
+    setTimeout(function () {
+      if (typeof showInfo === 'function') showInfo(initialState);
+    }, 800);
+  }
+
+  // Hide hints (concept-card)
+  if (showHints === 'false') {
+    document.querySelectorAll('.concept-card').forEach(function (el) {
+      el.style.display = 'none';
+    });
+  }
+}());
+</script>
+</body>
+</html>

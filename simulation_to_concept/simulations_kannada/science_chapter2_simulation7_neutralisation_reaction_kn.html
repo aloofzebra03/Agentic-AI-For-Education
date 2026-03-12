@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#4facfe">
+<title>ತಟಸ್ಥೀಕರಣ ಪ್ರತಿಕ್ರಿಯೆ – ಆಮ್ಲ + ಕ್ಷಾರ = ಉಪ್ಪು + ನೀರು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 8px 4px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 12px;
+}
+
+/* Equation box - now outside visual */
+.equation-box {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 10px 15px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1565c0;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.visual {
+  position: relative;
+  height: 32vh;
+  min-height: 220px;
+  background: linear-gradient(145deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+svg { width: 100%; height: 100%; display: block; }
+
+.static-hint {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 10px;
+  line-height: 1.3;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  z-index: 10;
+}
+
+.metrics {
+  background: #e3f2fd;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 11px;
+  line-height: 1.6;
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+}
+
+.metric-item { display: flex; justify-content: space-between; }
+.metric-label { color: #666; }
+.metric-value { font-weight: 600; color: #007AFF; }
+.metric-value.acidic { color: #d32f2f; }
+.metric-value.ಮೂಲ { color: #1565c0; }
+.metric-value.neutral { color: #2e7d32; }
+
+.control-panel {
+  background: #e3f2fd;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 8px;
+}
+
+.control-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slider-row label {
+  font-size: 10px;
+  color: #666;
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.slider-row input[type="range"] {
+  flex: 1;
+  height: 8px;
+  -webkit-appearance: none;
+  background: linear-gradient(90deg, #ef5350 0%, #4caf50 50%, #2196f3 100%);
+  border-radius: 4px;
+  outline: none;
+}
+
+.slider-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  background: #fff;
+  border: 3px solid #1565c0;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.slider-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1565c0;
+  width: 35px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.test-btn {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 18px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(76,175,80,0.3);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s ease;
+}
+
+.test-btn:active { transform: scale(0.95); }
+
+.products-box {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.product-item {
+  text-align: center;
+  opacity: 0.3;
+  transition: opacity 0.5s ease;
+}
+
+.product-item.active { opacity: 1; }
+.product-icon { font-size: 26px; }
+.product-label { font-size: 10px; color: #666; margin-top: 4px; }
+
+.insight-box {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 11px;
+  line-height: 1.5;
+  border-left: 4px solid #4caf50;
+}
+
+.insight-title { font-weight: 600; color: #2e7d32; margin-bottom: 4px; }
+
+.real-world {
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.real-world .icon { font-size: 36px; }
+.real-world .text { flex: 1; line-height: 1.4; }
+.real-world .highlight { color: #1565c0; font-weight: 600; }
+
+.takeaway {
+  background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  display: none;
+}
+
+.takeaway.show { display: block; }
+.takeaway-title { font-weight: 600; color: #0d47a1; margin-bottom: 4px; }
+
+.ph-scale {
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.ph-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.ph-bar {
+  height: 16px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #f44336 0%, #ff9800 15%, #ffeb3b 30%, #4caf50 50%, #8bc34a 60%, #03a9f4 75%, #3f51b5 100%);
+  position: relative;
+  margin-bottom: 5px;
+}
+
+.ph-pointer {
+  position: absolute;
+  top: -4px;
+  width: 4px;
+  height: 24px;
+  background: #333;
+  border-radius: 2px;
+  transition: left 0.8s ease;
+}
+
+.ph-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #666;
+}
+
+@media screen and (max-width: 380px) {
+  .slider-row label { width: 45px; font-size: 9px; }
+  .products-box { gap: 15px; padding: 10px; }
+  .product-icon { font-size: 22px; }
+  .equation-box { font-size: 11px; padding: 8px 12px; }
+}
+
+@supports (padding: max(0px)) {
+  #app {
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+  }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>⚗️ ತಟಸ್ಥೀಕರಣ ಪ್ರತಿಕ್ರಿಯೆ</h1>
+  <p>ಆಮ್ಲ ಕ್ಷಾರವನ್ನು ಭೇಟಿ ಮಾಡಿದಾಗ ಏನಾಗುತ್ತದೆ?</p>
+</div>
+
+<div class="section-title">ಪ್ರತಿಕ್ರಿಯೆ ಗಮನಿಸಲು ಆಮ್ಲ ಮತ್ತು ಕ್ಷಾರ ಮಿಶ್ರಣ ಮಾಡಿ</div>
+<div class="sim-card" id="sim"></div>
+
+<div class="products-box">
+  <div class="product-item" id="prod-salt">
+    <div class="product-icon">🧂</div>
+    <div class="product-label">ಉಪ್ಪು<br>(ರೂಪುಗೊಂಡಿದೆ)</div>
+  </div>
+  <div class="product-item" id="prod-water">
+    <div class="product-icon">💧</div>
+    <div class="product-label">ನೀರು<br>(ರೂಪುಗೊಂಡಿದೆ)</div>
+  </div>
+  <div class="product-item" id="prod-heat">
+    <div class="product-icon">🔥</div>
+    <div class="product-label">Heat<br>(ಬಿಡುಗಡೆ)</div>
+  </div>
+</div>
+
+<div class="ph-scale">
+  <div class="ph-title">pH ಮಾಪನ</div>
+  <div class="ph-bar">
+    <div class="ph-pointer" id="ph-pointer" style="left: calc(50% - 2px);"></div>
+  </div>
+  <div class="ph-labels">
+    <span>0 (ಬಲವಾದ ಆಮ್ಲ)</span>
+    <span>7 (ತಟಸ್ಥ)</span>
+    <span>14 (ಬಲವಾದ ಕ್ಷಾರ)</span>
+  </div>
+</div>
+
+<div class="insight-box">
+  <div class="insight-title">🔑 ಮುಖ್ಯ ಅಂತರ್ದೃಷ್ಟಿ:</div>
+  <strong>ಆಮ್ಲ + ಕ್ಷಾರ → ಉಪ್ಪು + ನೀರು + ಉಷ್ಣ</strong><br>
+  ಸರಿಯಾದ ಅನುಪಾತದಲ್ಲಿ ಮಿಶ್ರಣ ಮಾಡಿದಾಗ ಆಮ್ಲ ಮತ್ತು ಕ್ಷಾರ ಪರಸ್ಪರ ಪೂರ್ಣ ತಟಸ್ಥೀಕರಣ. ಫಲಿತಾಂಶ ದ್ರಾವಣದ pH 7 (ತಟಸ್ಥ)!
+</div>
+
+<div class="real-world">
+  <div class="icon">💊</div>
+  <div class="text">
+    <strong>ನೈಜ ಜೀವನ ಉದಾಹರಣೆ:</strong> <span class="highlight">ಆಮ್ಲನಿರೋಧಕಗಳು</span> ಅಧಿಕ ಜಠರ ಆಮ್ಲ (HCl) ಅನ್ನು ಮೆಗ್ನೀಸಿಯಂ ಹೈಡ್ರಾಕ್ಸೈಡ್ ನಂತಹ ಕ್ಷಾರದಿಂದ ತಟಸ್ಥೀಕರಿಸಿ ಆಮ್ಲತೆಯಿಂದ ಉಪಶಮನ ನೀಡುತ್ತವೆ!
+  </div>
+</div>
+
+<div class="takeaway" id="takeaway">
+  <div class="takeaway-title">💡 ನೀವು ಕಂಡುಕೊಂಡದ್ದು:</div>
+  <span id="takeaway-text">ಪೂರ್ಣ ತಟಸ್ಥೀಕರಣ ಉಪ್ಪು + ನೀರು + ಉಷ್ಣ ಉತ್ಪತ್ತಿ ಮಾಡುತ್ತದೆ. pH 7 (ತಟಸ್ಥ) ಆಗುತ್ತದೆ.</span>
+</div>
+
+</div>
+
+<script>
+const container = document.getElementById('sim');
+
+container.innerHTML = `
+<!-- Equation moved outside visual to prevent overlap -->
+<div class="equation-box">
+  ಆಮ್ಲ + ಕ್ಷಾರ → ಉಪ್ಪು + ನೀರು + ಉಷ್ಣ
+</div>
+
+<div class="visual">
+  <div class="static-hint">👆 ಸ್ಲೈಡರ್ ಸರಿಹೊಂದಿಸಿ, ಮಿಶ್ರಣ ಮಾಡಿ!</div>
+
+  <svg viewBox="0 0 400 240">
+    <!-- Lab bench -->
+    <rect x="10" y="180" width="380" height="50" rx="4" fill="#607d8b"/>
+    <rect x="10" y="180" width="380" height="6" rx="2" fill="#455a64"/>
+    
+    <!-- Acid beaker - adjusted position -->
+    <g transform="translate(70, 50)">
+      <path d="M-30,15 L-25,90 Q-25,100 -15,100 L15,100 Q25,100 25,90 L30,15 Z" 
+            fill="rgba(255,255,255,0.4)" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
+      <ellipse cx="0" cy="15" rx="30" ry="7" fill="rgba(255,255,255,0.3)"/>
+      <rect x="-22" y="28" width="44" height="60" rx="2" fill="#ef5350" id="acid-liquid"/>
+      <text x="0" y="0" text-anchor="middle" font-size="16">🍋</text>
+      <text x="0" y="115" text-anchor="middle" font-size="9" fill="#666">ನಿಂಬೆ ರಸ</text>
+      <text x="0" y="127" text-anchor="middle" font-size="8" fill="#d32f2f" font-weight="600">(ಆಮ್ಲ)</text>
+    </g>
+    
+    <!-- Plus sign -->
+    <text x="135" y="115" text-anchor="middle" font-size="28" fill="#455a64" font-weight="600">+</text>
+    
+    <!-- Base beaker - adjusted position -->
+    <g transform="translate(200, 50)">
+      <path d="M-30,15 L-25,90 Q-25,100 -15,100 L15,100 Q25,100 25,90 L30,15 Z" 
+            fill="rgba(255,255,255,0.4)" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
+      <ellipse cx="0" cy="15" rx="30" ry="7" fill="rgba(255,255,255,0.3)"/>
+      <rect x="-22" y="28" width="44" height="60" rx="2" fill="#42a5f5" id="base-liquid"/>
+      <text x="0" y="0" text-anchor="middle" font-size="16">💧</text>
+      <text x="0" y="115" text-anchor="middle" font-size="9" fill="#666">ಸುಣ್ಣದ ನೀರು</text>
+      <text x="0" y="127" text-anchor="middle" font-size="8" fill="#1565c0" font-weight="600">(ಕ್ಷಾರ)</text>
+    </g>
+    
+    <!-- Arrow -->
+    <text x="265" y="115" text-anchor="middle" font-size="28" fill="#455a64">→</text>
+    
+    <!-- ಫಲಿತಾಂಶ beaker - adjusted position -->
+    <g transform="translate(330, 50)">
+      <path d="M-30,15 L-25,90 Q-25,100 -15,100 L15,100 Q25,100 25,90 L30,15 Z" 
+            fill="rgba(255,255,255,0.4)" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
+      <ellipse cx="0" cy="15" rx="30" ry="7" fill="rgba(255,255,255,0.3)"/>
+      <rect x="-22" y="28" width="44" height="0" rx="2" fill="#81c784" id="result-liquid"/>
+      <text x="0" y="0" text-anchor="middle" font-size="16" id="result-icon">❓</text>
+      <text x="0" y="115" text-anchor="middle" font-size="9" fill="#666">ಫಲಿತಾಂಶ</text>
+      <text x="0" y="127" text-anchor="middle" font-size="8" fill="#666" id="result-type">(?)</text>
+    </g>
+    
+    <!-- Bubbles (hidden initially) -->
+    <g id="bubbles" opacity="0">
+      <circle cx="330" cy="100" r="4" fill="rgba(255,255,255,0.7)">
+        <animate attributeName="cy" from="130" to="80" dur="1s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" from="1" to="0" dur="1s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="320" cy="110" r="3" fill="rgba(255,255,255,0.7)">
+        <animate attributeName="cy" from="140" to="90" dur="1.2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" from="1" to="0" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="340" cy="120" r="3" fill="rgba(255,255,255,0.7)">
+        <animate attributeName="cy" from="150" to="100" dur="0.9s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" from="1" to="0" dur="0.9s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+    
+    <!-- Heat ಸೂಚಕ -->
+    <g id="heat-indicator" opacity="0" transform="translate(330, 35)">
+      <text x="0" y="0" text-anchor="middle" font-size="20">🔥</text>
+    </g>
+  </svg>
+
+  <button class="test-btn" id="mix-btn">🧪 ಮಿಶ್ರಣ ಮಾಡಿ</button>
+</div>
+
+<div class="metrics">
+  <div class="metric-item"><span class="metric-label">ಆಮ್ಲ ಪರಿಮಾಣ:</span> <span class="metric-value" id="acid-amount">50%</span></div>
+  <div class="metric-item"><span class="metric-label">ಕ್ಷಾರ ಪರಿಮಾಣ:</span> <span class="metric-value" id="base-amount">50%</span></div>
+  <div class="metric-item"><span class="metric-label">ಫಲಿತಾಂಶ pH:</span> <span class="metric-value" id="result-ph">?</span></div>
+  <div class="metric-item"><span class="metric-label">ವರ್ಗೀಕರಣ:</span> <span class="metric-value" id="classification">?</span></div>
+</div>
+
+<div class="control-panel">
+  <div class="control-label">ಸರಿಹೊಂದಿಸಿ ಆಮ್ಲ-ಕ್ಷಾರ ಅನುಪಾತ:</div>
+  <div class="slider-row">
+    <label>ಕ್ಷಾರ:</label>
+    <input type="range" id="base-slider" min="0" max="100" value="50">
+    <span class="slider-value" id="base-value">50%</span>
+  </div>
+</div>`;
+
+// State
+let baseAmount = 50;
+let isMixed = false;
+
+const acidLiquid = document.getElementById('acid-liquid');
+const baseLiquid = document.getElementById('base-liquid');
+const resultLiquid = document.getElementById('result-liquid');
+const resultIcon = document.getElementById('result-icon');
+const resultType = document.getElementById('result-type');
+const bubbles = document.getElementById('bubbles');
+const heatIndicator = document.getElementById('heat-indicator');
+const baseSlider = document.getElementById('base-slider');
+const baseValueDisplay = document.getElementById('base-value');
+const baseAmountDisplay = document.getElementById('base-amount');
+const acidAmountDisplay = document.getElementById('acid-amount');
+const resultPhDisplay = document.getElementById('result-ph');
+const classificationDisplay = document.getElementById('classification');
+const phPointer = document.getElementById('ph-pointer');
+const mixBtn = document.getElementById('mix-btn');
+const prodSalt = document.getElementById('prod-salt');
+const prodWater = document.getElementById('prod-water');
+const prodHeat = document.getElementById('prod-heat');
+const takeaway = document.getElementById('takeaway');
+const takeawayText = document.getElementById('takeaway-text');
+
+baseSlider.oninput = function() {
+  baseAmount = parseInt(this.value);
+  baseValueDisplay.textContent = baseAmount + '%';
+  baseAmountDisplay.textContent = baseAmount + '%';
+  acidAmountDisplay.textContent = (100 - baseAmount) + '%';
+  
+  // Update base ದ್ರವ height (max 60px)
+  baseLiquid.setAttribute('height', 60 * baseAmount / 100);
+  acidLiquid.setAttribute('height', 60 * (100 - baseAmount) / 100);
+};
+
+mixBtn.onclick = function() {
+  if (isMixed) {
+    // ಮರುಹೊಂದಿಸಿ
+    isMixed = false;
+    resultLiquid.setAttribute('height', '0');
+    resultIcon.textContent = '❓';
+    resultType.textContent = '(?)';
+    resultType.setAttribute('fill', '#666');
+    bubbles.style.opacity = '0';
+    heatIndicator.style.opacity = '0';
+    resultPhDisplay.textContent = '?';
+    classificationDisplay.textContent = '?';
+    classificationDisplay.className = 'metric-value';
+    phPointer.style.left = 'calc(50% - 2px)';
+    prodSalt.classList.remove('active');
+    prodWater.classList.remove('active');
+    prodHeat.classList.remove('active');
+    mixBtn.textContent = '🧪 ಮಿಶ್ರಣ ಮಾಡಿ';
+    return;
+  }
+  
+  isMixed = true;
+  mixBtn.textContent = '🔄 ಮರುಹೊಂದಿಸಿ';
+  
+  // Show bubbles ಮತ್ತು heat
+  bubbles.style.transition = 'opacity 0.5s';
+  bubbles.style.opacity = '1';
+  heatIndicator.style.transition = 'opacity 0.5s';
+  heatIndicator.style.opacity = '1';
+  
+  setTimeout(() => {
+    // ಲೆಕ್ಕ ಹಾಕಿ result
+    let ph, color, icon, typeText, classification;
+    
+    if (baseAmount < 40) {
+      // Excess acid
+      ph = 2 + (baseAmount / 40) * 3;
+      color = '#ef5350';
+      icon = '🟠';
+      typeText = '(ಆಮ್ಲೀಯ)';
+      classification = 'ಇನ್ನೂ ಆಮ್ಲೀಯ';
+      classificationDisplay.className = 'metric-value acidic';
+      takeawayText.textContent = 'ಕ್ಷಾರ ಕಡಿಮೆ! ದ್ರಾವಣ ಇನ್ನೂ ಆಮ್ಲೀಯ. ಪೂರ್ಣ ತಟಸ್ಥೀಕರಣಕ್ಕೆ ಹೆಚ್ಚು ಕ್ಷಾರ ಸೇರಿಸಿ.';
+    } else if (baseAmount > 60) {
+      // Excess base
+      ph = 9 + ((baseAmount - 60) / 40) * 3;
+      color = '#42a5f5';
+      icon = '🔵';
+      typeText = '(ಕ್ಷಾರೀಯ)';
+      classification = 'ಇನ್ನೂ ಕ್ಷಾರೀಯ';
+      classificationDisplay.className = 'metric-value ಮೂಲ';
+      takeawayText.textContent = 'ಕ್ಷಾರ ಹೆಚ್ಚು! ದ್ರಾವಣ ಇನ್ನೂ ಕ್ಷಾರೀಯ. ಪೂರ್ಣ ತಟಸ್ಥೀಕರಣಕ್ಕೆ ಕಡಿಮೆ ಕ್ಷಾರ ಬಳಸಿ.';
+    } else {
+      // Neutral
+      ph = 7;
+      color = '#81c784';
+      icon = '✅';
+      typeText = '(ತಟಸ್ಥ)';
+      classification = 'ಪರಿಪೂರ್ಣ ತಟಸ್ಥ!';
+      classificationDisplay.className = 'metric-value neutral';
+      takeawayText.textContent = 'ಪರಿಪೂರ್ಣ! ಆಮ್ಲ ಮತ್ತು ಕ್ಷಾರ ಪರಸ್ಪರ ಪೂರ್ಣ ತಟಸ್ಥೀಕರಣ, ಉಪ್ಪು ಮತ್ತು ನೀರು ಉಂಟಾಗುತ್ತದೆ. pH = 7!';
+    }
+    
+    // Update visuals
+    resultLiquid.style.transition = 'height 0.8s ease, fill 0.5s ease';
+    resultLiquid.setAttribute('height', '60');
+    resultLiquid.setAttribute('fill', color);
+    resultIcon.textContent = icon;
+    resultType.textContent = typeText;
+    resultType.setAttribute('fill', color === '#81c784' ? '#2e7d32' : (color === '#ef5350' ? '#d32f2f' : '#1565c0'));
+    
+    resultPhDisplay.textContent = ph.toFixed(1);
+    classificationDisplay.textContent = classification;
+    
+    // Update pH pointer
+    phPointer.style.left = `calc(${(ph / 14) * 100}% - 2px)`;
+    
+    // Show products
+    prodSalt.classList.add('active');
+    prodWater.classList.add('active');
+    prodHeat.classList.add('active');
+    
+    takeaway.classList.add('show');
+    
+    setTimeout(() => {
+      heatIndicator.style.opacity = '0.3';
+    }, 2000);
+  }, 500);
+};
+
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var initState = (p.get('initialState') || '').toLowerCase();
+  var showHintParam = p.get('showHints');
+  if (showHintParam === 'false') {
+    var box = document.querySelector('.insight-box');
+    if (box) box.style.display = 'none';
+  }
+  var sliderMap = { 'acidic': '20', 'neutral': '50', 'basic': '80' };
+  var sliderVal = sliderMap[initState];
+  if (!sliderVal) return;
+  setTimeout(function () {
+    var slider = document.getElementById('base-slider');
+    if (slider) {
+      slider.value = sliderVal;
+      slider.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    setTimeout(function () {
+      var mb = document.getElementById('mix-btn');
+      if (mb) mb.click();
+    }, 600);
+  }, 800);
+}());
+</script>
+</body>
+</html>

@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#e91e63">
+<title>ಕೆಂಪು ಗುಲಾಬಿ ಸೂಚಕ – ನೈಸರ್ಗಿಕ ಆಮ್ಲ-ಕ್ಷಾರ ಪರೀಕ್ಷೆ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #e91e63 0%, #f06292 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 8px 4px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 12px;
+}
+
+.visual {
+  position: relative;
+  height: 38vh;
+  min-height: 280px;
+  background: linear-gradient(145deg, #fce4ec 0%, #f8bbd9 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+svg { width: 100%; height: 100%; display: block; }
+
+.static-hint {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  line-height: 1.3;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  z-index: 10;
+}
+
+.metrics {
+  background: #fce4ec;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 11px;
+  line-height: 1.6;
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+}
+
+.metric-item { display: flex; justify-content: space-between; }
+.metric-label { color: #666; }
+.metric-value { font-weight: 600; color: #007AFF; }
+.metric-value.acidic { color: #d32f2f; }
+.metric-value.basic { color: #2e7d32; }
+.metric-value.neutral { color: #e91e63; }
+
+.control-panel {
+  background: #fce4ec;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.control-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.solution-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.solution-btn {
+  padding: 10px 6px;
+  border-radius: 10px;
+  border: 2px solid #f8bbd9;
+  font-size: 10px;
+  background: #fff;
+  cursor: pointer;
+  text-align: center;
+  line-height: 1.3;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: transform 0.1s ease;
+}
+
+.solution-btn:active { transform: scale(0.95); }
+.solution-btn.active { border-color: #e91e63; background: #fce4ec; }
+.solution-btn .icon { font-size: 20px; display: block; margin-bottom: 3px; }
+
+.test-btn {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background: linear-gradient(135deg, #e91e63 0%, #f06292 100%);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 12px 20px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(233,30,99,0.3);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s ease;
+}
+
+.test-btn:active { transform: scale(0.95); }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 10px;
+  margin-top: 12px;
+  font-size: 11px;
+}
+
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-color { width: 24px; height: 14px; border-radius: 4px; }
+.legend-color.original { background: #e91e63; }
+.legend-color.acidic { background: #d32f2f; }
+.legend-color.basic { background: #4caf50; }
+
+.insight-box {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-left: 4px solid #e91e63;
+}
+
+.insight-title { font-weight: 600; color: #c2185b; margin-bottom: 6px; }
+
+.real-world {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.real-world .icon { font-size: 40px; }
+.real-world .text { flex: 1; line-height: 1.5; }
+.real-world .highlight { color: #c2185b; font-weight: 600; }
+
+.takeaway {
+  background: linear-gradient(135deg, #f8bbd9 0%, #f48fb1 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  display: none;
+}
+
+.takeaway.show { display: block; }
+.takeaway-title { font-weight: 600; color: #880e4f; margin-bottom: 6px; }
+
+.prep-info {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 11px;
+}
+
+.prep-title { font-weight: 600; color: #c2185b; margin-bottom: 8px; }
+
+.prep-steps {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.prep-steps::-webkit-scrollbar { display: none; }
+.prep-step { flex-shrink: 0; text-align: center; width: 60px; }
+.prep-step .icon { font-size: 24px; }
+.prep-step .text { font-size: 9px; color: #666; margin-top: 4px; }
+
+@media screen and (max-width: 380px) {
+  .solution-grid { gap: 6px; }
+  .solution-btn { padding: 8px 4px; font-size: 9px; }
+  .solution-btn .icon { font-size: 18px; }
+}
+
+@supports (padding: max(0px)) {
+  #app {
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+  }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🌹 ಕೆಂಪು ಗುಲಾಬಿ ಸೂಚಕ</h1>
+  <p>ಪ್ರಕೃತಿಯ ಸುಂದರ ಆಮ್ಲ-ಕ್ಷಾರ ಪತ್ತೆಹಚ್ಚುವಿಕೆ!</p>
+</div>
+
+<div class="section-title">ಗುಲಾಬಿ ಅಂಗೈ ಸಾರದಿಂದ ದ್ರಾವಣಗಳನ್ನು ಪರೀಕ್ಷಿಸಿ</div>
+<div class="sim-card" id="sim"></div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-color original"></div> ಮೂಲ (ಗುಲಾಬಿ)</div>
+  <div class="legend-item"><div class="legend-color acidic"></div> ಆಮ್ಲೀಯ → ಕೆಂಪು</div>
+  <div class="legend-item"><div class="legend-color basic"></div> ಕ್ಷಾರೀಯ → ಹಸಿರು</div>
+</div>
+
+<div class="insight-box">
+  <div class="insight-title">🔑 ಮುಖ್ಯ ಅಂತರ್ದೃಷ್ಟಿ:</div>
+  ಗುಲಾಬಿ ಅಂಗೈ ಸಾರವು <strong style="color:#d32f2f">ಆಮ್ಲಗಳಲ್ಲಿ ಕೆಂಪಾಗುತ್ತದೆ</strong> ಮತ್ತು <strong style="color:#2e7d32">ಕ್ಷಾರಗಳಲ್ಲಿ ಹಸಿರಾಗುತ್ತದೆ</strong>. <strong style="color:#e91e63">ತಟಸ್ಥ ದ್ರಾವಣಗಳಲ್ಲಿ ಗುಲಾಬಿ ಉಳಿಯುತ್ತದೆ</strong>. ಇದು ಸಂಪೂರ್ಣ ನೈಸರ್ಗಿಕ ಸೂಚಕ!
+</div>
+
+<div class="prep-info">
+  <div class="prep-title">🧪 ಗುಲಾಬಿ ಅಂಗೈ ಸಾರ ತಯಾರಿಸುವುದು:</div>
+  <div class="prep-steps">
+    <div class="prep-step"><div class="icon">🌹</div><div class="text">ಅಂಗೈಗಳನ್ನು ಸಂಗ್ರಹಿಸಿ</div></div>
+    <div class="prep-step"><div class="icon">✂️</div><div class="text">ನುಚ್ಚುನೂರು ಮಾಡಿ</div></div>
+    <div class="prep-step"><div class="icon">🔥</div><div class="text">ಬಿಸಿ ನೀರು ಸೇರಿಸಿ</div></div>
+    <div class="prep-step"><div class="icon">⏳</div><div class="text">ಊರಲು ಬಿಡಿ</div></div>
+    <div class="prep-step"><div class="icon">🧪</div><div class="text">ಫಿಲ್ಟರ್ ಮಾಡಿ ಬಳಸಿ</div></div>
+  </div>
+</div>
+
+<div class="real-world">
+  <div class="icon">🌺</div>
+  <div class="text">
+    <strong>ಆಸಕ್ತಿದಾಯಕ:</strong> ಅನೇಕ ಹೂವುಗಳಲ್ಲಿ <span class="highlight">ಆಂಥೋಸೈನಿನ್ಗಳು</span> ಎಂಬ ನೈಸರ್ಗಿಕ ವರ್ಣದ್ರವ್ಯಗಳಿವೆ; pH ಜೊತೆ ಬಣ್ಣ ಬದಲಾಗುತ್ತದೆ. ಕೆಂಪು ಎಲೆಕೋಸು, ಹಿಬಿಸ್ಕಸ್ ಮತ್ತು ಬೀಟ್ರೂಟ್ ಸೂಚಕಗಳಾಗಿ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತವೆ!
+  </div>
+</div>
+
+<div class="takeaway" id="takeaway">
+  <div class="takeaway-title">💡 ನೀವು ಕಂಡುಕೊಂಡದ್ದು:</div>
+  <span id="takeaway-text">ಗುಲಾಬಿ ಸಾರ ಸಂಪೂರ್ಣ ನೈಸರ್ಗಿಕ ಸೂಚಕ!</span>
+</div>
+
+</div>
+
+<script>
+const SOLUTIONS = {
+  'lemon': { name: 'Lemon Juice', nameKn: 'ನಿಂಬೆ ರಸ', icon: '🍋', type: 'acidic', resultColor: '#d32f2f', colorName: 'ಕೆಂಪು' },
+  'vinegar': { name: 'Vinegar', nameKn: 'ವಿನಿಗರ್', icon: '🍶', type: 'acidic', resultColor: '#e53935', colorName: 'ಕೆಂಪು' },
+  'orange': { name: 'Orange Juice', nameKn: 'ಕಿತ್ತಳೆ ರಸ', icon: '🍊', type: 'acidic', resultColor: '#ef5350', colorName: 'ಉಜ್ಜ್ವಲ ಕೆಂಪು' },
+  'soap': { name: 'Soap Solution', nameKn: 'ಸಾಬೂನು ದ್ರಾವಣ', icon: '🧼', type: 'basic', resultColor: '#4caf50', colorName: 'ಹಸಿರು' },
+  'baking': { name: 'Baking Soda', nameKn: 'ಬೇಕಿಂಗ್ ಸೋಡಾ', icon: '🥄', type: 'basic', resultColor: '#66bb6a', colorName: 'ಹಸಿರು' },
+  'lime': { name: 'Lime Water', nameKn: 'ಸುಣ್ಣದ ನೀರು', icon: '💧', type: 'basic', resultColor: '#2e7d32', colorName: 'ಗಾಢ ಹಸಿರು' },
+  'water': { name: 'Tap Water', nameKn: 'ನಳ ನೀರು', icon: '🚰', type: 'neutral', resultColor: '#e91e63', colorName: 'ಗುಲಾಬಿ (ಬದಲಾವಣೆ ಇಲ್ಲ)' },
+  'milk': { name: 'Milk', nameKn: 'ಹಾಲು', icon: '🥛', type: 'neutral', resultColor: '#ec407a', colorName: 'ಗುಲಾಬಿ (ಬದಲಾವಣೆ ಇಲ್ಲ)' },
+  'salt': { name: 'Salt Solution', nameKn: 'ಉಪ್ಪು ದ್ರಾವಣ', icon: '🧂', type: 'neutral', resultColor: '#f06292', colorName: 'ಗುಲಾಬಿ (ಬದಲಾವಣೆ ಇಲ್ಲ)' }
+};
+const TYPE_KN = { acidic: 'ಆಮ್ಲೀಯ', basic: 'ಕ್ಷಾರೀಯ', neutral: 'ತಟಸ್ಥ' };
+
+const container = document.getElementById('sim');
+const defaultSolution = 'lemon';
+
+container.innerHTML = `
+<div class="visual">
+  <div class="static-hint">👆 ದ್ರಾವಣ ಆಯ್ಕೆಮಾಡಿ ಮತ್ತು "ಸೇರಿಸಿ" ಟ್ಯಾಪ್ ಮಾಡಿ</div>
+
+  <svg viewBox="0 0 400 300">
+    <!-- Lab bench -->
+    <rect x="30" y="220" width="340" height="60" rx="4" fill="#8d6e63"/>
+    <rect x="30" y="220" width="340" height="8" rx="2" fill="#6d4c41"/>
+    
+    <!-- Rose and mortar -->
+    <g transform="translate(70, 50)">
+      <text x="0" y="0" font-size="45">🌹</text>
+      <text x="22" y="55" font-size="9" fill="#888">ಗುಲಾಬಿ ಅಂಗೈ</text>
+    </g>
+    
+    <!-- Extract beaker -->
+    <g transform="translate(200, 70)">
+      <path d="M-40,20 L-35,100 Q-35,110 -25,110 L25,110 Q35,110 35,100 L40,20 Z" 
+            fill="rgba(255,255,255,0.4)" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
+      <ellipse cx="0" cy="20" rx="40" ry="8" fill="rgba(255,255,255,0.3)"/>
+      <rect x="-30" y="35" width="60" height="65" rx="2" fill="#e91e63" id="extract-liquid"/>
+      <text x="0" y="130" text-anchor="middle" font-size="10" fill="#666">ಗುಲಾಬಿ ಸಾರ</text>
+    </g>
+    
+    <!-- Test tubes -->
+    <g transform="translate(320, 60)">
+      <rect x="-18" y="0" width="36" height="100" rx="12" fill="rgba(255,255,255,0.5)" stroke="rgba(255,255,255,0.7)" stroke-width="2"/>
+      <rect x="-14" y="20" width="28" height="65" rx="8" fill="#e91e63" id="test-liquid"/>
+      <text x="0" y="120" text-anchor="middle" font-size="10" fill="#666" id="test-label">ಪರೀಕ್ಷಾ ನಳಿಕೆ</text>
+    </g>
+    
+    <!-- Dropper -->
+    <g id="dropper" transform="translate(200, 15)">
+      <rect x="-10" y="0" width="20" height="35" rx="4" fill="#90a4ae"/>
+      <ellipse cx="0" cy="0" rx="14" ry="9" fill="#78909c"/>
+      <rect x="-5" y="35" width="10" height="25" fill="#b0bec5"/>
+      <circle cx="0" cy="65" r="5" fill="#81d4fa" id="drop" opacity="0"/>
+      <text x="0" y="-15" text-anchor="middle" font-size="14" id="dropper-icon">${SOLUTIONS[defaultSolution].icon}</text>
+    </g>
+    
+    <!-- Result badge -->
+    <g id="result-box" opacity="0">
+      <rect x="135" y="190" width="130" height="28" rx="14" fill="#fff" stroke="#4caf50" stroke-width="2"/>
+      <text x="200" y="209" text-anchor="middle" font-size="12" fill="#4caf50" font-weight="600" id="result-text">ಫಲಿತಾಂಶ</text>
+    </g>
+  </svg>
+
+  <button class="test-btn" id="test-btn">💧 ದ್ರಾವಣ ಸೇರಿಸಿ</button>
+</div>
+
+<div class="metrics">
+  <div class="metric-item"><span class="metric-label">ದ್ರಾವಣ:</span> <span class="metric-value" id="solution-name">${SOLUTIONS[defaultSolution].nameKn || SOLUTIONS[defaultSolution].name}</span></div>
+  <div class="metric-item"><span class="metric-label">ವಿಧ:</span> <span class="metric-value" id="type-display">?</span></div>
+  <div class="metric-item"><span class="metric-label">ಬಣ್ಣ ಬದಲಾವಣೆ:</span> <span class="metric-value" id="color-display">ಗುಲಾಬಿ</span></div>
+  <div class="metric-item"><span class="metric-label">ತೀರ್ಮಾನ:</span> <span class="metric-value" id="conclusion">?</span></div>
+</div>
+
+<div class="control-panel">
+  <div class="control-label">ಪರೀಕ್ಷಿಸಲು ದ್ರಾವಣ ಆಯ್ಕೆಮಾಡಿ:</div>
+  <div class="solution-grid">
+    <button class="solution-btn active" data-solution="lemon"><span class="icon">🍋</span>ನಿಂಬೆ</button>
+    <button class="solution-btn" data-solution="vinegar"><span class="icon">🍶</span>ವಿನಿಗರ್</button>
+    <button class="solution-btn" data-solution="orange"><span class="icon">🍊</span>ಕಿತ್ತಳೆ</button>
+    <button class="solution-btn" data-solution="soap"><span class="icon">🧼</span>ಸಾಬೂನು</button>
+    <button class="solution-btn" data-solution="baking"><span class="icon">🥄</span>ಬೇಕಿಂಗ್ ಸೋಡಾ</button>
+    <button class="solution-btn" data-solution="lime"><span class="icon">💧</span>ಸುಣ್ಣದ ನೀರು</button>
+    <button class="solution-btn" data-solution="water"><span class="icon">🚰</span>ನಳ ನೀರು</button>
+    <button class="solution-btn" data-solution="milk"><span class="icon">🥛</span>ಹಾಲು</button>
+    <button class="solution-btn" data-solution="salt"><span class="icon">🧂</span>ಉಪ್ಪು</button>
+  </div>
+</div>`;
+
+let state = { solution: 'lemon', animating: false };
+
+const testLiquid = document.getElementById('test-liquid');
+const testLabel = document.getElementById('test-label');
+const drop = document.getElementById('drop');
+const dropper = document.getElementById('dropper');
+const dropperIcon = document.getElementById('dropper-icon');
+const solutionName = document.getElementById('solution-name');
+const typeDisplay = document.getElementById('type-display');
+const colorDisplay = document.getElementById('color-display');
+const conclusion = document.getElementById('conclusion');
+const resultBox = document.getElementById('result-box');
+const resultText = document.getElementById('result-text');
+const testBtn = document.getElementById('test-btn');
+const takeaway = document.getElementById('takeaway');
+const takeawayText = document.getElementById('takeaway-text');
+
+function updateDisplay() {
+  const sol = SOLUTIONS[state.solution];
+  dropperIcon.textContent = sol.icon;
+  solutionName.textContent = sol.nameKn || sol.name;
+}
+
+function animateDrop(callback) {
+  const sol = SOLUTIONS[state.solution];
+  
+  // Move dropper to test tube
+  dropper.style.transition = 'transform 0.4s ease';
+  dropper.setAttribute('transform', 'translate(320, 15)');
+  
+  setTimeout(() => {
+    drop.setAttribute('fill', sol.resultColor);
+    drop.setAttribute('opacity', '1');
+    drop.setAttribute('cy', '65');
+    
+    // Animate drop falling
+    let cy = 65;
+    const dropInterval = setInterval(() => {
+      cy += 8;
+      drop.setAttribute('cy', cy);
+      if (cy > 120) {
+        clearInterval(dropInterval);
+        drop.setAttribute('opacity', '0');
+        callback();
+      }
+    }, 30);
+  }, 400);
+}
+
+function runTest() {
+  if (state.animating) return;
+  state.animating = true;
+  
+  const sol = SOLUTIONS[state.solution];
+
+  animateDrop(() => {
+    // Change test tube color
+    testLiquid.style.transition = 'fill 0.6s ease';
+    testLiquid.setAttribute('fill', sol.resultColor);
+    testLabel.textContent = sol.nameKn || sol.name;
+
+    typeDisplay.textContent = TYPE_KN[sol.type] || sol.type.charAt(0).toUpperCase() + sol.type.slice(1);
+    typeDisplay.className = `metric-value ${sol.type}`;
+    
+    colorDisplay.textContent = sol.colorName;
+    colorDisplay.className = `metric-value ${sol.type}`;
+
+    if (sol.type === 'acidic') {
+      conclusion.textContent = TYPE_KN.acidic;
+      conclusion.className = 'metric-value acidic';
+      resultText.textContent = '🔴 ' + TYPE_KN.acidic;
+      resultText.setAttribute('fill', '#d32f2f');
+      resultBox.querySelector('rect').setAttribute('stroke', '#d32f2f');
+      takeawayText.textContent = (sol.nameKn || sol.name) + ' ಗುಲಾಬಿ ಸಾರವನ್ನು ಕೆಂಪಾಗಿಸಿತು – ಆಮ್ಲೀಯ!';
+    } else if (sol.type === 'basic') {
+      conclusion.textContent = TYPE_KN.basic;
+      conclusion.className = 'metric-value basic';
+      resultText.textContent = '🟢 ' + TYPE_KN.basic;
+      resultText.setAttribute('fill', '#2e7d32');
+      resultBox.querySelector('rect').setAttribute('stroke', '#2e7d32');
+      takeawayText.textContent = (sol.nameKn || sol.name) + ' ಗುಲಾಬಿ ಸಾರವನ್ನು ಹಸಿರಾಗಿಸಿತು – ಕ್ಷಾರೀಯ!';
+    } else {
+      conclusion.textContent = TYPE_KN.neutral;
+      conclusion.className = 'metric-value neutral';
+      resultText.textContent = '🩷 ' + TYPE_KN.neutral;
+      resultText.setAttribute('fill', '#e91e63');
+      resultBox.querySelector('rect').setAttribute('stroke', '#e91e63');
+      takeawayText.textContent = (sol.nameKn || sol.name) + ' ಗುಲಾಬಿ ಸಾರವನ್ನು ಗುಲಾಬಿ ಉಳಿಸಿತು – ತಟಸ್ಥ!';
+    }
+
+    resultBox.style.transition = 'opacity 0.3s';
+    resultBox.setAttribute('opacity', '1');
+    takeaway.classList.add('show');
+    
+    // Move dropper back
+    setTimeout(() => {
+      dropper.setAttribute('transform', 'translate(200, 15)');
+      state.animating = false;
+    }, 500);
+  });
+}
+
+function resetTest() {
+  if (state.animating) return;
+  
+  testLiquid.setAttribute('fill', '#e91e63');
+  testLabel.textContent = 'ಪರೀಕ್ಷಾ ನಳಿಕೆ';
+  dropper.setAttribute('transform', 'translate(200, 15)');
+  typeDisplay.textContent = '?';
+  typeDisplay.className = 'metric-value';
+  colorDisplay.textContent = 'ಗುಲಾಬಿ';
+  colorDisplay.className = 'metric-value';
+  conclusion.textContent = '?';
+  conclusion.className = 'metric-value';
+  resultBox.setAttribute('opacity', '0');
+}
+
+testBtn.onclick = runTest;
+
+container.querySelectorAll('.solution-btn').forEach(btn => {
+  btn.onclick = () => {
+    if (state.animating) return;
+    container.querySelectorAll('.solution-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.solution = btn.dataset.solution;
+    resetTest();
+    updateDisplay();
+  };
+});
+
+updateDisplay();
+
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var initState = (p.get('initialState') || '').toLowerCase();
+  var showHintParam = p.get('showHints');
+  if (showHintParam === 'false') {
+    var box = document.querySelector('.insight-box');
+    if (box) box.style.display = 'none';
+  }
+  var solutionMap = { 'acidic': 'lemon', 'basic': 'soap', 'neutral': 'water' };
+  var targetSolution = solutionMap[initState];
+  if (!targetSolution) return;
+  setTimeout(function () {
+    var solBtn = document.querySelector('.solution-btn[data-solution="' + targetSolution + '"]');
+    if (solBtn) solBtn.click();
+    setTimeout(function () {
+      var tb = document.getElementById('test-btn');
+      if (tb) tb.click();
+    }, 600);
+  }, 800);
+}());
+</script>
+</body>
+</html>

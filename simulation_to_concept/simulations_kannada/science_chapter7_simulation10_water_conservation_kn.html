@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#00897b">
+<title>ಜಲ ಸಂರಕ್ಷಣೆ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #00897b 0%, #4db6ac 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #00897b;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #00695c; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.method-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.method-tab {
+  padding: 10px 4px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  text-align: center;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.method-tab:active { transform: scale(0.95); }
+.method-tab.active { border-color: #00897b; background: #e0f2f1; color: #00695c; }
+
+.method-tab .emoji { font-size: 20px; display: block; margin-bottom: 2px; }
+
+.conservation-visual {
+  position: relative;
+  height: 240px;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: background 0.5s ease;
+}
+
+/* ವರ್ಷಾಧಾರ ಸಂಗ್ರಹಣೆ View */
+.rwh-view {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #87ceeb 0%, #e1f5fe 40%, #e0e0e0 40%);
+}
+
+.rwh-cloud {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 35px;
+}
+
+.rwh-house {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 80px;
+}
+
+.house-roof {
+  width: 0;
+  height: 0;
+  border-left: 70px solid transparent;
+  border-right: 70px solid transparent;
+  border-bottom: 40px solid #795548;
+  position: relative;
+  left: -10px;
+}
+
+.house-body {
+  width: 120px;
+  height: 50px;
+  background: #d7ccc8;
+}
+
+.gutter {
+  position: absolute;
+  bottom: 100px;
+  left: calc(50% + 50px);
+  width: 5px;
+  height: 40px;
+  background: #78909c;
+}
+
+.pipe {
+  position: absolute;
+  bottom: 60px;
+  left: calc(50% + 50px);
+  width: 40px;
+  height: 5px;
+  background: #78909c;
+}
+
+.tank {
+  position: absolute;
+  bottom: 20px;
+  right: 50px;
+  width: 50px;
+  height: 60px;
+  background: linear-gradient(180deg, #90a4ae 0%, #607d8b 100%);
+  border-radius: 5px;
+}
+
+.tank-ನೀರು {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, #4fc3f7, #0288d1);
+  border-radius: 0 0 5px 5px;
+  transition: height 1s ease;
+}
+
+.tank-label {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  color: #333;
+  white-space: nowrap;
+}
+
+.ನೀರು-drop-rwh {
+  position: absolute;
+  font-size: 12px;
+  animation: dropFall 1.5s linear infinite;
+}
+
+@keyframes dropFall {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(60px); opacity: 0; }
+}
+
+/* ರಿಚಾರ್ಜ್ ಗುಂಡಿ View */
+.pit-view {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #87ceeb 0%, #e1f5fe 30%, #8bc34a 30%, #8bc34a 35%, #795548 35%);
+  display: none;
+}
+
+.pit-cloud {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 35px;
+}
+
+.recharge-pit {
+  position: absolute;
+  top: 85px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 120px;
+  background: linear-gradient(180deg, #d7ccc8 0%, #bcaaa4 50%, #a1887f 100%);
+  border-radius: 5px 5px 20px 20px;
+  overflow: hidden;
+}
+
+.pit-gravel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(180deg, #8d6e63, #6d4c41);
+}
+
+.pit-sಮತ್ತು {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(180deg, #d7ccc8, #bcaaa4);
+}
+
+.pit-ನೀರು {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(180deg, rgba(79,195,247,0.7), rgba(2,136,209,0.7));
+  animation: pitನೀರುMove 2s ease-in-out infinite;
+}
+
+@keyframes pitನೀರುMove {
+  0%, 100% { height: 30px; }
+  50% { height: 20px; }
+}
+
+.pit-arrow {
+  position: absolute;
+  font-size: 16px;
+  color: #2196f3;
+  animation: arrowDown 1s ease-in-out infinite;
+}
+
+@keyframes arrowDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
+}
+
+.pit-label {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: #fff;
+  background: rgba(0,0,0,0.5);
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+/* ಐಸ್ ಸ್ತೂಪ View */
+.stupa-view {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #5c6bc0 0%, #7986cb 30%, #e8eaf6 30%, #e8eaf6 35%, #a1887f 35%);
+  display: none;
+}
+
+.stupa-moon {
+  position: absolute;
+  top: 15px;
+  right: 30px;
+  font-size: 30px;
+}
+
+.ice-stupa {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 50px solid transparent;
+  border-right: 50px solid transparent;
+  border-bottom: 100px solid #e3f2fd;
+  filter: drop-ನೆರಳು(0 0 10px rgba(255,255,255,0.5));
+}
+
+.stupa-ನೀರು {
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20px;
+  animation: ನೀರುSpray 1s ease-in-out infinite;
+}
+
+@keyframes ನೀರುSpray {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.2); }
+}
+
+.stupa-label {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #fff;
+  background: rgba(92,107,192,0.8);
+  padding: 4px 10px;
+  border-radius: 10px;
+}
+
+.mountain-bg {
+  position: absolute;
+  bottom: 40px;
+  right: 20px;
+  width: 0;
+  height: 0;
+  border-left: 40px solid transparent;
+  border-right: 40px solid transparent;
+  border-bottom: 80px solid #78909c;
+  opacity: 0.5;
+}
+
+.info-panel {
+  background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #00897b;
+}
+
+.info-title { font-size: 12px; font-weight: 700; color: #00695c; margin-bottom: 8px; }
+.info-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.problem-box {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #f44336;
+}
+
+.problem-title { font-size: 12px; font-weight: 700; color: #c62828; margin-bottom: 6px; }
+.problem-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2196f3;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>💧 ಜಲ ಸಂರಕ್ಷಣೆ</h1>
+  <p>ನಮ್ಮ ಅಮೂಲ್ಯ ಜಲ ಸಂಪನ್ಮೂಲಗಳನ್ನು ರಕ್ಷಿಸುವುದು</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ಭೂಜಲ <strong>ಖಾಲಿಯಾಗುತ್ತಿದೆ</strong> ಅತಿಯಾದ ಬಳಕೆ ಮತ್ತು ಕಡಿಮೆ ಅಂತರ್ಸೇಚನ (ಕಾಂಕ್ರೀಟ್ess vegetation). <strong>Rainನೀರು harvesting</strong> ಮತ್ತು <strong>ರಿಚಾರ್ಜ್ ಗುಂಡಿಗಳು</strong> ಭವಿಷ್ಯದ ಪೀಳಿಗೆಗೆ ಭೂಜಲ ಪುನಃಪೂರಣೆ.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="method-tabs">
+    <button class="method-tab active" onclick="selectMethod('rwh', this)">
+      <span class="emoji">🏠</span>
+      ವರ್ಷಾಧಾರ ಸಂಗ್ರಹಣೆ
+    </button>
+    <button class="method-tab" onclick="selectMethod('pit', this)">
+      <span class="emoji">🕳️</span>
+      ರಿಚಾರ್ಜ್ ಗುಂಡಿ
+    </button>
+    <button class="method-tab" onclick="selectMethod('stupa', this)">
+      <span class="emoji">🏔️</span>
+      ಐಸ್ ಸ್ತೂಪ
+    </button>
+  </div>
+  
+  <div class="conservation-visual">
+    <!-- ವರ್ಷಾಧಾರ ಸಂಗ್ರಹಣೆ View -->
+    <div class="rwh-view" id="rwh-view">
+      <div class="rwh-cloud">🌧️</div>
+      <div class="ನೀರು-drop-rwh" style="left: 45%; top: 50px; animation-delay: 0s;">💧</div>
+      <div class="ನೀರು-drop-rwh" style="left: 55%; top: 50px; animation-delay: 0.5s;">💧</div>
+      
+      <div class="rwh-house">
+        <div class="house-roof"></div>
+        <div class="house-body"></div>
+      </div>
+      <div class="gutter"></div>
+      <div class="pipe"></div>
+      <div class="tank">
+        <div class="tank-ನೀರು" style="height: 70%;"></div>
+        <div class="tank-label">ಭಂಡಾರ ಟ್ಯಾಂಕ್</div>
+      </div>
+    </div>
+    
+    <!-- ರಿಚಾರ್ಜ್ ಗುಂಡಿ View -->
+    <div class="pit-view" id="pit-view">
+      <div class="pit-cloud">🌧️</div>
+      <div class="recharge-pit">
+        <div class="pit-ನೀರು"></div>
+        <div class="pit-sಮತ್ತು"></div>
+        <div class="pit-gravel"></div>
+        <div class="pit-arrow" style="top: 50px; left: 35%;">⬇️</div>
+        <div class="pit-arrow" style="top: 60px; left: 55%; animation-delay: 0.5s;">⬇️</div>
+      </div>
+      <div class="pit-label">ನೀರು ಭೂಜಲಕ್ಕೆ ಒಳಸೇರುತ್ತದೆ</div>
+    </div>
+    
+    <!-- ಐಸ್ ಸ್ತೂಪ View -->
+    <div class="stupa-view" id="stupa-view">
+      <div class="stupa-moon">🌙</div>
+      <div class="mountain-bg"></div>
+      <div class="ice-stupa"></div>
+      <div class="stupa-ನೀರು">💦</div>
+      <div class="stupa-label">❄️ ಐಸ್ ಸ್ತೂಪ - Ladakh</div>
+    </div>
+  </div>
+</div>
+
+<div class="info-panel" id="info-panel">
+  <div class="info-title" id="info-title">🏠 ವರ್ಷಾಧಾರ ಸಂಗ್ರಹಣೆ</div>
+  <div class="info-text" id="info-text">
+    ಛಾವಣಿಯ ಮೇಲೆ ಬೀಳುವ ಮಳೆನೀರು ಗಟರ್ಸ್ ಮೂಲಕ ಸಂಗ್ರಹs ಮತ್ತು pipes into storage tanks. This ನೀರು can be used for <strong>ಉದ್ಯಾನ, ತೊಳೆಯುವುದು ಅಥವಾ ಕುಡಿಯುವುದು</strong> (ಚಿಕಿತ್ಸೆಯ ನಂತರ). ಭೂಜಲ ಅವಲಂಬನೆ ಕಡಿಮೆ!
+  </div>
+</div>
+
+<div class="problem-box">
+  <div class="problem-title">⚠️ The Problem: Groundನೀರು Depletion</div>
+  <div class="problem-text">
+    • <strong>ಕಾಂಕ್ರೀಟ್ ಮೇಲ್ಮೈ</strong> ನೀರು ಭೂಮಿಗೆ ಒಳಸೇರುವುದು ತಡೆ<br>
+    • <strong>ವನನಾಶ</strong> ನೀರು ಧಾರಣ ಕಡಿಮೆ<br>
+    • <strong>ಅತಿ ಹೊರತೆಗೆಯುವಿಕೆ</strong> ಕೃಷಿ ಮತ್ತು ನಗರಗಳಿಗೆ<br>
+    • ಭಾರತದ ಅನೇಕ ಪ್ರದೇಶದಲ್ಲಿ ಭೂಜಲ ಇಳಿಯುತ್ತಿದೆ
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನಾವು ಏನು ಮಾಡಬಹುದು?</div>
+  <div class="takeaway-text">
+    • ಸ್ಥಾಪಿಸಿ <strong>rainನೀರು harvesting</strong> at home<br>
+    • ರಚಿಸಿ <strong>ರಿಚಾರ್ಜ್ ಗುಂಡಿಗಳು</strong> ಉದ್ಯಾನಗಳಲ್ಲಿ<br>
+    • <strong>ಮರ ನೆಡಿ</strong> - ಬೇರುಗಳು ಒಳಸೇರುವಿಕೆಗೆ ಸಹಾಯ<br>
+    • <strong>ನೀರನ್ನು ಬುದ್ಧಿವಂತಿಕೆಯಿಂದ ಬಳಸಿ</strong> - ಸೋರಿಕೆ ಸರಿಪಡಿಸಿ, ಚಿಕ್ಕ ಸ್ನಾನ<br>
+    • Support community ನೀರು conservation projects
+  </div>
+</div>
+
+</div>
+
+<script>
+const methods = {
+  rwh: {
+    title: '🏠 ವರ್ಷಾಧಾರ ಸಂಗ್ರಹಣೆ',
+    text: 'ಛಾವಣಿಯ ಮೇಲೆ ಬೀಳುವ ಮಳೆನೀರು ಗಟರ್ಸ್ ಮೂಲಕ ಸಂಗ್ರಹs ಮತ್ತು pipes into storage tanks. This ನೀರು can be used for <strong>ಉದ್ಯಾನ, ತೊಳೆಯುವುದು ಅಥವಾ ಕುಡಿಯುವುದು</strong> (ಚಿಕಿತ್ಸೆಯ ನಂತರ). ಭೂಜಲ ಅವಲಂಬನೆ ಕಡಿಮೆ!'
+  },
+  pit: {
+    title: '🕳️ ರಿಚಾರ್ಜ್ ಗುಂಡಿ',
+    text: 'A recharge pit is a hole filled with gravel ಮತ್ತು sಮತ್ತು that allows rainನೀರು to <strong>seep directly into the ground</strong>. The layers filter the ನೀರು as it passes through. This helps replenish the aquifer (underground ನೀರು storage).'
+  },
+  stupa: {
+    title: '🏔️ ಐಸ್ ಸ್ಟೂಪಾ (ಲಡಾಕ್)',
+    text: 'In cold Ladakh, ನೀರು is sprayed at ರಾತ್ರಿ in winter to form <strong>artificial glaciers</strong> called ಐಸ್ ಸ್ತೂಪs. These cone-shaped ice structures slowly melt in summer, providing ನೀರು for farming when it\'s needed most - an ingenious traditional solution!'
+  }
+};
+
+const rwhView = document.getElementById('rwh-view');
+const pitView = document.getElementById('pit-view');
+const stupaView = document.getElementById('stupa-view');
+const infoTitle = document.getElementById('info-title');
+const infoText = document.getElementById('info-text');
+
+function selectMethod(method, btn) {
+  document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  
+  // Hide all views
+  rwhView.style.display = 'none';
+  pitView.style.display = 'none';
+  stupaView.style.display = 'none';
+  
+  // Show selected view
+  if (method === 'rwh') {
+    rwhView.style.display = 'block';
+  } else if (method === 'pit') {
+    pitView.style.display = 'block';
+  } else if (method === 'stupa') {
+    stupaView.style.display = 'block';
+  }
+  
+  // Update info
+  const data = methods[method];
+  infoTitle.textContent = data.title;
+  infoText.innerHTML = data.text;
+}
+
+// ── URL Parameter Support ──────────────────────────────────────────────
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var state = p.get('initialState');
+  var hints = p.get('showHints');
+
+  if (hints === 'false') {
+    var cc = document.querySelector('.concept-card');
+    if (cc) cc.style.display = 'none';
+  }
+
+  var validStates = ['rwh', 'pit', 'stupa'];
+  if (state && validStates.indexOf(state) !== -1) {
+    setTimeout(function () {
+      var typeOrder = ['rwh', 'pit', 'stupa'];
+      var idx = typeOrder.indexOf(state);
+      var tabs = document.querySelectorAll('.method-tab');
+      if (idx !== -1 && tabs[idx]) {
+        selectMethod(state, tabs[idx]);
+      }
+    }, 800);
+  }
+}());
+</script>
+</body>
+</html>

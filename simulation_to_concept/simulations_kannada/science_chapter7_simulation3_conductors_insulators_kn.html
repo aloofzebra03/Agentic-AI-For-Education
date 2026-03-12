@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#795548">
+<title>ವಾಹಕಗಳು ಮತ್ತು ಅವಾಹಕಗಳು - ಓಟ!</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #795548 0%, #a1887f 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #795548;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #5d4037; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.mode-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.mode-btn:active { transform: scale(0.98); }
+.mode-btn.active { border-color: #795548; background: #efebe9; color: #5d4037; }
+
+.race-visual {
+  position: relative;
+  height: 300px;
+  background: linear-gradient(180deg, #fafafa 0%, #e0e0e0 100%);
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 15px;
+}
+
+.race-title {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.heat-ಮೂಲ {
+  position: absolute;
+  left: 15px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.heat-ಮೂಲ .label {
+  font-size: 9px;
+  color: #e65100;
+  font-weight: 600;
+}
+
+.race-track {
+  position: absolute;
+  left: 60px;
+  right: 60px;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.race-track:hover { transform: scale(1.02); }
+.race-track.selected { box-shadow: 0 0 0 3px #ffeb3b; }
+
+.track-bg {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.track-metal { background: linear-gradient(180deg, #bdbdbd, #9e9e9e, #bdbdbd); }
+.track-wood { background: linear-gradient(180deg, #a1887f, #8d6e63, #a1887f); }
+.track-glass { background: linear-gradient(180deg, rgba(200,230,255,0.9), rgba(150,200,255,0.8), rgba(200,230,255,0.9)); }
+.track-plastic { background: linear-gradient(180deg, #81d4fa, #4fc3f7, #81d4fa); }
+
+.heat-progress {
+  height: 100%;
+  width: 0%;
+  border-radius: 8px 0 0 8px;
+  transition: width 0.1s linear;
+}
+
+.progress-metal { background: linear-gradient(90deg, #f44336, #ff9800, #ffeb3b); }
+.progress-wood { background: linear-gradient(90deg, #f44336 0%, #ff9800 100%); }
+.progress-glass { background: linear-gradient(90deg, #f44336 0%, #ff9800 100%); }
+.progress-plastic { background: linear-gradient(90deg, #f44336 0%, #ff9800 100%); }
+
+.track-label {
+  position: absolute;
+  left: -50px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #333;
+  width: 45px;
+  text-align: right;
+}
+
+.track-icon {
+  position: absolute;
+  right: -45px;
+  font-size: 24px;
+}
+
+.finish-line {
+  position: absolute;
+  right: 55px;
+  top: 40px;
+  bottom: 20px;
+  width: 3px;
+  background: repeating-linear-gradient(180deg, #333 0px, #333 5px, #fff 5px, #fff 10px);
+}
+
+.finish-label {
+  position: absolute;
+  right: 10px;
+  top: 45px;
+  font-size: 9px;
+  color: #333;
+  font-weight: 600;
+  writing-mode: vertical-lr;
+}
+
+.winner-badge {
+  position: absolute;
+  right: 70px;
+  padding: 3px 8px;
+  background: #4caf50;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 10px;
+  display: none;
+}
+
+.winner-badge.show { display: block; animation: pop 0.3s ease; }
+
+@keyframes pop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.control-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.start-btn { background: linear-gradient(135deg, #4caf50, #66bb6a); color: #fff; }
+.start-btn:disabled { background: #e0e0e0; color: #999; }
+.reset-btn { background: linear-gradient(135deg, #9e9e9e, #bdbdbd); color: #fff; }
+
+.timer-display {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin-top: 10px;
+}
+
+.results-panel {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.results-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 8px; }
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.result-item {
+  padding: 10px;
+  background: #fff;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.result-item .name { font-size: 11px; font-weight: 600; color: #333; }
+.result-item .time { font-size: 14px; font-weight: 700; margin-top: 4px; }
+.result-item .type { font-size: 9px; color: #666; margin-top: 2px; }
+
+.result-item.conductor .time { color: #4caf50; }
+.result-item.insulator .time { color: #f44336; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2196f3;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🏁 ಉಷ್ಣ ಓಟ: ವಾಹಕಗಳು ಮತ್ತು ಅವಾಹಕಗಳು</h1>
+  <p>ಯಾವ ಪದಾರ್ಥ ಉಷ್ಣವನ್ನು ಅತ್ಯಂತ ವೇಗವಾಗಿ ವರ್ಗಾವಣೆ ಮಾಡುತ್ತದೆ?</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ವಾಹಕಗಳು</strong> (ಲೋಹಗಳು) ಉಷ್ಣವನ್ನು ವೇಗವಾಗಿ ವರ್ಗಾವಣೆ ಮಾಡುತ್ತವೆ. <strong>ಅವಾಹಕಗಳು</strong> (wood, plastic, glass) transfer heat slowly. Race them to see the ವ್ಯತ್ಯಾಸ!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="mode-selector">
+    <button class="mode-btn active" onclick="selectMode('race', this)">🏁 ಓಟ ಮೋಡ್</button>
+    <button class="mode-btn" onclick="selectMode('compare', this)">📊 ಹೋಲಿಕೆ ಮೋಡ್</button>
+  </div>
+  
+  <div class="race-visual">
+    <div class="race-title">🔥 ಉಷ್ಣ ವರ್ಗಾವಣೆ ಓಟ 🏁</div>
+    
+    <div class="finish-line"></div>
+    <div class="finish-label">ಮುಗಿದಿದೆ</div>
+    
+    <!-- ಲೋಹ Track -->
+    <div class="heat-ಮೂಲ" style="top: 60px;">🔥</div>
+    <div class="race-track" style="top: 55px;" onclick="selectTrack('metal')">
+      <div class="track-label">ಲೋಹ</div>
+      <div class="track-bg track-metal">
+        <div class="heat-progress progress-metal" id="progress-metal"></div>
+      </div>
+      <div class="track-icon">🥄</div>
+      <div class="winner-badge" id="badge-metal">🥇 1st</div>
+    </div>
+    
+    <!-- Wood Track -->
+    <div class="heat-ಮೂಲ" style="top: 115px;">🔥</div>
+    <div class="race-track" style="top: 110px;" onclick="selectTrack('wood')">
+      <div class="track-label">ಮರ</div>
+      <div class="track-bg track-wood">
+        <div class="heat-progress progress-wood" id="progress-wood"></div>
+      </div>
+      <div class="track-icon">🪵</div>
+      <div class="winner-badge" id="badge-wood">🥈 2nd</div>
+    </div>
+    
+    <!-- ಗಾಜು Track -->
+    <div class="heat-ಮೂಲ" style="top: 170px;">🔥</div>
+    <div class="race-track" style="top: 165px;" onclick="selectTrack('glass')">
+      <div class="track-label">ಗಾಜು</div>
+      <div class="track-bg track-glass">
+        <div class="heat-progress progress-glass" id="progress-glass"></div>
+      </div>
+      <div class="track-icon">🫙</div>
+      <div class="winner-badge" id="badge-glass">🥉 3rd</div>
+    </div>
+    
+    <!-- ಪ್ಲಾಸ್ಟಿಕ್ Track -->
+    <div class="heat-ಮೂಲ" style="top: 225px;">🔥</div>
+    <div class="race-track" style="top: 220px;" onclick="selectTrack('plastic')">
+      <div class="track-label">ಪ್ಲಾಸ್ಟಿಕ್</div>
+      <div class="track-bg track-plastic">
+        <div class="heat-progress progress-plastic" id="progress-plastic"></div>
+      </div>
+      <div class="track-icon">🥤</div>
+      <div class="winner-badge" id="badge-plastic">4th</div>
+    </div>
+  </div>
+  
+  <div class="controls">
+    <button class="control-btn start-btn" id="start-btn" onclick="startRace()">🏁 ಓಟ ಪ್ರಾರಂಭಿಸಿ!</button>
+    <button class="control-btn reset-btn" onclick="resetRace()">🔄 ಮರುಹೊಂದಿಸಿ</button>
+  </div>
+  
+  <div class="timer-display" id="timer">⏱️ 0.0 ಸೆಕೆಂಡ್</div>
+</div>
+
+<div class="results-panel" id="results-panel" style="display: none;">
+  <div class="results-title">📊 ಓಟ ಫಲಿತಾಂಶ</div>
+  <div class="results-grid">
+    <div class="result-item conductor">
+      <div class="name">🥄 ಲೋಹ</div>
+      <div class="time" id="result-metal">--</div>
+      <div class="type">⚡ ವಾಹಕ</div>
+    </div>
+    <div class="result-item insulator">
+      <div class="name">🪵 ಮರ</div>
+      <div class="time" id="result-wood">--</div>
+      <div class="type">🛡️ ವಾಹಕವಲ್ಲದ</div>
+    </div>
+    <div class="result-item insulator">
+      <div class="name">🫙 ಗಾಜು</div>
+      <div class="time" id="result-glass">--</div>
+      <div class="type">🛡️ ವಾಹಕವಲ್ಲದ</div>
+    </div>
+    <div class="result-item insulator">
+      <div class="name">🥤 ಪ್ಲಾಸ್ಟಿಕ್</div>
+      <div class="time" id="result-plastic">--</div>
+      <div class="type">🛡️ ವಾಹಕವಲ್ಲದ</div>
+    </div>
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ಇದು ಏನನ್ನು ತೋರಿಸುತ್ತದೆ</div>
+  <div class="takeaway-text">
+    • <strong>ಲೋಹ ಗೆಲ್ಲುತ್ತದೆ</strong> – ಅದು ಉತ್ತಮ ವಾಹಕ!<br>
+    • <strong>ಅವಾಹಕಗಳು ನಿಧಾನ</strong> – ಅವು ಉಷ್ಣ ಹರಿವನ್ನು ತಡೆಯುತ್ತವೆ<br>
+    • ಅದಕ್ಕೇ ಪಾತ್ರೆ ಲೋಹ ಹಿಡಿಕೆ ಪ್ಲಾಸ್ಟಿಕ್/ಮರ!
+  </div>
+</div>
+
+</div>
+
+<script>
+let isRacing = false;
+let timer = 0;
+let timerInterval;
+let finishTimes = { metal: 0, wood: 0, glass: 0, plastic: 0 };
+let finishOrder = [];
+
+// ವೇಗ factors (higher = ವೇಗವಾಗಿ)
+const speeds = {
+  metal: 5,    // Very fast
+  wood: 0.8,   // Slow
+  glass: 1.0,  // Slow
+  plastic: 0.6 // Very slow
+};
+
+const progress = {
+  metal: 0,
+  wood: 0,
+  glass: 0,
+  plastic: 0
+};
+
+function selectMode(mode, btn) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  resetRace();
+}
+
+function selectTrack(material) {
+  // Show info about the material
+  const info = {
+    metal: 'ಲೋಹ ಉತ್ತಮ ವಾಹಕ! ಉಷ್ಣ ಅದರ ಮೂಲಕ ಬಹು ವೇಗವಾಗಿ ಹರಿಯುತ್ತದೆ.',
+    wood: 'ಮರ ಅವಾಹಕ. ಗಾಳಿ ಜಾಗಗಳು ಉಷ್ಣ ವರ್ಗಾವಣೆ ನಿಧಾನಗೊಳಿಸುತ್ತವೆ.',
+    glass: 'ಗಾಜು ಕಳಪೆ ವಾಹಕ. ಉಷ್ಣ ನಿಧಾನವಾಗಿ ಹರಿಯುತ್ತದೆ.',
+    plastic: 'ಪ್ಲಾಸ್ಟಿಕ್ ಉತ್ತಮ ಅವಾಹಕ. ಉಷ್ಣ ಬಹುತೇಕ ಹಾದುಹೋಗುವುದಿಲ್ಲ!'
+  };
+  alert(info[material]);
+}
+
+function startRace() {
+  if (isRacing) return;
+  
+  isRacing = true;
+  timer = 0;
+  finishTimes = { metal: 0, wood: 0, glass: 0, plastic: 0 };
+  finishOrder = [];
+  
+  document.getElementById('start-btn').disabled = true;
+  document.getElementById('results-panel').style.display = 'none';
+  
+  // Hide all badges
+  document.querySelectorAll('.winner-badge').forEach(b => b.classList.remove('show'));
+  
+  timerInterval = setInterval(() => {
+    timer += 0.1;
+    document.getElementById('timer').textContent = `⏱️ ${timer.toFixed(1)} ಸೆಕೆಂಡ್ಗಳು`;
+    
+    // Update each track
+    Object.keys(progress).forEach(material => {
+      if (progress[material] < 100) {
+        progress[material] += speeds[material] * (0.8 + Math.random() * 0.4);
+        
+        if (progress[material] >= 100) {
+          progress[material] = 100;
+          if (!finishTimes[material]) {
+            finishTimes[material] = timer;
+            finishOrder.push(material);
+            showBadge(material, finishOrder.length);
+          }
+        }
+        
+        document.getElementById(`progress-${material}`).style.width = `${progress[material]}%`;
+      }
+    });
+    
+    // Check if race is ಪೂರ್ಣ
+    if (Object.values(progress).every(p => p >= 100)) {
+      endRace();
+    }
+  }, 100);
+}
+
+function showBadge(material, position) {
+  const badges = ['🥇 1st', '🥈 2nd', '🥉 3rd', '4th'];
+  const badge = document.getElementById(`badge-${material}`);
+  badge.textContent = badges[position - 1];
+  badge.classList.add('show');
+}
+
+function endRace() {
+  clearInterval(timerInterval);
+  isRacing = false;
+  document.getElementById('start-btn').disabled = false;
+  
+  // Show results
+  document.getElementById('results-panel').style.display = 'block';
+  
+  Object.keys(finishTimes).forEach(material => {
+    document.getElementById(`result-${material}`).textContent = `${finishTimes[material].toFixed(1)}s`;
+  });
+}
+
+function resetRace() {
+  clearInterval(timerInterval);
+  isRacing = false;
+  timer = 0;
+  
+  Object.keys(progress).forEach(material => {
+    progress[material] = 0;
+    document.getElementById(`progress-${material}`).style.width = '0%';
+  });
+  
+  document.getElementById('timer').textContent = '⏱️ 0.0 ಸೆಕೆಂಡ್';
+  document.getElementById('start-btn').disabled = false;
+  document.getElementById('results-panel').style.display = 'none';
+  
+  document.querySelectorAll('.winner-badge').forEach(b => b.classList.remove('show'));
+}
+
+// URL parameter auto-initialisation
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var initialState = params.get('initialState') || 'race';
+  var showHints = params.get('showHints') !== 'false';
+  if (!showHints) {
+    var card = document.querySelector('.concept-card');
+    if (card) card.style.display = 'none';
+  }
+  var modeMap = { 'race': 0, 'compare': 1 };
+  var idx = modeMap[initialState];
+  if (idx !== undefined) {
+    setTimeout(function() {
+      var btns = document.querySelectorAll('.mode-btn');
+      if (btns[idx]) btns[idx].click();
+      if (initialState === 'race') {
+        setTimeout(function() { startRace(); }, 1800);
+      }
+    }, 800);
+  }
+})();
+</script>
+</body>
+</html>

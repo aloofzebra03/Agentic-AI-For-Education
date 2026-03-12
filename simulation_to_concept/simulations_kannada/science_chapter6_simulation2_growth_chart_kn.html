@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1976d2">
+<title>ಕೌಮಾರದಲ್ಲಿ ಬೆಳವಣಿಗೆ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #1976d2 0%, #64b5f6 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #1976d2;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.age-slider {
+  margin-bottom: 15px;
+}
+
+.age-slider label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #37474f;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.age-slider input[type="range"] {
+  width: 100%;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #c8e6c9, #fff59d, #ffcc80, #ef9a9a);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.age-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #1976d2;
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.age-display {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1976d2;
+  margin: 10px 0;
+}
+
+.growth-visual {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 200px;
+  background: linear-gradient(180deg, #e3f2fd 0%, #fff 100%);
+  border-radius: 10px;
+  padding: 10px;
+  position: relative;
+}
+
+.person-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.person-head {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ffcc80;
+  margin-bottom: 5px;
+}
+
+.person-body {
+  width: 40px;
+  background: #64b5f6;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.3s ease;
+}
+
+.person-legs {
+  display: flex;
+  gap: 4px;
+}
+
+.person-leg {
+  width: 15px;
+  background: #1976d2;
+  border-radius: 0 0 5px 5px;
+  transition: all 0.3s ease;
+}
+
+.height-marker {
+  position: absolute;
+  left: 20px;
+  bottom: 10px;
+  height: 180px;
+  width: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 8px;
+  color: #666;
+}
+
+.height-marker span {
+  background: #fff;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.stats-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.stat-card {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.stat-card.height { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); }
+.stat-card.weight { background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); }
+
+.stat-label { font-size: 10px; color: #666; margin-bottom: 4px; }
+.stat-value { font-size: 18px; font-weight: 700; }
+.stat-card.height .stat-value { color: #2e7d32; }
+.stat-card.weight .stat-value { color: #e65100; }
+.stat-change { font-size: 9px; color: #888; margin-top: 4px; }
+
+.growth-info {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #7b1fa2;
+}
+
+.growth-title { font-size: 12px; font-weight: 700; color: #7b1fa2; margin-bottom: 6px; }
+.growth-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.puberty-highlight {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.puberty-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 6px; }
+.puberty-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #1976d2;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>📏 ಕೌಮಾರದಲ್ಲಿ ಬೆಳವಣಿಗೆ</h1>
+  <p>ಕಾಲಾನುಕ್ರಮದಲ್ಲಿ ಎತ್ತರ ಮತ್ತು ತೂಕ ಹೇಗೆ ಬದಲಾಗುತ್ತದೆ ನೋಡಿ</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ಕೌಮಾರದಲ್ಲಿ ಉಂಟಾಗುತ್ತದೆ <strong>ಬೆಳವಣಿಗೆ ಉಲ್ಬಣ</strong> - a rapid increase in height ಮತ್ತು weight. ಹುಡುಗರು typically grow taller ಮತ್ತು develop broader shoulders; girls may develop earlier ಮತ್ತು gain weight in different areas.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="age-slider">
+    <label>🎂 ಬೆಳವಣಿಗೆ ನೋಡಲು ವಯಸ್ಸು ಆಯ್ಕೆಮಾಡಿ:</label>
+    <input type="range" id="age-slider" min="5" max="20" value="12" oninput="updateGrowth(this.value)">
+  </div>
+  
+  <div class="age-display" id="age-display">ವಯಸ್ಸು: 12 ವರ್ಷ</div>
+  
+  <div class="growth-visual">
+    <div class="height-marker">
+      <span>180cm</span>
+      <span>150cm</span>
+      <span>120cm</span>
+      <span>90cm</span>
+    </div>
+    <div class="person-figure" id="person-figure">
+      <div class="person-head"></div>
+      <div class="person-body" id="person-body"></div>
+      <div class="person-legs">
+        <div class="person-leg" id="person-leg-l"></div>
+        <div class="person-leg" id="person-leg-r"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="stats-row">
+    <div class="stat-card height">
+      <div class="stat-label">📏 ಸರಾಸರಿ ಎತ್ತರ</div>
+      <div class="stat-value" id="height-value">145 cm</div>
+      <div class="stat-change" id="height-change">ಸ್ಥಿರವಾಗಿ ಬೆಳೆಯುತ್ತಿದೆ</div>
+    </div>
+    <div class="stat-card weight">
+      <div class="stat-label">⚖️ ಸರಾಸರಿ ತೂಕ</div>
+      <div class="stat-value" id="weight-value">38 kg</div>
+      <div class="stat-change" id="weight-change">ಆರೋಗ್ಯಕರ ವ್ಯಾಪ್ತಿ</div>
+    </div>
+  </div>
+</div>
+
+<div class="growth-info" id="growth-info">
+  <div class="growth-title" id="growth-title">🌟 ವಯಸ್ಸು 12: ಆರಂಭಿಕ ಕೌಮಾರ</div>
+  <div class="growth-text" id="growth-text">
+    ಯೌವನಾರಂಭ ಸಾಮಾನ್ಯವಾಗಿ ಇದೇ ಸಮಯದಲ್ಲಿ ಪ್ರಾರಂಭವಾಗುತ್ತದೆ! ಶರೀರ ಬೆಳವಣಿಗೆ ಬದಲಾವಣೆಗಳನ್ನು ಉಂಟುಮಾಡುವ ಹಾರ್ಮೋನ್‌ಗಳನ್ನು ಉತ್ಪಾದಿಸಲು ಪ್ರಾರಂಭಿಸುತ್ತದೆ. ನೀವು ಮೊದಲಿಗಿಂತ ವೇಗವಾಗಿ ಬೆಳೆಯುತ್ತಿದ್ದೀರಿ ಎಂದು ಗಮನಿಸಬಹುದು.
+  </div>
+</div>
+
+<div class="puberty-highlight">
+  <div class="puberty-title">📊 ಬೆಳವಣಿಗೆ ಏರಿಕೆ ಸತ್ಯ</div>
+  <div class="puberty-text">
+    <strong>ಹುಡುಗಿಯರು:</strong> ಬೆಳವಣಿಗೆ ಏರಿಕೆ ಸಾಮಾನ್ಯವಾಗಿ 10-14 ವಯಸ್ಸಿನಲ್ಲಿ<br>
+    <strong>ಹುಡುಗರು:</strong> ಬೆಳವಣಿಗೆ ಏರಿಕೆ ಸಾಮಾನ್ಯವಾಗಿ 12-16 ವಯಸ್ಸಿನಲ್ಲಿ<br><br>
+    ವೇಗದ ಬೆಳವಣಿಗೆ ಅವಧಿಯಲ್ಲಿ ಕೌಮಾರದವರು <strong>ವರ್ಷಕ್ಕೆ 8-12 ಸೆ.ಮೀ</strong> ಬೆಳೆಯಬಹುದು!
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೆನಪಿಡಿ</div>
+  <div class="takeaway-text">
+    ಎಲ್ಲರೂ ತಮ್ಮ ವೇಗದಲ್ಲಿ ಬೆಳೆಯುತ್ತಾರೆ - ಕೆಲವು ಮುಂಚೆ, ಕೆಲವು ನಂತರ. ಇದು ಸಂಪೂರ್ಣ <strong>ಸಾಮಾನ್ಯ</strong>! ಉತ್ತಮ ಪೋಷಣೆ, ವ್ಯಾಯಾಮ ಮತ್ತು ನಿದ್ರೆ ನಿಮ್ಮ ಪೂರ್ಣ ಸಾಮರ್ಥ್ಯಕ್ಕೆ ಬೆಳೆಯಲು ಸಹಾಯ.
+  </div>
+</div>
+
+</div>
+
+<script>
+// Growth data (approximate averages)
+const growthData = {
+  5:  { height: 110, weight: 18, stage: 'ಬಾಲ್ಯ', info: 'ಮುಂಬಾಲ್ಯ - ಸ್ಥಿರ ಬೆಳವಣಿಗೆ, ಆಟ ಮತ್ತು ಕಲಿಕೆಗೆ ಶಕ್ತಿ!' },
+  6:  { height: 116, weight: 20, stage: 'ಬಾಲ್ಯ', info: 'ಸ್ಥಿರವಾಗಿ ಬೆಳೆಯುತ್ತಿದೆ, ಸಂಯೋಜನೆ ಮತ್ತು ಚಲನಾ ಕೌಶಲ ವಿಕಾಸ.' },
+  7:  { height: 122, weight: 23, stage: 'ಬಾಲ್ಯ', info: 'ಶಾಲಾ ವಯಸ್ಸು - ವೇಗವಾಗಿ ಕಲಿಕೆ, ಸ್ನೇಹಿತರು, ಸಕ್ರಿಯ ಜೀವನಶೈಲಿ.' },
+  8:  { height: 128, weight: 26, stage: 'ಬಾಲ್ಯ', info: 'ನಿರಂತರ ಸ್ಥಿರ ಬೆಳವಣಿಗೆ, ಭೌತಿಕ ಸಾಮರ್ಥ್ಯ ವಿಕಾಸ.' },
+  9:  { height: 133, weight: 29, stage: 'ಅಂತಿಮ ಬಾಲ್ಯ', info: 'ಯೌವನಾರಂಭ ಸಮೀಪ. ಬದಲಾವಣೆಯ ಆರಂಭಿಕ ಚಿಹ್ನೆಗಳು ಕಾಣಿಸಬಹುದು.' },
+  10: { height: 138, weight: 32, stage: 'ಪೂರ್ವ-ಕೌಮಾರ', info: 'ಕೆಲವರಿಗೆ ಯೌವನಾರಂಭ ಮುಂಚೆ. ಶರೀರ ಪ್ರಮುಖ ಬದಲಾವಣೆಗಳಿಗೆ ತಯಾರಿ.' },
+  11: { height: 143, weight: 35, stage: 'ಆರಂಭಿಕ ಕೌಮಾರ', info: 'ಈ ವಯಸ್ಸಿನಲ್ಲಿ ಯೌವನಾರಂಭ, ವಿಶೇಷವಾಗಿ ಹುಡುಗಿಯರಿಗೆ.' },
+  12: { height: 149, weight: 40, stage: 'ಆರಂಭಿಕ ಕೌಮಾರ', info: 'ಬೆಳವಣಿಗೆ ಏರಿಕೆ ಪ್ರಾರಂಭ! ಎತ್ತರದಲ್ಲಿ ವೇಗವಾದ ಬದಲಾವಣೆ ಗಮನಿಸಬಹುದು.' },
+  13: { height: 156, weight: 45, stage: 'ಕೌಮಾರ', info: 'ಅನೇಕರಿಗೆ ಉಚ್ಚ ಬೆಳವಣಿಗೆ. ಶರೀರ ವೇಗವಾಗಿ ಬದಲಾಗುತ್ತಿದೆ.' },
+  14: { height: 162, weight: 50, stage: 'ಕೌಮಾರ', info: 'ವೇಗವಾದ ಬೆಳವಣಿಗೆ. ಹುಡುಗರು ಎತ್ತರದಲ್ಲಿ ಹುಡುಗಿಯರನ್ನು ಹಿಂದೆ ಹಾಕಬಹುದು.' },
+  15: { height: 167, weight: 55, stage: 'ಮಧ್ಯ ಕೌಮಾರ', info: 'ಬೆಳವಣಿಗೆ ಮುಂದುವರಿಯುತ್ತದೆ, ನಿಧಾನವಾಗಬಹುದು. ಶರೀರ ಅನುಪಾತ ಬದಲಾಗುತ್ತಿದೆ.' },
+  16: { height: 170, weight: 58, stage: 'ಮಧ್ಯ ಕೌಮಾರ', info: 'ಅನೇಕರು ಪ್ರೌಢ ಎತ್ತರಕ್ಕೆ. ಭೌತಿಕ ವಿಕಾಸ ಮುಂದುವರಿಯುತ್ತದೆ.' },
+  17: { height: 172, weight: 60, stage: 'ಅಂತಿಮ ಕೌಮಾರ', info: 'ಬೆಳವಣಿಗೆ ನಿಧಾನ. ಶರೀರ ಪ್ರೌಢ ರೂಪ ಸಮೀಪಿಸುತ್ತಿದೆ.' },
+  18: { height: 173, weight: 62, stage: 'ಅಂತಿಮ ಕೌಮಾರ', info: 'ಬಹುತೇಕರಿಗೆ ಪ್ರೌಢ ಎತ್ತರ. ಭೌತಿಕ ವಿಕಾಸದ ಅಂತಿಮ ಹಂತಗಳು.' },
+  19: { height: 174, weight: 63, stage: 'ಯುವ ಪ್ರೌಢ', info: 'ಬಹುತೇಕರು ಪ್ರೌಢ ಎತ್ತರ ತಲುಪಿದ್ದಾರೆ. ಕೆಲವರಿಗೆ ಬೆಳವಣಿಗೆ ಫಲಕಗಳು ಸಕ್ರಿಯ.' },
+  20: { height: 175, weight: 65, stage: 'ಯುವ ಪ್ರೌಢ', info: 'ಸಾಮಾನ್ಯವಾಗಿ ಪ್ರೌಢ ಎತ್ತರ. ಆರೋಗ್ಯ ನಿರ್ವಹಣೆಗೆ ಗಮನ.' }
+};
+
+const ageDisplay = document.getElementById('age-display');
+const heightValue = document.getElementById('height-value');
+const weightValue = document.getElementById('weight-value');
+const heightChange = document.getElementById('height-change');
+const weightChange = document.getElementById('weight-change');
+const growthTitle = document.getElementById('growth-title');
+const growthText = document.getElementById('growth-text');
+const personBody = document.getElementById('person-body');
+const personLegL = document.getElementById('person-leg-l');
+const personLegR = document.getElementById('person-leg-r');
+
+function updateGrowth(age) {
+  age = parseInt(age);
+  const data = growthData[age];
+  
+  ageDisplay.textContent = `ವಯಸ್ಸು: ${age} ವರ್ಷ`;
+  heightValue.textContent = `${data.height} ಸೆ.ಮೀ`;
+  weightValue.textContent = `${data.weight} ಕಿ.ಗ್ರಾ`;
+  
+  // ಲೆಕ್ಕ ಹಾಕಿ growth rate
+  const prevData = growthData[Math.max(5, age - 1)];
+  const heightGrowth = data.height - prevData.height;
+  const weightGrowth = data.weight - prevData.weight;
+  
+  if (heightGrowth >= 6) {
+    heightChange.textContent = `🚀 ಬೆಳವಣಿಗೆ ಏರಿಕೆ! +${heightGrowth}ಸೆ.ಮೀ/ವರ್ಷ`;
+    heightChange.style.color = '#4caf50';
+  } else if (heightGrowth >= 4) {
+    heightChange.textContent = `📈 ವೇಗವಾಗಿ ಬೆಳೆಯುತ್ತಿದೆ! +${heightGrowth}ಸೆ.ಮೀ/ವರ್ಷ`;
+    heightChange.style.color = '#ff9800';
+  } else {
+    heightChange.textContent = `📊 ಸ್ಥಿರ ಬೆಳವಣಿಗೆ +${heightGrowth}ಸೆ.ಮೀ/ವರ್ಷ`;
+    heightChange.style.color = '#888';
+  }
+  
+  weightChange.textContent = `ಕಳೆದ ವರ್ಷದಿಂದ +${weightGrowth}ಕಿ.ಗ್ರಾ`;
+  
+  growthTitle.textContent = `🌟 ವಯಸ್ಸು ${age}: ${data.stage}`;
+  growthText.textContent = data.info;
+  
+  // Update visual figure
+  const bodyHeight = 30 + (data.height - 110) * 0.8;
+  const legHeight = 20 + (data.height - 110) * 0.5;
+  
+  personBody.style.height = `${bodyHeight}px`;
+  personLegL.style.height = `${legHeight}px`;
+  personLegR.style.height = `${legHeight}px`;
+  
+  // Highlight adolescence period
+  const growthInfo = document.getElementById('growth-info');
+  if (age >= 10 && age <= 18) {
+    growthInfo.style.background = 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)';
+    growthInfo.style.borderColor = '#ff9800';
+    growthTitle.style.color = '#e65100';
+  } else {
+    growthInfo.style.background = 'linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%)';
+    growthInfo.style.borderColor = '#7b1fa2';
+    growthTitle.style.color = '#7b1fa2';
+  }
+}
+
+// Initialize
+updateGrowth(12);
+
+// === URL PARAMETER SUPPORT ===
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var initialState = params.get('initialState');
+  var showHints = params.get('showHints');
+
+  if (showHints === 'false') {
+    document.querySelectorAll('.concept-card, .puberty-highlight, .takeaway').forEach(function(el) { el.style.display = 'none'; });
+  }
+
+  var ageMap = { age_8: 8, age_10: 10, age_12: 12, age_13: 13, age_14: 14, age_15: 15, age_16: 16, age_18: 18, age_20: 20 };
+  if (initialState && ageMap[initialState] !== undefined) {
+    setTimeout(function() {
+      var slider = document.getElementById('age-slider');
+      slider.value = ageMap[initialState];
+      slider.dispatchEvent(new Event('input'));
+    }, 800);
+  }
+})();
+</script>
+</body>
+</html>

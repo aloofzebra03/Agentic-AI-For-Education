@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ff9800">
+<title>ಸಂವಾದಾತ್ಮಕ ಸೂರ್ಯ ಘಡಿಯಾರ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.time-control {
+  margin-bottom: 15px;
+}
+
+.time-control label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #37474f;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.time-control input[type="range"] {
+  width: 100%;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #1a237e, #42a5f5, #ffeb3b, #ff9800, #e65100);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.time-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffeb3b 0%, #ff9800 100%);
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 0 15px rgba(255,152,0,0.5);
+}
+
+.time-display {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.current-time {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #e65100;
+  margin: 10px 0;
+}
+
+.sundial-visual {
+  position: relative;
+  height: 320px;
+  background: linear-gradient(180deg, #87ceeb 0%, #b3e5fc 50%, #e0e0e0 80%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.sun {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, #ffeb3b 0%, #ff9800 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 40px #ffeb3b;
+  transition: all 0.3s ease;
+}
+
+.sun-rays {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.sun-ray {
+  position: absolute;
+  width: 4px;
+  height: 20px;
+  background: #ffeb3b;
+  left: 50%;
+  transform-origin: center 50px;
+}
+
+.ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(180deg, #a5d6a7 0%, #81c784 100%);
+}
+
+.sundial-base {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 90px;
+  background: linear-gradient(180deg, #efebe9 0%, #d7ccc8 100%);
+  border-radius: 90px 90px 0 0;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.sundial-face {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 0;
+  border-radius: 80px 80px 0 0;
+  background: #fff;
+  overflow: hidden;
+}
+
+.hour-marks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.hour-mark {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  height: 70px;
+  background: #5d4037;
+  transform-origin: bottom center;
+}
+
+.hour-label {
+  position: absolute;
+  font-size: 10px;
+  font-weight: 700;
+  color: #5d4037;
+}
+
+.gnomon {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 8px;
+  height: 70px;
+  background: linear-gradient(90deg, #5d4037, #8d6e63);
+  transform: translateX(-50%);
+  transform-origin: bottom center;
+  box-shadow: 2px 0 4px rgba(0,0,0,0.3);
+  z-index: 10;
+}
+
+.ನೆರಳು {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 6px;
+  height: 60px;
+  background: rgba(0,0,0,0.4);
+  transform-origin: bottom center;
+  transition: transform 0.3s ease;
+  border-radius: 3px;
+}
+
+.time-period {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 15px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+.info-panel {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.info-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 6px; }
+.info-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.limitations {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #f44336;
+}
+
+.limitations-title { font-size: 12px; font-weight: 700; color: #c62828; margin-bottom: 6px; }
+.limitations-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>☀️ ಸಂವಾದಾತ್ಮಕ ಸೂರ್ಯ ಘಡಿಯಾರ</h1>
+  <p>ಸೂರ್ಯನನ್ನು ಚಲಿಸಿ ಮತ್ತು ನೆರಳು ಸಮಯ ಹೇಳುವುದನ್ನು ನೋಡಿ!</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಸೂರ್ಯ ಘಡಿಯಾರಗಳು ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತವೆ</div>
+  <div class="concept-text">
+    ಸೂರ್ಯ ಘಡಿಯಾರ ಆಕಾಶದಲ್ಲಿ ಸೂರ್ಯನ ಸ್ಥಾನವನ್ನು ಬಳಸಿ <strong>ನೆರಳು</strong> ಲಂಬ ಕೋಲಿನ (ಗ್ನೋಮನ್)ಿಂದ. ಸೂರ್ಯ ಚಲಿಸಿದಂತೆ ನೆರಳುdow moves, pointing to different hour marks.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="time-control">
+    <label>☀️ ಸೂರ್ಯನನ್ನು ಆಕಾಶದಾದ್ಯಂತ ಸರಿಸಿ (6 ಪೂರ್ವಾಹ್ನ - 6 ಅಪರಾಹ್ನ):</label>
+    <input type="range" id="time-slider" min="6" max="18" value="12" step="0.5" oninput="updateSundial(this.value)">
+    <div class="time-display">
+      <span>🌅 6 ಪೂರ್ವಾಹ್ನ</span>
+      <span>☀️ 12 ಮಧ್ಯಾಹ್ನ</span>
+      <span>🌇 6 ಅಪರಾಹ್ನ</span>
+    </div>
+  </div>
+  
+  <div class="current-time" id="current-time">12:00 ಅಪರಾಹ್ನ</div>
+  
+  <div class="sundial-visual">
+    <div class="time-period" id="time-period">☀️ ಮಧ್ಯಾಹ್ನ</div>
+    
+    <div class="sun" id="sun">
+      <div class="sun-rays">
+        <div class="sun-ray" style="transform: rotate(0deg);"></div>
+        <div class="sun-ray" style="transform: rotate(45deg);"></div>
+        <div class="sun-ray" style="transform: rotate(90deg);"></div>
+        <div class="sun-ray" style="transform: rotate(135deg);"></div>
+        <div class="sun-ray" style="transform: rotate(180deg);"></div>
+        <div class="sun-ray" style="transform: rotate(225deg);"></div>
+        <div class="sun-ray" style="transform: rotate(270deg);"></div>
+        <div class="sun-ray" style="transform: rotate(315deg);"></div>
+      </div>
+    </div>
+    
+    <div class="ground"></div>
+    
+    <div class="sundial-base">
+      <div class="sundial-face">
+        <div class="hour-marks">
+          <div class="hour-mark" style="transform: rotate(-75deg);"></div>
+          <div class="hour-mark" style="transform: rotate(-60deg);"></div>
+          <div class="hour-mark" style="transform: rotate(-45deg);"></div>
+          <div class="hour-mark" style="transform: rotate(-30deg);"></div>
+          <div class="hour-mark" style="transform: rotate(-15deg);"></div>
+          <div class="hour-mark" style="transform: rotate(0deg);"></div>
+          <div class="hour-mark" style="transform: rotate(15deg);"></div>
+          <div class="hour-mark" style="transform: rotate(30deg);"></div>
+          <div class="hour-mark" style="transform: rotate(45deg);"></div>
+          <div class="hour-mark" style="transform: rotate(60deg);"></div>
+          <div class="hour-mark" style="transform: rotate(75deg);"></div>
+        </div>
+        <div class="ನೆರಳು" id="shadow"></div>
+        <div class="gnomon"></div>
+        
+        <div class="hour-label" style="left: 15px; top: 30px;">6</div>
+        <div class="hour-label" style="left: 35px; top: 10px;">9</div>
+        <div class="hour-label" style="left: 75px; top: 0px;">12</div>
+        <div class="hour-label" style="right: 35px; top: 10px;">3</div>
+        <div class="hour-label" style="right: 15px; top: 30px;">6</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="info-panel">
+  <div class="info-title">🔬 ವಿಜ್ಞಾನ</div>
+  <div class="info-text">
+    ಭೂಮಿ ತಿರುಗುತ್ತದೆ <strong>15° per hour</strong>. As the Sun appears to move across the sky (east to west), the ನೆರಳು of the gnomon sweeps across the dial face, acting like a clock hಮತ್ತು!
+  </div>
+</div>
+
+<div class="limitations">
+  <div class="limitations-title">⚠️ ಸೂರ್ಯ ಘಡಿಯಾರ ಮಿತಿಗಳು</div>
+  <div class="limitations-text">
+    • ❌ <strong>ರಾತ್ರಿ</strong>ಯಲ್ಲಿ ಕೆಲಸ ಮಾಡುವುದಿಲ್ಲ<br>
+    • ❌ <strong>ಮೋಡದ ದಿನಗಳು</strong> ಕೆಲಸ ಮಾಡುವುದಿಲ್ಲ<br>
+    • ❌ ವಿಭಿನ್ನ ಅಕ್ಷಾಂಶಕ್ಕೆ <strong>ಸರಿಹೊಂದಿಸುವಿಕೆ</strong> ಅಗತ್ಯ<br>
+    • ❌ ನಿಖರತೆ ~15-30 ನಿಮಿಷ
+  </div>
+</div>
+
+</div>
+
+<script>
+const sun = document.getElementById('sun');
+const ನೆರಳು = document.getElementById('shadow');
+const currentTime = document.getElementById('current-time');
+const timePeriod = document.getElementById('time-period');
+
+function updateSundial(hours) {
+  hours = parseFloat(hours);
+  
+  // ಲೆಕ್ಕ ಹಾಕಿ sun position (arc from left to right)
+  const progress = (hours - 6) / 12; // 0 to 1
+  const angle = progress * Math.PI; // 0 to PI
+  
+  const sunX = 30 + (progress * 320); // Left to right
+  const sunY = 180 - Math.sin(angle) * 150; // Arc path
+  
+  sun.style.left = sunX + 'px';
+  sun.style.top = sunY + 'px';
+  
+  // ಲೆಕ್ಕ ಹಾಕಿ ನೆರಳು angle (opposite to sun)
+  // At 6AM (sun on left), ನೆರಳು points right (+75deg)
+  // At 12PM (sun above), ನೆರಳು points down (0deg)
+  // At 6PM (sun on right), ನೆರಳು points left (-75deg)
+  const ನೆರಳುAngle = 75 - (progress * 150);
+  ನೆರಳು.style.transform = `translateX(-50%) rotate(${ನೆರಳುAngle}deg)`;
+  
+  // Update time display
+  const hour = Math.floor(hours);
+  const minutes = (hours % 1) * 60;
+  const ampm = hours >= 12 ? 'ಅಪರಾಹ್ನ' : 'ಪೂರ್ವಾಹ್ನ';
+  const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+  currentTime.textContent = `${displayHour}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+  
+  // Update time period
+  if (hours < 9) {
+    timePeriod.textContent = '🌅 ಬೆಳಿಗ್ಗೆ';
+  } else if (hours < 12) {
+    timePeriod.textContent = '☀️ ನಂತರದ ಬೆಳಿಗ್ಗೆ';
+  } else if (hours < 14) {
+    timePeriod.textContent = '☀️ ಮಧ್ಯಾಹ್ನ';
+  } else if (hours < 17) {
+    timePeriod.textContent = '🌤️ ಮಧ್ಯಾಹ್ನ';
+  } else {
+    timePeriod.textContent = '🌇 ಸಂಜೆ';
+  }
+}
+
+// Initialize
+updateSundial(12);
+
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var hour = params.get('hour');
+  var showHints = params.get('showHints');
+
+  if (hour !== null) {
+    var h = parseFloat(hour);
+    if (h >= 6 && h <= 18) {
+      var slider = document.getElementById('time-slider');
+      slider.value = h;
+      updateSundial(h);
+    }
+  }
+
+  if (showHints === 'false') {
+    var cc = document.querySelector('.concept-card');
+    var lm = document.querySelector('.limitations');
+    if (cc) cc.style.display = 'none';
+    if (lm) lm.style.display = 'none';
+  }
+})();
+</script>
+</body>
+</html>

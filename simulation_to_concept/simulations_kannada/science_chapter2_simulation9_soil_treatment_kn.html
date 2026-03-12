@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#134e5e">
+<title>ಮಣ್ಣಿನ ಚಿಕಿತ್ಸೆ – ಕೃಷಿಯಲ್ಲಿ ತಟಸ್ಥೀಕರಣ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 10px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+/* ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ Card - Most Important */
+.concept-card {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #f9a825;
+}
+
+.concept-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f57f17;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.concept-text {
+  font-size: 12px;
+  color: #5d4037;
+  line-height: 1.5;
+}
+
+.concept-equation {
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1565c0;
+  border: 2px dashed #90caf9;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.visual {
+  position: relative;
+  height: 32vh;
+  min-height: 220px;
+  background: linear-gradient(180deg, #87CEEB 0%, #87CEEB 50%, transparent 50%);
+  border-radius: 12px;
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+svg { width: 100%; height: 100%; display: block; }
+
+.soil-ಸೂಚಕ {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  transition: all 0.3s ease;
+}
+
+.soil-ಸೂಚಕ.acidic { background: #fff3e0; color: #e65100; }
+.soil-ಸೂಚಕ.ಮೂಲ { background: #e3f2fd; color: #1565c0; }
+.soil-ಸೂಚಕ.neutral { background: #e8f5e9; color: #2e7d32; }
+
+/* Learning Box - ತೋರಿಸುತ್ತದೆ what's happening */
+.learning-box {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 8px;
+  border-left: 3px solid #1976d2;
+}
+
+.learning-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1565c0;
+  margin-bottom: 4px;
+}
+
+.learning-text {
+  font-size: 11px;
+  color: #37474f;
+  line-height: 1.5;
+}
+
+.learning-text strong {
+  color: #d32f2f;
+}
+
+.learning-text .base {
+  color: #1565c0;
+  font-weight: 600;
+}
+
+.learning-text .acid {
+  color: #e65100;
+  font-weight: 600;
+}
+
+.learning-text .neutral {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+/* Reaction Display */
+.reaction-display {
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px;
+  margin-top: 8px;
+  text-align: center;
+  font-size: 12px;
+  display: none;
+}
+
+.reaction-display.show { display: block; }
+
+.reaction-equation {
+  font-weight: 600;
+  color: #333;
+  padding: 6px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+.reaction-result {
+  font-size: 11px;
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.soil-selector {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 8px;
+}
+
+.selector-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.soil-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.soil-btn {
+  flex: 1;
+  padding: 10px 6px;
+  border-radius: 10px;
+  border: 2px solid #ddd;
+  font-size: 10px;
+  background: #fff;
+  cursor: pointer;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.soil-btn:active { transform: scale(0.95); }
+.soil-btn.acidic.active { border-color: #ff9800; background: #fff3e0; }
+.soil-btn.ಮೂಲ.active { border-color: #2196f3; background: #e3f2fd; }
+.soil-btn .icon { font-size: 18px; display: block; margin-bottom: 4px; }
+.soil-btn .ph-info { font-size: 9px; color: #888; margin-top: 2px; }
+
+.action-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  color: white;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s ease;
+}
+
+.action-btn:active { transform: scale(0.98); }
+.action-btn:disabled { background: #ccc; }
+
+/* pH Scale */
+.ph-scale {
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.ph-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.ph-bar {
+  height: 20px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #f44336 0%, #ff9800 20%, #ffeb3b 35%, #4caf50 50%, #8bc34a 65%, #03a9f4 80%, #3f51b5 100%);
+  position: relative;
+  margin-bottom: 5px;
+}
+
+.ph-pointer {
+  position: absolute;
+  top: -6px;
+  width: 6px;
+  height: 32px;
+  background: #333;
+  border-radius: 3px;
+  transition: left 0.8s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.ph-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #666;
+  padding: 0 2px;
+}
+
+.ph-labels span {
+  text-align: center;
+}
+
+.ph-labels .acidic-label { color: #e65100; font-weight: 600; }
+.ph-labels .neutral-label { color: #2e7d32; font-weight: 600; }
+.ph-labels .ಮೂಲ-label { color: #1565c0; font-weight: 600; }
+
+/* Key Takeaway */
+.takeaway {
+  background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  display: none;
+  border-left: 4px solid #2e7d32;
+}
+
+.takeaway.show { display: block; }
+.takeaway-title { font-weight: 700; color: #1b5e20; margin-bottom: 6px; }
+
+@media screen and (max-width: 380px) {
+  .soil-btn { padding: 8px 4px; font-size: 9px; }
+  .concept-text { font-size: 11px; }
+}
+
+@supports (padding: max(0px)) {
+  #app {
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+  }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🌱 ಕೃಷಿಯಲ್ಲಿ ತಟಸ್ಥೀಕರಣ</h1>
+  <p>ರೈತರು ಆರೋಗ್ಯಕರ ಬೆಳೆ ಬೆಳೆಯಲು ರಸಾಯನಶಾಸ್ತ್ರವನ್ನು ಹೇಗೆ ಬಳಸುತ್ತಾರೆ</p>
+</div>
+
+<!-- ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ - Always Visible -->
+<div class="concept-card">
+  <div class="concept-title">📚 ಕಲಿಯಲು ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ತಟಸ್ಥೀಕರಣ</strong> ಎಂದರೆ <span style="color:#e65100;font-weight:600;">ಆಮ್ಲ</span> ಮತ್ತು <span style="color:#1565c0;font-weight:600;">ಕ್ಷಾರ</span> ಪರಸ್ಪರ ಪ್ರತಿಕ್ರಿಯಿಸಿ ರದ್ದುಗೊಂಡು ತಟಸ್ಥ ದ್ರಾವಣ ಉಂಟಾಗುವುದು.
+  </div>
+  <div class="concept-equation">
+    ಆಮ್ಲ + ಕ್ಷಾರ → ಉಪ್ಪು + ನೀರು (ತಟಸ್ಥ pH)
+  </div>
+</div>
+
+<div class="sim-card" id="sim"></div>
+
+<!-- pH Scale -->
+<div class="ph-scale">
+  <div class="ph-title">pH ಮಾಪನ – ಆಮ್ಲತೆ ಮತ್ತು ಕ್ಷಾರತೆ</div>
+  <div class="ph-bar">
+    <div class="ph-pointer" id="ph-pointer" style="left: calc(50% - 3px);"></div>
+  </div>
+  <div class="ph-labels">
+    <span class="acidic-label">0-6<br>ಆಮ್ಲೀಯ</span>
+    <span class="neutral-label">7<br>ತಟಸ್ಥ</span>
+    <span class="ಮೂಲ-label">8-14<br>ಕ್ಷಾರೀಯ</span>
+  </div>
+</div>
+
+<!-- Key Takeaway -->
+<div class="takeaway" id="takeaway">
+  <div class="takeaway-title">🎯 ನೀವು ಕಲಿತದ್ದು:</div>
+  <span id="takeaway-text"></span>
+</div>
+
+</div>
+
+<script>
+const container = document.getElementById('sim');
+
+container.innerHTML = `
+<div class="visual">
+  <div class="soil-ಸೂಚಕ" id="soil-display">ಮಣ್ಣಿನ ಪ್ರಕಾರ ಆಯ್ಕೆಮಾಡಿ</div>
+
+  <svg viewBox="0 0 400 240">
+    <!-- Sun -->
+    <text x="350" y="35" font-size="35">☀️</text>
+    
+    <!-- Clouds -->
+    <text x="40" y="40" font-size="25">☁️</text>
+    <text x="140" y="30" font-size="20">☁️</text>
+    
+    <!-- Plant -->
+    <g id="plant" transform="translate(200, 80)">
+      <text x="0" y="0" text-anchor="middle" font-size="45" id="plant-icon">🌱</text>
+    </g>
+    
+    <!-- Soil layer -->
+    <rect x="0" y="140" width="400" height="100" rx="0" id="soil-layer" fill="#6d4c41"/>
+    
+    <!-- Treatment items -->
+    <g id="lime-bag" transform="translate(70, 155)" opacity="0.3">
+      <rect x="-28" y="0" width="56" height="55" rx="5" fill="#eceff1" stroke="#b0bec5" stroke-width="2"/>
+      <text x="0" y="18" text-anchor="middle" font-size="9" fill="#455a64" font-weight="700">ಸುಣ್ಣ</text>
+      <text x="0" y="32" text-anchor="middle" font-size="7" fill="#666">(ಕ್ಷಾರ)</text>
+      <circle cx="0" cy="44" r="8" fill="#e0e0e0" stroke="#bdbdbd"/>
+    </g>
+    
+    <g id="compost-bag" transform="translate(330, 155)" opacity="0.3">
+      <rect x="-28" y="0" width="56" height="55" rx="5" fill="#795548" stroke="#5d4037" stroke-width="2"/>
+      <text x="0" y="18" text-anchor="middle" font-size="9" fill="#fff" font-weight="700">ಕಂಪೋಸ್ಟ್</text>
+      <text x="0" y="32" text-anchor="middle" font-size="7" fill="#ddd">(ಆಮ್ಲ ಬಿಡುಗಡೆ)</text>
+      <text x="0" y="46" text-anchor="middle" font-size="14">🍂</text>
+    </g>
+  </svg>
+</div>
+
+<!-- Learning Box - Dynamic content -->
+<div class="learning-box" id="learning-box">
+  <div class="learning-title">🔬 ಸಮಸ್ಯೆಯನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು</div>
+  <div class="learning-text" id="learning-text">
+    ಸಸ್ಯಗಳು <span class="neutral">ತಟಸ್ಥ ಮಣ್ಣಿನಲ್ಲಿ (pH 7)</span> ಉತ್ತಮ ಬೆಳೆಯುತ್ತವೆ. ಮಣ್ಣು ಅತಿ ಆಮ್ಲೀಯ ಅಥವಾ ಅತಿ ಕ್ಷಾರೀಯವಾದಾಗ ಸಸ್ಯಗಳು ಪೋಷಕಾಂಶ ಹೀರಲಾರವು ಮತ್ತು ಅನಾರೋಗ್ಯವಾಗುತ್ತವೆ.
+  </div>
+</div>
+
+<!-- Reaction Display -->
+<div class="reaction-display" id="reaction-display">
+  <div class="reaction-equation" id="reaction-equation"></div>
+  <div class="reaction-result" id="reaction-result"></div>
+</div>
+
+<div class="soil-selector">
+  <div class="selector-label">ಹಂತ 1: ಚಿಕಿತ್ಸೆ ಮಾಡಲು ಸಮಸ್ಯಾತ್ಮಕ ಮಣ್ಣು ಆಯ್ಕೆಮಾಡಿ</div>
+  <div class="soil-btns">
+    <button class="soil-btn acidic" data-type="acidic">
+      <span class="icon">🟠</span>
+      ಆಮ್ಲೀಯ ಮಣ್ಣು
+      <div class="ph-info">pH 4-5 (ಅಧಿಕ ಆಮ್ಲ)</div>
+    </button>
+    <button class="soil-btn ಮೂಲ" data-type="ಮೂಲ">
+      <span class="icon">🔵</span>
+      ಕ್ಷಾರೀಯ ಮಣ್ಣು
+      <div class="ph-info">pH 9-10 (ಅಧಿಕ ಕ್ಷಾರ)</div>
+    </button>
+  </div>
+</div>
+
+<button class="action-btn" id="treat-btn" disabled>ಹಂತ 2: ತಟಸ್ಥೀಕರಣ ಚಿಕಿತ್ಸೆ ಲೇಪಿಸಿ</button>`;
+
+let selectedSoil = null;
+let isTreated = false;
+
+const soilDisplay = document.getElementById('soil-display');
+const soilLayer = document.getElementById('soil-layer');
+const plantIcon = document.getElementById('plant-icon');
+const limeBag = document.getElementById('lime-bag');
+const compostBag = document.getElementById('compost-bag');
+const phPointer = document.getElementById('ph-pointer');
+const treatBtn = document.getElementById('treat-btn');
+const takeaway = document.getElementById('takeaway');
+const takeawayText = document.getElementById('takeaway-text');
+const learningBox = document.getElementById('learning-box');
+const learningTitle = learningBox.querySelector('.learning-title');
+const learningText = document.getElementById('learning-text');
+const reactionDisplay = document.getElementById('reaction-display');
+const reactionEquation = document.getElementById('reaction-equation');
+const reactionResult = document.getElementById('reaction-result');
+
+container.querySelectorAll('.soil-btn').forEach(btn => {
+  btn.onclick = () => {
+    if (isTreated) return;
+    
+    container.querySelectorAll('.soil-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedSoil = btn.dataset.type;
+    
+    reactionDisplay.classList.remove('show');
+    
+    if (selectedSoil === 'acidic') {
+      soilLayer.style.transition = 'fill 0.5s ease';
+      soilLayer.style.fill = '#8d6e63';
+      plantIcon.textContent = '🥀';
+      soilDisplay.textContent = '🟠 ಆಮ್ಲೀಯ (pH 4-5)';
+      soilDisplay.className = 'soil-ಸೂಚಕ acidic';
+      phPointer.style.left = '12%';
+      limeBag.style.opacity = '1';
+      compostBag.style.opacity = '0.3';
+      
+      learningTitle.textContent = '🔬 ಸಮಸ್ಯೆ: ಆಮ್ಲೀಯ ಮಣ್ಣು';
+      learningText.innerHTML = `
+        ಈ ಮಣ್ಣಿನಲ್ಲಿ <span class="acid">ಅಧಿಕ ಆಮ್ಲ (ಕಡಿಮೆ pH)</span>. ಅಧಿಕ ಆಮ್ಲ ಸಸ್ಯವು ಪೋಷಕಾಂಶ ಹೀರುವುದನ್ನು ತಡೆಯುತ್ತದೆ.<br><br>
+        <strong>ಪರಿಹಾರ:</strong> ಆಮ್ಲ ತಟಸ್ಥೀಕರಿಸಲು <span class="base">ಸುಣ್ಣ (ಕ್ಷಾರ)</span> ಸೇರಿಸಿ!<br>
+        <em>ನೆನಪಿಡಿ: ಕ್ಷಾರ + ಆಮ್ಲ → ತಟಸ್ಥ</em>
+      `;
+      
+      treatBtn.textContent = 'ಹಂತ 2: ಸುಣ್ಣ (ಕ್ಷಾರ) ಸೇರಿಸಿ ತಟಸ್ಥೀಕರಿಸಿ';
+      treatBtn.style.background = 'linear-gradient(135deg, #78909c 0%, #546e7a 100%)';
+      
+    } else {
+      soilLayer.style.fill = '#78909c';
+      plantIcon.textContent = '🥀';
+      soilDisplay.textContent = '🔵 ಮೂಲ (pH 9-10)';
+      soilDisplay.className = 'soil-ಸೂಚಕ ಮೂಲ';
+      phPointer.style.left = '85%';
+      compostBag.style.opacity = '1';
+      limeBag.style.opacity = '0.3';
+      
+      learningTitle.textContent = '🔬 ಸಮಸ್ಯೆ: ಕ್ಷಾರ ಮಣ್ಣು';
+      learningText.innerHTML = `
+        ಈ ಮಣ್ಣಿನಲ್ಲಿ <span class="base">ಅಧಿಕ ಕ್ಷಾರ (ಅಧಿಕ pH)</span>. ಅಧಿಕ ಕ್ಷಾರ ಸಸ್ಯವು ಕಬ್ಬಿಣ ಹೀರುವುದನ್ನು ತಡೆಯುತ್ತದೆ.<br><br>
+        <strong>ಪರಿಹಾರ:</strong> ಕ್ಷಾರ ತಟಸ್ಥೀಕರಿಸಲು <span class="acid">ಕಂಪೋಸ್ಟ್ (ಆಮ್ಲ ಬಿಡುಗಡೆ)</span> ಸೇರಿಸಿ!<br>
+        <em>ನೆನಪಿಡಿ: ಆಮ್ಲ + ಕ್ಷಾರ → ತಟಸ್ಥ</em>
+      `;
+      
+      treatBtn.textContent = 'ಹಂತ 2: ಕಂಪೋಸ್ಟ್ (ಆಮ್ಲ) ಸೇರಿಸಿ ತಟಸ್ಥೀಕರಿಸಿ';
+      treatBtn.style.background = 'linear-gradient(135deg, #8d6e63 0%, #6d4c41 100%)';
+    }
+    
+    treatBtn.disabled = false;
+    takeaway.classList.remove('show');
+  };
+});
+
+treatBtn.onclick = function() {
+  if (!selectedSoil || isTreated) return;
+  isTreated = true;
+  treatBtn.disabled = true;
+  treatBtn.textContent = '⏳ ತಟಸ್ಥೀಕರಿಸುತ್ತಿದೆ...';
+  
+  setTimeout(() => {
+    soilLayer.style.fill = '#5d4037';
+    plantIcon.textContent = '🌿';
+    soilDisplay.textContent = '🟢 ತಟಸ್ಥ (pH 7)';
+    soilDisplay.className = 'soil-ಸೂಚಕ neutral';
+    phPointer.style.left = 'calc(50% - 3px)';
+    
+    learningTitle.textContent = '✅ ತಟಸ್ಥೀಕರಣ ಪೂರ್ಣ!';
+    
+    if (selectedSoil === 'acidic') {
+      learningText.innerHTML = `
+        <span class="base">ಸುಣ್ಣ (ಕ್ಷಾರ)</span> ಮಣ್ಣಿನ <span class="acid">ಆಮ್ಲ</span>ದೊಂದಿಗೆ ಪ್ರತಿಕ್ರಿಯಿಸಿತು.<br>
+        ಪರಸ್ಪರ <strong>ತಟಸ್ಥೀಕರಣ</strong> → pH ಈಗ <span class="neutral">7 (ತಟಸ್ಥ)</span>!<br>
+        ಸಸ್ಯ ಈಗ ಪೋಷಕಾಂಶ ಸರಿಯಾಗಿ ಹೀರಬಲ್ಲದು.
+      `;
+      
+      reactionEquation.textContent = 'ಮಣ್ಣಿನ ಆಮ್ಲ + ಸುಣ್ಣ (ಕ್ಷಾರ) → ಉಪ್ಪು + ನೀರು';
+      reactionResult.textContent = '🌿 ಫಲಿತಾಂಶ: ತಟಸ್ಥ ಮಣ್ಣು (pH 7) — ಸಸ್ಯ ಆರೋಗ್ಯಕರ!';
+      
+      takeawayText.innerHTML = `
+        <strong>ತಟಸ್ಥೀಕರಣ ಕ್ರಿಯೆ:</strong> ಮಣ್ಣು ಅತಿ ಆಮ್ಲೀಯವಾದಾಗ ರೈತರು ಸುಣ್ಣ (ಕ್ಷಾರ) ಸೇರಿಸುತ್ತಾರೆ. ಕ್ಷಾರ ಆಮ್ಲವನ್ನು ತಟಸ್ಥೀಕರಿಸಿ ಮಣ್ಣನ್ನು ತಟಸ್ಥ pH 7 ಗೆ ತರುತ್ತದೆ.<br><br>
+        <strong>ಪ್ರತಿಕ್ರಿಯೆ:</strong> ಆಮ್ಲ + ಕ್ಷಾರ → ಉಪ್ಪು + ನೀರು<br><br>
+        ರಸಾಯನಶಾಸ್ತ್ರದಲ್ಲಿ ಕಲಿಯುವ ಅದೇ ತಟಸ್ಥೀಕರಣ — ಕೃಷಿಗೆ ಅನ್ವಯ! 🧪🌾
+      `;
+    } else {
+      learningText.innerHTML = `
+        <span class="acid">ಕಂಪೋಸ್ಟ್ ಬಿಡುಗಡೆ ಮಾಡುವ ಆಮ್ಲಗಳು</span> ಮಣ್ಣಿನ <span class="base">ಕ್ಷಾರ</span>ದೊಂದಿಗೆ ಪ್ರತಿಕ್ರಿಯಿಸಿದವು.<br>
+        ಪರಸ್ಪರ <strong>ತಟಸ್ಥೀಕರಣ</strong> → pH ಈಗ <span class="neutral">7 (ತಟಸ್ಥ)</span>!<br>
+        ಸಸ್ಯ ಈಗ ಕಬ್ಬಿಣ ಸರಿಯಾಗಿ ಹೀರಬಲ್ಲದು.
+      `;
+      
+      reactionEquation.textContent = 'ಕಂಪೋಸ್ಟ್ ಆಮ್ಲ + ಮಣ್ಣಿನ ಕ್ಷಾರ → ಉಪ್ಪು + ನೀರು';
+      reactionResult.textContent = '🌿 ಫಲಿತಾಂಶ: ತಟಸ್ಥ ಮಣ್ಣು (pH 7) — ಸಸ್ಯ ಆರೋಗ್ಯಕರ!';
+      
+      takeawayText.innerHTML = `
+        <strong>ತಟಸ್ಥೀಕರಣ ಕ್ರಿಯೆ:</strong> ಮಣ್ಣು ಅತಿ ಕ್ಷಾರೀಯವಾದಾಗ ರೈತರು ಸಾವಯವ ಕಂಪೋಸ್ಟ್ ಸೇರಿಸುತ್ತಾರೆ. ಕಂಪೋಸ್ಟ್ ಕೊಳೆತಾಗ ಆಮ್ಲ ಬಿಡುಗಡೆ ಮಾಡಿ ಕ್ಷಾರವನ್ನು ತಟಸ್ಥೀಕರಿಸುತ್ತದೆ.<br><br>
+        <strong>ಪ್ರತಿಕ್ರಿಯೆ:</strong> ಆಮ್ಲ + ಕ್ಷಾರ → ಉಪ್ಪು + ನೀರು<br><br>
+        ರಸಾಯನಶಾಸ್ತ್ರದಲ್ಲಿ ಕಲಿಯುವ ಅದೇ ತಟಸ್ಥೀಕರಣ — ಕೃಷಿಗೆ ಅನ್ವಯ! 🧪🌾
+      `;
+    }
+    
+    reactionDisplay.classList.add('show');
+    takeaway.classList.add('show');
+    
+    treatBtn.textContent = '✅ ತಟಸ್ಥೀಕರಣ ಯಶಸ್ವಿ!';
+    treatBtn.style.background = 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)';
+  }, 800);
+};
+
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var initState = (p.get('initialState') || '').toLowerCase();
+  var showHintParam = p.get('showHints');
+  if (showHintParam === 'false') {
+    var card = document.querySelector('.concept-card');
+    if (card) card.style.display = 'none';
+  }
+  if (initState === 'acidic' || initState === 'basic' || initState === 'treated') {
+    var soilType = (initState === 'basic') ? '\u0cae\u0cc2\u0cb2' : 'acidic';
+    setTimeout(function () {
+      var soilBtn = document.querySelector('.soil-btn[data-type="' + soilType + '"]');
+      if (soilBtn) soilBtn.click();
+      if (initState === 'treated') {
+        setTimeout(function () {
+          var treatBtn = document.getElementById('treat-btn');
+          if (treatBtn) treatBtn.click();
+        }, 1800);
+      }
+    }, 800);
+  }
+}());
+</script>
+</body>
+</html>

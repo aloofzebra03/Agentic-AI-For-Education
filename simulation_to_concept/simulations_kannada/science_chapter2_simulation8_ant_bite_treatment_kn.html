@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ff6b6b">
+<title>ಇರುವೆ ಕಚ್ಚುವಿಕೆ ಚಿಕಿತ್ಸೆ – ದೈನಂದಿನ ಜೀವನದಲ್ಲಿ ತಟಸ್ಥೀಕರಣ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 8px 4px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 12px;
+}
+
+.visual {
+  position: relative;
+  height: 38vh;
+  min-height: 280px;
+  background: linear-gradient(180deg, #87CEEB 0%, #98FB98 70%, #228B22 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+svg { width: 100%; height: 100%; display: block; }
+
+.static-hint {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 11px;
+  line-height: 1.3;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  z-index: 10;
+}
+
+.pain-ಸೂಚಕ {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  transition: all 0.3s ease;
+}
+
+.pain-ಸೂಚಕ.pain { background: #ffebee; color: #c62828; }
+.pain-ಸೂಚಕ.relief { background: #e8f5e9; color: #2e7d32; }
+
+.metrics {
+  background: #fff3e0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 11px;
+  line-height: 1.6;
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+}
+
+.metric-item { display: flex; justify-content: space-between; }
+.metric-label { color: #666; }
+.metric-value { font-weight: 600; color: #007AFF; }
+.metric-value.danger { color: #c62828; }
+.metric-value.success { color: #2e7d32; }
+
+.control-btns {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s ease;
+}
+
+.action-btn:active { transform: scale(0.95); }
+.action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.bite-btn {
+  background: linear-gradient(135deg, #ef5350 0%, #c62828 100%);
+  color: white;
+}
+
+.treat-btn {
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  color: white;
+}
+
+.reset-btn {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.step-progress {
+  display: flex;
+  justify-content: space-around;
+  padding: 12px;
+  background: #fff;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.step {
+  text-align: center;
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+}
+
+.step.active { opacity: 1; }
+.step-icon { font-size: 24px; }
+.step-label { font-size: 9px; color: #666; margin-top: 4px; }
+
+.insight-box {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 11px;
+  line-height: 1.5;
+  border-left: 4px solid #ff9800;
+}
+
+.insight-title { font-weight: 600; color: #e65100; margin-bottom: 4px; }
+
+.science-box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.equation {
+  background: #e3f2fd;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1565c0;
+}
+
+.takeaway {
+  background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  display: none;
+}
+
+.takeaway.show { display: block; }
+.takeaway-title { font-weight: 600; color: #1b5e20; margin-bottom: 4px; }
+
+@media screen and (max-width: 380px) {
+  .action-btn { padding: 10px; font-size: 11px; }
+}
+
+@supports (padding: max(0px)) {
+  #app {
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+  }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🐜 ಇರುವೆ ಕಚ್ಚುವಿಕೆ ಚಿಕಿತ್ಸೆ</h1>
+  <p>ನೋವು ಕಡಿಮೆ ಮಾಡಲು ತಟಸ್ಥೀಕರಣ ಬಳಸುವುದು!</p>
+</div>
+
+<div class="section-title">ಇರುವೆ ಕಚ್ಚುವಿಕೆ ಮತ್ತು ಚಿಕಿತ್ಸೆ ಅನುಕರಿಸಿ</div>
+<div class="sim-card" id="sim"></div>
+
+<div class="step-progress">
+  <div class="step" id="step1">
+    <div class="step-icon">🐜</div>
+    <div class="step-label">ಇರುವೆ ಕಚ್ಚುವಿಕೆ</div>
+  </div>
+  <div class="step" id="step2">
+    <div class="step-icon">😣</div>
+    <div class="step-label">ನೋವು (ಆಮ್ಲ)</div>
+  </div>
+  <div class="step" id="step3">
+    <div class="step-icon">🥄</div>
+    <div class="step-label">ಕ್ಷಾರ ಲೇಪಿಸಿ</div>
+  </div>
+  <div class="step" id="step4">
+    <div class="step-icon">😊</div>
+    <div class="step-label">ಉಪಶಮನ!</div>
+  </div>
+</div>
+
+<div class="insight-box">
+  <div class="insight-title">🔑 ಇದು ಏಕೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ?</div>
+  ಇರುವೆ ಕಚ್ಚಿದಾಗ ಅದು <strong style="color:#c62828">ಫಾರ್ಮಿಕ್ ಆಮ್ಲ</strong> (HCOOH) ನಿಮ್ಮ ಚರ್ಮದೊಳಗೆ ಚುಚ್ಚುತ್ತದೆ. <strong style="color:#1565c0">ಬೇಕಿಂಗ್ ಸೋಡಾ</strong> (ಕ್ಷಾರ) ಲೇಪಿಸಿದಾಗ ಆಮ್ಲವನ್ನು ತಟಸ್ಥೀಕರಿಸಿ ಉಪಶಮನ ನೀಡುತ್ತದೆ!
+</div>
+
+<div class="science-box">
+  <div style="font-size:11px;font-weight:600;color:#666;margin-bottom:8px;">🔬 ತಟಸ್ಥೀಕರಣ ಪ್ರತಿಕ್ರಿಯೆ</div>
+  <div class="equation">
+    ಫಾರ್ಮಿಕ್ ಆಮ್ಲ + ಬೇಕಿಂಗ್ ಸೋಡಾ → ಉಪ್ಪು + ನೀರು + ಉಪಶಮನ!
+  </div>
+</div>
+
+<div class="takeaway" id="takeaway">
+  <div class="takeaway-title">💡 ನೀವು ಕಂಡುಕೊಂಡದ್ದು:</div>
+  <span id="takeaway-text">ಕ್ಷಾರ (ಬೇಕಿಂಗ್ ಸೋಡಾ) ಲೇಪಿಸಿ ಫಾರ್ಮಿಕ್ ಆಮ್ಲವನ್ನು ತಟಸ್ಥೀಕರಿಸಿದಾಗ ಇರುವೆ ಕಚ್ಚುವಿಕೆಯ ನೋವು ಕಡಿಮೆಯಾಗುತ್ತದೆ!</span>
+</div>
+
+</div>
+
+<script>
+const container = document.getElementById('sim');
+
+container.innerHTML = `
+<div class="visual">
+  <div class="static-hint">
+    👆 ಕೆಳಗಿನ ಹಂತಗಳನ್ನು ಅನುಸರಿಸಿ
+  </div>
+  <div class="pain-ಸೂಚಕ" id="pain-display">😊 ಆರೋಗ್ಯಕರ ಚರ್ಮ</div>
+
+  <svg viewBox="0 0 400 300">
+    <!-- Sky ಮತ್ತು ground already in background -->
+    
+    <!-- Arm -->
+    <g transform="translate(200, 100)">
+      <ellipse cx="0" cy="80" rx="70" ry="30" fill="#6d4c41"/>
+      <rect x="-60" y="-20" width="120" height="100" rx="30" fill="url(#skinGradient)"/>
+      <ellipse cx="0" cy="-20" rx="60" ry="25" fill="url(#skinGradient)"/>
+      
+      <!-- Bite area -->
+      <circle cx="0" cy="30" r="25" fill="url(#skinGradient)" id="bite-area"/>
+      
+      <!-- ಕೆಂಪುness overlay -->
+      <circle cx="0" cy="30" r="25" fill="url(#rednessGradient)" id="redness" opacity="0"/>
+      
+      <!-- Treatment paste -->
+      <g id="paste" opacity="0">
+        <ellipse cx="-5" cy="25" rx="8" ry="6" fill="#fff"/>
+        <ellipse cx="8" cy="35" rx="6" ry="5" fill="#fff"/>
+        <ellipse cx="-8" cy="38" rx="5" ry="4" fill="#fff"/>
+      </g>
+    </g>
+    
+    <!-- Ants -->
+    <g id="ants">
+      <text x="100" y="150" font-size="16" id="ant1">🐜</text>
+      <text x="280" y="180" font-size="14" id="ant2">🐜</text>
+      <text x="120" y="200" font-size="12" id="ant3">🐜</text>
+    </g>
+    
+    <!-- Formic acid ಸೂಚಕ -->
+    <g id="acid-indicator" opacity="0" transform="translate(200, 220)">
+      <rect x="-60" y="-12" width="120" height="24" rx="12" fill="rgba(198,40,40,0.2)" stroke="#c62828" stroke-dasharray="4 2"/>
+      <text x="0" y="5" text-anchor="middle" font-size="10" fill="#c62828" font-weight="600">⚠️ ಫಾರ್ಮಿಕ್ ಆಮ್ಲ ಚುಚ್ಚಲಾಗಿದೆ!</text>
+    </g>
+    
+    <!-- Baking soda box -->
+    <g transform="translate(340, 130)" id="soda-box">
+      <rect x="-25" y="0" width="50" height="70" rx="5" fill="#eceff1" stroke="#b0bec5" stroke-width="2"/>
+      <text x="0" y="25" text-anchor="middle" font-size="7" fill="#455a64" font-weight="600">ಬೇಕಿಂಗ್</text>
+      <text x="0" y="35" text-anchor="middle" font-size="7" fill="#455a64" font-weight="600">ಸೋಡಾ</text>
+      <text x="0" y="55" text-anchor="middle" font-size="16">🥄</text>
+      <text x="0" y="90" text-anchor="middle" font-size="8" fill="#666">(ಕ್ಷಾರ)</text>
+    </g>
+    
+    <!-- Ground -->
+    <rect x="0" y="260" width="400" height="40" fill="#228B22"/>
+    
+    <!-- Definitions -->
+    <defs>
+      <linearGradient id="skinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#FFCC80"/>
+        <stop offset="100%" style="stop-color:#FFB74D"/>
+      </linearGradient>
+      <radialGradient id="rednessGradient">
+        <stop offset="0%" style="stop-color:#ef5350"/>
+        <stop offset="100%" style="stop-color:transparent"/>
+      </radialGradient>
+    </defs>
+  </svg>
+</div>
+
+<div class="metrics">
+  <div class="metric-item"><span class="metric-label">ಇರುವೆ ವಿಷ:</span> <span class="metric-value" id="venom-status">ಇಲ್ಲ</span></div>
+  <div class="metric-item"><span class="metric-label">ಚರ್ಮ pH:</span> <span class="metric-value" id="ph-status">ಸಾಮಾನ್ಯ (~7)</span></div>
+  <div class="metric-item"><span class="metric-label">ಚಿಕಿತ್ಸೆ:</span> <span class="metric-value" id="treatment-status">ಅಗತ್ಯವಿಲ್ಲ</span></div>
+  <div class="metric-item"><span class="metric-label">ನೋವು ಮಟ್ಟ:</span> <span class="metric-value" id="pain-level">ಇಲ್ಲ</span></div>
+</div>
+
+<div class="control-btns">
+  <button class="action-btn bite-btn" id="bite-btn">🐜 ಕಚ್ಚುವಿಕೆ ಅನುಕರಿಸಿ</button>
+  <button class="action-btn treat-btn" id="treat-btn" disabled>🥄 ಚಿಕಿತ್ಸೆ ಲೇಪಿಸಿ</button>
+  <button class="action-btn reset-btn" id="reset-btn">🔄</button>
+</div>`;
+
+let state = 'normal'; // normal, bitten, treated
+
+const painDisplay = document.getElementById('pain-display');
+const redness = document.getElementById('redness');
+const paste = document.getElementById('paste');
+const acidIndicator = document.getElementById('acid-indicator');
+const venomStatus = document.getElementById('venom-status');
+const phStatus = document.getElementById('ph-status');
+const treatmentStatus = document.getElementById('treatment-status');
+const painLevel = document.getElementById('pain-level');
+const biteBtn = document.getElementById('bite-btn');
+const treatBtn = document.getElementById('treat-btn');
+const resetBtn = document.getElementById('reset-btn');
+const steps = [document.getElementById('step1'), document.getElementById('step2'), document.getElementById('step3'), document.getElementById('step4')];
+const takeaway = document.getElementById('takeaway');
+const takeawayText = document.getElementById('takeaway-text');
+
+function updateSteps(activeIndex) {
+  steps.forEach((step, i) => {
+    step.classList.toggle('active', i <= activeIndex);
+  });
+}
+
+biteBtn.onclick = function() {
+  if (state !== 'normal') return;
+  state = 'bitten';
+  
+  // Show redness
+  redness.style.transition = 'opacity 0.5s ease';
+  redness.style.opacity = '1';
+  
+  // Show acid ಸೂಚಕ
+  acidIndicator.style.transition = 'opacity 0.3s ease';
+  acidIndicator.style.opacity = '1';
+  
+  // Update displays
+  painDisplay.textContent = '😣 ಐಯ್ಯೋ! ನೋವು!';
+  painDisplay.className = 'pain-ಸೂಚಕ pain';
+  
+  venomStatus.textContent = 'ಫಾರ್ಮಿಕ್ ಆಮ್ಲ!';
+  venomStatus.className = 'metric-value danger';
+  
+  phStatus.textContent = 'ಆಮ್ಲೀಯ (~4)';
+  phStatus.className = 'metric-value danger';
+  
+  treatmentStatus.textContent = 'ಕ್ಷಾರ ಬೇಕು!';
+  
+  painLevel.textContent = 'ಅಧಿಕ 🔴';
+  painLevel.className = 'metric-value danger';
+  
+  updateSteps(1);
+  
+  biteBtn.disabled = true;
+  treatBtn.disabled = false;
+  
+  takeawayText.textContent = 'ಇರುವೆ ನಿಮ್ಮ ಚರ್ಮದೊಳಗೆ ಫಾರ್ಮಿಕ್ ಆಮ್ಲ ಚುಚ್ಚಿದೆ — ನೋವು ಮತ್ತು ಉರಿಯೂತ. ಕ್ಷಾರದಿಂದ ತಟಸ್ಥೀಕರಿಸಬೇಕು!';
+  takeaway.classList.add('show');
+};
+
+treatBtn.onclick = function() {
+  if (state !== 'bitten') return;
+  state = 'treated';
+  
+  updateSteps(2);
+  
+  // Show paste application
+  paste.style.transition = 'opacity 0.5s ease';
+  paste.style.opacity = '1';
+  
+  setTimeout(() => {
+    // Remove redness
+    redness.style.opacity = '0';
+    acidIndicator.style.opacity = '0';
+    
+    // Update displays
+    painDisplay.textContent = '😊 ಉಪಶಮನ!';
+    painDisplay.className = 'pain-ಸೂಚಕ relief';
+    
+    venomStatus.textContent = 'ತಟಸ್ಥೀಕರಣವಾಯಿತು';
+    venomStatus.className = 'metric-value success';
+    
+    phStatus.textContent = 'ಸಾಮಾನ್ಯ (~7)';
+    phStatus.className = 'metric-value success';
+    
+    treatmentStatus.textContent = 'ಯಶಸ್ಸು!';
+    treatmentStatus.className = 'metric-value success';
+    
+    painLevel.textContent = 'ಇಲ್ಲ ✅';
+  painLevel.className = 'metric-value success';
+    
+    updateSteps(3);
+    
+    treatBtn.disabled = true;
+    
+    takeawayText.textContent = 'ಬೇಕಿಂಗ್ ಸೋಡಾ (ಕ್ಷಾರ) ಫಾರ್ಮಿಕ್ ಆಮ್ಲವನ್ನು ತಟಸ್ಥೀಕರಿಸಿ ಹಾನಿಕರವಲ್ಲದ ಉಪ್ಪು ಮತ್ತು ನೀರಾಗಿ ಬದಲಾಯಿಸಿತು. ನೋವು ಹೋಯಿತು! ಇದು ತಟಸ್ಥೀಕರಣ ಕ್ರಿಯೆ!';
+  }, 1000);
+};
+
+resetBtn.onclick = function() {
+  state = 'normal';
+  
+  redness.style.opacity = '0';
+  paste.style.opacity = '0';
+  acidIndicator.style.opacity = '0';
+  
+  painDisplay.textContent = '😊 ಆರೋಗ್ಯಕರ ಚರ್ಮ';
+  painDisplay.className = 'pain-ಸೂಚಕ';
+  
+  venomStatus.textContent = 'ಇಲ್ಲ';
+  venomStatus.className = 'metric-value';
+  
+  phStatus.textContent = 'ಸಾಮಾನ್ಯ (~7)';
+  phStatus.className = 'metric-value';
+  
+  treatmentStatus.textContent = 'ಅಗತ್ಯವಿಲ್ಲ';
+  treatmentStatus.className = 'metric-value';
+  
+  painLevel.textContent = 'ಇಲ್ಲ';
+  painLevel.className = 'metric-value';
+  
+  steps.forEach(s => s.classList.remove('active'));
+  
+  biteBtn.disabled = false;
+  treatBtn.disabled = true;
+  takeaway.classList.remove('show');
+};
+
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var initState = (p.get('initialState') || '').toLowerCase();
+  var showHintParam = p.get('showHints');
+  if (showHintParam === 'false') {
+    var box = document.querySelector('.insight-box');
+    if (box) box.style.display = 'none';
+  }
+  if (initState === 'bitten' || initState === 'treated') {
+    setTimeout(function () {
+      var biteBtn = document.getElementById('bite-btn');
+      if (biteBtn) biteBtn.click();
+      if (initState === 'treated') {
+        setTimeout(function () {
+          var treatBtn = document.getElementById('treat-btn');
+          if (treatBtn) treatBtn.click();
+        }, 1800);
+      }
+    }, 800);
+  }
+}());
+</script>
+</body>
+</html>

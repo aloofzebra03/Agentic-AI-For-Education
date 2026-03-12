@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#00897b">
+<title>ಲೋಲಕ ಕಾಲಾವಧಿ ಪ್ರಯೋಗ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #00897b 0%, #4db6ac 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #00897b;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #00695c; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.experiment-setup {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.pendulum-setup {
+  flex: 1;
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.pendulum-setup:hover { border-color: #b2dfdb; }
+.pendulum-setup.active { border-color: #00897b; background: #e0f2f1; }
+
+.pendulum-setup .icon { font-size: 30px; margin-bottom: 5px; }
+.pendulum-setup .name { font-size: 11px; font-weight: 600; color: #333; }
+.pendulum-setup .length { font-size: 10px; color: #00897b; font-weight: 700; }
+
+.comparison-visual {
+  position: relative;
+  height: 250px;
+  background: linear-gradient(180deg, #eceff1 0%, #cfd8dc 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-around;
+}
+
+.support-bar {
+  position: absolute;
+  top: 15px;
+  left: 20px;
+  right: 20px;
+  height: 10px;
+  background: linear-gradient(180deg, #5d4037, #795548);
+  border-radius: 3px;
+}
+
+.pendulum-container {
+  position: relative;
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mini-pendulum {
+  position: absolute;
+  top: 20px;
+  transform-origin: top center;
+}
+
+.mini-ದಾರ {
+  width: 2px;
+  background: #333;
+  margin: 0 auto;
+}
+
+.mini-bob {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  margin: 0 auto;
+  margin-top: -3px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+}
+
+.bob-short { background: radial-gradient(circle at 30% 30%, #ef5350, #c62828); }
+.bob-medium { background: radial-gradient(circle at 30% 30%, #66bb6a, #388e3c); }
+.bob-long { background: radial-gradient(circle at 30% 30%, #42a5f5, #1976d2); }
+
+.pendulum-label {
+  position: absolute;
+  bottom: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #333;
+  background: #fff;
+  padding: 3px 8px;
+  border-radius: 10px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.control-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.start-btn { background: linear-gradient(135deg, #4caf50, #66bb6a); color: #fff; }
+.start-btn:disabled { background: #e0e0e0; color: #999; }
+.reset-btn { background: linear-gradient(135deg, #9e9e9e, #bdbdbd); color: #fff; }
+
+.stopwatch {
+  text-align: center;
+  margin-top: 12px;
+  padding: 15px;
+  background: #263238;
+  border-radius: 10px;
+  color: #fff;
+}
+
+.stopwatch-time {
+  font-size: 32px;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.stopwatch-label {
+  font-size: 10px;
+  color: #90a4ae;
+  margin-top: 5px;
+}
+
+.results-table {
+  margin-top: 12px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.table-cell {
+  padding: 10px;
+  text-align: center;
+  font-size: 10px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+}
+
+.table-header .table-cell {
+  background: #00897b;
+  color: #fff;
+  font-weight: 700;
+}
+
+.table-cell.highlight {
+  background: #e0f2f1;
+  font-weight: 700;
+  color: #00695c;
+}
+
+.observation {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.observation-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 6px; }
+.observation-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>⏱️ ಲೋಲಕ ಕಾಲಾವಧಿ ಪ್ರಯೋಗ</h1>
+  <p>ವಿವಿಧ ಉದ್ದದ ಲೋಲಕಗಳನ್ನು ಹೋಲಿಸಿ!</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಪ್ರಯೋಗ ಉದ್ದೇಶ</div>
+  <div class="concept-text">
+    ಪರೀಕ್ಷಿಸಿ <strong>ಉದ್ದ ಕಾಲಾವಧಿಯನ್ನು ಪರಿಣಾಮ ಬೀರುತ್ತದೆಯೇ</strong>. ವಿವಿಧ ಉದ್ದದ ಮೂರು ಲೋಲಕಗಳನ್ನು ಊಘಾಡಿ ಅಳೆಯುತ್ತೇವೆasure how long each takes to ಪೂರ್ಣ 10 ಆಂದೋಲನs.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="experiment-setup">
+    <div class="pendulum-setup active" onclick="selectPendulum('short', this)">
+      <div class="icon">🔴</div>
+      <div class="name">ಕಿರಿದಾದ</div>
+      <div class="length">50 cm</div>
+    </div>
+    <div class="pendulum-setup" onclick="selectPendulum('medium', this)">
+      <div class="icon">🟢</div>
+      <div class="name">ಮಧ್ಯಮ</div>
+      <div class="length">100 cm</div>
+    </div>
+    <div class="pendulum-setup" onclick="selectPendulum('long', this)">
+      <div class="icon">🔵</div>
+      <div class="name">Long</div>
+      <div class="length">150 cm</div>
+    </div>
+  </div>
+  
+  <div class="comparison-visual">
+    <div class="support-bar"></div>
+    
+    <div class="pendulum-container">
+      <div class="mini-pendulum" id="pendulum-short">
+        <div class="mini-ದಾರ" style="height: 60px;"></div>
+        <div class="mini-bob bob-short"></div>
+      </div>
+      <div class="pendulum-label">ಕಿರಿದಾದ (50ಸೆಂ)</div>
+    </div>
+    
+    <div class="pendulum-container">
+      <div class="mini-pendulum" id="pendulum-medium">
+        <div class="mini-ದಾರ" style="height: 100px;"></div>
+        <div class="mini-bob bob-medium"></div>
+      </div>
+      <div class="pendulum-label">ಮಧ್ಯಮ (100ಸೆಂ)</div>
+    </div>
+    
+    <div class="pendulum-container">
+      <div class="mini-pendulum" id="pendulum-long">
+        <div class="mini-ದಾರ" style="height: 140px;"></div>
+        <div class="mini-bob bob-long"></div>
+      </div>
+      <div class="pendulum-label">ಉದ್ದ (150ಸೆಂ)</div>
+    </div>
+  </div>
+  
+  <div class="controls">
+    <button class="control-btn start-btn" id="start-btn" onclick="startExperiment()">▶️ ಪ್ರಯೋಗ ಪ್ರಾರಂಭಿಸಿ</button>
+    <button class="control-btn reset-btn" onclick="resetExperiment()">🔄 ಮರುಹೊಂದಿಸಿ</button>
+  </div>
+  
+  <div class="stopwatch">
+    <div class="stopwatch-time" id="stopwatch">00.00</div>
+    <div class="stopwatch-label" id="stopwatch-label">ಊಸರವಳಿ ಆಯ್ಕೆಮಾಡಿ ಮತ್ತು ಪ್ರಾರಂಭ ಒತ್ತಿರಿ</div>
+  </div>
+</div>
+
+<div class="results-table">
+  <div class="table-row table-header">
+    <div class="table-cell">ಊಸರವಳಿ</div>
+    <div class="table-cell">ಉದ್ದ</div>
+    <div class="table-cell">10ಕ್ಕೆ ಸಮಯ</div>
+    <div class="table-cell">ಅವಧಿ (T)</div>
+  </div>
+  <div class="table-row">
+    <div class="table-cell">🔴 ಕಿರಿದಾದ</div>
+    <div class="table-cell">50 cm</div>
+    <div class="table-cell" id="time-short">--</div>
+    <div class="table-cell highlight" id="period-short">--</div>
+  </div>
+  <div class="table-row">
+    <div class="table-cell">🟢 ಮಧ್ಯಮ</div>
+    <div class="table-cell">100 cm</div>
+    <div class="table-cell" id="time-medium">--</div>
+    <div class="table-cell highlight" id="period-medium">--</div>
+  </div>
+  <div class="table-row">
+    <div class="table-cell">🔵 ಉದ್ದ</div>
+    <div class="table-cell">150 cm</div>
+    <div class="table-cell" id="time-long">--</div>
+    <div class="table-cell highlight" id="period-long">--</div>
+  </div>
+</div>
+
+<div class="observation" id="observation" style="display: none;">
+  <div class="observation-title">🔬 ವೀಕ್ಷಣೆ</div>
+  <div class="observation-text" id="observation-text"></div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ಏನನ್ನು ನೋಡಬೇಕು</div>
+  <div class="takeaway-text">
+    • ಯಾವ ಲೋಲಕ 10 ಆಂದೋಲನಗಳನ್ನು ವೇಗವಾಗಿ ಪೂರ್ಣಗೊಳಿಸುತ್ತದೆ?<br>
+    • ಉದ್ದ ಕಾಲಾವಧಿಯನ್ನು ಹೇಗೆ ಪರಿಣಾಮ?<br>
+    • <strong>ಉದ್ದ ಊಸರವಳಿ = ಉದ್ದ ಕಾಲಾವಧಿ</strong><br>
+    • ಅದಕ್ಕೇ ದಾದಾ ಗಡಿಯಾರ ಉದ್ದ ಊಸರವಳಿ!
+  </div>
+</div>
+
+</div>
+
+<script>
+let currentPendulum = 'short';
+let isRunning = false;
+let startTime;
+let timerInterval;
+let ಆಂದೋಲನCount = 0;
+let results = { short: null, medium: null, long: null };
+
+// Theoretical time periods (T = 2π√(L/g))
+const periods = {
+  short: 2 * Math.PI * Math.sqrt(0.5 / 9.8),  // ~1.42s
+  medium: 2 * Math.PI * Math.sqrt(1.0 / 9.8), // ~2.01s
+  long: 2 * Math.PI * Math.sqrt(1.5 / 9.8)    // ~2.46s
+};
+
+function selectPendulum(type, element) {
+  if (isRunning) return;
+  
+  currentPendulum = type;
+  document.querySelectorAll('.pendulum-setup').forEach(el => el.classList.remove('active'));
+  element.classList.add('active');
+  
+  document.getElementById('stopwatch-label').textContent = `${type} ಊಸರವಳಿಗೆ ಸಮಯ ಮಾಪನ ಸಿದ್ಧ (10 ಆಂದೋಲನಗಳು)`;
+}
+
+function startExperiment() {
+  if (isRunning) return;
+  
+  isRunning = true;
+  startTime = Date.now();
+  ಆಂದೋಲನCount = 0;
+  
+  document.getElementById('start-btn').disabled = true;
+  document.getElementById('stopwatch-label').textContent = `${currentPendulum} ಊಸರವಳಿಗೆ ಆಂದೋಲನಗಳು ಎಣಿಸಲಾಗುತ್ತಿದೆ...`;
+  
+  // ಪ್ರಾರಂಭ all pendulums swinging
+  animatePendulums();
+  
+  // ಪ್ರಾರಂಭ timer
+  timerInterval = setInterval(updateTimer, 10);
+  
+  // Auto-ಪೂರ್ಣ after calculated time
+  const timeFor10 = periods[currentPendulum] * 10;
+  setTimeout(() => {
+    completeExperiment(timeFor10);
+  }, timeFor10 * 1000);
+}
+
+function animatePendulums() {
+  const pendulums = {
+    short: document.getElementById('pendulum-short'),
+    medium: document.getElementById('pendulum-medium'),
+    long: document.getElementById('pendulum-long')
+  };
+  
+  Object.keys(pendulums).forEach(key => {
+    const el = pendulums[key];
+    const period = periods[key];
+    el.style.animation = `swing ${period}s ease-in-out infinite`;
+  });
+  
+  // Add keyframes dynamically
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes swing {
+      0%, 100% { transform: rotate(20deg); }
+      50% { transform: rotate(-20deg); }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function updateTimer() {
+  const elapsed = (Date.now() - startTime) / 1000;
+  document.getElementById('stopwatch').textContent = elapsed.toFixed(2);
+}
+
+function completeExperiment(timeFor10) {
+  clearInterval(timerInterval);
+  isRunning = false;
+  
+  // Add some realistic variation
+  const actualTime = timeFor10 + (Math.random() - 0.5) * 0.3;
+  const period = actualTime / 10;
+  
+  results[currentPendulum] = { time: actualTime, period: period };
+  
+  // Update table
+  document.getElementById(`time-${currentPendulum}`).textContent = actualTime.toFixed(2) + 's';
+  document.getElementById(`period-${currentPendulum}`).textContent = period.toFixed(2) + 's';
+  
+  document.getElementById('stopwatch').textContent = actualTime.toFixed(2);
+  document.getElementById('stopwatch-label').textContent = `${currentPendulum} ಊಸರವಳಿ: 10 ಆಂದೋಲನಗಳಿಗೆ ${actualTime.toFixed(2)}s`;
+  
+  document.getElementById('start-btn').disabled = false;
+  
+  // Check if all experiments done
+  checkAllDone();
+}
+
+function checkAllDone() {
+  if (results.short && results.medium && results.long) {
+    document.getElementById('observation').style.display = 'block';
+    document.getElementById('observation-text').innerHTML = `
+      <strong>ಫಲಿತಾಂಶ ವಿಶ್ಲೇಷಣೆ:</strong><br>
+      • ಕಿರಿದಾದ (50ಸೆಂ): ಕಾಲಾವಧಿ = ${results.short.period.toFixed(2)}s<br>
+      • ಮಧ್ಯಮ (100ಸೆಂ): ಕಾಲಾವಧಿ = ${results.medium.period.toFixed(2)}s<br>
+      • ಉದ್ದ (150ಸೆಂ): ಕಾಲಾವಧಿ = ${results.long.period.toFixed(2)}s<br><br>
+      <strong>ತೀರ್ಮಾನ:</strong> ಉದ್ದ ಊಸರವಳಿ = ಉದ್ದ ಕಾಲಾವಧಿ!<br>
+      ಉದ್ದ ದ್ವಿಗುಣವಾದಾಗ (50→100ಸೆಂ), ಕಾಲಾವಧಿ ~${((results.medium.period / results.short.period - 1) * 100).toFixed(0)}% ಏರಿಕೆ
+    `;
+  }
+}
+
+function resetExperiment() {
+  clearInterval(timerInterval);
+  isRunning = false;
+  results = { short: null, medium: null, long: null };
+  
+  document.getElementById('stopwatch').textContent = '00.00';
+  document.getElementById('stopwatch-label').textContent = 'ಊಸರವಳಿ ಆಯ್ಕೆಮಾಡಿ ಮತ್ತು ಪ್ರಾರಂಭ ಒತ್ತಿರಿ';
+  document.getElementById('start-btn').disabled = false;
+  
+  ['short', 'medium', 'long'].forEach(type => {
+    document.getElementById(`time-${type}`).textContent = '--';
+    document.getElementById(`period-${type}`).textContent = '--';
+  });
+  
+  document.getElementById('observation').style.display = 'none';
+  
+  // ನಿಲ್ಲಿಸಿ animations
+  ['pendulum-short', 'pendulum-medium', 'pendulum-long'].forEach(id => {
+    document.getElementById(id).style.animation = 'none';
+  });
+}
+
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var initialState = params.get('initialState');
+  var showHints = params.get('showHints');
+
+  if (initialState && initialState !== 'short') {
+    var indexMap = { short: 0, medium: 1, long: 2 };
+    var idx = indexMap[initialState];
+    var setups = document.querySelectorAll('.pendulum-setup');
+    if (idx !== undefined && setups[idx]) {
+      selectPendulum(initialState, setups[idx]);
+    }
+  }
+
+  if (showHints === 'false') {
+    var cc = document.querySelector('.concept-card');
+    var obs = document.getElementById('observation');
+    var tw = document.querySelector('.takeaway');
+    if (cc) cc.style.display = 'none';
+    if (obs) obs.style.display = 'none';
+    if (tw) tw.style.display = 'none';
+  }
+})();
+</script>
+</body>
+</html>

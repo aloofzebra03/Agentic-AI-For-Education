@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#6a1b9a">
+<title>ಬ್ಯಾಟರಿ – ಕೋಶಗಳನ್ನು ಜೋಡಿಸುವುದು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #6a1b9a 0%, #ab47bc 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #f9a825;
+}
+
+.concept-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f57f17;
+  margin-bottom: 6px;
+}
+
+.concept-text {
+  font-size: 12px;
+  color: #5d4037;
+  line-height: 1.5;
+}
+
+.concept-equation {
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px;
+  margin-top: 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6a1b9a;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.visual {
+  position: relative;
+  height: 35vh;
+  min-height: 240px;
+  background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+svg { width: 100%; height: 100%; }
+
+.instruction {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(106,27,154,0.9);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.control-btn {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.control-btn:active { transform: scale(0.95); }
+.control-btn.active { border-color: #6a1b9a; background: #f3e5f5; }
+.control-btn .icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+.voltage-display {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.voltage-label {
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.voltage-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+.voltage-calc {
+  font-size: 10px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.connection-status {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.status-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 11px;
+}
+
+.status-icon { font-size: 16px; }
+.status-text { color: #333; }
+.status-text.correct { color: #2e7d32; font-weight: 600; }
+.status-text.wrong { color: #c62828; font-weight: 600; }
+
+.learning-box {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #1976d2;
+}
+
+.learning-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1565c0;
+  margin-bottom: 6px;
+}
+
+.learning-text {
+  font-size: 11px;
+  color: #37474f;
+  line-height: 1.6;
+}
+
+.takeaway {
+  background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2e7d32;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1b5e20; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+@keyframes connect {
+  0% { stroke-dashoffset: 20; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.wire-animate { stroke-dasharray: 5 5; animation: connect 0.5s linear infinite; }
+
+@keyframes glow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.3); }
+}
+
+.bulb-glow { animation: glow 1s ease-in-out infinite; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🔋 ಬ್ಯಾಟರಿ – ಕೋಶಗಳನ್ನು ಜೋಡಿಸುವುದು</h1>
+  <p>ಕೋಶಗಳು ಬ್ಯಾಟರಿ ರೂಪಿಸಲು ಹೇಗೆ ಜೋಡಾಗುತ್ತವೆ</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ಬ್ಯಾಟರಿ</strong> ಎರಡು ಅಥವಾ ಹೆಚ್ಚು ಕೋಶಗಳನ್ನು ಜೋಡಿಸಿದಾಗ ರೂಪುಗೊಳ್ಳುತ್ತದೆ. ಒಂದು ಕೋಶದ <strong>ಧನ (+)</strong> ಟರ್ಮಿನಲ್ ಮುಂದಿನ ಕೋಶದ <strong>ಋಣ (−)</strong> ಟರ್ಮಿನಲ್‌ಗೆ ಸಂಪರ್ಕವಾಗುತ್ತದೆ.
+  </div>
+  <div class="concept-equation">
+    ಬ್ಯಾಟರಿ ವೋಲ್ಟೇಜ್ = ಕೋಶ 1 + ಕೋಶ 2 + ಕೋಶ 3 ...
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="visual">
+    <div class="instruction" id="instruction">ಕೋಶಗಳ ಸಂಖ್ಯೆ ಆಯ್ಕೆಮಾಡಲು ಟ್ಯಾಪ್ ಮಾಡಿ</div>
+    <svg viewBox="0 0 400 240" id="battery-svg">
+      <!-- Cells container -->
+      <g id="cells-group"></g>
+      
+      <!-- Connection wires -->
+      <g id="wires-group"></g>
+      
+      <!-- Bulb -->
+      <g id="bulb-group" transform="translate(340, 80)">
+        <circle cx="0" cy="0" r="25" fill="#e0e0e0" id="bulb-glass"/>
+        <path d="M -8 25 L -8 40 L 8 40 L 8 25" fill="#9e9e9e"/>
+        <circle cx="0" cy="0" r="15" fill="#bdbdbd" id="bulb-filament"/>
+      </g>
+      
+      <!-- Labels -->
+      <text x="340" y="130" font-size="10" fill="#666" text-anchor="middle">ಬಲ್ಬ್</text>
+    </svg>
+  </div>
+  
+  <div class="controls">
+    <button class="control-btn active" id="btn-1cell" onclick="setCells(1)">
+      <span class="icon">🔋</span>
+      1 ಕೋಶ
+    </button>
+    <button class="control-btn" id="btn-2cells" onclick="setCells(2)">
+      <span class="icon">🔋🔋</span>
+      2 ಘಟಕಗಳು
+    </button>
+    <button class="control-btn" id="btn-3cells" onclick="setCells(3)">
+      <span class="icon">🔋🔋🔋</span>
+      3 ಘಟಕಗಳು
+    </button>
+  </div>
+</div>
+
+<div class="voltage-display">
+  <div class="voltage-label">ಒಟ್ಟು ವೋಲ್ಟೇಜ್ (ಬ್ಯಾಟರಿ)</div>
+  <div class="voltage-value" id="voltage-value">1.5V</div>
+  <div class="voltage-calc" id="voltage-calc">1 ಕೋಶ × 1.5V = 1.5V</div>
+</div>
+
+<div class="connection-status" id="connection-status">
+  <div class="status-title">ಸಂಪರ್ಕ ಸ್ಥಿತಿ:</div>
+  <div class="status-item">
+    <span class="status-icon">✅</span>
+    <span class="status-text correct">ಸರಿ! ಒಂದು ಕೋಶದ (+) ಮುಂದಿನ ಕೋಶದ (−) ಗೆ ಸಂಪರ್ಕ</span>
+  </div>
+</div>
+
+<div class="learning-box">
+  <div class="learning-title">🔬 ಬ್ಯಾಟರಿ ಸಂಪರ್ಕ ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು</div>
+  <div class="learning-text" id="learning-text">
+    ಕೋಶಗಳನ್ನು ಸರಿಯಾಗಿ ಜೋಡಿಸಿದಾಗ (ಒಂದರ + ಮುಂದಿನ ಕೋಶದ − ಗೆ), ಅವುಗಳ ವೋಲ್ಟೇಜ್ <strong>ಕೂಡಿಕೆಯಾಗುತ್ತದೆ</strong>. ಇದನ್ನು ಕೋಶಗಳನ್ನು <strong>ಸರಣಿ</strong>ಯಲ್ಲಿ ಜೋಡಿಸುವುದು ಎನ್ನುತ್ತಾರೆ.<br><br>
+    ಹೆಚ್ಚು ಕೋಶಗಳು = ಹೆಚ್ಚು ವೋಲ್ಟೇಜ್ = ಹೆಚ್ಚು ಹೊಳೆಯುವ ಬಲ್ಬ್! 💡
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೀವು ಕಲಿತದ್ದು</div>
+  <div class="takeaway-text">
+    ಬ್ಯಾಟರಿ ಕೋಶಗಳನ್ನು ಸರಣಿಯಲ್ಲಿ ಜೋಡಿಸಿ ಮಾಡಲಾಗುತ್ತದೆ: <strong>ಒಂದು ಕೋಶದ ಧನ (+) ಟರ್ಮಿನಲ್ ಮುಂದಿನ ಕೋಶದ ಋಣ (−) ಟರ್ಮಿನಲ್‌ಗೆ</strong>. ಒಟ್ಟು ವೋಲ್ಟೇಜ್ ಎಲ್ಲ ಕೋಶ ವೋಲ್ಟೇಜ್‌ಗಳ ಮೊತ್ತ. ಹೆಚ್ಚು ಕೋಶಗಳು = ಹೆಚ್ಚು ಶಕ್ತಿ!
+  </div>
+</div>
+
+</div>
+
+<script>
+const ಘಟಕಗಳುGroup = document.getElementById('cells-group');
+const wiresGroup = document.getElementById('wires-group');
+const bulbGlass = document.getElementById('bulb-glass');
+const bulbFilament = document.getElementById('bulb-filament');
+const voltageValue = document.getElementById('voltage-value');
+const voltageCalc = document.getElementById('voltage-calc');
+const learningText = document.getElementById('learning-text');
+const instruction = document.getElementById('instruction');
+
+let currentCells = 1;
+
+function createCell(x, y, index) {
+  return `
+    <g transform="translate(${x}, ${y})">
+      <!-- Cell body -->
+      <rect x="0" y="0" width="70" height="45" rx="5" fill="#1565c0"/>
+      
+      <!-- Negative terminal (left) -->
+      <rect x="-8" y="12" width="12" height="21" rx="2" fill="#757575"/>
+      <text x="-2" y="27" font-size="14" fill="#fff" text-anchor="middle">−</text>
+      
+      <!-- Positive terminal (right) -->
+      <rect x="66" y="8" width="15" height="29" rx="3" fill="#ffd600"/>
+      <text x="73" y="28" font-size="14" fill="#e65100" text-anchor="middle">+</text>
+      
+      <!-- Label -->
+      <text x="35" y="28" font-size="9" fill="#fff" text-anchor="middle">1.5V</text>
+      <text x="35" y="38" font-size="7" fill="#bbdefb" text-anchor="middle">ಕೋಶ ${index}</text>
+    </g>
+  `;
+}
+
+function createWire(x1, y1, x2, y2, isAnimated = true) {
+  const animClass = isAnimated ? 'wire-animate' : '';
+  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#4caf50" stroke-width="3" class="${animClass}"/>`;
+}
+
+function setCells(num) {
+  currentCells = num;
+  
+  // Update buttons
+  document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById(`btn-${num}cell${num > 1 ? 's' : ''}`).classList.add('active');
+  
+  // Clear previous
+  ಘಟಕಗಳುGroup.innerHTML = '';
+  wiresGroup.innerHTML = '';
+  
+  // ಲೆಕ್ಕ ಹಾಕಿ positions
+  const startX = num === 1 ? 120 : (num === 2 ? 80 : 40);
+  const cellWidth = 85;
+  
+  // Create ಘಟಕಗಳು
+  for (let i = 0; i < num; i++) {
+    ಘಟಕಗಳುGroup.innerHTML += createCell(startX + i * cellWidth, 100, i + 1);
+  }
+  
+  // Create connection wires between ಘಟಕಗಳು
+  for (let i = 0; i < num - 1; i++) {
+    const x1 = startX + i * cellWidth + 81; // + terminal
+    const x2 = startX + (i + 1) * cellWidth - 8; // - terminal of next
+    wiresGroup.innerHTML += createWire(x1, 122, x2, 122);
+  }
+  
+  // Wire to bulb
+  const lastCellX = startX + (num - 1) * cellWidth + 81;
+  wiresGroup.innerHTML += createWire(lastCellX, 122, 315, 80);
+  
+  // Wire from bulb back to first cell
+  wiresGroup.innerHTML += `
+    <path d="M 315 80 Q 315 180 200 180 Q ${startX - 30} 180 ${startX - 8} 122" 
+          stroke="#4caf50" stroke-width="3" fill="none" class="wire-animate"/>
+  `;
+  
+  // Update voltage
+  const voltage = (num * 1.5).toFixed(1);
+  voltageValue.textContent = `${voltage}V`;
+  voltageCalc.textContent = `${num} ಕೋಶ × 1.5V = ${voltage}V`;
+  
+  // Update bulb brightness
+  const brightness = num === 1 ? '#fff59d' : (num === 2 ? '#ffeb3b' : '#ffff00');
+  const filamentColor = num === 1 ? '#ffe082' : (num === 2 ? '#ffd54f' : '#ffffff');
+  bulbGlass.setAttribute('fill', brightness);
+  bulbFilament.setAttribute('fill', filamentColor);
+  bulbGlass.classList.add('bulb-glow');
+  
+  // Update instruction
+  instruction.textContent = num === 1 ? 'ಒಂದು ಕೋಶ = 1.5V' : `${num} ಕೋಶಗಳು ಜೋಡಿಸಿದೆ = ${voltage}V ಬ್ಯಾಟರಿ`;
+  
+  // Update learning text
+  if (num === 1) {
+    learningText.innerHTML = `
+      ಒಂದು ಕೋಶ <strong>1.5V</strong> ವಿದ್ಯುತ್ ಶಕ್ತಿ ನೀಡುತ್ತದೆ.<br><br>
+      ಹೆಚ್ಚು ಶಕ್ತಿಗಾಗಿ ಹಲವು ಕೋಶಗಳನ್ನು ಜೋಡಿಸಿ <strong>ಬ್ಯಾಟರಿ</strong> ರೂಪಿಸಬಹುದು.
+    `;
+  } else if (num === 2) {
+    learningText.innerHTML = `
+      ಸರಣಿಯಲ್ಲಿ ಜೋಡಿಸಿದ ಎರಡು ಕೋಶಗಳು: <strong>1.5V + 1.5V = 3V</strong><br><br>
+      ಕೋಶ 1 ರ <span style="color:#e65100;font-weight:600">+ ಟರ್ಮಿನಲ್</span> ಕೋಶ 2 ರ <span style="color:#1565c0;font-weight:600">− ಟರ್ಮಿನಲ್</span>‌ಗೆ ಸಂಪರ್ಕವಾಗುವುದು ಗಮನಿಸಿ. ಬಲ್ಬ್ ಹೆಚ್ಚು ಹೊಳೆಯುತ್ತದೆ! 💡
+    `;
+  } else {
+    learningText.innerHTML = `
+      ಸರಣಿಯಲ್ಲಿ ಮೂರು ಕೋಶಗಳು: <strong>1.5V + 1.5V + 1.5V = 4.5V</strong><br><br>
+      ಪ್ರತಿ ಕೋಶದ <span style="color:#e65100;font-weight:600">(+)</span> ಮುಂದಿನ ಕೋಶದ <span style="color:#1565c0;font-weight:600">(−)</span> ಗೆ ಸಂಪರ್ಕ. ಹೆಚ್ಚು ವೋಲ್ಟೇಜ್ = ಅತ್ಯಂತ ಹೊಳೆಯುವ ಬಲ್ಬ್! 💡💡💡
+    `;
+  }
+}
+
+// Initialize with 1 cell
+setCells(1);
+
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var state = params.get('initialState');
+  var hints = params.get('showHints');
+
+  if (hints === 'false') {
+    document.querySelectorAll('.concept-card').forEach(function(el) { el.style.display = 'none'; });
+  }
+
+  var stateMap = { 'one_cell': 1, 'two_cells': 2, 'three_cells': 3 };
+  if (state && stateMap[state] !== undefined) {
+    setCells(stateMap[state]);
+  }
+})();
+</script>
+</body>
+</html>

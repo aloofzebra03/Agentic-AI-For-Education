@@ -450,7 +450,7 @@ def ge_node(state: Dict[str, Any]) -> Dict[str, Any]:
 "{question_context}"
 
 Task: Provide a clear, concise explanation of '{concept}' that:
-1. Explains what it is (2-3 sentences)
+1. Explains what it is (2-3 sentences at max)
 2. Explains why it's important
 3. Relates it back to the question they missed
 

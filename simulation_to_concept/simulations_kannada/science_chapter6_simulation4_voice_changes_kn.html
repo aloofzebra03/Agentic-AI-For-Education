@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#5c6bc0">
+<title>ಯೌವನದಲ್ಲಿ ಧ್ವನಿ ಬದಲಾವಣೆಗಳು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #5c6bc0 0%, #7986cb 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #5c6bc0;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #3949ab; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.visual {
+  position: relative;
+  height: 35vh;
+  min-height: 240px;
+  background: linear-gradient(180deg, #e8eaf6 0%, #fff 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 10px;
+}
+
+svg { width: 100%; height: 100%; }
+
+.gender-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.gender-tab {
+  flex: 1;
+  padding: 12px;
+  border: 3px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fafafa;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.gender-tab:active { transform: scale(0.98); }
+.gender-tab.boys.active { border-color: #2196f3; background: #e3f2fd; color: #1565c0; }
+.gender-tab.girls.active { border-color: #e91e63; background: #fce4ec; color: #c2185b; }
+
+.stage-selector {
+  margin: 15px 0;
+}
+
+.stage-selector label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #37474f;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.stage-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.stage-btn {
+  flex: 1;
+  padding: 10px 6px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.stage-btn.active { border-color: #5c6bc0; background: #e8eaf6; color: #3949ab; }
+
+.voice-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.wave-visual {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 60px;
+}
+
+.wave-bar {
+  width: 8px;
+  background: #5c6bc0;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.voice-info {
+  text-align: center;
+}
+
+.voice-label { font-size: 10px; color: #666; margin-bottom: 4px; }
+.voice-pitch { font-size: 18px; font-weight: 700; color: #5c6bc0; }
+.voice-desc { font-size: 10px; color: #888; margin-top: 4px; }
+
+.larynx-info {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.larynx-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 8px; }
+.larynx-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.comparison-panel {
+  background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.comparison-title { font-size: 12px; font-weight: 700; color: #3949ab; margin-bottom: 10px; }
+
+.comparison-row {
+  display: flex;
+  gap: 10px;
+}
+
+.compare-box {
+  flex: 1;
+  padding: 10px;
+  background: #fff;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.compare-box .icon { font-size: 24px; margin-bottom: 4px; }
+.compare-box .label { font-size: 10px; color: #666; }
+.compare-box .value { font-size: 11px; font-weight: 700; color: #333; margin-top: 4px; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🎤 ಯೌವನದಲ್ಲಿ ಧ್ವನಿ ಬದಲಾವಣೆಗಳು</h1>
+  <p>ನಿಮ್ಮ ಧ್ವನಿ ಏಕೆ ಬದಲಾಗುತ್ತದೆ?</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ಯೌವನದಲ್ಲಿ <strong>ಸ್ವರ ಪೆಟ್ಟಿಗೆ</strong> ದೊಡ್ಡದಾಗುತ್ತದೆ. ಹುಡುಗರಲ್ಲಿ ಧ್ವನಿ ಆಳವಾಗುತ್ತದೆg of the voice. In girls, the change is more subtle.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="gender-tabs">
+    <button class="gender-tab boys active" onclick="selectGender('boys', this)">👦 ಹುಡುಗರು</button>
+    <button class="gender-tab girls" onclick="selectGender('girls', this)">👧 ಹುಡುಗಿಯರು</button>
+  </div>
+  
+  <div class="visual">
+    <svg viewBox="0 0 400 200" id="larynx-svg">
+      <!-- Throat outline -->
+      <ellipse cx="200" cy="100" rx="80" ry="90" fill="#ffccbc" stroke="#ff8a65" stroke-width="2"/>
+      
+      <!-- ಸ್ವರಪೆಟ್ಟಿಗೆ (voice box) -->
+      <g id="larynx-group">
+        <rect id="larynx-box" x="170" y="70" width="60" height="50" rx="10" fill="#ef9a9a" stroke="#e57373" stroke-width="2"/>
+        <text x="200" y="100" font-size="10" fill="#c62828" text-anchor="middle" font-weight="bold">ಸ್ವರಪೆಟ್ಟಿಗೆ</text>
+      </g>
+      
+      <!-- Vocal cords -->
+      <g id="vocal-cords">
+        <line id="cord-left" x1="175" y1="85" x2="200" y2="95" stroke="#d32f2f" stroke-width="3"/>
+        <line id="cord-right" x1="225" y1="85" x2="200" y2="95" stroke="#d32f2f" stroke-width="3"/>
+      </g>
+      
+      <!-- ಆಡಮ್‌ಸ್ ಆಪಲ್ ಸೂಚಕ (for boys) -->
+      <g id="adams-apple" style="display:none">
+        <path d="M 195 55 L 200 45 L 205 55" fill="#ffab91" stroke="#ff7043" stroke-width="2"/>
+        <text x="200" y="38" font-size="8" fill="#e64a19" text-anchor="middle">ಆಡಮ್‌ಸ್ ಆಪಲ್</text>
+      </g>
+      
+      <!-- Labels -->
+      <text x="200" y="180" font-size="10" fill="#666" text-anchor="middle" id="stage-label">ಯೌವನದ ಮೊದಲು</text>
+    </svg>
+  </div>
+  
+  <div class="stage-selector">
+    <label>📅 ಹಂತ ಆಯ್ಕೆಮಾಡಿ:</label>
+    <div class="stage-btns">
+      <button class="stage-btn active" onclick="selectStage('before', this)">ಯೌವನದ ಮೊದಲು</button>
+      <button class="stage-btn" onclick="selectStage('during', this)">ಯೌವನದ ಸಮಯದಲ್ಲಿ</button>
+      <button class="stage-btn" onclick="selectStage('after', this)">ಯೌವನದ ನಂತರ</button>
+    </div>
+  </div>
+  
+  <div class="voice-display">
+    <div class="wave-visual" id="wave-visual">
+      <div class="wave-bar" style="height: 20px;"></div>
+      <div class="wave-bar" style="height: 35px;"></div>
+      <div class="wave-bar" style="height: 50px;"></div>
+      <div class="wave-bar" style="height: 35px;"></div>
+      <div class="wave-bar" style="height: 20px;"></div>
+    </div>
+    <div class="voice-info">
+      <div class="voice-label">ಸ್ವರ ಪಿಚ್</div>
+      <div class="voice-pitch" id="voice-pitch">High</div>
+      <div class="voice-desc" id="voice-desc">ಮಗುವಿನ ಸ್ವರ</div>
+    </div>
+  </div>
+</div>
+
+<div class="larynx-info" id="larynx-info">
+  <div class="larynx-title" id="larynx-title">🔬 ಯೌವನದ ಮೊದಲು</div>
+  <div class="larynx-text" id="larynx-text">
+    The ಸ್ವರ ಪೆಟ್ಟಿಗೆ is small in children, producing a higher-pitched voice. ಹುಡುಗರು ಮತ್ತು girls have similar voice pitches at this stage.
+  </div>
+</div>
+
+<div class="comparison-panel">
+  <div class="comparison-title">📊 ಸ್ವರ ಬದಲಾವಣೆ ಹೋಲಿಕೆ</div>
+  <div class="comparison-row">
+    <div class="compare-box">
+      <div class="icon">👦</div>
+      <div class="label">ಹುಡುಗರು' Voice</div>
+      <div class="value">ಗಣನೀಯವಾಗಿ ಆಳ<br>(ಸುಮಾರು 1 ಅಕ್ಟೇವ್ ಕೆಳಗೆ)</div>
+    </div>
+    <div class="compare-box">
+      <div class="icon">👧</div>
+      <div class="label">ಹುಡುಗಿಯರು' Voice</div>
+      <div class="value">ಸ್ವಲ್ಪ ಬದಲಾವಣೆ<br>(ಸುಮಾರು 3 ಸ್ವರ ಕೆಳಗೆ)</div>
+    </div>
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ರೋಚಕ ತಥ್ಯಗಳು</div>
+  <div class="takeaway-text">
+    • <strong>ಸ್ವರ ಒಡೆಯುವಿಕೆ</strong> ಹುಡುಗರಲ್ಲಿ ತಾತ್ಕಾಲಿಕ - ದೊಡ್ಡ ಸ್ವರಪೆಟ್ಟಿಗೆಗೆ ಸ್ನಾಯು ಹೊಂದಿಕೊಳ್ಳುವಾಗ<br>
+    • The <strong>ಆಡಮ್‌ಸ್ ಆಪಲ್</strong> ಚರ್ಮದ ಮೂಲಕ ಕಾಣುವ ಸ್ವರಪೆಟ್ಟಿಗೆ<br>
+    • Voice ಬದಲಾಗುತ್ತದೆ usually ಪೂರ್ಣ by age 16-17 in boys<br>
+    • ಪ್ರತಿಯೊಬ್ಬರ ಸ್ವರ ವಿಶಿಷ್ಟ - ಅದು ನಿಮ್ಮನ್ನು ನೀವು ಮಾಡುತ್ತದೆ!
+  </div>
+</div>
+
+</div>
+
+<script>
+let currentGender = 'boys';
+let currentStage = 'before';
+
+const larynxBox = document.getElementById('larynx-box');
+const cordLeft = document.getElementById('cord-left');
+const cordRight = document.getElementById('cord-right');
+const adamsApple = document.getElementById('adams-apple');
+const stageLabel = document.getElementById('stage-label');
+const voicePitch = document.getElementById('voice-pitch');
+const voiceDesc = document.getElementById('voice-desc');
+const larynxTitle = document.getElementById('larynx-title');
+const larynxText = document.getElementById('larynx-text');
+const waveVisual = document.getElementById('wave-visual');
+
+const voiceData = {
+  boys: {
+    before: {
+      larynxSize: { width: 60, height: 50 },
+      pitch: 'High',
+      desc: "ಮಗುವಿನ ಸ್ವರ",
+      waves: [20, 35, 50, 35, 20],
+      info: 'ಮೊದಲು puberty, the larynx is small ಮತ್ತು the vocal cords are short. This produces a high-pitched voice, similar to girls of the same age.',
+      showAdams: false
+    },
+    during: {
+      larynxSize: { width: 75, height: 60 },
+      pitch: 'Changing',
+      desc: 'Voice may crack!',
+      waves: [25, 40, 30, 45, 25],
+      info: 'The larynx is growing rapidly! The vocal cords are getting longer ಮತ್ತು thicker. The voice may "crack" or squeak as the muscles learn to control the larger voice box. This is ಪೂರ್ಣly ಸಾಮಾನ್ಯ!',
+      showAdams: true
+    },
+    after: {
+      larynxSize: { width: 90, height: 70 },
+      pitch: 'Deep',
+      desc: 'Adult male voice',
+      waves: [40, 55, 60, 55, 40],
+      info: 'The larynx has grown about 60% larger! The vocal cords are now longer ಮತ್ತು thicker, producing a deeper voice. The Adam\'s apple is visible as the larger larynx pushes against the throat.',
+      showAdams: true
+    }
+  },
+  girls: {
+    before: {
+      larynxSize: { width: 60, height: 50 },
+      pitch: 'High',
+      desc: "ಮಗುವಿನ ಸ್ವರ",
+      waves: [20, 35, 50, 35, 20],
+      info: 'ಮೊದಲು puberty, girls ಮತ್ತು boys have similar voice pitches. The larynx is small ಮತ್ತು produces higher sounds.',
+      showAdams: false
+    },
+    during: {
+      larynxSize: { width: 65, height: 52 },
+      pitch: 'Slightly Lower',
+      desc: 'Subtle change',
+      waves: [22, 38, 48, 38, 22],
+      info: 'The larynx grows slightly during puberty in girls, but not as much as in boys. The voice becomes a little deeper ಮತ್ತು more mature-sounding.',
+      showAdams: false
+    },
+    after: {
+      larynxSize: { width: 70, height: 55 },
+      pitch: 'Mature',
+      desc: 'Adult female voice',
+      waves: [25, 40, 45, 40, 25],
+      info: 'ಹುಡುಗಿಯರು\' larynx grows about 30% - much less than boys. This is why adult women generally have higher voices than adult men. The change is gradual ಮತ್ತು usually not very noticeable.',
+      showAdams: false
+    }
+  }
+};
+
+function selectGender(gender, btn) {
+  currentGender = gender;
+  
+  document.querySelectorAll('.gender-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  
+  updateDisplay();
+}
+
+function selectStage(stage, btn) {
+  currentStage = stage;
+  
+  document.querySelectorAll('.stage-btn').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  
+  updateDisplay();
+}
+
+function updateDisplay() {
+  const data = voiceData[currentGender][currentStage];
+  
+  // Update larynx visual
+  const x = 200 - data.larynxSize.width / 2;
+  const y = 95 - data.larynxSize.height / 2;
+  larynxBox.setAttribute('x', x);
+  larynxBox.setAttribute('y', y);
+  larynxBox.setAttribute('width', data.larynxSize.width);
+  larynxBox.setAttribute('height', data.larynxSize.height);
+  
+  // Update vocal cords
+  cordLeft.setAttribute('x1', x + 5);
+  cordLeft.setAttribute('y1', y + 15);
+  cordRight.setAttribute('x1', x + data.larynxSize.width - 5);
+  cordRight.setAttribute('y1', y + 15);
+  
+  // ಆಡಮ್‌ಸ್ ಆಪಲ್
+  adamsApple.style.display = data.showAdams ? 'block' : 'none';
+  
+  // Stage label
+  const stageNames = { before: 'ಯೌವನದ ಮೊದಲು', during: 'ಯೌವನದ ಸಮಯದಲ್ಲಿ', after: 'ಯೌವನದ ನಂತರ' };
+  stageLabel.textContent = stageNames[currentStage];
+  
+  // Voice info
+  voicePitch.textContent = data.pitch;
+  voiceDesc.textContent = data.desc;
+  
+  // Wave visual
+  const bars = waveVisual.querySelectorAll('.wave-bar');
+  bars.forEach((bar, i) => {
+    bar.style.height = `${data.waves[i]}px`;
+  });
+  
+  // Info panel
+  larynxTitle.textContent = `🔬 ${stageNames[currentStage]} - ${currentGender === 'boys' ? 'ಹುಡುಗರು' : 'ಹುಡುಗಿಯರು'}`;
+  larynxText.textContent = data.info;
+}
+
+// Initialize
+updateDisplay();
+
+// === URL PARAMETER SUPPORT ===
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var initialState = params.get('initialState');
+  var showHints = params.get('showHints');
+
+  if (showHints === 'false') {
+    document.querySelectorAll('.concept-card, .takeaway').forEach(function(el) { el.style.display = 'none'; });
+  }
+
+  var stateMap = {
+    boys_before:  { gender: 'boys',  stage: 'before' },
+    boys_during:  { gender: 'boys',  stage: 'during' },
+    boys_after:   { gender: 'boys',  stage: 'after'  },
+    girls_before: { gender: 'girls', stage: 'before' },
+    girls_during: { gender: 'girls', stage: 'during' },
+    girls_after:  { gender: 'girls', stage: 'after'  }
+  };
+  if (initialState && stateMap[initialState]) {
+    setTimeout(function() {
+      var s = stateMap[initialState];
+      var genderTabs = document.querySelectorAll('.gender-tab');
+      selectGender(s.gender, s.gender === 'boys' ? genderTabs[0] : genderTabs[1]);
+      var stageBtns = document.querySelectorAll('.stage-btn');
+      var stageIdx = { before: 0, during: 1, after: 2 };
+      selectStage(s.stage, stageBtns[stageIdx[s.stage]]);
+    }, 800);
+  }
+})();
+</script>
+</body>
+</html>

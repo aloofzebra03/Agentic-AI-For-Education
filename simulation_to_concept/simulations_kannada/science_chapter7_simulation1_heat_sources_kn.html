@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ff9800">
+<title>ಉಷ್ಣದ ಮೂಲಗಳು - ಪ್ರಾದೇಶಿಕ ವ್ಯತ್ಯಾಸಗಳು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.earth-visual {
+  position: relative;
+  height: 280px;
+  background: linear-gradient(180deg, #1a237e 0%, #3949ab 50%, #7986cb 100%);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.sun {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, #ffeb3b 0%, #ff9800 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 40px #ffeb3b, 0 0 80px #ff9800;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 40px #ffeb3b, 0 0 80px #ff9800; }
+  50% { box-shadow: 0 0 60px #ffeb3b, 0 0 100px #ff9800; }
+}
+
+.sun-rays {
+  position: absolute;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ray {
+  width: 3px;
+  height: 40px;
+  background: linear-gradient(180deg, rgba(255,235,59,0.8) 0%, rgba(255,235,59,0) 100%);
+  margin: 2px;
+  animation: rayPulse 1.5s ease-in-out infinite;
+}
+
+.ray:nth-child(1) { transform: rotate(-30deg); animation-delay: 0s; }
+.ray:nth-child(2) { transform: rotate(-15deg); animation-delay: 0.2s; }
+.ray:nth-child(3) { transform: rotate(0deg); animation-delay: 0.4s; }
+.ray:nth-child(4) { transform: rotate(15deg); animation-delay: 0.6s; }
+.ray:nth-child(5) { transform: rotate(30deg); animation-delay: 0.8s; }
+
+@keyframes rayPulse {
+  0%, 100% { opacity: 0.5; height: 40px; }
+  50% { opacity: 1; height: 50px; }
+}
+
+.earth {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 280px;
+  height: 100px;
+  background: linear-gradient(90deg, #81c784, #a5d6a7, #c8e6c9, #fff59d, #ffcc80);
+  border-radius: 50% 50% 0 0;
+  overflow: hidden;
+}
+
+.ವಿಷುವದ್ರೇಖೆ-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #f44336;
+  opacity: 0.7;
+}
+
+.ವಿಷುವದ್ರೇಖೆ-label {
+  position: absolute;
+  top: 45%;
+  right: 10px;
+  font-size: 8px;
+  color: #fff;
+  background: #f44336;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.location-marker {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.location-marker:active { transform: scale(1.2); }
+.location-marker.active { transform: scale(1.3); border-color: #ff9800; }
+
+.marker-kerala { bottom: 25px; left: 35%; background: #ff7043; }
+.marker-delhi { bottom: 45px; left: 50%; background: #ffa726; }
+.marker-sikkim { bottom: 60px; left: 65%; background: #42a5f5; }
+
+.region-tabs {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.region-tab {
+  flex: 1;
+  padding: 10px 6px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.region-tab:active { transform: scale(0.98); }
+.region-tab.active { border-color: #ff9800; background: #fff3e0; color: #e65100; }
+
+.region-tab .emoji { font-size: 18px; display: block; margin-bottom: 2px; }
+
+.region-info {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.region-title { font-size: 13px; font-weight: 700; color: #e65100; margin-bottom: 8px; }
+.region-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.temp-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.temp-hot { background: #ffccbc; color: #d84315; }
+.temp-moderate { background: #ffe0b2; color: #e65100; }
+.temp-cold { background: #bbdefb; color: #1565c0; }
+
+.comparison-box {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.comparison-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 8px; }
+
+.factor-row {
+  display: flex;
+  gap: 8px;
+}
+
+.factor-item {
+  flex: 1;
+  padding: 10px;
+  background: #fff;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.factor-item .icon { font-size: 24px; margin-bottom: 4px; }
+.factor-item .label { font-size: 10px; color: #333; font-weight: 600; }
+.factor-item .desc { font-size: 8px; color: #666; margin-top: 4px; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2196f3;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>☀️ ಉಷ್ಣದ ಮೂಲಗಳು</h1>
+  <p>ಸೂರ್ಯ ಮತ್ತು ಪ್ರಾದೇಶಿಕ ಉಷ್ಣಾಂಶ ವ್ಯತ್ಯಾಸಗಳು</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ಸೂರ್ಯ</strong> ಭೂಮಿಗೆ ಉಷ್ಣದ ಮುಖ್ಯ ಮೂಲ. ವಿಷುವದ್ರೇಖೆಗೆ ಹತ್ತಿರದ ಸ್ಥಳಗಳು ದೂರದ ಸ್ಥಳಗಳಿಗಿಂತ ಹೆಚ್ಚು ನೇರ ಸೂರ್ಯನ ಬೆಳಕು ಮತ್ತು ಉಷ್ಣ ಪಡೆಯುತ್ತವೆ. ಭೂಗೋಳ ಸ್ಥಳೀಯ ಉಷ್ಣಾಂಶವನ್ನೂ ಪ್ರಭಾವಿಸುತ್ತದೆ.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="earth-visual">
+    <div class="sun"></div>
+    <div class="sun-rays">
+      <div style="display: flex; gap: 10px;">
+        <div class="ray"></div>
+        <div class="ray"></div>
+        <div class="ray"></div>
+        <div class="ray"></div>
+        <div class="ray"></div>
+      </div>
+    </div>
+    <div class="earth">
+      <div class="ವಿಷುವದ್ರೇಖೆ-line"></div>
+      <div class="ವಿಷುವದ್ರೇಖೆ-label">ವಿಷುವದ್ರೇಖೆ</div>
+      <div class="location-marker marker-kerala active" onclick="selectRegion('kerala', this)">🌴</div>
+      <div class="location-marker marker-delhi" onclick="selectRegion('delhi', this)">🏛️</div>
+      <div class="location-marker marker-sikkim" onclick="selectRegion('sikkim', this)">🏔️</div>
+    </div>
+  </div>
+  
+  <div class="region-tabs">
+    <div class="region-tab active" onclick="selectRegion('kerala', this)">
+      <span class="emoji">🌴</span>
+      ಕೇರಳ
+    </div>
+    <div class="region-tab" onclick="selectRegion('delhi', this)">
+      <span class="emoji">🏛️</span>
+      ದೆಹಲಿ
+    </div>
+    <div class="region-tab" onclick="selectRegion('sikkim', this)">
+      <span class="emoji">🏔️</span>
+      ಸಿಕ್ಕಿಂ
+    </div>
+  </div>
+</div>
+
+<div class="region-info" id="region-info">
+  <div class="region-title" id="region-title">🌴 ಕೇರಳ - ಉಷ್ಣವಲಯ ಹವಾಮಾನ</div>
+  <div class="region-text" id="region-text">
+    ಕೇರಳ ವಿಷುವದ್ರೇಖೆಗೆ ಹತ್ತಿರ, ಹೆಚ್ಚು ಸೂರ್ಯನ ಬೆಳಕುrect sunlight ಉದ್ದಕ್ಕೂ the year. It's also a <strong>ತೀರ ರಾಜ್ಯ</strong>, ಸಮುದ್ರ ಉಷ್ಣತೆ ಮತ್ತು ಒದ್ದೆ ಹೆಚ್ಚು.
+  </div>
+  <div class="temp-badge temp-hot" id="temp-badge">🌡️ ಸರಾಸರಿ: 25-32°C (ಬಿಸಿ ಮತ್ತು ಒದ್ದೆ)</div>
+</div>
+
+<div class="comparison-box">
+  <div class="comparison-title">🌍 ಉಷ್ಣತೆಯನ್ನು ಪ್ರಭಾವಿಸುವ ಅಂಶಗಳು</div>
+  <div class="factor-row">
+    <div class="factor-item">
+      <div class="icon">📍</div>
+      <div class="label">ಅಕ್ಷಾಂಶ</div>
+      <div class="desc">ದೂರ from ವಿಷುವದ್ರೇಖೆ</div>
+    </div>
+    <div class="factor-item">
+      <div class="icon">⛰️</div>
+      <div class="label">ಎತ್ತರ</div>
+      <div class="desc">ಸಮುದ್ರ ಮಟ್ಟದ ಮೇಲೆ ಎತ್ತರ</div>
+    </div>
+    <div class="factor-item">
+      <div class="icon">🌊</div>
+      <div class="label">ಸಮುದ್ರ ಸನಿಹ</div>
+      <div class="desc">ತೀರ ವಿರುದ್ಧ ಒಳನಾಡು</div>
+    </div>
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೆನಪಿಡಿ</div>
+  <div class="takeaway-text">
+    • <strong>ಸೂರ್ಯ</strong> ಭೂಮಿಯ ಪ್ರಾಥಮಿಕ ಉಷ್ಣ ಮೂಲ<br>
+    • <strong>ವಿಷುವದ್ರೇಖೆ</strong>ಗೆ ಹತ್ತಿರದ ಸ್ಥಳಗಳು ಬಿಸಿ<br>
+    • <strong>ಪರ್ವತಗಳು</strong> ಎತ್ತರದಿಂದ ತಂಪು<br>
+    • <strong>ತೀರ ಪ್ರದೇಶಗಳು</strong> ಮಧ್ಯಮ ಉಷ್ಣತೆ<br>
+    • ಈ ವ್ಯತ್ಯಾಸಗಳು ಭಾರತದ ವೈವಿಧ್ಯಮಯ ವಾತಾವರಣವನ್ನು ಉಂಟುಮಾಡುತ್ತವೆ!
+  </div>
+</div>
+
+</div>
+
+<script>
+const regions = {
+  kerala: {
+    title: '🌴 ಕೇರಳ - ಉಷ್ಣವಲಯ ಹವಾಮಾನ',
+    text: 'ಕೇರಳ ವಿಷುವದ್ರೇಖೆಗೆ ಹತ್ತಿರ, ವರ್ಷಪೂರ್ತಿ ಹೆಚ್ಚು ನೇರ ಸೂರ್ಯನ ಬೆಳಕು. <strong>ತೀರ ರಾಜ್ಯ</strong> – ಸಮುದ್ರ ಉಷ್ಣತೆ ಮತ್ತು ಒದ್ದೆ ಹೆಚ್ಚು.',
+    temp: '🌡️ ಸರಾಸರಿ: 25-32°C (ಬಿಸಿ ಮತ್ತು ಒದ್ದೆ)',
+    tempClass: 'temp-hot'
+  },
+  delhi: {
+    title: '🏛️ ದೆಹಲಿ - ತೀವ್ರ ಹವಾಮಾನ',
+    text: 'ದೆಹಲಿ ವಿಷುವದ್ರೇಖೆಗಿಂತ ದೂರ ಮತ್ತು ಸಮುದ್ರದಿಂದ ದೂರ (ಒಳನಾಡು). <strong>ತೀವ್ರ ಉಷ್ಣಾಂಶ</strong> – ಬಹಳ ಬಿಸಿ ಬೇಸಿಗೆ (45°C ವರೆಗೆ) ಮತ್ತು ತಂಪು ಚಳಿಗಾಲ (5°C ವರೆಗೆ).',
+    temp: '🌡️ ವ್ಯಾಪ್ತಿ: 5-45°C (ತೀವ್ರ ವ್ಯತ್ಯಾಸ)',
+    tempClass: 'temp-moderate'
+  },
+  sikkim: {
+    title: '🏔️ ಸಿಕ್ಕಿಂ - ಶೀತ ಪರ್ವತ ವಾತಾವರಣ',
+    text: 'ಸಿಕ್ಕಿಂ <strong>ಹಿಮಾಲಯ</strong>ದಲ್ಲಿ ಹೆಚ್ಚು ಎತ್ತರ. ವರ್ಷದ ಬಹುಭಾಗ ತಂಪು – ಎತ್ತರ ಏರಿದಂತೆ ಉಷ್ಣಾಂಶ ಕಡಿಮೆ (ಸುಮಾರು 1000ಮೀಗೆ 6°C).',
+    temp: '🌡️ ಸರಾಸರಿ: 5-20°C (ತಂಪು)',
+    tempClass: 'temp-cold'
+  }
+};
+
+const regionTitle = document.getElementById('region-title');
+const regionText = document.getElementById('region-text');
+const tempBadge = document.getElementById('temp-badge');
+
+function selectRegion(region, element) {
+  // Update tabs
+  document.querySelectorAll('.region-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.location-marker').forEach(m => m.classList.remove('active'));
+  
+  if (element.classList.contains('region-tab')) {
+    element.classList.add('active');
+    document.querySelector(`.marker-${region}`).classList.add('active');
+  } else {
+    element.classList.add('active');
+    document.querySelectorAll('.region-tab').forEach((tab, i) => {
+      const regions = ['kerala', 'delhi', 'sikkim'];
+      if (regions[i] === region) tab.classList.add('active');
+    });
+  }
+  
+  // Update info
+  const data = regions[region];
+  regionTitle.textContent = data.title;
+  regionText.innerHTML = data.text;
+  tempBadge.textContent = data.temp;
+  tempBadge.className = `temp-badge ${data.tempClass}`;
+}
+
+// URL parameter auto-initialisation
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var initialState = params.get('initialState') || 'kerala';
+  var showHints = params.get('showHints') !== 'false';
+  if (!showHints) {
+    var card = document.querySelector('.concept-card');
+    if (card) card.style.display = 'none';
+  }
+  var stateMap = { 'kerala': 0, 'delhi': 1, 'sikkim': 2 };
+  var idx = stateMap[initialState];
+  if (idx !== undefined) {
+    setTimeout(function() {
+      var tabs = document.querySelectorAll('.region-tab');
+      if (tabs[idx]) tabs[idx].click();
+    }, 800);
+  }
+})();
+</script>
+</body>
+</html>

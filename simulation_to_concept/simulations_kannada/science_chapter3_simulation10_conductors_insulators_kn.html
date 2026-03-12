@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#00838f">
+<title>ವಾಹಕಗಳು ಮತ್ತು ಅವಾಹಕಗಳು – ಪದಾರ್ಥ ಪರೀಕ್ಷೆ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #00838f 0%, #4dd0e1 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #f9a825;
+}
+
+.concept-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f57f17;
+  margin-bottom: 6px;
+}
+
+.concept-text {
+  font-size: 12px;
+  color: #5d4037;
+  line-height: 1.5;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.visual {
+  position: relative;
+  height: 35vh;
+  min-height: 240px;
+  background: #eceff1;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+svg { width: 100%; height: 100%; }
+
+.result-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  display: none;
+}
+
+.result-badge.conductor {
+  background: #e8f5e9;
+  color: #2e7d32;
+  display: block;
+}
+
+.result-badge.insulator {
+  background: #ffebee;
+  color: #c62828;
+  display: block;
+}
+
+.materials-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.material-btn {
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 10px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.material-btn:active { transform: scale(0.95); }
+.material-btn.tested { opacity: 0.6; }
+.material-btn.conductor { border-color: #4caf50; background: #e8f5e9; }
+.material-btn.insulator { border-color: #f44336; background: #ffebee; }
+.material-btn .icon { font-size: 22px; }
+.material-btn .name { font-size: 9px; color: #333; margin-top: 4px; }
+
+.score-panel {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.score-card {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.score-card.conductors {
+  background: #e8f5e9;
+  border: 2px solid #a5d6a7;
+}
+
+.score-card.insulators {
+  background: #ffebee;
+  border: 2px solid #ef9a9a;
+}
+
+.score-card .icon { font-size: 24px; }
+.score-card .label { font-size: 10px; font-weight: 600; margin-top: 4px; }
+.score-card.conductors .label { color: #2e7d32; }
+.score-card.insulators .label { color: #c62828; }
+.score-card .count { font-size: 20px; font-weight: 700; margin-top: 4px; }
+.score-card.conductors .count { color: #2e7d32; }
+.score-card.insulators .count { color: #c62828; }
+.score-card .items { font-size: 8px; color: #666; margin-top: 4px; min-height: 30px; }
+
+.explanation-panel {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #1976d2;
+}
+
+.explanation-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1565c0;
+  margin-bottom: 6px;
+}
+
+.explanation-text {
+  font-size: 11px;
+  color: #37474f;
+  line-height: 1.6;
+}
+
+.safety-panel {
+  background: #fff3e0;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #ff9800;
+}
+
+.safety-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #e65100;
+  margin-bottom: 6px;
+}
+
+.safety-text {
+  font-size: 10px;
+  color: #5d4037;
+  line-height: 1.6;
+}
+
+.takeaway {
+  background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2e7d32;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1b5e20; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+@keyframes glow {
+  0%, 100% { filter: drop-ನೆರಳು(0 0 5px rgba(255,235,59,0.8)); }
+  50% { filter: drop-ನೆರಳು(0 0 15px rgba(255,235,59,1)); }
+}
+
+.bulb-glow { animation: glow 1s ease-in-out infinite; }
+
+@keyframes flow {
+  0% { stroke-dashoffset: 20; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.current-flow { stroke-dasharray: 5 5; animation: flow 0.3s linear infinite; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.shake { animation: shake 0.3s ease; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>⚡ ವಾಹಕಗಳು ಮತ್ತು ಅವಾಹಕಗಳು</h1>
+  <p>ಪದಾರ್ಥಗಳು ವಿದ್ಯುತ್ ಹರಿಸುತ್ತವೆಯೇ ಪರೀಕ್ಷಿಸಿ</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ವಾಹಕಗಳು</strong> ವಿದ್ಯುತ್ ಹರಿಯಲು ಅನುಮತಿಸುತ್ತವೆ (ಲೋಹಗಳು copper, iron). <strong>ಅವಾಹಕಗಳು</strong> ವಿದ್ಯುತ್ ಹರಿವನ್ನು ತಡೆಯುತ್ತವೆ (ಪ್ಲಾಸ್ಟಿಕ್, ರಬ್ಬರ್, ಮರ).s why wires have metal inside ಮತ್ತು plastic outside!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="visual">
+    <div class="result-badge" id="result-badge">ಒಂದು ಪದಾರ್ಥ ಆಯ್ಕೆಮಾಡಿ</div>
+    <svg viewBox="0 0 400 240" id="circuit-svg">
+      <!-- Background -->
+      <rect x="0" y="0" width="400" height="240" fill="#eceff1"/>
+      
+      <!-- Test circuit -->
+      <!-- Cell -->
+      <g transform="translate(50, 100)">
+        <rect x="0" y="0" width="50" height="40" rx="3" fill="#1565c0"/>
+        <rect x="-5" y="10" width="8" height="20" rx="2" fill="#757575"/>
+        <rect x="47" y="8" width="10" height="24" rx="2" fill="#ffd600"/>
+        <text x="25" y="25" font-size="8" fill="#fff" text-anchor="middle">CELL</text>
+      </g>
+      
+      <!-- ತಂತಿಗಳು -->
+      <path id="wire-left" d="M 60 100 L 60 60 L 150 60" stroke="#4caf50" stroke-width="3"/>
+      <path id="wire-right" d="M 250 60 L 340 60 L 340 100" stroke="#e0e0e0" stroke-width="3"/>
+      <path id="wire-bottom" d="M 340 160 L 340 180 L 60 180 L 60 140" stroke="#4caf50" stroke-width="3"/>
+      
+      <!-- Test gap with probes -->
+      <g id="test-area" transform="translate(150, 40)">
+        <rect x="0" y="0" width="100" height="40" rx="5" fill="#fff" stroke="#bdbdbd" stroke-width="2"/>
+        <text x="50" y="25" font-size="10" fill="#999" text-anchor="middle" id="test-label">ಪದಾರ್ಥವನ್ನು ಇಲ್ಲಿ ಎಳೆಯಿರಿ</text>
+        
+        <!-- Probe tips -->
+        <circle cx="10" cy="20" r="5" fill="#f44336"/>
+        <circle cx="90" cy="20" r="5" fill="#333"/>
+        
+        <!-- ಪದಾರ್ಥ placeholder -->
+        <g id="test-material" style="display:none">
+          <rect x="25" y="5" width="50" height="30" rx="3" fill="#9e9e9e" id="material-rect"/>
+          <text x="50" y="25" font-size="20" text-anchor="middle" id="material-icon"></text>
+        </g>
+      </g>
+      
+      <!-- Bulb -->
+      <g transform="translate(310, 100)">
+        <circle cx="30" cy="30" r="25" fill="#e0e0e0" id="bulb-glass"/>
+        <circle cx="30" cy="30" r="12" fill="#bdbdbd" id="bulb-filament"/>
+        <rect x="20" y="52" width="20" height="12" rx="2" fill="#666"/>
+        <text x="30" y="85" font-size="9" fill="#666" text-anchor="middle">Bulb</text>
+      </g>
+      
+      <!-- Instructions -->
+      <text x="200" y="220" font-size="10" fill="#666" text-anchor="middle">👆 ಒಂದು ಪದಾರ್ಥ ಆಯ್ಕೆಮಾಡಿ below to test</text>
+    </svg>
+  </div>
+  
+  <div class="materials-grid">
+    <div class="material-btn" onclick="testMaterial('spoon', '🥄', true, this)">
+      <div class="icon">🥄</div>
+      <div class="name">ಲೋಹ Spoon</div>
+    </div>
+    <div class="material-btn" onclick="testMaterial('key', '🔑', true, this)">
+      <div class="icon">🔑</div>
+      <div class="name">Iron Key</div>
+    </div>
+    <div class="material-btn" onclick="testMaterial('coin', '🪙', true, this)">
+      <div class="icon">🪙</div>
+      <div class="name">ನಾಣ್ಯ</div>
+    </div>
+    <div class="material-btn" onclick="testMaterial('foil', '📄', true, this)">
+      <div class="icon">📄</div>
+      <div class="name">ಅಲ್ಯೂಮಿನಿಯಂ ಫಾಯಿಲ್</div>
+    </div>
+    <div class="material-btn" onclick="testMaterial('plastic', '📏', false, this)">
+      <div class="icon">📏</div>
+      <div class="name">ಪ್ಲಾಸ್ಟಿಕ್ ಸ್ಕೇಲ್</div>
+    </div>
+    <div class="material-btn" onclick="testMaterial('rubber', '🧽', false, this)">
+      <div class="icon">🧽</div>
+      <div class="name">ರಬ್ಬರ್ ಈರೇಸರ್</div>
+    </div>
+    <div class="material-btn" onclick="testMaterial('wood', '🪵', false, this)">
+      <div class="icon">🪵</div>
+      <div class="name">ಮರದ ಕಡ್ಡಿ</div>
+    </div>
+    <div class="material-btn" onclick="testMaterial('glass', '🥛', false, this)">
+      <div class="icon">🥛</div>
+      <div class="name">ಗಾಜು</div>
+    </div>
+  </div>
+</div>
+
+<div class="score-panel">
+  <div class="score-card conductors">
+    <div class="icon">✅</div>
+    <div class="label">ವಾಹಕಗಳು</div>
+    <div class="count" id="conductor-count">0</div>
+    <div class="items" id="conductor-items">-</div>
+  </div>
+  <div class="score-card insulators">
+    <div class="icon">❌</div>
+    <div class="label">ವಿದ್ಯುತ್ ನಿರೋಧಕಗಳು</div>
+    <div class="count" id="insulator-count">0</div>
+    <div class="items" id="insulator-items">-</div>
+  </div>
+</div>
+
+<div class="explanation-panel">
+  <div class="explanation-title">🔬 ಕೆಲವು ಪದಾರ್ಥಗಳು ಏಕೆ ವಾಹಕ?</div>
+  <div class="explanation-text" id="explanation-text">
+    ವಾಹಕಗಳಲ್ಲಿ <strong>ಮುಕ್ತ ಇಲೆಕ್ಟ್ರಾನ್‌ಗಳು</strong> ಸುಲಭವಾಗಿ ಚಲಿಸಬಲ್ಲವು, ವಿದ್ಯುತ್ ಪ್ರವಾಹವನ್ನು ಸಾಗಿಸುತ್ತವೆ. ಲೋಹಗಳು ಉತ್ತಮ ವಾಹಕಗಳು – ಅವುಗಳ ಅಣುಗಳು ಸ್ವತಂತ್ರವಾಗಿ ಹರಿಯುವ ಇಲೆಕ್ಟ್ರಾನ್‌ಗಳನ್ನು ಬಿಡುಗಡೆ ಮಾಡುತ್ತವೆ.<br><br>
+    ಅವಾಹಕಗಳು ತಮ್ಮ ಇಲೆಕ್ಟ್ರಾನ್‌ಗಳನ್ನು ಬಿಗಿಯಾಗಿ ಹಿಡಿದಿಟ್ಟುಕೊಳ್ಳುತ್ತವೆ – ಪ್ರವಾಹ ಸಾಗಿಸಲು ಅವು ಚಲಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ. ಅದಕ್ಕೇ ಭದ್ರತೆಗಾಗಿ ತಂತಿಗಳನ್ನು ಪ್ಲಾಸ್ಟಿಕ್‌ನಿಂದ ಆವರಿಸುತ್ತೇವೆ!
+  </div>
+</div>
+
+<div class="safety-panel">
+  <div class="safety-title">⚠️ Safety with ವಿದ್ಯುತ್</div>
+  <div class="safety-text">
+    <strong>ನಮ್ಮ ಶರೀರ ವಾಹಕ!</strong> ವಿದ್ಯುತ್ ಪ್ರವಾಹ ನಮ್ಮ ಮೂಲಕ ಹರಿಯಬಹುದು, ಅಪಾಯಕಾರಿ.<br><br>
+    ಭದ್ರತಾ ನಿಯಮಗಳು:<br>
+    • ಒದ್ದೆ ಕೈಯಿಂದ ಸ್ವಿಚ್ ಸ್ಪರ್ಶಿಸಬೇಡಿ<br>
+    • ನೀರಿನ ಹತ್ತಿರ ವಿದ್ಯುತ್ ಸಾಧನಗಳನ್ನು ಬಳಸಬೇಡಿ<br>
+    • ಸಾಕೆಟ್‌ಗೆ ವಸ್ತು ಸೇರಿಸಬೇಡಿ<br>
+    • ಪ್ರಯೋಗಗಳಿಗೆ ಬ್ಯಾಟರಿ ಮಾತ್ರ
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೀವು ಕಲಿತದ್ದು</div>
+  <div class="takeaway-text">
+    <strong>ವಾಹಕಗಳು</strong> (ಲೋಹಗಳು) ಪ್ರವಾಹ ಹರಿಯಲು ಅನುಮತಿ - ತಂತಿಗಳಿಗೆ. <strong>ಅವಾಹಕಗಳು</strong> (ಪ್ಲಾಸ್ಟಿಕ್, ರಬ್ಬರ್, ಮರ) ಪ್ರವಾಹ ನಿರ್ಬಂಧ - ಭದ್ರತಾ ಆವರಣ. ವಿದ್ಯುತ್ ತಂತಿಗಳಲ್ಲಿ ಒಳಗೆ ತಾಮ್ರ ಹೊರಗೆ ಪ್ಲಾಸ್ಟಿಕ್!
+  </div>
+</div>
+
+</div>
+
+<script>
+const conductors = [];
+const insulators = [];
+
+const bulbGlass = document.getElementById('bulb-glass');
+const bulbFilament = document.getElementById('bulb-filament');
+const wireRight = document.getElementById('wire-right');
+const resultBadge = document.getElementById('result-badge');
+const testMaterialEl = document.getElementById('test-material');
+const materialIcon = document.getElementById('material-icon');
+const materialRect = document.getElementById('material-rect');
+const testLabel = document.getElementById('test-label');
+const explanationText = document.getElementById('explanation-text');
+
+const materialNames = {
+  'spoon': 'ಲೋಹದ ಚಮಚ',
+  'key': 'ಕಬ್ಬಿಣದ ಕೀಲಿ',
+  'coin': 'ನಾಣ್ಯ',
+  'foil': 'ಅಲ್ಯೂಮಿನಿಯಂ ಫಾಯಿಲ್',
+  'plastic': 'ಪ್ಲಾಸ್ಟಿಕ್ ಸ್ಕೇಲ್',
+  'rubber': 'ರಬ್ಬರ್ ಈರೇಸರ್',
+  'wood': 'ಮರದ ಕಡ್ಡಿ',
+  'glass': 'ಗಾಜು'
+};
+
+function testMaterial(id, icon, isConductor, btn) {
+  if (btn.classList.contains('tested')) return;
+  
+  // Show material in test area
+  testMaterialEl.style.display = 'block';
+  materialIcon.textContent = icon;
+  testLabel.style.display = 'none';
+  
+  // ಅನಿಮೇಟ್ test
+  setTimeout(() => {
+    if (isConductor) {
+      // ವಾಹಕ - bulb lights up!
+      wireRight.setAttribute('stroke', '#4caf50');
+      wireRight.classList.add('current-flow');
+      bulbGlass.setAttribute('fill', '#ffeb3b');
+      bulbFilament.setAttribute('fill', '#fff');
+      bulbGlass.classList.add('bulb-glow');
+      
+      materialRect.setAttribute('fill', '#a5d6a7');
+      resultBadge.textContent = '✅ ವಾಹಕ - ಬಲ್ಬ್ ಬೆಳಗುತ್ತದೆ!';
+      resultBadge.className = 'result-badge conductor';
+      
+      btn.classList.add('tested', 'conductor');
+      conductors.push(materialNames[id]);
+      
+      explanationText.innerHTML = `
+        <strong style="color:#2e7d32">${materialNames[id]} ವಾಹಕ!</strong><br><br>
+        ವಿದ್ಯುತ್ ಪ್ರವಾಹ ಹಾಯಲು ಅನುಮತಿಸುತ್ತದೆ. ಸರ್ಕ್ಯೂಟ್ ಪೂರ್ಣವಾಗಿರುವುದರಿಂದ ಬಲ್ಬ್ ಬೆಳಗುತ್ತದೆ.<br><br>
+        ಕಬ್ಬಿಣ, ತಾಮ್ರ ಮತ್ತು ಅಲ್ಯೂಮಿನಿಯಂ ನಂತಹ ಲೋಹಗಳಲ್ಲಿ <strong>ಮುಕ್ತ ಇಲೆಕ್ಟ್ರಾನ್‌ಗಳು</strong> ಇವೆ – ಚಲಿಸಿ ಪ್ರವಾಹ ಸಾಗಿಸಬಲ್ಲವು.
+      `;
+    } else {
+      // ವಾಹಕವಲ್ಲದ - bulb stays off
+      wireRight.setAttribute('stroke', '#e0e0e0');
+      wireRight.classList.remove('current-flow');
+      bulbGlass.setAttribute('fill', '#e0e0e0');
+      bulbFilament.setAttribute('fill', '#bdbdbd');
+      bulbGlass.classList.remove('bulb-glow');
+      
+      materialRect.setAttribute('fill', '#ef9a9a');
+      resultBadge.textContent = '❌ ಅವಾಹಕ - ವಿದ್ಯುತ್ ಇಲ್ಲ!';
+      resultBadge.className = 'result-badge insulator';
+      
+      btn.classList.add('tested', 'insulator');
+      btn.classList.add('shake');
+      setTimeout(() => btn.classList.remove('shake'), 300);
+      insulators.push(materialNames[id]);
+      
+      explanationText.innerHTML = `
+        <strong style="color:#c62828">${materialNames[id]} ಅವಾಹಕ!</strong><br><br>
+        ಪ್ರವಾಹ ಹಾಯಲು ಅನುಮತಿಸುವುದಿಲ್ಲ. ಸರ್ಕ್ಯೂಟ್ ಮುರಿದಿರುವುದರಿಂದ ಬಲ್ಬ್ ಆಫ್‌ನಲ್ಲೇ ಇರುತ್ತದೆ.<br><br>
+        ಪ್ಲಾಸ್ಟಿಕ್, ರಬ್ಬರ್ ಮತ್ತು ಮರದಂಥ ಪದಾರ್ಥಗಳು ತಮ್ಮ ಇಲೆಕ್ಟ್ರಾನ್‌ಗಳನ್ನು ಬಿಗಿಯಾಗಿ ಹಿಡಿದಿಟ್ಟುಕೊಳ್ಳುತ್ತವೆ – ಪ್ರವಾಹ ಸಾಗಿಸಲು ಚಲಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.
+      `;
+    }
+    
+    // Update counts
+    document.getElementById('conductor-count').textContent = conductors.length;
+    document.getElementById('insulator-count').textContent = insulators.length;
+    document.getElementById('conductor-items').textContent = conductors.length ? conductors.join(', ') : '-';
+    document.getElementById('insulator-items').textContent = insulators.length ? insulators.join(', ') : '-';
+    
+  }, 500);
+}
+
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var initState = (p.get('initialState') || '').toLowerCase();
+  var showHintParam = p.get('showHints');
+  if (showHintParam === 'false') {
+    var card = document.querySelector('.concept-card');
+    if (card) card.style.display = 'none';
+  }
+  if (initState === 'conductor' || initState === 'insulator') {
+    setTimeout(function () {
+      var btns = document.querySelectorAll('.material-btn');
+      if (initState === 'conductor' && btns[0]) btns[0].click();
+      if (initState === 'insulator' && btns[4]) btns[4].click();
+    }, 800);
+  }
+}());
+</script>
+</body>
+</html>

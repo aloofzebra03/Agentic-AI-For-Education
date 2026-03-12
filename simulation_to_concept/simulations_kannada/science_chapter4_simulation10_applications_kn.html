@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#00796b">
+<title>ನೈಜ ಜಗತ್ತಿನ ಅನ್ವಯಗಳು – ಲೋಹಗಳು ಮತ್ತು ಅಲೋಹಗಳು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #00796b 0%, #4db6ac 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #00796b;
+}
+
+.concept-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #00695c;
+  margin-bottom: 6px;
+}
+
+.concept-text {
+  font-size: 12px;
+  color: #37474f;
+  line-height: 1.5;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.category-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.cat-tab {
+  flex: 1;
+  padding: 10px 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 11px;
+  font-weight: 600;
+  color: #37474f;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.cat-tab:active { transform: scale(0.95); }
+.cat-tab.active.metals { border-color: #1976d2; background: #e3f2fd; color: #0d47a1; }
+.cat-tab.active.nonmetals { border-color: #f9a825; background: #fff8e1; color: #f57f17; }
+.cat-tab.active.both { border-color: #00796b; background: #e0f2f1; color: #00695c; }
+
+.applications-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.app-card {
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.app-card:active { transform: scale(0.95); }
+.app-card.expanded { 
+  grid-column: span 2;
+  background: #fff;
+  border-color: #00796b;
+}
+
+.app-card .icon { font-size: 36px; margin-bottom: 8px; }
+.app-card .name { font-size: 12px; font-weight: 600; color: #37474f; }
+.app-card .material { font-size: 9px; color: #666; margin-top: 4px; }
+
+.app-card .detail {
+  display: none;
+  text-align: left;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.app-card.expanded .detail { display: block; }
+
+.detail-property {
+  font-size: 10px;
+  color: #00796b;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.detail-explain {
+  font-size: 10px;
+  color: #37474f;
+  line-height: 1.5;
+}
+
+.match-game {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.match-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #e65100;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.match-instruction {
+  font-size: 11px;
+  color: #37474f;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.match-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: #fff;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 2px solid #e0e0e0;
+}
+
+.match-item .use { flex: 1; font-size: 11px; font-weight: 600; }
+.match-item .options {
+  display: flex;
+  gap: 6px;
+}
+
+.match-option {
+  padding: 6px 10px;
+  border-radius: 15px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.match-option.metal { background: #e3f2fd; color: #1565c0; }
+.match-option.nonmetal { background: #fff8e1; color: #f57f17; }
+.match-option:active { transform: scale(0.95); }
+.match-option.correct { border-color: #4caf50; background: #e8f5e9; }
+.match-option.wrong { border-color: #f44336; opacity: 0.5; }
+
+.match-result {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 10px;
+  display: none;
+}
+
+.match-result.show { display: block; }
+
+.fun-fact {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #e91e63;
+}
+
+.fun-fact-title { font-size: 12px; font-weight: 700; color: #c2185b; margin-bottom: 6px; }
+.fun-fact-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #00796b;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #00695c; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🏭 ನೈಜ ಜಗತ್ತಿನ ಅನ್ವಯಗಳು</h1>
+  <p>ನಿರ್ದಿಷ್ಟ ಲೋಹಗಳು ಮತ್ತು ಅಲೋಹಗಳನ್ನು ಏಕೆ ಬಳಸುತ್ತೇವೆ?</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    We choose specific materials based on their <strong>ಗುಣಗಳು</strong>. ಪದಾರ್ಥ ಏಕೆ ಬಳಸಲಾಗುತ್ತದೆ ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು ನೆನಪಿಡಲು ಸಹಾಯ its ಗುಣಗಳು!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="category-tabs">
+    <button class="cat-tab metals active" onclick="showCategory('metals', this)">🔵 ಲೋಹಗಳು</button>
+    <button class="cat-tab nonmetals" onclick="showCategory('nonmetals', this)">🟡 ಅಲೋಹಗಳು</button>
+    <button class="cat-tab both" onclick="showCategory('both', this)">⚖️ ಎರಡೂ ಬಳಕೆ</button>
+  </div>
+  
+  <div class="applications-grid" id="applications-grid">
+    <!-- ಲೋಹ applications -->
+    <div class="app-card" onclick="toggleCard(this)" data-category="metals">
+      <div class="icon">🔌</div>
+      <div class="name">ವಿದ್ಯುತ್ ತಂತಿಗಳು</div>
+      <div class="material">ತಾಮ್ರ, ಅಲ್ಯೂಮಿನಿಯಂ</div>
+      <div class="detail">
+        <div class="detail-property">ಗುಣಧರ್ಮ Used: ವಿದ್ಯುತ್ ವಾಹಕತೆ + ಸೆಳೆತ</div>
+        <div class="detail-explain">ತಾಮ್ರ ಮತ್ತು aluminium are used because they conduct electricity well AND can be ತೆಳು ತಂತಿಗಳಾಗಿ ಎಳೆಯಬಹುದು!</div>
+      </div>
+    </div>
+    
+    <div class="app-card" onclick="toggleCard(this)" data-category="metals">
+      <div class="icon">🍳</div>
+      <div class="name">ಅಡುಗೆ ಪಾತ್ರೆಗಳು</div>
+      <div class="material">ಅಲ್ಯೂಮಿನಿಯಂ, ಸ್ಟೀಲ್</div>
+      <div class="detail">
+        <div class="detail-property">ಬಳಸಿದ ಗುಣ: ಉಷ್ಣ ವಾಹಕತೆ</div>
+        <div class="detail-explain">ಲೋಹಗಳು transfer heat quickly ಮತ್ತು evenly, cooking food properly. They're also malleable to shape into pots!</div>
+      </div>
+    </div>
+    
+    <div class="app-card" onclick="toggleCard(this)" data-category="metals">
+      <div class="icon">🔔</div>
+      <div class="name">ಗಂಟೆ ಮತ್ತು ಜಂಗ್ಲ್</div>
+      <div class="material">ಕಂಚು, ಪಿತ್ತಳೆ</div>
+      <div class="detail">
+        <div class="detail-property">ಗುಣಧರ್ಮ Used: ಧ್ವನಿಮುದ್ರಣ</div>
+        <div class="detail-explain">ಲೋಹಗಳು produce a beautiful ಘಂಟಾ ಧ್ವನಿ when struck! That's why all musical bells are made of metal.</div>
+      </div>
+    </div>
+    
+    <div class="app-card" onclick="toggleCard(this)" data-category="metals">
+      <div class="icon">💍</div>
+      <div class="name">ಆಭರಣ</div>
+      <div class="material">ಚಿನ್ನ, ಬೆಳ್ಳಿ, ಪ್ಲಾಟಿನಂ</div>
+      <div class="detail">
+        <div class="detail-property">ಗುಣಧರ್ಮ Used: ದ್ಯುತಿ + ನಮ್ಯತೆ + ಸೆಳೆತ</div>
+        <div class="detail-explain">Gold is shiny (lustrous), can be beaten into thin sheets (malleable), ಮತ್ತು ತೆಳು ತಂತಿಗಳಾಗಿ ಎಳೆಯಬಹುದು for intricate designs!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="match-game">
+  <div class="match-title">🎮 ಆಡಿಸಿ the Application!</div>
+  <div class="match-instruction">ಯಾವ ವಸ್ತು ಬಳಕೆ ಮತ್ತು ಏಕೆ?</div>
+  
+  <div class="match-item" id="match-1">
+    <div class="use">ವಿದ್ಯುತ್ ತಂತ್ರಜ್ಞರಿಗೆ ರಬ್ಬರ್ ಕೈಚೀಲ</div>
+    <div class="options">
+      <span class="match-option metal" onclick="checkMatch(1, 'metal', this)">ಲೋಹ</span>
+      <span class="match-option nonmetal" onclick="checkMatch(1, 'nonmetal', this)">ಅಲೋಹ</span>
+    </div>
+  </div>
+  
+  <div class="match-item" id="match-2">
+    <div class="use">ನಾಣ್ಯ ಮತ್ತು ಪದಕ</div>
+    <div class="options">
+      <span class="match-option metal" onclick="checkMatch(2, 'metal', this)">ಲೋಹ</span>
+      <span class="match-option nonmetal" onclick="checkMatch(2, 'nonmetal', this)">ಅಲೋಹ</span>
+    </div>
+  </div>
+  
+  <div class="match-item" id="match-3">
+    <div class="use">ಮರದ ಚಮಚ ಹಿಡಿಕೆಗಳು</div>
+    <div class="options">
+      <span class="match-option metal" onclick="checkMatch(3, 'metal', this)">ಲೋಹ</span>
+      <span class="match-option nonmetal" onclick="checkMatch(3, 'nonmetal', this)">ಅಲೋಹ</span>
+    </div>
+  </div>
+  
+  <div class="match-item" id="match-4">
+    <div class="use">ಸೇತು ನಿರ್ಮಾಣ</div>
+    <div class="options">
+      <span class="match-option metal" onclick="checkMatch(4, 'metal', this)">ಲೋಹ</span>
+      <span class="match-option nonmetal" onclick="checkMatch(4, 'nonmetal', this)">ಅಲೋಹ</span>
+    </div>
+  </div>
+  
+  <div class="match-result" id="match-result">🎉 ಉತ್ತಮ! ಎಲ್ಲ ಸರಿ!</div>
+</div>
+
+<div class="fun-fact">
+  <div class="fun-fact-title">🏛️ Amazing Fact: Iron Pillar of ದೆಹಲಿ</div>
+  <div class="fun-fact-text">
+    The <strong>Iron Pillar of ದೆಹಲಿ</strong> 1,600 ವರ್ಷಕ್ಕಿಂತ ಹಳೆಯದು ಆದರೆ ತುಕ್ಕು ಹಿಡಿಯಲಿಲ್ಲ! ಪ್ರಾಚೀನ ಭಾರತದ ಉನ್ನತ ಲೋಹಶಾಸ್ತ್ರ. ಸ್ತಂಭಕ್ಕೆ ತುಕ್ಕು ರಕ್ಷಣೆ ನೀಡುವ ವಿಶಿಷ್ಟ ಸಂಯೋಜನೆ.
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">♻️ ಸುಸ್ಥಿರತಾ ಸಲಹೆ</div>
+  <div class="takeaway-text">
+    <strong>ಲೋಹ ಮರುಬಳಕೆ</strong> ಕಬ್ಬಿಣ ಮತ್ತು ಅಲ್ಯೂಮಿನಿಯಂ ಶಕ್ತಿ ಮತ್ತು ನೈಸರ್ಗಿಕ ಸಂಪನ್ಮೂಲ ಉಳಿಸುತ್ತದೆ!<br><br>
+    • ಅಲ್ಯೂಮಿನಿಯಂ ಮರುಬಳಕೆ 95% ಕಡಿಮೆ ಶಕ್ತಿ ಹೊಸ ಅಲ್ಯೂಮಿನಿಯಂ ತಯಾರಿಸುವುದಕ್ಕಿಂತ<br>
+    • Iron can be recycled infinitely without losing quality<br><br>
+    <strong>ಜವಾಬ್ದಾರಿಯುತ ನಾಗರಿಕ - ಮರುಬಳಕೆ!</strong>
+  </div>
+</div>
+
+</div>
+
+<script>
+const applications = {
+  metals: [
+    { icon: '🔌', name: 'ವಿದ್ಯುತ್ ತಂತಿಗಳು', material: 'ತಾಮ್ರ, ಅಲ್ಯೂಮಿನಿಯಂ', property: 'ವಿದ್ಯುತ್ ವಾಹಕತೆ + ಸೆಳೆತ', explain: 'ತಾಮ್ರ ಮತ್ತು aluminium conduct electricity well AND can be ತೆಳು ತಂತಿಗಳಾಗಿ ಎಳೆಯಬಹುದು!' },
+    { icon: '🍳', name: 'ಅಡುಗೆ ಪಾತ್ರೆಗಳು', material: 'ಅಲ್ಯೂಮಿನಿಯಂ, ಸ್ಟೀಲ್', property: 'Heat Conductivity', explain: 'ಲೋಹಗಳು transfer heat quickly ಮತ್ತು evenly. Also malleable to shape into pots!' },
+    { icon: '🔔', name: 'ಗಂಟೆ ಮತ್ತು ಜಂಗ್ಲ್', material: 'ಕಂಚು, ಪಿತ್ತಳೆ', property: 'ಧ್ವನಿಮುದ್ರಣ', explain: 'ಲೋಹಗಳು produce a beautiful ಘಂಟಾ ಧ್ವನಿ when struck!' },
+    { icon: '💍', name: 'ಆಭರಣ', material: 'Gold, Silver', property: 'ದ್ಯುತಿ + ನಮ್ಯತೆ + ಸೆಳೆತ', explain: 'Shiny, can be beaten into sheets ಮತ್ತು drawn into wires for designs!' }
+  ],
+  nonmetals: [
+    { icon: '🧤', name: 'Electrical Insulation', material: 'ರಬ್ಬರ್, ಪ್ಲಾಸ್ಟಿಕ್', property: 'Poor ವಿದ್ಯುತ್ ವಾಹಕತೆ', explain: 'ರಬ್ಬರ್ ಮತ್ತು plastic protect us from electric shocks!' },
+    { icon: '🫁', name: 'Breathing', material: 'ಆಮ್ಲಜನಕ (O₂)', property: 'Essential for Life', explain: 'We breathe ಆಮ್ಲಜನಕ - a non-metal essential for respiration!' },
+    { icon: '💧', name: 'ನೀರು Purification', material: 'Chlorine (Cl)', property: 'Disinfectant', explain: 'Chlorine kills germs in drinking ನೀರು, making it safe!' },
+    { icon: '🩹', name: 'Antiseptic', material: 'Iodine (I)', property: 'Kills Germs', explain: 'Iodine solution (tincture) is used to clean wounds!' }
+  ],
+  both: [
+    { icon: '🔧', name: 'Tools (Hammer)', material: 'Iron head + ಮರದ hಮತ್ತುle', property: 'ಕಾಠಿಣ್ಯ + Insulation', explain: 'ಲೋಹ head is hard, wooden hಮತ್ತುle doesn\'t conduct heat!' },
+    { icon: '🍳', name: 'Frying Pan', material: 'ಲೋಹ body + ಪ್ಲಾಸ್ಟಿಕ್ hಮತ್ತುle', property: 'ಉಷ್ಣ ವಾಹಕತೆ + Insulation', explain: 'ಲೋಹ conducts heat to cook, plastic hಮತ್ತುle stays cool!' },
+    { icon: '🔌', name: 'Electric Plug', material: 'ಲೋಹ pins + ಪ್ಲಾಸ್ಟಿಕ್ body', property: 'ವಾಹಕತೆ + Insulation', explain: 'ಲೋಹ pins conduct electricity, plastic protects us!' },
+    { icon: '✏️', name: 'Pencil', material: 'Graphite (C) + Wood', property: 'Marking + Easy to hold', explain: 'Graphite (non-metal) marks paper, wood is easy to grip!' }
+  ]
+};
+
+const matchAnswers = {
+  1: 'nonmetal', // ರಬ್ಬರ್ gloves - insulator
+  2: 'metal',    // Coins - malleable, lustrous
+  3: 'nonmetal', // ಮರದ hಮತ್ತುles - poor heat conductor
+  4: 'metal'     // Bridge - strong, hard
+};
+
+let matchScore = 0;
+
+function showCategory(category, btn) {
+  // Update tabs
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  
+  // Update grid
+  const grid = document.getElementById('applications-grid');
+  const apps = applications[category];
+  
+  grid.innerHTML = apps.map(app => `
+    <div class="app-card" onclick="toggleCard(this)">
+      <div class="icon">${app.icon}</div>
+      <div class="name">${app.name}</div>
+      <div class="material">${app.material}</div>
+      <div class="detail">
+        <div class="detail-property">ಗುಣಧರ್ಮ Used: ${app.property}</div>
+        <div class="detail-explain">${app.explain}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleCard(card) {
+  // ಮುಚ್ಚಿ other expanded cards
+  document.querySelectorAll('.app-card.expanded').forEach(c => {
+    if (c !== card) c.classList.remove('expanded');
+  });
+  
+  card.classList.toggle('expanded');
+}
+
+function checkMatch(id, answer, btn) {
+  const item = document.getElementById(`match-${id}`);
+  const options = item.querySelectorAll('.match-option');
+  
+  // Disable further clicks
+  options.forEach(o => o.style.pointerEvents = 'none');
+  
+  if (answer === matchAnswers[id]) {
+    btn.classList.add('correct');
+    matchScore++;
+  } else {
+    btn.classList.add('wrong');
+    // Highlight correct answer
+    options.forEach(o => {
+      if ((matchAnswers[id] === 'metal' && o.classList.contains('metal')) ||
+          (matchAnswers[id] === 'nonmetal' && o.classList.contains('nonmetal'))) {
+        o.classList.add('correct');
+      }
+    });
+  }
+  
+  // Check if all answered
+  const allOptions = document.querySelectorAll('.match-option');
+  const answered = Array.from(allOptions).filter(o => o.classList.contains('correct') || o.classList.contains('wrong'));
+  
+  if (answered.length >= 4) {
+    const result = document.getElementById('match-result');
+    if (matchScore === 4) {
+      result.textContent = '🎉 ಪರಿಪೂರ್ಣ! ನಾಲ್ಕೂ ಸರಿ!';
+      result.style.color = '#2e7d32';
+    } else {
+      result.textContent = `Good try! ${matchScore}/4 correct`;
+      result.style.color = '#f57f17';
+    }
+    result.classList.add('show');
+  }
+}
+
+// ── URL parameter support ──────────────────────────────────────────────
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var state = p.get('initialState') || 'metals';
+  var hints = p.get('showHints');
+
+  if (hints === 'false') {
+    ['concept-card', 'fun-fact'].forEach(function (cls) {
+      var el = document.querySelector('.' + cls);
+      if (el) el.style.display = 'none';
+    });
+  }
+
+  // Category tabs: metals (index 0), nonmetals (1), both (2)
+  var tabIndex = { 'metals': 0, 'nonmetals': 1, 'both': 2 };
+  var idx = tabIndex[state];
+  if (idx !== undefined && idx !== 0) {   // metals is already default
+    setTimeout(function () {
+      var tabs = document.querySelectorAll('.cat-tab');
+      var btn = tabs[idx];
+      if (btn) {
+        Array.prototype.forEach.call(tabs, function (t) { t.classList.remove('active'); });
+        btn.classList.add('active');
+        showCategory(state, btn);
+      }
+    }, 400);
+  }
+}());
+</script>
+</body>
+</html>

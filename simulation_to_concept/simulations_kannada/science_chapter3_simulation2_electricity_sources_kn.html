@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1565c0">
+<title>ವಿದ್ಯುತ್ ಮೂಲಗಳು – ವಿದ್ಯುತ್ ಉತ್ಪಾದನೆ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #1565c0 0%, #42a5f5 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #f9a825;
+}
+
+.concept-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f57f17;
+  margin-bottom: 6px;
+}
+
+.concept-text {
+  font-size: 12px;
+  color: #5d4037;
+  line-height: 1.5;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.visual {
+  position: relative;
+  height: 45vh;
+  min-height: 320px;
+  background: linear-gradient(180deg, #87CEEB 0%, #87CEEB 60%, #90EE90 60%, #228B22 100%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+svg { width: 100%; height: 100%; }
+
+.ಮೂಲ-btns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.ಮೂಲ-btn {
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 10px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ಮೂಲ-btn:active { transform: scale(0.95); }
+.ಮೂಲ-btn.active { border-color: #1976d2; background: #e3f2fd; }
+.ಮೂಲ-btn .icon { font-size: 24px; }
+.ಮೂಲ-btn .name { font-size: 9px; font-weight: 600; color: #333; margin-top: 4px; }
+
+.info-panel {
+  background: #e3f2fd;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #1976d2;
+}
+
+.info-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1565c0;
+  margin-bottom: 6px;
+}
+
+.info-text {
+  font-size: 11px;
+  color: #37474f;
+  line-height: 1.6;
+}
+
+.info-example {
+  background: #fff;
+  border-radius: 6px;
+  padding: 8px;
+  margin-top: 8px;
+  font-size: 10px;
+  color: #666;
+}
+
+.info-example strong { color: #1976d2; }
+
+.energy-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px;
+  background: #fff8e1;
+  border-radius: 8px;
+}
+
+.flow-item {
+  text-align: center;
+  font-size: 10px;
+}
+
+.flow-item .icon { font-size: 20px; }
+.flow-arrow { font-size: 16px; color: #ff9800; }
+
+.takeaway {
+  background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2e7d32;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1b5e20; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+.safety-note {
+  background: #ffebee;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 10px;
+  border-left: 3px solid #f44336;
+}
+
+.safety-note .title { font-size: 11px; font-weight: 700; color: #c62828; margin-bottom: 4px; }
+.safety-note .text { font-size: 10px; color: #37474f; line-height: 1.5; }
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes flow {
+  0% { stroke-dashoffset: 20; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.rotating { animation: rotate 3s linear infinite; }
+.wire-flow { stroke-dasharray: 5 5; animation: flow 0.5s linear infinite; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🔌 ವಿದ್ಯುತ್ ಮೂಲಗಳು</h1>
+  <p>ನಮ್ಮ ವಿದ್ಯುತ್ ಎಲ್ಲಿಂದ ಬರುತ್ತದೆ?</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ವಿವಿಧ <strong>ಶಕ್ತಿ ಮೂಲಗಳಿಂದ</strong> ವಿದ್ಯುತ್ ಉತ್ಪಾದನೆಯಾಗುತ್ತದೆ. ನವೀಕರಣೀಯ ಮೂಲಗಳು (ಸೂರ್ಯ, ಗಾಳಿ, ನೀರು) ಮತ್ತು ನವೀಕರಣೇತರ ಮೂಲಗಳು (ಇಂಗಾಲ, ಅನಿಲ) ಸೇರಿವೆ. ವಿದ್ಯುತ್ ತಂತಿಗಳ ಮೂಲಕ ನಮ್ಮ ಮನೆಗಳನ್ನು ತಲುಪುತ್ತದೆ.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="visual">
+    <svg viewBox="0 0 400 320" id="scene">
+      <!-- Sky already in background -->
+      
+      <!-- Sun -->
+      <text x="350" y="40" font-size="35">☀️</text>
+      <text x="50" y="35" font-size="22">☁️</text>
+      <text x="150" y="28" font-size="18">☁️</text>
+      
+      <!-- Power ಮೂಲ area (ಬದಲಾಗುತ್ತದೆ based on selection) -->
+      <g id="power-source"></g>
+      
+      <!-- Transmission tower -->
+      <g transform="translate(280, 120)">
+        <line x1="0" y1="0" x2="0" y2="80" stroke="#666" stroke-width="3"/>
+        <line x1="-20" y1="0" x2="20" y2="0" stroke="#666" stroke-width="2"/>
+        <line x1="-15" y1="20" x2="15" y2="20" stroke="#666" stroke-width="2"/>
+        <line x1="-10" y1="40" x2="10" y2="40" stroke="#666" stroke-width="2"/>
+        <line x1="-25" y1="80" x2="0" y2="60" stroke="#666" stroke-width="2"/>
+        <line x1="25" y1="80" x2="0" y2="60" stroke="#666" stroke-width="2"/>
+      </g>
+      
+      <!-- Power lines -->
+      <path id="power-line" d="M 180 140 Q 230 130 280 120" stroke="#333" stroke-width="2" fill="none"/>
+      <path id="power-line-glow" d="M 180 140 Q 230 130 280 120" stroke="#ffeb3b" stroke-width="3" fill="none" opacity="0" class="wire-flow"/>
+      
+      <!-- House -->
+      <g transform="translate(340, 200)">
+        <rect x="-30" y="0" width="60" height="50" fill="#8d6e63"/>
+        <polygon points="-35,0 0,-30 35,0" fill="#5d4037"/>
+        <rect x="-10" y="20" width="20" height="30" fill="#4e342e"/>
+        <rect x="-22" y="10" width="12" height="15" fill="#fff9c4" id="house-window"/>
+      </g>
+      
+      <!-- Wire to house -->
+      <path d="M 280 140 L 320 180" stroke="#333" stroke-width="2"/>
+      
+      <!-- Labels -->
+      <text x="120" y="310" font-size="10" fill="#fff" font-weight="600" id="source-label">ಕೆಳಗೆ ಒಂದು ಮೂಲ ಆಯ್ಕೆಮಾಡಿ</text>
+    </svg>
+  </div>
+  
+  <div class="ಮೂಲ-btns">
+    <button class="ಮೂಲ-btn" data-ಮೂಲ="hydro" onclick="showSource('hydro')">
+      <div class="icon">💧</div>
+      <div class="name">ಜಲವಿದ್ಯುತ್</div>
+    </button>
+    <button class="ಮೂಲ-btn" data-ಮೂಲ="solar" onclick="showSource('solar')">
+      <div class="icon">☀️</div>
+      <div class="name">ಸೌರ</div>
+    </button>
+    <button class="ಮೂಲ-btn" data-ಮೂಲ="wind" onclick="showSource('wind')">
+      <div class="icon">🌬️</div>
+      <div class="name">ಗಾಳಿ</div>
+    </button>
+    <button class="ಮೂಲ-btn" data-ಮೂಲ="thermal" onclick="showSource('thermal')">
+      <div class="icon">🏭</div>
+      <div class="name">ಉಷ್ಣ</div>
+    </button>
+  </div>
+</div>
+
+<div class="info-panel" id="info-panel">
+  <div class="info-title" id="info-title">⚡ ವಿದ್ಯುತ್ ಹೇಗೆ ಉತ್ಪಾದನೆಯಾಗುತ್ತದೆ?</div>
+  <div class="info-text" id="info-text">
+    ವಿದ್ಯುತ್ ಹೇಗೆ ಉತ್ಪಾದನೆಯಾಗಿ ನಿಮ್ಮ ಮನೆಗೆ ಶಕ್ತಿ ನೀಡುತ್ತದೆ ನೋಡಲು ಮೇಲೆ ಯಾವುದೇ ಮೂಲವನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿ!
+  </div>
+  <div class="info-example" id="info-example" style="display:none;"></div>
+</div>
+
+<div class="energy-flow" id="energy-flow" style="display:none;">
+  <div class="flow-item">
+    <div class="icon" id="flow-source">💧</div>
+    <div>ಮೂಲ</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-item">
+    <div class="icon">⚙️</div>
+    <div>ಜನರೇಟರ್</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-item">
+    <div class="icon">⚡</div>
+    <div>ವಿದ್ಯುತ್</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-item">
+    <div class="icon">🏠</div>
+    <div>ಮನೆ</div>
+  </div>
+</div>
+
+<div class="safety-note">
+  <div class="title">⚠️ ಮೊದಲು ಸುರಕ್ಷತೆ!</div>
+  <div class="text">
+    ನಮ್ಮ ಮನೆಗಳ ವಿದ್ಯುತ್ ವಿದ್ಯುತ್ ಕೇಂದ್ರಗಳಿಂದ ಬರುತ್ತದೆ ಮತ್ತು ಅತ್ಯಂತ ಅಪಾಯಕಾರಿ. ಪ್ರಯೋಗಗಳಿಗೆ ಯಾವಾಗಲೂ <strong>ಬ್ಯಾಟರಿಗಳು ಅಥವಾ ಕೋಶಗಳನ್ನು</strong> ಮಾತ್ರ ಬಳಸಿ - ಮುಖ್ಯ ವಿದ್ಯುತ್ ಸರಬರಾಜನ್ನು ಎಂದಿಗೂ ಬಳಸಬೇಡಿ!
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೀವು ಕಲಿತದ್ದು</div>
+  <div class="takeaway-text">
+    ವಿದ್ಯುತ್ ಅನೇಕ ಮೂಲಗಳಿಂದ ಉತ್ಪಾದನೆಯಾಗಬಹುದು — ಧುಮುಕುವ ನೀರು (ಜಲವಿದ್ಯುತ್), ಸೂರ್ಯನ ಬೆಳಕು (ಸೌರ), ಗಾಳಿ ಮತ್ತು ಇಂಧನ ಸುಡುವುದು (ಉಷ್ಣ). ಅದು ತಂತಿಗಳ ಮೂಲಕ ನಮ್ಮ ಮನೆಗಳಿಗೆ ಶಕ್ತಿ ನೀಡುತ್ತದೆ. ಸುರಕ್ಷಿತ ಪ್ರಯೋಗಗಳಿಗೆ ಯಾವಾಗಲೂ ಬ್ಯಾಟರಿಗಳನ್ನು ಬಳಸಿ!
+  </div>
+</div>
+
+</div>
+
+<script>
+const powerSource = document.getElementById('power-source');
+const infoTitle = document.getElementById('info-title');
+const infoText = document.getElementById('info-text');
+const infoExample = document.getElementById('info-example');
+const ಮೂಲLabel = document.getElementById('source-label');
+const energyFlow = document.getElementById('energy-flow');
+const flowSource = document.getElementById('flow-source');
+const powerLineGlow = document.getElementById('power-line-glow');
+const houseWindow = document.getElementById('house-window');
+
+const ಮೂಲs = {
+  hydro: {
+    title: '💧 ಜಲವಿದ್ಯುತ್ ಶಕ್ತಿ',
+    text: 'ಅಣೆಕಟ್ಟಿನಿಂದ ಧುಮುಕುವ ನೀರು ಟರ್ಬೈನ್ ಅನ್ನು ತಿರುಗಿಸುತ್ತದೆ, ಅದು ಜನರೇಟರ್ಗೆ ಸಂಪರ್ಕವಾಗಿದೆ. ತಿರುಗುವ ಜನರೇಟರ್ ವಿದ್ಯುತ್ ಉತ್ಪಾದಿಸುತ್ತದೆ. ಇದು ನವೀಕರಣೀಯ ಮೂಲ — ಜಲ ಚಕ್ರ ಶಾಶ್ವತವಾಗಿ ಮುಂದುವರಿಯುತ್ತದೆ!',
+    example: '<strong>ಉದಾಹರಣೆ:</strong> ಭಾರತದ ಭಾಕ್ರಾ ನಂಗಲ್ ಅಣೆಕಟ್ಟು ಜಲವಿದ್ಯುತ್ ಉತ್ಪಾದಿಸುತ್ತದೆ',
+    icon: '💧',
+    svg: `
+      <rect x="40" y="160" width="120" height="80" fill="#795548"/>
+      <rect x="50" y="140" width="100" height="20" fill="#5d4037"/>
+      <rect x="70" y="100" width="60" height="40" fill="#42a5f5"/>
+      <text x="100" y="130" font-size="25" text-anchor="middle">💧</text>
+      <path d="M 100 160 Q 120 180 140 200 Q 160 220 180 200" stroke="#42a5f5" stroke-width="8" fill="none"/>
+      <circle cx="180" cy="180" r="15" fill="#9e9e9e"/>
+      <line x1="180" y1="165" x2="180" y2="180" stroke="#fff" stroke-width="2"/>
+    `
+  },
+  solar: {
+    title: '☀️ ಸೌರ ಶಕ್ತಿ',
+    text: 'ಸೌರ ಫಲಕಗಳಲ್ಲಿ ವಿಶೇಷ ಕೋಶಗಳಿವೆ, ಸೂರ್ಯನ ಬೆಳಕನ್ನು ನೇರವಾಗಿ ವಿದ್ಯುತ್ಗೆ ಪರಿವರ್ತಿಸುತ್ತವೆ. ಚಲಿಸುವ ಭಾಗಗಳ ಅಗತ್ಯವಿಲ್ಲ! ಇದು ನವೀಕರಣೀಯ - ಸೂರ್ಯನು ಪ್ರತಿದಿನ ಬೆಳಗುತ್ತದೆ.',
+    example: '<strong>ಉದಾಹರಣೆ:</strong> ಛಾವಣಿಗಳ ಮೇಲೆ ಸೌರ ಫಲಕಗಳು ಮತ್ತು ಸೌರ ಕ್ಷೇತ್ರಗಳು',
+    icon: '☀️',
+    svg: `
+      <g transform="translate(80, 140)">
+        <rect x="0" y="20" width="80" height="50" fill="#1565c0" rx="2" transform="rotate(-20)"/>
+        <rect x="5" y="25" width="15" height="15" fill="#42a5f5" transform="rotate(-20)"/>
+        <rect x="25" y="25" width="15" height="15" fill="#42a5f5" transform="rotate(-20)"/>
+        <rect x="45" y="25" width="15" height="15" fill="#42a5f5" transform="rotate(-20)"/>
+        <rect x="65" y="25" width="15" height="15" fill="#42a5f5" transform="rotate(-20)"/>
+      </g>
+      <line x1="300" y1="60" x2="140" y2="140" stroke="#ffeb3b" stroke-width="3" stroke-dasharray="10 5"/>
+      <line x1="320" y1="70" x2="160" y2="150" stroke="#ffeb3b" stroke-width="3" stroke-dasharray="10 5"/>
+      <rect x="115" y="200" width="10" height="40" fill="#666"/>
+    `
+  },
+  wind: {
+    title: '🌬️ ಗಾಳಿ ಶಕ್ತಿ',
+    text: 'ಗಾಳಿ ಗಾಳಿಮರದ (ಟರ್ಬೈನ್) ಚಕ್ರಗಳನ್ನು ತಿರುಗಿಸುತ್ತದೆ. ತಿರುಗುವ ಚಕ್ರಗಳು ವಿದ್ಯುತ್ ಉತ್ಪಾದಿಸಲು ಜನರೇಟರ್ ಅನ್ನು ತಿರುಗಿಸುತ್ತವೆ. ನವೀಕರಣೀಯ ಮೂಲ - ಗಾಳಿ ಬೀಸುತ್ತಲೇ ಇರುತ್ತದೆ!',
+    example: '<strong>ಉದಾಹರಣೆ:</strong> ಗುಜರಾತ್ ಮತ್ತು ತಮಿಳುನಾಡು ಗಾಳಿ ಕ್ಷೇತ್ರಗಳು',
+    icon: '🌬️',
+    svg: `
+      <!-- ಗಾಳಿ blowing -->
+      <text x="40" y="130" font-size="28">🌬️</text>
+      
+      <!-- ಗಾಳಿmill tower -->
+      <rect x="115" y="145" width="10" height="95" fill="#bdbdbd"/>
+      <rect x="110" y="235" width="20" height="10" fill="#9e9e9e"/>
+      
+      <!-- ಗಾಳಿmill blades - centered at top of tower -->
+      <g id="windmill-blades" transform="translate(120, 145)" transform-origin="0 0">
+        <!-- Blade 1 - pointing up -->
+        <ellipse cx="0" cy="-35" rx="6" ry="38" fill="#fff" stroke="#ddd" stroke-width="1"/>
+        <!-- Blade 2 - pointing bottom-right -->
+        <ellipse cx="0" cy="-35" rx="6" ry="38" fill="#fff" stroke="#ddd" stroke-width="1" transform="rotate(120)"/>
+        <!-- Blade 3 - pointing bottom-left -->
+        <ellipse cx="0" cy="-35" rx="6" ry="38" fill="#fff" stroke="#ddd" stroke-width="1" transform="rotate(240)"/>
+        <!-- Hub center -->
+        <circle cx="0" cy="0" r="10" fill="#1976d2"/>
+        <circle cx="0" cy="0" r="5" fill="#0d47a1"/>
+      </g>
+    `
+  },
+  thermal: {
+    title: '🏭 ಉಷ್ಣ ವಿದ್ಯುತ್',
+    text: 'ಇಂಗಾಲ, ತೈಲ ಅಥವಾ ಅನಿಲ ಸುಡುವುದರಿಂದ ನೀರು ಬಿಸಿಯಾಗಿ ಆವಿ ಉಂಟಾಗುತ್ತದೆ. ಆವಿ ಜನರೇಟರ್ಗೆ ಸಂಪರ್ಕವಾದ ಟರ್ಬೈನ್ ಅನ್ನು ತಿರುಗಿಸುತ್ತದೆ. ನವೀಕರಣೇತರ - ಜೀವಾಶ್ಮ ಇಂಧನಗಳು ಖಾಲಿಯಾಗುತ್ತವೆ ಮತ್ತು ಮಾಲಿನ್ಯ ಉಂಟುಮಾಡುತ್ತವೆ.',
+    example: '<strong>ಉದಾಹರಣೆ:</strong> ಭಾರತದ ಹೆಚ್ಚಿನ ವಿದ್ಯುತ್ ಕೇಂದ್ರಗಳು ಇಂಗಾಲ ಬಳಸುತ್ತವೆ',
+    icon: '🏭',
+    svg: `
+      <rect x="60" y="160" width="100" height="80" fill="#78909c"/>
+      <rect x="70" y="140" width="30" height="20" fill="#607d8b"/>
+      <rect x="110" y="120" width="20" height="40" fill="#546e7a"/>
+      <rect x="140" y="140" width="15" height="100" fill="#455a64"/>
+      <ellipse cx="147" cy="110" rx="20" ry="15" fill="#9e9e9e" opacity="0.7"/>
+      <ellipse cx="147" cy="90" rx="15" ry="12" fill="#bdbdbd" opacity="0.5"/>
+      <text x="90" y="200" font-size="20">🔥</text>
+    `
+  }
+};
+
+function showSource(type) {
+  const ಮೂಲ = ಮೂಲs[type];
+  
+  // Update buttons
+  document.querySelectorAll('.ಮೂಲ-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.ಮೂಲ === type);
+  });
+  
+  // Update SVG
+  powerSource.innerHTML = ಮೂಲ.svg;
+  
+  // ಅನಿಮೇಟ್ windmill if selected
+  if (type === 'wind') {
+    const blades = document.getElementById('windmill-blades');
+    if (blades) blades.classList.add('rotating');
+  }
+  
+  // Update info panel
+  infoTitle.textContent = ಮೂಲ.title;
+  infoText.textContent = ಮೂಲ.text;
+  infoExample.innerHTML = ಮೂಲ.example;
+  infoExample.style.display = 'block';
+  
+  // Update label
+  ಮೂಲLabel.textContent = ಮೂಲ.title.replace(/[^\w\s]/g, '').trim();
+  
+  // Show energy flow
+  energyFlow.style.display = 'flex';
+  flowSource.textContent = ಮೂಲ.icon;
+  
+  // ಅನಿಮೇಟ್ power flow
+  powerLineGlow.style.opacity = '1';
+  houseWindow.style.fill = '#ffeb3b';
+}
+
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var state = params.get('initialState');
+  var hints = params.get('showHints');
+
+  if (hints === 'false') {
+    document.querySelectorAll('.concept-card').forEach(function(el) { el.style.display = 'none'; });
+  }
+
+  var validStates = ['hydro','solar','wind','thermal'];
+  if (state && validStates.indexOf(state) > -1) {
+    showSource(state);
+  }
+})();
+</script>
+</body>
+</html>

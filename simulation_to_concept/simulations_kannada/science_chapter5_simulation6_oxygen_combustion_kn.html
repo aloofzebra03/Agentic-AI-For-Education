@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#e65100">
+<title>ಆಮ್ಲಜನಕ ಮತ್ತು ದಹನ – ಮೇಣದ ಪ್ರಯೋಗ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #e65100 0%, #ff9800 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #e65100;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.visual {
+  position: relative;
+  height: 42vh;
+  min-height: 300px;
+  background: linear-gradient(180deg, #37474f 0%, #455a64 100%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+svg { width: 100%; height: 100%; }
+
+.timer-display {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-display {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #4caf50;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.ctrl-btn {
+  flex: 1;
+  padding: 14px 8px;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ctrl-btn:active { transform: scale(0.98); }
+.ctrl-btn:disabled { background: #ccc !important; }
+
+.ctrl-btn.light { background: linear-gradient(135deg, #ff5722 0%, #ff7043 100%); color: white; }
+.ctrl-btn.cover { background: linear-gradient(135deg, #2196f3 0%, #64b5f6 100%); color: white; }
+.ctrl-btn.reset { background: linear-gradient(135deg, #607d8b 0%, #90a4ae 100%); color: white; }
+
+.observation-box {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #e91e63;
+}
+
+.obs-title { font-size: 12px; font-weight: 700; color: #c2185b; margin-bottom: 6px; }
+.obs-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.learning-panel {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #e65100;
+}
+
+.learning-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 6px; }
+.learning-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+@keyframes flame {
+  0%, 100% { transform: scaleY(1) scaleX(1); }
+  50% { transform: scaleY(1.15) scaleX(0.9); }
+}
+
+.flame-anim { animation: flame 0.4s ease-in-out infinite; }
+
+@keyframes flameOut {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+.flame-out { animation: flameOut 0.5s ease-out forwards; }
+
+@keyframes jarDown {
+  0% { transform: translateY(-150px); }
+  100% { transform: translateY(0); }
+}
+
+.jar-down { animation: jarDown 0.5s ease-out forwards; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🕯️ ಗಾಜಿನ ಕೆಳಗೆ ಮೇಣ</h1>
+  <p>ಮೇಣ ಏಕೆ ಆರಿಹೋಗುತ್ತದೆ?</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ದಹನಕ್ಕೆ ಆಮ್ಲಜನಕ ಅಗತ್ಯ.</strong> ಮೇಣವನ್ನು ಗಾಜಿನ ಜಾರ್‌ನಿಂದ ಮುಚ್ಚಿದಾಗ ಆಮ್ಲಜನಕide gets used up. Without ಆಮ್ಲಜನಕ, the flame goes out - proving ಆಮ್ಲಜನಕ's role in burning!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="visual">
+    <div class="timer-display" id="timer-display">⏱️ 0s</div>
+    <div class="status-display" id="status-display">ಸಿದ್ಧ</div>
+    <svg viewBox="0 0 400 300" id="scene">
+      <!-- Table/surface -->
+      <rect x="50" y="250" width="300" height="30" rx="3" fill="#8d6e63"/>
+      
+      <!-- Cಮತ್ತುle base/holder -->
+      <rect x="175" y="220" width="50" height="30" rx="3" fill="#ffcc80"/>
+      
+      <!-- Cಮತ್ತುle body -->
+      <rect x="185" y="150" width="30" height="70" rx="2" fill="#fff9c4" id="candle-body"/>
+      <rect x="190" y="155" width="8" height="15" rx="1" fill="#fff" opacity="0.5"/>
+      
+      <!-- Wick -->
+      <line x1="200" y1="150" x2="200" y2="135" stroke="#5d4037" stroke-width="2" id="wick"/>
+      
+      <!-- Flame -->
+      <g id="flame-group" style="display:none">
+        <ellipse cx="200" cy="115" rx="8" ry="20" fill="#ff9800" class="flame-anim"/>
+        <ellipse cx="200" cy="118" rx="5" ry="14" fill="#ffeb3b" class="flame-anim"/>
+        <ellipse cx="200" cy="120" rx="2" ry="8" fill="#fff" class="flame-anim"/>
+      </g>
+      
+      <!-- Smoke (shown when flame goes out) -->
+      <g id="smoke-group" style="display:none">
+        <text x="195" y="110" font-size="14" fill="#90a4ae">~</text>
+        <text x="205" y="100" font-size="14" fill="#90a4ae">~</text>
+        <text x="200" y="90" font-size="14" fill="#90a4ae">~</text>
+      </g>
+      
+      <!-- ಗಾಜು jar (initially hidden/above) -->
+      <g id="glass-jar" style="display:none">
+        <rect x="150" y="70" width="100" height="180" rx="5" fill="none" stroke="#b0bec5" stroke-width="3"/>
+        <rect x="155" y="75" width="90" height="170" rx="3" fill="#e3f2fd" opacity="0.2"/>
+        <rect x="160" y="80" width="20" height="60" rx="2" fill="#fff" opacity="0.2"/>
+      </g>
+      
+      <!-- ಆಮ್ಲಜನಕ ಸೂಚಕs (inside jar when covered) -->
+      <g id="oxygen-indicators" style="display:none">
+        <text x="165" y="120" font-size="10" fill="#4fc3f7" id="o2-1">O₂</text>
+        <text x="210" y="100" font-size="10" fill="#4fc3f7" id="o2-2">O₂</text>
+        <text x="185" y="140" font-size="10" fill="#4fc3f7" id="o2-3">O₂</text>
+        <text x="220" y="130" font-size="10" fill="#4fc3f7" id="o2-4">O₂</text>
+      </g>
+      
+      <!-- CO2 ಸೂಚಕs -->
+      <g id="co2-indicators" style="display:none">
+        <text x="165" y="120" font-size="10" fill="#ffab91">CO₂</text>
+        <text x="210" y="100" font-size="10" fill="#ffab91">CO₂</text>
+        <text x="185" y="140" font-size="10" fill="#ffab91">CO₂</text>
+      </g>
+      
+      <!-- Labels -->
+      <text x="200" y="280" font-size="10" fill="#90a4ae" text-anchor="middle">ಮೇಜಿನ ಮೇಲೆ ಮೇಣ</text>
+    </svg>
+  </div>
+  
+  <div class="controls">
+    <button class="ctrl-btn light" id="btn-light" onclick="lightCandle()">🔥 ಮೇಣ ಬೆಳಗಿಸಿ</button>
+    <button class="ctrl-btn cover" id="btn-cover" onclick="coverWithJar()" disabled>🫙 ಜಾರ್‌ನಿಂದ ಮುಚ್ಚಿ</button>
+    <button class="ctrl-btn reset" id="btn-reset" onclick="resetExperiment()" disabled>🔄 ಮರುಹೊಂದಿಸಿ</button>
+  </div>
+</div>
+
+<div class="observation-box">
+  <div class="obs-title">👁️ ವೀಕ್ಷಣೆ</div>
+  <div class="obs-text" id="obs-text">
+    ಪ್ರಯೋಗ ಪ್ರಾರಂಭಿಸಲು "ಮೇಣ ಬೆಳಗಿಸಿ" ಟ್ಯಾಪ್ ಮಾಡಿ. ನಂತರ ಏನಾಗುತ್ತದೆ ನೋಡಲು ಗಾಜಿನ ಜಾರ್ ನಿಂದ ಮುಚ್ಚಿ!
+  </div>
+</div>
+
+<div class="learning-panel">
+  <div class="learning-title">🔬 ಏನಾಗುತ್ತಿದೆ?</div>
+  <div class="learning-text" id="learning-text">
+    ಈ ಶಾಸ್ತ್ರೀಯ ಪ್ರಯೋಗ ಸಾಬೀತು <strong>ಉರಿಯಲು ಆಮ್ಲಜನಕ ಅಗತ್ಯ</strong>.<br><br>
+    ಜಾರ್ ಮೇಣ ಮುಚ್ಚಿದಾಗ ಜಾರ್ ಒಳಗೆ ಆಮ್ಲಜನಕ ಬಳಸಲಾಗಿದೆ. ಜ್ವಾಲೆ ಉತ್ಪಾದಿಸುತ್ತದೆ <strong>ಕಾರ್ಬನ್ ಡೈಆಕ್ಸೈಡ್ (CO₂)</strong> ಮತ್ತು <strong>ನೀರಿನ ಆವಿ</strong>. ಆಮ್ಲಜನಕ ಮುಗಿದರೆ ಜ್ವಾಲೆ ಆರಿಹೋಗುತ್ತದೆ!
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ವೈಜ್ಞಾನಿಕ ತೀರ್ಮಾನ</div>
+  <div class="takeaway-text">
+    <strong>ದಹನಕ್ಕೆ ಆಮ್ಲಜನಕ ಅಗತ್ಯ!</strong><br><br>
+    • ಜಾರ್ ಒಳಗೆ ಮೇಣ O₂ ಬಳಸುತ್ತದೆ<br>
+    • CO₂ ಮತ್ತು H₂O ಉತ್ಪಾದಿಸಲ್ಪಡುತ್ತವೆ (ರಾಸಾಯನಿಕ ಬದಲಾವಣೆ)<br>
+    • ಆಮ್ಲಜನಕ ಇಲ್ಲ = ಅಗ್ನಿ ಇಲ್ಲ<br><br>
+    ಅದಕ್ಕೇ ಅಗ್ನಿಶಾಮಕ ಆಮ್ಲಜನಕ ಸರಬರಾಜು ಕಡಿದು!
+  </div>
+</div>
+
+</div>
+
+<script>
+let candleLit = false;
+let jarClosed = false;
+let timer = 0;
+let timerInterval = null;
+
+const flameGroup = document.getElementById('flame-group');
+const smokeGroup = document.getElementById('smoke-group');
+const glassJar = document.getElementById('glass-jar');
+const ಆಮ್ಲಜನಕIndicators = document.getElementById('oxygen-indicators');
+const co2Indicators = document.getElementById('co2-indicators');
+const btnLight = document.getElementById('btn-light');
+const btnCover = document.getElementById('btn-cover');
+const btnReset = document.getElementById('btn-reset');
+const timerDisplay = document.getElementById('timer-display');
+const statusDisplay = document.getElementById('status-display');
+const obsText = document.getElementById('obs-text');
+const learningText = document.getElementById('learning-text');
+
+function lightCandle() {
+  candleLit = true;
+  flameGroup.style.display = 'block';
+  flameGroup.classList.remove('flame-out');
+  smokeGroup.style.display = 'none';
+  
+  btnLight.disabled = true;
+  btnCover.disabled = false;
+  
+  statusDisplay.textContent = '🔥 ಉರಿಯುತ್ತಿದೆ';
+  statusDisplay.style.background = '#ff9800';
+  
+  obsText.innerHTML = `
+    ಮೇಣ ಈಗ <strong>ಉರಿಯುತ್ತಿದೆ</strong>!<br><br>
+    ಗಾಳಿಯಿಂದ ಆಮ್ಲಜನಕ ಬಳಸುತ್ತಿದೆ ಮತ್ತು ಉಷ್ಣ, ಬೆಳಕು, CO₂ ಮತ್ತು ನೀರಿನ ಆವಿ ಬಿಡುಗಡೆ ಮಾಡುತ್ತಿದೆ. ಏನಾಗುತ್ತದೆ ನೋಡಲು ಜಾರ್ ನಿಂದ ಮುಚ್ಚಿ!
+  `;
+  
+  learningText.innerHTML = `
+    <strong>ಇದೀಗ:</strong><br>
+    • ಮೇಣ ಮೇಣ (ಇಂಧನ) ಉರಿಯುತ್ತಿದೆ<br>
+    • ಗಾಳಿಯ ಆಮ್ಲಜನಕ ಜ್ವಾಲೆಗೆ ಬೆಂಬಲ<br>
+    • ಉಷ್ಣ ಪ್ರತಿಕ್ರಿಯೆ ನಡೆಸುತ್ತದೆ<br><br>
+    ಇದು <strong>ಅಗ್ನಿ ತ್ರಿಕೋಣ</strong> ಕ್ರಿಯೆಯಲ್ಲಿ! ಆಮ್ಲಜನಕ ಸೀಮಿತಗೊಳಿಸಿದರೆ ಏನಾಗುತ್ತದೆ?
+  `;
+}
+
+function coverWithJar() {
+  if (!candleLit) return;
+  
+  jarClosed = true;
+  glassJar.style.display = 'block';
+  glassJar.classList.add('jar-down');
+  ಆಮ್ಲಜನಕIndicators.style.display = 'block';
+  
+  btnCover.disabled = true;
+  
+  statusDisplay.textContent = '🫙 ಮುಚ್ಚಲಾಗಿದೆ';
+  statusDisplay.style.background = '#2196f3';
+  
+  obsText.innerHTML = `
+    ಜಾರ್ ಇರಿಸಲಾಗಿದೆ! ಮೇಣ ಈಗ ಸೀಮಿತ ಆಮ್ಲಜನಕದೊಂದಿಗೆ <strong>ಮುಚ್ಚಿದ ಜಾಗ</strong>ದಲ್ಲಿದೆ.<br><br>
+    ಆಮ್ಲಜನಕ ಖಾಲಿಯಾಗುತ್ತಿದ್ದಂತೆ ಏನಾಗುತ್ತದೆ ನೋಡಿ...
+  `;
+  
+  // ಪ್ರಾರಂಭ countdown
+  timer = 0;
+  timerInterval = setInterval(() => {
+    timer++;
+    timerDisplay.textContent = `⏱️ ${timer}s`;
+    
+    // Fade out ಆಮ್ಲಜನಕ ಸೂಚಕs over time
+    const opacity = Math.max(0, 1 - (timer / 5));
+    document.querySelectorAll('#oxygen-indicators text').forEach(t => {
+      t.setAttribute('fill-opacity', opacity);
+    });
+    
+    if (timer === 2) {
+      obsText.innerHTML = `
+        <strong>ಆಮ್ಲಜನಕ ಕಡಿಮೆಯಾಗುತ್ತಿದೆ...</strong><br><br>
+        ಜ್ವಾಲೆ ಜಾರ್ ಒಳಗಿನ O₂ ಬಳಸುತ್ತಿದೆ. CO₂ ಉತ್ಪಾದನೆಯಾಗುತ್ತಿದೆ!
+      `;
+    }
+    
+    if (timer === 4) {
+      obsText.innerHTML = `
+        <strong>ಆಮ್ಲಜನಕ ಬಹುತೇಕ ಇಲ್ಲ!</strong><br><br>
+        ಜ್ವಾಲೆ ದುರ್ಬಲವಾಗುತ್ತಿದೆ. ಆಮ್ಲಜನಕ ಕಂಡುಹಿಡಿಯಲು ಹೋರಾಡುತ್ತಿದೆ...
+      `;
+      // Flame starts flickering/shrinking - use SVG scale for mobile compatibility
+      const flames = flameGroup.querySelectorAll('ellipse');
+      flames.forEach(f => {
+        const rx = parseFloat(f.getAttribute('rx')) * 0.7;
+        const ry = parseFloat(f.getAttribute('ry')) * 0.7;
+        f.setAttribute('rx', rx);
+        f.setAttribute('ry', ry);
+      });
+    }
+    
+    if (timer >= 5) {
+      // Flame goes out
+      clearInterval(timerInterval);
+      flameGroup.classList.add('flame-out');
+      
+      setTimeout(() => {
+        flameGroup.style.display = 'none';
+        smokeGroup.style.display = 'block';
+        ಆಮ್ಲಜನಕIndicators.style.display = 'none';
+        co2Indicators.style.display = 'block';
+        
+        statusDisplay.textContent = '💨 ಆರಿಹೋಯಿತು';
+        statusDisplay.style.background = '#607d8b';
+        
+        btnReset.disabled = false;
+        
+        obsText.innerHTML = `
+          <strong style="color:#c62828">🕯️ ಮೇಣ ಆರಿಹೋಯಿತು!</strong><br><br>
+          ನಂತರ ~5 ಸೆಕೆಂಡ್‌ಗಳಲ್ಲಿ, ಜಾರ್ ಒಳಗಿನ ಎಲ್ಲ ಆಮ್ಲಜನಕ ಬಳಸಲ್ಪಟ್ಟಿತು. ಆಮ್ಲಜನಕ ಇಲ್ಲದೆ <strong>ದಹನ ಮುಂದುವರಿಯಲು ಸಾಧ್ಯವಿಲ್ಲ</strong>!<br><br>
+          ಜಾರ್ ಈಗ CO₂ ತುಂಬಿದೆ (ಸುಣ್ಣದ ನೀರಿನಿಂದ ಪರೀಕ್ಷಿಸಬಹುದು – ಹಾಲು ಬಣ್ಣವಾಗುತ್ತದೆ!)
+        `;
+        
+        learningText.innerHTML = `
+          <strong style="color:#2e7d32">✅ ಪ್ರಯೋಗ ಪೂರ್ಣ!</strong><br><br>
+          <strong>ನಾವು ಸಾಬೀತು ಮಾಡಿದ್ದು:</strong><br>
+          • ಉರಿಯಲು ಆಮ್ಲಜನಕ <strong>ಅಗತ್ಯ</strong><br>
+          • ಜ್ವಾಲೆ ಜಾರ್ ಒಳಗಿನ O₂ ಬಳಸಿತು<br>
+          • CO₂ ಉತ್ಪಾದನೆಯಾಯಿತು (ಹೊಸ ಪದಾರ್ಥ = ರಾಸಾಯನಿಕ ಬದಲಾವಣೆ)<br>
+          • ಆಮ್ಲಜನಕ ಇಲ್ಲ → ಅಗ್ನಿ ಆರಿಹೋಗುತ್ತದೆ<br><br>
+            ಅಗ್ನಿಯನ್ನು ಮುಚ್ಚಿ ಆರಿಸುವುದು ಏಕೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ!
+        `;
+      }, 500);
+    }
+  }, 1000);
+}
+
+function resetExperiment() {
+  clearInterval(timerInterval);
+  
+  candleLit = false;
+  jarClosed = false;
+  timer = 0;
+  
+  flameGroup.style.display = 'none';
+  flameGroup.classList.remove('flame-out');
+  
+  // ಮರುಹೊಂದಿಸಿ flame sizes to original
+  const flames = flameGroup.querySelectorAll('ellipse');
+  const originalSizes = [{rx: 8, ry: 20}, {rx: 5, ry: 14}, {rx: 2, ry: 8}];
+  flames.forEach((f, i) => {
+    if (originalSizes[i]) {
+      f.setAttribute('rx', originalSizes[i].rx);
+      f.setAttribute('ry', originalSizes[i].ry);
+    }
+  });
+  smokeGroup.style.display = 'none';
+  glassJar.style.display = 'none';
+  glassJar.classList.remove('jar-down');
+  ಆಮ್ಲಜನಕIndicators.style.display = 'none';
+  co2Indicators.style.display = 'none';
+  
+  document.querySelectorAll('#oxygen-indicators text').forEach(t => {
+    t.setAttribute('fill-opacity', '1');
+  });
+  
+  btnLight.disabled = false;
+  btnCover.disabled = true;
+  btnReset.disabled = true;
+  
+  timerDisplay.textContent = '⏱️ 0s';
+  statusDisplay.textContent = 'ಸಿದ್ಧ';
+  statusDisplay.style.background = '#4caf50';
+  
+  obsText.innerHTML = `
+    ಪ್ರಯೋಗ ಪ್ರಾರಂಭಿಸಲು "ಮೇಣ ಬೆಳಗಿಸಿ" ಟ್ಯಾಪ್ ಮಾಡಿ. ನಂತರ ಏನಾಗುತ್ತದೆ ನೋಡಲು ಗಾಜಿನ ಜಾರ್ ನಿಂದ ಮುಚ್ಚಿ!
+  `;
+  
+  learningText.innerHTML = `
+    ಈ ಶಾಸ್ತ್ರೀಯ ಪ್ರಯೋಗ ಸಾಬೀತು <strong>ಉರಿಯಲು ಆಮ್ಲಜನಕ ಅಗತ್ಯ</strong>.<br><br>
+    ಜಾರ್ ಮೇಣ ಮುಚ್ಚಿದಾಗ ಜಾರ್ ಒಳಗೆ ಆಮ್ಲಜನಕ ಬಳಸಲಾಗಿದೆ. ಜ್ವಾಲೆ ಉತ್ಪಾದಿಸುತ್ತದೆ <strong>ಕಾರ್ಬನ್ ಡೈಆಕ್ಸೈಡ್ (CO₂)</strong> ಮತ್ತು <strong>ನೀರಿನ ಆವಿ</strong>. ಆಮ್ಲಜನಕ ಮುಗಿದರೆ ಜ್ವಾಲೆ ಆರಿಹೋಗುತ್ತದೆ!
+  `;
+}
+
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var showHints = params.get('showHints');
+  if (showHints === 'false') {
+    document.querySelectorAll('.concept-card, .learning-panel, .takeaway').forEach(function (el) { el.style.display = 'none'; });
+  }
+  var state = params.get('initialState');
+  if (!state || state === 'initial') return;
+  if (state === 'lit') {
+    setTimeout(function () {
+      var btn = document.getElementById('btn-light');
+      if (btn && !btn.disabled) btn.click();
+    }, 800);
+  } else if (state === 'covered_extinguished') {
+    setTimeout(function () {
+      var btn = document.getElementById('btn-light');
+      if (btn && !btn.disabled) btn.click();
+    }, 800);
+    setTimeout(function () {
+      var btn = document.getElementById('btn-cover');
+      if (btn && !btn.disabled) btn.click();
+    }, 2600);
+  }
+}());
+</script>
+</body>
+</html>

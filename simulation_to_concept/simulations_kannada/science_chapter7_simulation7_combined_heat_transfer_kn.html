@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#9c27b0">
+<title>ಸಂಯೋಜಿತ ಉಷ್ಣ ವರ್ಗಾವಣೆ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #9c27b0;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #7b1fa2; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.cooking-visual {
+  position: relative;
+  height: 280px;
+  background: linear-gradient(180deg, #fafafa 0%, #e0e0e0 100%);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Stove/Flame */
+.stove {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 40px;
+  background: #424242;
+  border-radius: 5px 5px 0 0;
+}
+
+.flame-container {
+  position: absolute;
+  bottom: 35px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+}
+
+.flame {
+  width: 20px;
+  height: 35px;
+  background: linear-gradient(0deg, #1565c0 0%, #ff9800 50%, #ffeb3b 100%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: flicker 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes flicker {
+  0% { transform: scale(1) translateY(0); }
+  100% { transform: scale(1.05) translateY(-3px); }
+}
+
+/* Pan */
+.pan {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 160px;
+  height: 60px;
+  background: linear-gradient(180deg, #757575, #616161, #757575);
+  border-radius: 0 0 30px 30px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.pan-handle {
+  position: absolute;
+  right: -50px;
+  top: 10px;
+  width: 60px;
+  height: 15px;
+  background: #8d6e63;
+  border-radius: 5px;
+}
+
+/* ನೀರು in pan */
+.ನೀರು {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  height: 40px;
+  background: linear-gradient(180deg, rgba(66,165,245,0.6), rgba(33,150,243,0.8));
+  border-radius: 0 0 25px 25px;
+  overflow: hidden;
+}
+
+/* Bubbles */
+.bubble {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 50%;
+  animation: bubbleRise 2s ease-in-out infinite;
+}
+
+@keyframes bubbleRise {
+  0% { transform: translateY(0) scale(0); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-50px) scale(1); opacity: 0; }
+}
+
+/* Steam */
+.steam-container {
+  position: absolute;
+  bottom: 130px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.steam {
+  position: absolute;
+  width: 20px;
+  height: 30px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 50%;
+  animation: steamRise 3s ease-in-out infinite;
+}
+
+@keyframes steamRise {
+  0% { transform: translateY(0) scale(1); opacity: 0.8; }
+  100% { transform: translateY(-80px) scale(2); opacity: 0; }
+}
+
+/* ವಿಕಿರಣ waves */
+.radiation-ಸೂಚಕ {
+  position: absolute;
+  bottom: 100px;
+  right: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rad-wave {
+  width: 40px;
+  height: 6px;
+  background: linear-gradient(90deg, transparent, #ff9800, transparent);
+  border-radius: 3px;
+  margin: 3px 0;
+  animation: radPulse 1s ease-in-out infinite;
+}
+
+.rad-wave:nth-child(1) { animation-delay: 0s; }
+.rad-wave:nth-child(2) { animation-delay: 0.3s; }
+.rad-wave:nth-child(3) { animation-delay: 0.6s; }
+
+@keyframes radPulse {
+  0%, 100% { opacity: 0.3; transform: scaleX(0.8); }
+  50% { opacity: 1; transform: scaleX(1.2); }
+}
+
+/* Labels */
+.heat-label {
+  position: absolute;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 9px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.label-ವಾಹಕತೆ {
+  bottom: 70px;
+  left: 10px;
+  background: #f44336;
+}
+
+.label-convection {
+  bottom: 160px;
+  left: 10px;
+  background: #2196f3;
+}
+
+.label-radiation {
+  bottom: 100px;
+  right: 10px;
+  background: #ff9800;
+}
+
+/* Person icon */
+.person {
+  position: absolute;
+  right: 20px;
+  top: 80px;
+  font-size: 40px;
+}
+
+.highlight-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.highlight-tab {
+  padding: 10px 4px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  text-align: center;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.highlight-tab:active { transform: scale(0.95); }
+.highlight-tab.conduction.active { border-color: #f44336; background: #ffebee; color: #c62828; }
+.highlight-tab.convection.active { border-color: #2196f3; background: #e3f2fd; color: #1565c0; }
+.highlight-tab.radiation.active { border-color: #ff9800; background: #fff3e0; color: #e65100; }
+
+.highlight-tab .emoji { font-size: 20px; display: block; margin-bottom: 2px; }
+
+.method-info {
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid;
+}
+
+.method-info.ವಾಹಕತೆ-info { background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); border-color: #f44336; }
+.method-info.convection-info { background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-color: #2196f3; }
+.method-info.radiation-info { background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); border-color: #ff9800; }
+
+.method-title { font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+.ವಾಹಕತೆ-info .method-title { color: #c62828; }
+.convection-info .method-title { color: #1565c0; }
+.radiation-info .method-title { color: #e65100; }
+
+.method-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.summary-table {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.table-title { font-size: 12px; font-weight: 700; color: #333; margin-bottom: 10px; text-align: center; }
+
+.table-row {
+  display: flex;
+  margin-bottom: 6px;
+}
+
+.table-cell {
+  flex: 1;
+  padding: 8px;
+  text-align: center;
+  font-size: 9px;
+  background: #fff;
+  border-radius: 4px;
+  margin: 0 2px;
+}
+
+.cell-header { font-weight: 700; background: #e0e0e0; }
+.cell-cond { background: #ffcdd2; }
+.cell-conv { background: #bbdefb; }
+.cell-rad { background: #ffe0b2; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🍳 ಸಂಯೋಜಿತ ಉಷ್ಣ ವರ್ಗಾವಣೆ</h1>
+  <p>ಮೂರು ವಿಧಾನಗಳು ಒಟ್ಟಿಗೆ ಕೆಲಸ ಮಾಡುತ್ತವೆ!</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ನೈಜ ಜೀವನದಲ್ಲಿ ಉಷ್ಣ ವರ್ಗಾವಣೆ ಸಾಮಾನ್ಯವಾಗಿ ಮೂರು ವಿಧಾನಗಳನ್ನು ಒಳಗೊಂಡಿರುತ್ತದೆ - <strong>ವಾಹಕತೆ, ಸಂವಹನ ಮತ್ತು ವಿಕಿರಣ</strong> ಒಟ್ಟಿಗೆ ಕೆಲಸ ಮಾಡುತ್ತವೆ. ಪಾತ್ರೆಯಲ್ಲಿ ನೀರು ಬಿಸಿ ಮಾಡುವುದು ಪರಿಪೂರ್ಣ ಉದಾಹರಣೆ!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="cooking-visual">
+    <div class="person">🧍</div>
+    
+    <div class="steam-container">
+      <div class="steam" style="left: -30px; animation-delay: 0s;"></div>
+      <div class="steam" style="left: 0px; animation-delay: 0.5s;"></div>
+      <div class="steam" style="left: 30px; animation-delay: 1s;"></div>
+    </div>
+    
+    <div class="pan">
+      <div class="pan-handle"></div>
+      <div class="ನೀರು">
+        <div class="bubble" style="left: 20%; animation-delay: 0s;"></div>
+        <div class="bubble" style="left: 40%; animation-delay: 0.5s;"></div>
+        <div class="bubble" style="left: 60%; animation-delay: 1s;"></div>
+        <div class="bubble" style="left: 80%; animation-delay: 1.5s;"></div>
+      </div>
+    </div>
+    
+    <div class="radiation-ಸೂಚಕ">
+      <div class="rad-wave"></div>
+      <div class="rad-wave"></div>
+      <div class="rad-wave"></div>
+    </div>
+    
+    <div class="flame-container">
+      <div class="flame"></div>
+      <div class="flame" style="animation-delay: 0.1s;"></div>
+      <div class="flame" style="animation-delay: 0.2s;"></div>
+    </div>
+    
+    <div class="stove"></div>
+    
+    <div class="heat-label label-ವಾಹಕತೆ">🔥 ವಾಹಕತೆ<br>ಜ್ವಾಲೆ → ಪಾತ್ರೆ</div>
+    <div class="heat-label label-convection">💧 ಸಂವಹನ<br>ಬಿಸಿ ನೀರು ಏರುತ್ತದೆ</div>
+    <div class="heat-label label-radiation">☀️ ವಿಕಿರಣ<br>ನೀವು ಉಷ್ಣ ಅನುಭವಿಸುತ್ತೀರಿ</div>
+  </div>
+  
+  <div class="highlight-tabs">
+    <button class="highlight-tab conduction active" data-method="conduction" type="button">
+      <span class="emoji">🔥</span>
+      ವಾಹಕತೆ
+    </button>
+    <button class="highlight-tab convection" data-method="convection" type="button">
+      <span class="emoji">💧</span>
+      ಸಂವಹನ
+    </button>
+    <button class="highlight-tab radiation" data-method="radiation" type="button">
+      <span class="emoji">☀️</span>
+      ವಿಕಿರಣ
+    </button>
+  </div>
+</div>
+
+<div class="method-info ವಾಹಕತೆ-info" id="method-info">
+  <div class="method-title" id="method-title">🔥 ವಾಹಕತೆ: ಜ್ವಾಲೆ → ಪಾತ್ರೆ → ನೀರು (ಕೆಳಭಾಗ)</div>
+  <div class="method-text" id="method-text">
+    ಜ್ವಾಲೆಯ ಉಷ್ಣ ಲೋಹದ ಪಾತ್ರೆಗೆ ವರ್ಗಾವಣೆ <strong>ವಾಹಕತೆ</strong>. ಲೋಹ ಕಣಗಳು ಕಂಪಿಸಿ ನೆರೆಯ ಕಣಗಳಿಗೆ ಶಕ್ತಿ. ಪಾತ್ರೆ ಬಿಸಿಯಾಗುತ್ತದೆ, ಪಾತ್ರೆ ಅಡಿಯ ನೀರು ಮೇಲೆ ಏರುತ್ತದೆ.
+  </div>
+</div>
+
+<div class="summary-table">
+  <div class="table-title">📊 ಎಲ್ಲ ಮೂರು ವಿಧಾನಗಳು ಒಂದು ದೃಶ್ಯದಲ್ಲಿ</div>
+  <div class="table-row">
+    <div class="table-cell cell-header">ವಿಧಾನ</div>
+    <div class="table-cell cell-header">ಎಲ್ಲಿ</div>
+    <div class="table-cell cell-header">ಹೇಗೆ</div>
+  </div>
+  <div class="table-row">
+    <div class="table-cell cell-cond">ವಾಹಕತೆ</div>
+    <div class="table-cell">ಜ್ವಾಲೆ → ಪಾತ್ರೆ</div>
+    <div class="table-cell">ಕಣ ಕಂಪನ</div>
+  </div>
+  <div class="table-row">
+    <div class="table-cell cell-conv">ಸಂವಹನ</div>
+    <div class="table-cell">ನೀರಿನ ಒಳಗೆ</div>
+    <div class="table-cell">ಬಿಸಿ ಏರುತ್ತದೆ, ತಂಪು ಇಳಿಯುತ್ತದೆ</div>
+  </div>
+  <div class="table-row">
+    <div class="table-cell cell-rad">ವಿಕಿರಣ</div>
+    <div class="table-cell">ಪಾತ್ರೆ → ನೀವು</div>
+    <div class="table-cell">ಗಾಳಿಯಲ್ಲಿ ಉಷ್ಣ ತರಂಗ</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const methods = {
+  conduction: {
+    title: '🔥 ವಾಹಕತೆ: ಜ್ವಾಲೆ → ಪಾತ್ರೆ → ನೀರು (ಕೆಳಭಾಗ)',
+    text: 'ಜ್ವಾಲೆಯ ಉಷ್ಣ ಲೋಹದ ಪಾತ್ರೆಗೆ ವರ್ಗಾವಣೆ <strong>ವಾಹಕತೆ</strong>. ಲೋಹ ಕಣಗಳು ಕಂಪಿಸಿ ನೆರೆಯ ಕಣಗಳಿಗೆ ಶಕ್ತಿ. ಪಾತ್ರೆ ಬಿಸಿಯಾಗುತ್ತದೆ, ಪಾತ್ರೆ ಅಡಿಯ ನೀರು ಮೇಲೆ ಏರುತ್ತದೆ.',
+    infoClass: 'ವಾಹಕತೆ-info'
+  },
+  convection: {
+    title: '💧 ಸಂವಹನ: ಪಾತ್ರೆಯ ಒಳಗೆ ನೀರಿನ ಸಂಚಲನ',
+    text: 'ನೀರಿನ ಒಳಗೆ <strong>ಸಂವಹನ</strong>. ಅಡಿಯ ಬಿಸಿ ನೀರು ಕಡಿಮೆ ಸಾಂದ್ರ ಮತ್ತು ಏರುತ್ತದೆ. ಮೇಲಿನ ತಂಪು ನೀರು ಇಳಿಯುತ್ತದೆ. ಈ ವೃತ್ತಾಕಾರ ಚಲನೆ ಎಲ್ಲ ನೀರು ಸಮವಾಗಿ ಬಿಸಿ -'s why we see bubbles rising!',
+    infoClass: 'convection-info'
+  },
+  radiation: {
+    title: '☀️ ವಿಕಿರಣ: ಹತ್ತಿರ ನಿಂತಾಗ ಅನುಭವಿಸುವ ಉಷ್ಣ',
+    text: 'ಅಡುಗೆ ಅಟ್ಟಿ ಹತ್ತಿರ ನಿಂತರೆ ಸ್ಪರ್ಶಿಸದೆ ಉಷ್ಣ - ಅದು's <strong>radiation</strong>! The hot pan ಮತ್ತು flame radiate heat ಶಕ್ತಿ as waves. This is why you feel warm near a cooking stove.',
+    infoClass: 'radiation-info'
+  }
+};
+
+const methodInfo = document.getElementById('method-info');
+const methodTitle = document.getElementById('method-title');
+const methodText = document.getElementById('method-text');
+
+function selectMethod(method, btn) {
+  document.querySelectorAll('.highlight-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  
+  const data = methods[method];
+  methodInfo.className = `method-info ${data.infoClass}`;
+  methodTitle.textContent = data.title;
+  methodText.innerHTML = data.text;
+}
+
+// ── URL Parameter Initialisation (IIFE) ───────────────────────────────────
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var initialState = params.get('initialState') || 'conduction';
+  var showHints    = params.get('showHints');
+
+  // Activate the chosen method tab
+  var validMethods = ['conduction', 'convection', 'radiation'];
+  if (validMethods.indexOf(initialState) !== -1) {
+    setTimeout(function () {
+      var btn = document.querySelector('.highlight-tab[data-method="' + initialState + '"]');
+      if (btn && typeof selectMethod === 'function') {
+        selectMethod(initialState, btn);
+      }
+    }, 800);
+  }
+
+  // Hide hints (concept-card)
+  if (showHints === 'false') {
+    document.querySelectorAll('.concept-card').forEach(function (el) {
+      el.style.display = 'none';
+    });
+  }
+}());
+</script>
+</body>
+</html>

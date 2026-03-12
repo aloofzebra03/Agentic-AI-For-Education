@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#e91e63">
+<title>ಸಮಯ ಘಟಕ ಪರಿವರ್ತಕ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #e91e63 0%, #f48fb1 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #e91e63;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #c2185b; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.input-section {
+  margin-bottom: 15px;
+}
+
+.input-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #37474f;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+}
+
+.input-field {
+  flex: 2;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+}
+
+.input-field:focus { border-color: #e91e63; }
+
+.unit-select {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  background: #fce4ec;
+  color: #c2185b;
+  cursor: pointer;
+}
+
+.convert-btn {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #e91e63, #f06292);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.convert-btn:active { transform: scale(0.98); }
+
+.results-section {
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.results-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.result-item {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.result-item.highlight {
+  border-color: #e91e63;
+  background: #fce4ec;
+}
+
+.result-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+}
+
+.result-unit {
+  font-size: 11px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.result-symbol {
+  font-size: 10px;
+  color: #e91e63;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.conversions-table {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2196f3;
+}
+
+.table-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 10px; }
+
+.conversion-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  font-size: 12px;
+}
+
+.conversion-row:last-child { border-bottom: none; }
+
+.small-units {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.small-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 8px; }
+.small-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.notation-box {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #f44336;
+}
+
+.notation-title { font-size: 12px; font-weight: 700; color: #c62828; margin-bottom: 8px; }
+
+.notation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.notation-item {
+  padding: 8px;
+  background: #fff;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.notation-correct {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4caf50;
+}
+
+.notation-wrong {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f44336;
+  text-decoration: line-through;
+}
+
+.notation-label {
+  font-size: 9px;
+  color: #666;
+  margin-top: 4px;
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>⏰ ಸಮಯ ಘಟಕ ಪರಿವರ್ತಕ</h1>
+  <p>ವಿವಿಧ ಸಮಯ ಘಟಕಗಳ ನಡುವೆ ಪರಿವರ್ತಿಸಿ</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಸಮಯದ SI ಘಟಕ</div>
+  <div class="concept-text">
+    ಸಮಯದ SI ಘಟಕ <strong>ಸೆಕೆಂಡ್</strong>. ಇತರ ಸಾಮಾನ್ಯ ಘಟಕಗಳು ನಿಮಿಷ (ನಿಮಿ) ಮತ್ತು ಗಂಟೆ (ಗಂ). ಯಾವಾಗಲೂ ಸರಿಯಾದ ಸಂಕೇತಗಳನ್ನು ಬಳಸಿ!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="input-section">
+    <div class="input-label">ಪರಿವರ್ತಿಸಲು ಸಮಯ ನಮೂದಿಸಿ:</div>
+    <div class="input-row">
+      <input type="number" class="input-field" id="time-input" value="1" min="0" oninput="convertTime()">
+      <select class="unit-select" id="unit-select" onchange="convertTime()">
+        <option value="h">ಗಂಟೆಗಳು</option>
+        <option value="min">ನಿಮಿಷಗಳು</option>
+        <option value="s" selected>ಸೆಕೆಂಡ್ಗಳು</option>
+        <option value="ms">ಮಿಲಿಸೆಕೆಂಡ್ಗಳು</option>
+      </select>
+    </div>
+  </div>
+  
+  <div class="results-section">
+    <div class="results-title">📊 ಸಮಾನ ಮೌಲ್ಯಗಳು</div>
+    <div class="results-grid">
+      <div class="result-item" id="result-h">
+        <div class="result-value" id="value-h">0.000278</div>
+        <div class="result-unit">ಗಂಟೆಗಳು</div>
+        <div class="result-symbol">h</div>
+      </div>
+      <div class="result-item" id="result-min">
+        <div class="result-value" id="value-min">0.0167</div>
+        <div class="result-unit">ನಿಮಿಷಗಳು</div>
+        <div class="result-symbol">min</div>
+      </div>
+      <div class="result-item highlight" id="result-s">
+        <div class="result-value" id="value-s">1</div>
+        <div class="result-unit">ಸೆಕೆಂಡ್ಗಳು</div>
+        <div class="result-symbol">s</div>
+      </div>
+      <div class="result-item" id="result-ms">
+        <div class="result-value" id="value-ms">1000</div>
+        <div class="result-unit">ಮಿಲಿಸೆಕೆಂಡ್ಗಳು</div>
+        <div class="result-symbol">ms</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="conversions-table">
+  <div class="table-title">📐 ಪರಿವರ್ತನಾ ಅಂಶಗಳು</div>
+  <div class="conversion-row">
+    <span>1 ಗಂಟೆ (h)</span>
+    <span>= 60 ನಿಮಿಷ = 3600 ಸೆಕೆಂಡ್</span>
+  </div>
+  <div class="conversion-row">
+    <span>1 ನಿಮಿಷ (ನಿಮಿ)</span>
+    <span>= 60 ಸೆಕೆಂಡ್</span>
+  </div>
+  <div class="conversion-row">
+    <span>1 ಸೆಕೆಂಡ್ (ಗಳು)</span>
+    <span>= 1000 ಮಿಲಿಸೆಕೆಂಡ್</span>
+  </div>
+  <div class="conversion-row">
+    <span>1 ಮಿಲಿಸೆಕೆಂಡ್ (ms)</span>
+    <span>= 1000 ಮೈಕ್ರೋಸೆಕೆಂಡ್ಗಳು (μs)</span>
+  </div>
+</div>
+
+<div class="small-units">
+  <div class="small-title">🔬 ಚಿಕ್ಕ ಸಮಯ ಘಟಕ ಏಕೆ ಮುಖ್ಯ</div>
+  <div class="small-text">
+    • <strong>ಕ್ರೀಡೆಗಳು:</strong> ಒಲಂಪಿಕ್ ಒಟ್ಟು ಮಿಲಿಸೆಕೆಂಡ್ಗಳಿಂದ!<br>
+    • <strong>ಔಷಧಿ:</strong> ECG ಹೃದಯ ಬಡಿತ ನಿಖರವಾಗಿ<br>
+    • <strong>ಕಂಪ್ಯೂಟರ್‌ಗಳು:</strong> ಪ್ರೊಸೆಸರ್‌ಗಳು ನ್ಯಾನೋಸೆಕೆಂಡ್ಗಳಲ್ಲಿ ಕೆಲಸ<br>
+    • <strong>ಸಂಗೀತ:</strong> ಡಿಜಿಟಲ್ ರೆಕಾರ್ಡಿಂಗ್ ಸೆಕೆಂಡಿಗೆ ಸಾವಿರಾರು ಸ್ಯಾಂಪಲ್
+  </div>
+</div>
+
+<div class="notation-box">
+  <div class="notation-title">✍️ ಸರಿಯಾದ ಸಂಕೇತ (SI ಪ್ರಮಾಣ)</div>
+  <div class="notation-grid">
+    <div class="notation-item">
+      <div class="notation-correct">s</div>
+      <div class="notation-wrong">sec</div>
+      <div class="notation-label">ಸೆಕೆಂಡ್</div>
+    </div>
+    <div class="notation-item">
+      <div class="notation-correct">min</div>
+      <div class="notation-wrong">mins</div>
+      <div class="notation-label">ನಿಮಿಷ</div>
+    </div>
+    <div class="notation-item">
+      <div class="notation-correct">h</div>
+      <div class="notation-wrong">hr, hrs</div>
+      <div class="notation-label">ಗಂಟೆ</div>
+    </div>
+    <div class="notation-item">
+      <div class="notation-correct">ms</div>
+      <div class="notation-wrong">msec</div>
+      <div class="notation-label">ಮಿಲಿಸೆಕೆಂಡ್</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function convertTime() {
+  const value = parseFloat(document.getElementById('time-input').value) || 0;
+  const unit = document.getElementById('unit-select').value;
+  
+  // Convert to ಸೆಕೆಂಡ್ಗಳು ಮೊದಲ
+  let ಸೆಕೆಂಡ್ಗಳು;
+  switch(unit) {
+    case 'h': ಸೆಕೆಂಡ್ಗಳು = value * 3600; break;
+    case 'min': ಸೆಕೆಂಡ್ಗಳು = value * 60; break;
+    case 's': ಸೆಕೆಂಡ್ಗಳು = value; break;
+    case 'ms': ಸೆಕೆಂಡ್ಗಳು = value / 1000; break;
+  }
+  
+  // Convert to all units
+  const ಗಂಟೆಗಳು = ಸೆಕೆಂಡ್ಗಳು / 3600;
+  const ನಿಮಿಷಗಳು = ಸೆಕೆಂಡ್ಗಳು / 60;
+  const ಮಿಲಿಸೆಕೆಂಡ್ಗಳು = ಸೆಕೆಂಡ್ಗಳು * 1000;
+  
+  // Format numbers nicely
+  function format(num) {
+    if (num === 0) return '0';
+    if (num >= 1000000) return num.toExponential(2);
+    if (num >= 1) return num.toFixed(2);
+    if (num >= 0.01) return num.toFixed(4);
+    return num.toExponential(2);
+  }
+  
+  document.getElementById('value-h').textContent = format(ಗಂಟೆಗಳು);
+  document.getElementById('value-min').textContent = format(ನಿಮಿಷಗಳು);
+  document.getElementById('value-s').textContent = format(ಸೆಕೆಂಡ್ಗಳು);
+  document.getElementById('value-ms').textContent = format(ಮಿಲಿಸೆಕೆಂಡ್ಗಳು);
+  
+  // Highlight current unit
+  document.querySelectorAll('.result-item').forEach(item => item.classList.remove('highlight'));
+  document.getElementById(`result-${unit}`).classList.add('highlight');
+}
+
+// Initialize
+convertTime();
+
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var valueParam = params.get('value');
+  var unitParam = params.get('unit');
+  var showHints = params.get('showHints');
+
+  if (valueParam !== null) {
+    document.getElementById('time-input').value = parseFloat(valueParam);
+  }
+
+  if (unitParam !== null) {
+    var validUnits = ['h', 'min', 's', 'ms'];
+    if (validUnits.indexOf(unitParam) !== -1) {
+      document.getElementById('unit-select').value = unitParam;
+    }
+  }
+
+  if (valueParam !== null || unitParam !== null) {
+    convertTime();
+  }
+
+  if (showHints === 'false') {
+    var cc = document.querySelector('.concept-card');
+    var ct = document.querySelector('.conversions-table');
+    var su = document.querySelector('.small-units');
+    var nb = document.querySelector('.notation-box');
+    if (cc) cc.style.display = 'none';
+    if (ct) ct.style.display = 'none';
+    if (su) su.style.display = 'none';
+    if (nb) nb.style.display = 'none';
+  }
+})();
+</script>
+</body>
+</html>

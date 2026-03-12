@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#d32f2f">
+<title>ದಹನ ಉದಾಹರಣೆಗಳು – ಉರಿಯುವ ಪದಾರ್ಥಗಳು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #d32f2f 0%, #ef5350 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #d32f2f;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #c62828; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.visual {
+  position: relative;
+  height: 38vh;
+  min-height: 260px;
+  background: linear-gradient(180deg, #263238 0%, #37474f 100%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+svg { width: 100%; height: 100%; }
+
+.material-label {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.materials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.material-btn {
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 12px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.material-btn:active { transform: scale(0.95); }
+.material-btn.active { border-color: #d32f2f; background: #ffebee; }
+.material-btn.done { border-color: #4caf50; background: #e8f5e9; }
+.material-btn .icon { font-size: 28px; }
+.material-btn .name { font-size: 10px; color: #333; margin-top: 4px; }
+
+.burn-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  background: linear-gradient(135deg, #d32f2f 0%, #f44336 100%);
+  color: white;
+}
+
+.burn-btn:disabled { background: #ccc; }
+
+.equation-box {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  text-align: center;
+  border-left: 4px solid #ff9800;
+}
+
+.equation-title { font-size: 11px; font-weight: 600; color: #e65100; margin-bottom: 6px; }
+.equation { font-size: 12px; font-weight: 700; color: #37474f; }
+.equation-products { font-size: 10px; color: #666; margin-top: 6px; }
+
+.learning-panel {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #d32f2f;
+}
+
+.learning-title { font-size: 12px; font-weight: 700; color: #c62828; margin-bottom: 6px; }
+.learning-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+@keyframes burn {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.1); }
+}
+
+.burning { animation: burn 0.3s ease infinite; }
+
+@keyframes brightFlash {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.flash { animation: brightFlash 0.5s ease; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🔥 ದಹನ ಉದಾಹರಣೆಗಳು</h1>
+  <p>ವಿವಿಧ ಪದಾರ್ಥಗಳು ವಿಭಿನ್ನವಾಗಿ ಸುಡುತ್ತವೆ!</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ದಹನ</strong> ರಾಸಾಯನಿಕ ಪ್ರತಿಕ್ರಿಯೆ – ಪದಾರ್ಥ ಆಮ್ಲಜನಕದೊಂದಿಗೆ ಪ್ರತಿಕ್ರಿಯಿಸಿ ಉಷ್ಣ, ಬೆಳಕು ಮತ್ತು ಹೊಸ ಪದಾರ್ಥಗಳನ್ನು ಉತ್ಪಾದಿಸುತ್ತದೆ. ವಿಭಿನ್ನ ಇಂಧನಗಳು ವಿಭಿನ್ನ ಜ್ವಾಲೆ ಮತ್ತು ಉತ್ಪನ್ನಗಳೊಂದಿಗೆ ಸುಡುತ್ತವೆ!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="visual">
+    <div class="material-label" id="material-label">ಉರಿಸಲು ಒಂದು ಪದಾರ್ಥ ಆಯ್ಕೆಮಾಡಿ</div>
+    <svg viewBox="0 0 400 260" id="scene">
+      <!-- Bunsen burner -->
+      <g transform="translate(200, 200)">
+        <rect x="-30" y="0" width="60" height="50" rx="5" fill="#455a64"/>
+        <rect x="-20" y="50" width="40" height="15" rx="3" fill="#37474f"/>
+        <rect x="-40" y="65" width="80" height="8" rx="2" fill="#263238"/>
+        
+        <!-- Flame base -->
+        <g id="burner-flame">
+          <ellipse cx="0" cy="-15" rx="12" ry="25" fill="#2196f3" opacity="0.7"/>
+          <ellipse cx="0" cy="-10" rx="8" ry="18" fill="#64b5f6"/>
+        </g>
+      </g>
+      
+      <!-- ಪದಾರ್ಥ holder (tongs) -->
+      <g id="tongs" transform="translate(200, 100)">
+        <line x1="-20" y1="0" x2="30" y2="60" stroke="#757575" stroke-width="5" stroke-linecap="round"/>
+        <line x1="20" y1="0" x2="30" y2="60" stroke="#757575" stroke-width="5" stroke-linecap="round"/>
+      </g>
+      
+      <!-- ಪದಾರ್ಥ samples (shown based on selection) -->
+      <g id="material-display" transform="translate(200, 85)">
+        <!-- ಮೆಗ್ನೀಸಿಯಂ ribbon -->
+        <g id="mat-magnesium" style="display:none">
+          <rect x="-20" y="0" width="40" height="8" rx="2" fill="#e0e0e0"/>
+          <text x="0" y="25" font-size="10" fill="#90a4ae" text-anchor="middle">Mg ರಿಬ್ಬನ್</text>
+        </g>
+        
+        <!-- ಕಾಗದ -->
+        <g id="mat-paper" style="display:none">
+          <rect x="-15" y="-10" width="30" height="35" rx="2" fill="#fff" stroke="#ccc"/>
+          <text x="0" y="40" font-size="10" fill="#90a4ae" text-anchor="middle">ಕಾಗದ</text>
+        </g>
+        
+        <!-- Wood -->
+        <g id="mat-wood" style="display:none">
+          <rect x="-8" y="-5" width="16" height="40" rx="2" fill="#8d6e63"/>
+          <text x="0" y="50" font-size="10" fill="#90a4ae" text-anchor="middle">ಮರ ಕಡ್ಡಿ</text>
+        </g>
+        
+        <!-- ಇದ್ದಲು -->
+        <g id="mat-charcoal" style="display:none">
+          <ellipse cx="0" cy="10" rx="15" ry="12" fill="#263238"/>
+          <text x="0" y="40" font-size="10" fill="#90a4ae" text-anchor="middle">ಇದ್ದಲು</text>
+        </g>
+        
+        <!-- ಸಲ್ಫರ್ -->
+        <g id="mat-sulfur" style="display:none">
+          <ellipse cx="0" cy="10" rx="12" ry="10" fill="#fdd835"/>
+          <text x="0" y="35" font-size="10" fill="#90a4ae" text-anchor="middle">ಸಲ್ಫರ್</text>
+        </g>
+        
+        <!-- ಆಂಟಿಸೆಪ್ಟಿಕ್ -->
+        <g id="mat-match" style="display:none">
+          <rect x="-3" y="-5" width="6" height="35" rx="1" fill="#8d6e63"/>
+          <ellipse cx="0" cy="-8" rx="5" ry="6" fill="#d32f2f"/>
+          <text x="0" y="45" font-size="10" fill="#90a4ae" text-anchor="middle">ಆಡಿಸಿ</text>
+        </g>
+      </g>
+      
+      <!-- ಉರಿಯುತ್ತಿದೆ effects (shown when burning) -->
+      <g id="burn-effect" style="display:none" transform="translate(200, 60)">
+        <!-- Generic flame -->
+        <g id="flame-yellow" style="display:none">
+          <ellipse cx="0" cy="0" rx="15" ry="30" fill="#ff9800" class="burning"/>
+          <ellipse cx="0" cy="5" rx="10" ry="20" fill="#ffeb3b" class="burning"/>
+        </g>
+        
+        <!-- Bright white (Mg) -->
+        <g id="flame-white" style="display:none">
+          <circle cx="0" cy="0" r="40" fill="#fff" opacity="0.9"/>
+          <circle cx="0" cy="0" r="25" fill="#fff"/>
+          <text x="0" y="60" font-size="10" fill="#fff" text-anchor="middle">⚠️ ಅತ್ಯಂತ ಪ್ರಕಾಶಮಾನ!</text>
+        </g>
+        
+        <!-- ನೀಲಿ flame (sulfur) -->
+        <g id="flame-blue" style="display:none">
+          <ellipse cx="0" cy="0" rx="12" ry="25" fill="#42a5f5" class="burning"/>
+          <ellipse cx="0" cy="5" rx="8" ry="18" fill="#90caf9" class="burning"/>
+        </g>
+        
+        <!-- Glowing red (charcoal) -->
+        <g id="glow-red" style="display:none">
+          <ellipse cx="0" cy="20" rx="18" ry="15" fill="#ff5722" opacity="0.8"/>
+          <ellipse cx="0" cy="20" rx="12" ry="10" fill="#ff8a65"/>
+        </g>
+      </g>
+      
+      <!-- Ash/residue -->
+      <g id="ash" style="display:none" transform="translate(200, 90)">
+        <ellipse cx="0" cy="0" rx="15" ry="8" fill="#9e9e9e" opacity="0.7"/>
+        <text x="0" y="25" font-size="9" fill="#90a4ae" text-anchor="middle">ಬೂದಿ</text>
+      </g>
+    </svg>
+  </div>
+  
+  <div class="materials-grid">
+    <div class="material-btn" onclick="selectMaterial('magnesium', this)">
+      <div class="icon">✨</div>
+      <div class="name">ಮೆಗ್ನೀಸಿಯಂ</div>
+    </div>
+    <div class="material-btn" onclick="selectMaterial('paper', this)">
+      <div class="icon">📄</div>
+      <div class="name">ಕಾಗದ</div>
+    </div>
+    <div class="material-btn" onclick="selectMaterial('wood', this)">
+      <div class="icon">🪵</div>
+      <div class="name">ಮರ</div>
+    </div>
+    <div class="material-btn" onclick="selectMaterial('charcoal', this)">
+      <div class="icon">⬛</div>
+      <div class="name">ಇದ್ದಲು</div>
+    </div>
+    <div class="material-btn" onclick="selectMaterial('sulfur', this)">
+      <div class="icon">🟡</div>
+      <div class="name">ಸಲ್ಫರ್</div>
+    </div>
+    <div class="material-btn" onclick="selectMaterial('match', this)">
+      <div class="icon">🔥</div>
+      <div class="name">ಆಂಟಿಸೆಪ್ಟಿಕ್</div>
+    </div>
+  </div>
+  
+  <button class="burn-btn" id="burn-btn" onclick="burnMaterial()" disabled>
+    ಒಂದು ಪದಾರ್ಥ ಆಯ್ಕೆಮಾಡಿ ಮೊದಲ
+  </button>
+</div>
+
+<div class="equation-box" id="equation-box">
+  <div class="equation-title">⚗️ ದಹನ ಪ್ರತಿಕ್ರಿಯೆ</div>
+  <div class="equation" id="equation">ಇಂಧನ + O₂ → ಉತ್ಪನ್ನಗಳು + ಉಷ್ಣ + ಬೆಳಕು</div>
+  <div class="equation-products" id="equation-products">ಅದರ ನಿರ್ದಿಷ್ಟ ಪ್ರತಿಕ್ರಿಯೆ ನೋಡಲು ಒಂದು ಪದಾರ್ಥ ಆಯ್ಕೆಮಾಡಿ</div>
+</div>
+
+<div class="learning-panel">
+  <div class="learning-title">🔬 ದಹನ ಗುಣಗಳು</div>
+  <div class="learning-text" id="learning-text">
+    ವಿಭಿನ್ನ ವಸ್ತುಗಳಿಗೆ ವಿಭಿನ್ನ:<br>
+    • <strong>ಉರಿಯುವ ಉಷ್ಣತೆಗಳು</strong> (ಉರಿಯುವ ಸುಲಭತೆ)<br>
+    • <strong>ಜ್ವಾಲೆ ಬಣ್ಣಗಳು</strong> (ಅಂಶಗಳ ಮೇಲೆ ಅವಲಂಬಿತ)<br>
+    • <strong>ಉತ್ಪನ್ನಗಳು</strong> (ಸುಡಿದ ನಂತರ ರೂಪುಗೊಂಡುದು)<br><br>
+    ಒಂದು ಪದಾರ್ಥ ಆಯ್ಕೆಮಾಡಿ ಮತ್ತು ಸುಡಿ ಹೆಚ್ಚು ತಿಳಿಯಲು!
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ಮುಖ್ಯ ಅಂಶಗಳು</div>
+  <div class="takeaway-text">
+    <strong>ಎಲ್ಲ ದಹನ ಪ್ರತಿಕ್ರಿಯೆ:</strong><br>
+    • ರಾಸಾಯನಿಕ ಬದಲಾವಣೆಗಳು (ಹಿಮ್ಮುಖವಲ್ಲ)<br>
+    • ಸಂಭವಿಸಲು ಆಮ್ಲಜನಕ ಅಗತ್ಯ<br>
+    • ಉಷ್ಣ ಮತ್ತು ಬೆಳಕು ಬಿಡುಗಡೆ<br>
+    • ಹೊಸ ಪದಾರ್ಥ ರೂಪ (ಸಾಮಾನ್ಯವಾಗಿ CO₂, H₂O ಅಥವಾ ಆಕ್ಸೈಡ್)
+  </div>
+</div>
+
+</div>
+
+<script>
+const materials = {
+  magnesium: {
+    name: 'ಮೆಗ್ನೀಸಿಯಂ Ribbon',
+    element: 'mat-magnesium',
+    flame: 'flame-white',
+    equation: '2Mg + O₂ → 2MgO',
+    products: 'ಉತ್ಪನ್ನಗಳು: ಮೆಗ್ನೀಸಿಯಂ ಆಕ್ಸೈಡ್ (ಬಿಳಿ ಬೂದಿ) + ಪ್ರಕಾಶಮಾನ ಬಿಳಿ ಬೆಳಕು',
+    learning: `<strong style="color:#9c27b0">✨ ಮೆಗ್ನೀಸಿಯಂ ಪ್ರಕಾಶಮಾನ ಬಿಳಿ ಬೆಳಕಿನೊಂದಿಗೆ ಸುಡುತ್ತದೆ!</strong><br><br>
+      • <strong>ಜ್ವಾಲೆ:</strong> ಅತ್ಯಂತ ಪ್ರಕಾಶಮಾನ ಬಿಳಿ (ನೇರವಾಗಿ ನೋಡಬೇಡಿ!)<br>
+      • <strong>ಉತ್ಪನ್ನ:</strong> ಬಿಳಿ ಪುಡಿ ಬೂದಿ (MgO - ಮೆಗ್ನೀಸಿಯಂ ಆಕ್ಸೈಡ್)<br>
+      • <strong>ಬಳಕೆ:</strong> ಬಾಣಬಂಡಿ, ಫ್ಲೇರ್‌ಗಳು, ಛಾಯಾಗ್ರಹಣ ಫ್ಲ್ಯಾಶ್<br><br>
+      ತೀವ್ರ ಬಿಳಿ ಬೆಳಕೇ ಹಳೆಯ ಕ್ಯಾಮೆರಾ ಫ್ಲ್ಯಾಶ್‌ಗಳಲ್ಲಿ ಮೆಗ್ನೀಸಿಯಂ ಬಳಸಲು ಕಾರಣ!`
+  },
+  paper: {
+    name: 'ಕಾಗದ',
+    element: 'mat-paper',
+    flame: 'flame-yellow',
+    equation: 'ಕಾಗದ (C,H,O) + O₂ → CO₂ + H₂O',
+    products: 'ಉತ್ಪನ್ನಗಳು: ಕಾರ್ಬನ್ ಡೈಆಕ್ಸೈಡ್ + ನೀರಿನ ಆವಿ + ಬೂದಿ',
+    learning: `<strong style="color:#ff9800">📄 ಕಾಗದ ಹಳದಿ ಜ್ವಾಲೆಯೊಂದಿಗೆ ಸುಡುತ್ತದೆ!</strong><br><br>
+      • <strong>ಜ್ವಾಲೆ:</strong> ಹಳದಿ/ಕಿತ್ತಳೆ (ಸಾಮಾನ್ಯ ಸಾವಯವ ಪದಾರ್ಥ)<br>
+      • <strong>ಉತ್ಪನ್ನಗಳು:</strong> CO₂, H₂O ಮತ್ತು ಬೂದಿ ಬಣ್ಣದ ಬೂದಿ<br>
+      • <strong>ಉರಿಯುವ ಉಷ್ಣತೆ:</strong> ~233°C<br><br>
+      ಕಾಗದ ಸೆಲ್ಯುಲೋಸ್ (ಕಾರ್ಬನ್, ಹೈಡ್ರೋಜನ್, ಆಮ್ಲಜನಕ) ನಿಂದ ಮಾಡಲ್ಪಟ್ಟಿದೆ – ಸುಲಭವಾಗಿ ಸುಡುತ್ತದೆ!`
+  },
+  wood: {
+    name: 'ಮರ',
+    element: 'mat-wood',
+    flame: 'flame-yellow',
+    equation: 'ಮರ (C,H,O) + O₂ → CO₂ + H₂O + ಬೂದಿ',
+    products: 'ಉತ್ಪನ್ನಗಳು: ಕಾರ್ಬನ್ ಡೈಆಕ್ಸೈಡ್ + ನೀರಿನ ಆವಿ + ಇದ್ದಲು/ಬೂದಿ',
+    learning: `<strong style="color:#8d6e63">🪵 ಮರ ಕಿತ್ತಳೆ-ಹಳದಿ ಜ್ವಾಲೆಯೊಂದಿಗೆ ಸುಡುತ್ತದೆ!</strong><br><br>
+      • <strong>ಜ್ವಾಲೆ:</strong> ಕಿತ್ತಳೆ-ಹಳದಿ, ಶಬ್ದ ಮಾಡುತ್ತಾ<br>
+      • <strong>ಉತ್ಪನ್ನಗಳು:</strong> CO₂, H₂O, ಹೊಗೆ, ಬೂದಿ<br>
+      • <strong>ಕಾಗದಕ್ಕಿಂತ ನಿಧಾನವಾಗಿ ಸುಡುತ್ತದೆ</strong> (ಸಾಂದ್ರ ಪದಾರ್ಥ)<br><br>
+      ಮರ ಮಾನವಕುಲದ ಪ್ರಾಥಮಿಕ ಇಂಧನವಾಗಿ ಸಾವಿರಾರು ವರ್ಷಗಳಿಂದ!`
+  },
+  charcoal: {
+    name: 'ಇದ್ದಲು',
+    element: 'mat-charcoal',
+    flame: 'glow-red',
+    equation: 'C + O₂ → CO₂',
+    products: 'ಉತ್ಪನ್ನಗಳು: ಕಾರ್ಬನ್ ಡೈಆಕ್ಸೈಡ್ + ಉಷ್ಣ (ಕೆಂಪು ಜ್ವಳೆ, ಗೋಚರ ಜ್ವಾಲೆ ಇಲ್ಲ)',
+    learning: `<strong style="color:#ff5722">⬛ ಇದ್ದಲು ಕೆಂಪು-ಬಿಸಿಯಾಗಿ ಜ್ವಳಿಸುತ್ತದೆ!</strong><br><br>
+      • <strong>ಗೋಚರ ಜ್ವಾಲೆ ಇಲ್ಲ</strong> – ಕೇವಲ ಜ್ವಳಿಸುವ ಇದ್ದಲು<br>
+      • <strong>ಉತ್ಪನ್ನ:</strong> ಪ್ರಧಾನವಾಗಿ CO₂<br>
+      • <strong>ಅತಿ ಬಿಸಿಯಾಗಿ ಸುಡುತ್ತದೆ</strong> – ಅಡುಗೆ/ಬಾರ್ಬೆಕ್ಯೂಗೆ ಬಳಕೆ<br><br>
+      ಇದ್ದಲು ಬಹುತೇಕ ಶುದ್ಧ ಕಾರ್ಬನ್ – ಮರಕ್ಕಿಂತ ಸ್ವಚ್ಛವಾಗಿ ಸುಡುತ್ತದೆ!`
+  },
+  sulfur: {
+    name: 'ಸಲ್ಫರ್',
+    element: 'mat-sulfur',
+    flame: 'flame-blue',
+    equation: 'S + O₂ → SO₂',
+    products: 'ಉತ್ಪನ್ನಗಳು: ಸಲ್ಫರ್ ಡೈಆಕ್ಸೈಡ್ (ಕಟುವಾದ ವಾಸನೆ) – ವಿಷ!',
+    learning: `<strong style="color:#2196f3">🟡 ಸಲ್ಫರ್ ನೀಲಿ ಜ್ವಾಲೆಯೊಂದಿಗೆ ಸುಡುತ್ತದೆ!</strong><br><br>
+      • <strong>ಜ್ವಾಲೆ:</strong> ವಿಶಿಷ್ಟ ನೀಲಿ ಬಣ್ಣ<br>
+      • <strong>ಉತ್ಪನ್ನ:</strong> SO₂ (ಸಲ್ಫರ್ ಡೈಆಕ್ಸೈಡ್) – ಆಮ್ಲೀಯ, ವಿಷ ಅನಿಲ<br>
+      • <strong>ವಾಸನೆ:</strong> ಕಟು, ಉಸಿರುಕಟ್ಟುವ (ಕೆಟ್ಟ ಮೊಟ್ಟೆ)<br><br>
+      ⚠️ ಸಲ್ಫರ್ ಅನ್ನು ಚೆನ್ನಾಗಿ ಗಾಳಿ ಬೀಸುವ ಸ್ಥಳ ಅಥವಾ ಪ್ರಯೋಗಾಲಯದಲ್ಲಿ ಮಾತ್ರ ಸುಡಿ!`
+  },
+  match: {
+    name: 'ಆಂಟಿಸೆಪ್ಟಿಕ್',
+    element: 'mat-match',
+    flame: 'flame-yellow',
+    equation: 'ಆಡಿಸಿ ತಲೆ + ಘರ್ಷಣೆ → ಬೆಂಕಿ → ಮರ ಸುಡುತ್ತದೆ',
+    products: 'ಆಡಿಸಿ ತಲೆ ಉರಿಯುತ್ತದೆ, ನಂತರ ಮರ ಸುಡುತ್ತದೆ CO₂ + H₂O ಉತ್ಪಾದಿಸುತ್ತದೆ',
+    learning: `<strong style="color:#d32f2f">🔥 ಆಂಟಿಸೆಪ್ಟಿಕ್ – ಎರಡು ಹಂತದ ಉರಿಯುವಿಕೆ!</strong><br><br>
+      • <strong>ಹಂತ 1:</strong> ಕೆಂಪು ಫಾಸ್ಫರಸ್ ಘರ್ಷಣೆಯಿಂದ ಉರಿಯುತ್ತದೆ<br>
+      • <strong>ಹಂತ 2:</strong> ಉಷ್ಣ ಮರದ ಕಡ್ಡಿಯನ್ನು ಉರಿಯಿಸುತ್ತದೆ<br>
+      • <strong>ಉತ್ಪನ್ನಗಳು:</strong> ವಿವಿಧ ಆಕ್ಸೈಡ್‌ಗಳು, CO₂, H₂O<br><br>
+      ಆಡಿಸಿ ತಲೆಯಲ್ಲಿ ರಾಸಾಯನಿಕಗಳಿವೆ – ಉಜ್ಜಿದಾಗ ಕಡಿಮೆ ಉಷ್ಣತೆಯಲ್ಲಿ ಉರಿಯುತ್ತದೆ!`
+  }
+};
+
+let selectedMaterial = null;
+let selectedBtn = null;
+
+const materialLabel = document.getElementById('material-label');
+const burnBtn = document.getElementById('burn-btn');
+const equation = document.getElementById('equation');
+const equationProducts = document.getElementById('equation-products');
+const learningText = document.getElementById('learning-text');
+const burnEffect = document.getElementById('burn-effect');
+const ash = document.getElementById('ash');
+
+function hideAllMaterials() {
+  Object.keys(materials).forEach(key => {
+    document.getElementById(materials[key].element).style.display = 'none';
+  });
+  document.getElementById('flame-yellow').style.display = 'none';
+  document.getElementById('flame-white').style.display = 'none';
+  document.getElementById('flame-blue').style.display = 'none';
+  document.getElementById('glow-red').style.display = 'none';
+  burnEffect.style.display = 'none';
+  ash.style.display = 'none';
+}
+
+function selectMaterial(type, btn) {
+  if (btn.classList.contains('done')) return;
+  
+  document.querySelectorAll('.material-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  selectedMaterial = type;
+  selectedBtn = btn;
+  
+  hideAllMaterials();
+  
+  const mat = materials[type];
+  document.getElementById(mat.element).style.display = 'block';
+  
+  materialLabel.textContent = mat.name;
+  burnBtn.disabled = false;
+  burnBtn.textContent = `🔥 ${mat.name} ಸುಡಿ`;
+  
+  equation.textContent = mat.equation;
+  equationProducts.textContent = mat.products;
+}
+
+function burnMaterial() {
+  if (!selectedMaterial) return;
+  
+  burnBtn.disabled = true;
+  const mat = materials[selectedMaterial];
+  
+  materialLabel.textContent = `🔥 ಉರಿಯುತ್ತಿದೆ ${mat.name}...`;
+  
+  // Show burning effect
+  burnEffect.style.display = 'block';
+  document.getElementById(mat.flame).style.display = 'block';
+  
+  // Hide original material
+  setTimeout(() => {
+    document.getElementById(mat.element).style.display = 'none';
+  }, 500);
+  
+  // Show results after burning
+  setTimeout(() => {
+    document.getElementById(mat.flame).style.display = 'none';
+    burnEffect.style.display = 'none';
+    
+    if (selectedMaterial !== 'sulfur') {
+      ash.style.display = 'block';
+    }
+    
+    materialLabel.textContent = `✅ ${mat.name} ಸಂಪೂರ್ಣವಾಗಿ ಸುಡಲ್ಪಟ್ಟಿದೆ!`;
+    learningText.innerHTML = mat.learning;
+    
+    selectedBtn.classList.add('done');
+    burnBtn.textContent = 'ಇನ್ನೊಂದು ಪದಾರ್ಥ ಆಯ್ಕೆಮಾಡಿ';
+    selectedMaterial = null;
+  }, 2000);
+}
+
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var showHints = params.get('showHints');
+  if (showHints === 'false') {
+    document.querySelectorAll('.concept-card, .learning-panel, .takeaway').forEach(function (el) { el.style.display = 'none'; });
+  }
+  var state = params.get('initialState');
+  var matMap = { magnesium: 0, paper: 1, wood: 2, charcoal: 3, sulfur: 4, match: 5 };
+  if (!state || state === 'initial' || matMap[state] === undefined) return;
+  var idx = matMap[state];
+  setTimeout(function () {
+    var btns = document.querySelectorAll('.material-btn');
+    if (btns[idx]) btns[idx].click();
+    setTimeout(function () {
+      var burnBtn = document.getElementById('burn-btn');
+      if (burnBtn && !burnBtn.disabled) burnBtn.click();
+    }, 1800);
+  }, 800);
+}());
+</script>
+</body>
+</html>

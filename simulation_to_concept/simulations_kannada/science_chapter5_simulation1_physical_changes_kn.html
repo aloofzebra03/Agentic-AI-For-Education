@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1565c0">
+<title>ಭೌತಿಕ ಬದಲಾವಣೆಗಳು – ಹೊಸ ಪದಾರ್ಥ ಇಲ್ಲ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #1565c0 0%, #42a5f5 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #1565c0;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.visual {
+  position: relative;
+  height: 38vh;
+  min-height: 260px;
+  background: linear-gradient(180deg, #eceff1 0%, #cfd8dc 100%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+svg { width: 100%; height: 100%; }
+
+.action-label {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(21, 101, 192, 0.9);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.examples-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.example-btn {
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 12px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.example-btn:active { transform: scale(0.95); }
+.example-btn.active { border-color: #1565c0; background: #e3f2fd; }
+.example-btn.done { border-color: #4caf50; background: #e8f5e9; }
+.example-btn .icon { font-size: 28px; }
+.example-btn .name { font-size: 10px; color: #333; margin-top: 4px; }
+
+.action-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
+  color: white;
+}
+
+.action-btn:disabled { background: #ccc; }
+
+.result-box {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+  display: none;
+}
+
+.result-box.show { display: block; }
+.result-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 6px; }
+.result-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+.learning-panel {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #1565c0;
+}
+
+.learning-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 6px; }
+.learning-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.takeaway {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🔄 ಭೌತಿಕ ಬದಲಾವಣೆಗಳು</h1>
+  <p>ಹೊಸ ಪದಾರ್ಥ ರೂಪುಗೊಳ್ಳದ ಬದಲಾವಣೆಗಳು</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ಭೌತಿಕ ಬದಲಾವಣೆಯಲ್ಲಿ, ಪದಾರ್ಥದ <strong>ಗೋಚರತೆ</strong> (ಆಕಾರ, ಗಾತ್ರ ಅಥವಾ ಸ್ಥಿತಿ) ಬದಲಾಗುತ್ತದೆ ಆದರೆ <strong>ಅದೇ ಪದಾರ್ಥ</strong> ಉಳಿಯುತ್ತದೆ. ಹೊಸ ಪದಾರ್ಥ ಉಂಟಾಗುವುದಿಲ್ಲ.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="visual">
+    <div class="action-label" id="action-label">ಕೆಳಗೆ ಒಂದು ಉದಾಹರಣೆ ಆಯ್ಕೆಮಾಡಿ</div>
+    <svg viewBox="0 0 400 260" id="scene">
+      <!-- ಕಾಗದ example -->
+      <g id="paper-scene" style="display:none">
+        <rect id="paper" x="150" y="80" width="100" height="120" rx="3" fill="#fff" stroke="#ccc" stroke-width="2"/>
+        <line x1="160" y1="100" x2="240" y2="100" stroke="#ddd" stroke-width="1"/>
+        <line x1="160" y1="120" x2="240" y2="120" stroke="#ddd" stroke-width="1"/>
+        <line x1="160" y1="140" x2="240" y2="140" stroke="#ddd" stroke-width="1"/>
+        <text x="200" y="220" font-size="11" fill="#666" text-anchor="middle">ಕಾಗದ ಹಾಳೆ</text>
+      </g>
+      
+      <!-- Folded paper (boat) -->
+      <g id="paper-folded" style="display:none">
+        <path d="M 160 180 L 200 100 L 240 180 L 220 180 L 200 140 L 180 180 Z" fill="#fff" stroke="#1565c0" stroke-width="2"/>
+        <text x="200" y="220" font-size="11" fill="#666" text-anchor="middle">ಕಾಗದ ದೋಣಿ</text>
+      </g>
+      
+      <!-- ಸೀಮೆಸುಣ್ಣ example -->
+      <g id="chalk-scene" style="display:none">
+        <rect id="chalk" x="170" y="100" width="60" height="20" rx="5" fill="#f5f5f5" stroke="#ccc"/>
+        <text x="200" y="150" font-size="11" fill="#666" text-anchor="middle">ಸೀಮೆಸುಣ್ಣ ಕಡ್ಡಿ</text>
+      </g>
+      
+      <!-- Crushed chalk -->
+      <g id="chalk-crushed" style="display:none">
+        <circle cx="180" cy="120" r="8" fill="#e0e0e0"/>
+        <circle cx="200" cy="115" r="6" fill="#eeeeee"/>
+        <circle cx="215" cy="125" r="7" fill="#e0e0e0"/>
+        <circle cx="190" cy="130" r="5" fill="#f5f5f5"/>
+        <circle cx="210" cy="135" r="4" fill="#eeeeee"/>
+        <text x="200" y="170" font-size="11" fill="#666" text-anchor="middle">ಸೀಮೆಸುಣ್ಣ ಪುಡಿ</text>
+      </g>
+      
+      <!-- Ice example -->
+      <g id="ice-scene" style="display:none">
+        <rect id="ice-cube" x="170" y="100" width="60" height="50" rx="5" fill="#b3e5fc" stroke="#4fc3f7" stroke-width="2"/>
+        <rect x="175" y="105" width="15" height="10" rx="2" fill="#e1f5fe" opacity="0.7"/>
+        <text x="200" y="180" font-size="11" fill="#666" text-anchor="middle">ಬರ್ಫ ಘನ</text>
+      </g>
+      
+      <!-- Melted ice (ನೀರು) -->
+      <g id="ice-melted" style="display:none">
+        <ellipse cx="200" cy="140" rx="50" ry="15" fill="#4fc3f7" opacity="0.6"/>
+        <ellipse cx="200" cy="138" rx="40" ry="10" fill="#81d4fa" opacity="0.5"/>
+        <text x="200" y="180" font-size="11" fill="#666" text-anchor="middle">ನೀರು (ಕರಗಿದ ಬರ್ಫ)</text>
+      </g>
+      
+      <!-- Balloon example -->
+      <g id="balloon-scene" style="display:none">
+        <ellipse id="balloon" cx="200" cy="120" rx="30" ry="25" fill="#ef5350" stroke="#c62828" stroke-width="2"/>
+        <path d="M 200 145 L 200 180" stroke="#795548" stroke-width="3"/>
+        <text x="200" y="210" font-size="11" fill="#666" text-anchor="middle">ಉಬ್ಬಿಕೊಳ್ಳದ ಬಲೂನ್</text>
+      </g>
+      
+      <!-- Inflated balloon -->
+      <g id="balloon-inflated" style="display:none">
+        <ellipse cx="200" cy="110" rx="60" ry="50" fill="#ef5350" stroke="#c62828" stroke-width="2"/>
+        <ellipse cx="180" cy="95" rx="15" ry="10" fill="#ff8a80" opacity="0.5"/>
+        <path d="M 200 160 L 200 200" stroke="#795548" stroke-width="3"/>
+        <text x="200" y="230" font-size="11" fill="#666" text-anchor="middle">ಊದಿದ ಬಲೂನ್</text>
+      </g>
+      
+      <!-- ರಬ್ಬರ್ bಮತ್ತು example -->
+      <g id="rubber-scene" style="display:none">
+        <ellipse id="rubber" cx="200" cy="120" rx="40" ry="25" fill="none" stroke="#ff9800" stroke-width="8"/>
+        <text x="200" y="180" font-size="11" fill="#666" text-anchor="middle">ರಬ್ಬರ್ ಬ್ಯಾಂಡ್</text>
+      </g>
+      
+      <!-- Stretched rubber bಮತ್ತು -->
+      <g id="rubber-stretched" style="display:none">
+        <ellipse cx="200" cy="120" rx="80" ry="15" fill="none" stroke="#ff9800" stroke-width="5"/>
+        <text x="200" y="170" font-size="11" fill="#666" text-anchor="middle">ಚಾಚಿದ ರಬ್ಬರ್ ಬ್ಯಾಂಡ್</text>
+      </g>
+      
+      <!-- Spring example -->
+      <g id="spring-scene" style="display:none">
+        <path d="M 160 100 Q 180 80 200 100 Q 220 120 240 100 Q 260 80 280 100 Q 300 120 320 100" 
+              fill="none" stroke="#9e9e9e" stroke-width="6" stroke-linecap="round" id="spring-path"/>
+        <text x="240" y="150" font-size="11" fill="#666" text-anchor="middle">ಸ್ಪ್ರಿಂಗ್ (ಸಾಮಾನ್ಯ)</text>
+      </g>
+      
+      <!-- Compressed spring -->
+      <g id="spring-compressed" style="display:none">
+        <path d="M 180 100 Q 190 85 200 100 Q 210 115 220 100 Q 230 85 240 100 Q 250 115 260 100" 
+              fill="none" stroke="#9e9e9e" stroke-width="8" stroke-linecap="round"/>
+        <text x="220" y="150" font-size="11" fill="#666" text-anchor="middle">ಸ್ಪ್ರಿಂಗ್ (ಒತ್ತಿದ)</text>
+      </g>
+    </svg>
+  </div>
+  
+  <div class="examples-grid">
+    <div class="example-btn" onclick="selectExample('paper', '📄', this)">
+      <div class="icon">📄</div>
+      <div class="name">ಕಾಗದ ಮಡಚಿ</div>
+    </div>
+    <div class="example-btn" onclick="selectExample('chalk', '🖍️', this)">
+      <div class="icon">🖍️</div>
+      <div class="name">ಸೀಮೆಸುಣ್ಣ ಚೂರ್ಣ ಮಾಡಿ</div>
+    </div>
+    <div class="example-btn" onclick="selectExample('ice', '🧊', this)">
+      <div class="icon">🧊</div>
+      <div class="name">ಬರ್ಫ ಕರಗಿಸಿ</div>
+    </div>
+    <div class="example-btn" onclick="selectExample('balloon', '🎈', this)">
+      <div class="icon">🎈</div>
+      <div class="name">ಬಲೂನ್ ಊದಿ</div>
+    </div>
+    <div class="example-btn" onclick="selectExample('rubber', '⭕', this)">
+      <div class="icon">⭕</div>
+      <div class="name">ಬ್ಯಾಂಡ್ ಚಾಚಿ</div>
+    </div>
+    <div class="example-btn" onclick="selectExample('spring', '🔩', this)">
+      <div class="icon">🔩</div>
+      <div class="name">ಸ್ಪ್ರಿಂಗ್ ಒತ್ತಿ</div>
+    </div>
+  </div>
+  
+  <button class="action-btn" id="action-btn" onclick="performChange()" disabled>
+    ಮೊದಲು ಒಂದು ಉದಾಹರಣೆ ಆಯ್ಕೆಮಾಡಿ
+  </button>
+</div>
+
+<div class="result-box" id="result-box">
+  <div class="result-title" id="result-title">✅ ಭೌತಿಕ ಬದಲಾವಣೆ!</div>
+  <div class="result-text" id="result-text"></div>
+</div>
+
+<div class="learning-panel">
+  <div class="learning-title">🔬 ಭೌತಿಕ ಬದಲಾವಣೆಗಳನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು</div>
+  <div class="learning-text" id="learning-text">
+    ಭೌತಿಕ ಬದಲಾವಣೆ ಕ್ರಿಯೆಯಲ್ಲಿ ನೋಡಲು ಮೇಲೆ ಒಂದು ಉದಾಹರಣೆ ಆಯ್ಕೆಮಾಡಿ!<br><br>
+    ಭೌತಿಕ ಬದಲಾವಣೆಗಳಲ್ಲಿ:<br>
+    • ಆಕಾರ, ಗಾತ್ರ ಅಥವಾ ಸ್ಥಿತಿ ಬದಲಾಗಬಹುದು<br>
+    • <strong>ಪದಾರ್ಥ ಅದೇ ಉಳಿಯುತ್ತದೆ</strong><br>
+    • ಹೊಸ ಪದಾರ್ಥ ರೂಪುಗೊಳ್ಳುವುದಿಲ್ಲ
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೆನಪಿಡಿ!</div>
+  <div class="takeaway-text">
+    <strong>ಭೌತಿಕ ಬದಲಾವಣೆ = ಅದೇ ಪದಾರ್ಥ, ವಿಭಿನ್ನ ರೂಪ</strong><br><br>
+    ಮಡಚಿದ ಕಾಗದ ಇನ್ನೂ ಕಾಗದ. ಚೂರ್ಣವಾದ ಸೀಮೆಸುಣ್ಣ ಇನ್ನೂ ಸೀಮೆಸುಣ್ಣ. ಕರಗಿದ ಬರ್ಫ ಇನ್ನೂ H₂O (ನೀರು). ಪದಾರ್ಥ ಬದಲಾಗುವುದಿಲ್ಲ - ಅದರ ಗೋಚರತೆ ಮಾತ್ರ ಬದಲಾಗುತ್ತದೆ!
+  </div>
+</div>
+
+</div>
+
+<script>
+let selectedExample = null;
+let selectedBtn = null;
+
+const examples = {
+  paper: {
+    before: 'paper-scene',
+    after: 'paper-folded',
+    action: '📄 Fold the ಕಾಗದ',
+    title: '✅ ಕಾಗದ Folded - Physical Change!',
+    result: 'ಕಾಗದ <strong>ಆಕಾರ</strong> ಫ್ಲಾಟ್ ಶೀಟ್‌ನಿಂದ ಹಡಗು. ಆದರೆ ಅದು ಇನ್ನೂ <strong>ಕಾಗದ</strong>! ನೀವು ಅದನ್ನು ಬಿಚ್ಚಿ ಮೂಲ ಶೀಟ್ ಮರಳಿ ಪಡೆಯಬಹುದು.',
+    learning: 'ಕಾಗದ ಮಡಚುವುದು <strong>ಭೌತಿಕ ಬದಲಾವಣೆ</strong>. ಕಾಗದ ಅಣುಗಳು ಅದೇ ಉಳಿಯುತ್ತವೆ - ವ್ಯವಸ್ಥೆ ಮಾತ್ರ ಬದಲಾಗುತ್ತದೆ. ಇದು <strong>ಹಿಮ್ಮುಖ</strong> ಬದಲಾವಣೆ!'
+  },
+  chalk: {
+    before: 'chalk-scene',
+    after: 'chalk-crushed',
+    action: '🔨 Crush the ಸೀಮೆಸುಣ್ಣ',
+    title: '✅ ಸೀಮೆಸುಣ್ಣ Crushed - Physical Change!',
+    result: 'ಸೀಮೆಸುಣ್ಣ <strong>ಕಡ್ಡಿಯಿಂದ ಪುಡಿ</strong>ಗೆ ಬದಲಾಯಿತು. ಆದರೆ ಅದು ಇನ್ನೂ <strong>ಕ್ಯಾಲ್ಸಿಯಂ ಕಾರ್ಬೊನೇಟ್ (ಸೀಮೆಸುಣ್ಣ)</strong>! ರಾಸಾಯನಿಕ ಸಂಯೋಜನೆ ಬದಲಾಗಿಲ್ಲ.',
+    learning: 'ಸೀಮೆಸುಣ್ಣ ಚೂರ್ಣ ಮಾಡುವುದು <strong>ಭೌತಿಕ ಬದಲಾವಣೆ</strong>. ತುಂಡುಗಳು ಚಿಕ್ಕದಾಗಿವೆ, ಆದರೆ ಪ್ರತಿ ಕಣವೂ ಇನ್ನೂ ಸೀಮೆಸುಣ್ಣ. ಇದು <strong>ಅಹಿಮ್ಮುಖ</strong> ಭೌತಿಕ ಬದಲಾವಣೆ!'
+  },
+  ice: {
+    before: 'ice-scene',
+    after: 'ice-melted',
+    action: '🔥 Melt the Ice',
+    title: '✅ Ice Melted - Physical Change!',
+    result: 'ಬರ್ಫ <strong>ಘನದಿಂದ ದ್ರವ</strong>ಕ್ಕೆ ಬದಲಾಯಿತು. ಆದರೆ ಅದು ಇನ್ನೂ <strong>H₂O (ನೀರು)</strong>! ಸ್ಥಿತಿ ಬದಲಾಯಿತು, ಪದಾರ್ಥ ಅಲ್ಲ.',
+    learning: 'ಬರ್ಫ ಕರಗುವುದು <strong>ಭೌತಿಕ ಬದಲಾವಣೆ</strong> - ಸ್ಥಿತಿ ಬದಲಾವಣೆ. ಬರ್ಫ, ನೀರು ಮತ್ತು ಆವಿ ಎಲ್ಲವೂ H₂O! ಇದು <strong>ಹಿಮ್ಮುಖ</strong> - ನೀರನ್ನು ಘನೀಕರಿಸಿ ಮತ್ತೆ ಬರ್ಫ ಪಡೆಯಬಹುದು.'
+  },
+  balloon: {
+    before: 'balloon-scene',
+    after: 'balloon-inflated',
+    action: '💨 ಬಲೂನ್ ಊದಿ',
+    title: '✅ Balloon Inflated - Physical Change!',
+    result: 'ಬಲೂನ್ <strong>ಗಾತ್ರ ಮತ್ತು ಆಕಾರ</strong> ಬದಲಾಯಿತು. ರಬ್ಬರ್ ಪದಾರ್ಥ ಅದೇ! ಒಳಗೆ ಗಾಳಿ ಸೇರಿಸಲಾಯಿತು.',
+    learning: 'ಬಲೂನ್ ಊದುವುದು <strong>ಭೌತಿಕ ಬದಲಾವಣೆ</strong>. ರಬ್ಬರ್ ಚಾಚುತ್ತದೆ ಆದರೆ ಹೊಸ ಪದಾರ್ಥವಾಗುವುದಿಲ್ಲ. ಇದು <strong>ಹಿಮ್ಮುಖ</strong> - ಗಾಳಿ ಬಿಟ್ಟರೆ ಉಬ್ಬಿಕೊಳ್ಳುವುದಿಳಿದುಹೋಗುತ್ತದೆ!'
+  },
+  rubber: {
+    before: 'rubber-scene',
+    after: 'rubber-stretched',
+    action: '↔️ ಬ್ಯಾಂಡ್ ಚಾಚಿ',
+    title: '✅ ರಬ್ಬರ್ Stretched - Physical Change!',
+    result: 'ರಬ್ಬರ್ ಬ್ಯಾಂಡ್ ಚಾಚಿದಾಗ <strong>ಆಕಾರ</strong> ಬದಲಾಯಿತು. ಆದರೆ ಅದು ಇನ್ನೂ ಅದೇ ರಬ್ಬರ್ ಪದಾರ್ಥ!',
+    learning: 'ರಬ್ಬರ್ ಬ್ಯಾಂಡ್ ಚಾಚುವುದು <strong>ಭೌತಿಕ ಬದಲಾವಣೆ</strong>. ರಬ್ಬರ್ ಅಣುಗಳು ಚಾಚುತ್ತವೆ ಆದರೆ ರಾಸಾಯನಿಕವಾಗಿ ಬದಲಾಗುವುದಿಲ್ಲ. <strong>ಹಿಮ್ಮುಖ</strong> - ಬಿಟ್ಟರೆ ಹಿಂದೆ ಬರುತ್ತದೆ!'
+  },
+  spring: {
+    before: 'spring-scene',
+    after: 'spring-compressed',
+    action: '⬇️ ಸ್ಪ್ರಿಂಗ್ ಒತ್ತಿ',
+    title: '✅ Spring Compressed - Physical Change!',
+    result: 'ಸ್ಪ್ರಿಂಗ್ ಒತ್ತಿದಾಗ <strong>ಆಕಾರ</strong> ಬದಲಾಯಿತು. ಲೋಹ ಇನ್ನೂ ಅದೇ ಪದಾರ್ಥ!',
+    learning: 'ಸ್ಪ್ರಿಂಗ್ ಒತ್ತುವುದು <strong>ಭೌತಿಕ ಬದಲಾವಣೆ</strong>. ಲೋಹ ಸುರುಳಿಗಳು ಒಟ್ಟಿಗೆ ಬರುತ್ತವೆ ಆದರೆ ಹೊಸ ಪದಾರ್ಥ ರೂಪುಗೊಳ್ಳುವುದಿಲ್ಲ. <strong>ಹಿಮ್ಮುಖ</strong> - ಬಿಟ್ಟರೆ ಹಿಂದೆ ಬರುತ್ತದೆ!'
+  }
+};
+
+const actionLabel = document.getElementById('action-label');
+const actionBtn = document.getElementById('action-btn');
+const resultBox = document.getElementById('result-box');
+const resultTitle = document.getElementById('result-title');
+const resultText = document.getElementById('result-text');
+const learningText = document.getElementById('learning-text');
+
+function hideAllScenes() {
+  const scenes = ['paper-scene', 'paper-folded', 'chalk-scene', 'chalk-crushed', 
+                  'ice-scene', 'ice-melted', 'balloon-scene', 'balloon-inflated',
+                  'rubber-scene', 'rubber-stretched', 'spring-scene', 'spring-compressed'];
+  scenes.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+}
+
+function selectExample(type, icon, btn) {
+  document.querySelectorAll('.example-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  selectedExample = type;
+  selectedBtn = btn;
+  
+  const ex = examples[type];
+  
+  // Show before state
+  hideAllScenes();
+  document.getElementById(ex.before).style.display = 'block';
+  
+  actionLabel.textContent = `${icon} ಸಿದ್ಧ to change!`;
+  actionBtn.disabled = false;
+  actionBtn.textContent = ex.action;
+  
+  resultBox.classList.remove('show');
+  
+  learningText.innerHTML = `
+    <strong>${icon} ${type.charAt(0).toUpperCase() + type.slice(1)} ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ</strong><br><br>
+    ಈ ಕ್ರಿಯೆ ಮಾಡಿದಾಗ ಏನಾಗುತ್ತದೆ ನೋಡಲು ಬಟನ್ ಟ್ಯಾಪ್ ಮಾಡಿ. ಜಾಗ್ರತೆಯಿಂದ ನೋಡಿ – ಹೊಸ ಪದಾರ್ಥ ರೂಪುಗೊಳ್ಳುವುದೇ?
+  `;
+}
+
+function performChange() {
+  if (!selectedExample) return;
+  
+  const ex = examples[selectedExample];
+  
+  actionBtn.disabled = true;
+  actionLabel.textContent = '⏳ ಬದಲಾಯಿಸುತ್ತಿದೆ...';
+  
+  // ಅನಿಮೇಟ್ transition
+  setTimeout(() => {
+    hideAllScenes();
+    document.getElementById(ex.after).style.display = 'block';
+    
+    actionLabel.textContent = '✅ ಬದಲಾವಣೆ ಪೂರ್ಣ!';
+    
+    resultTitle.textContent = ex.title;
+    resultText.innerHTML = ex.result;
+    resultBox.classList.add('show');
+    
+    learningText.innerHTML = ex.learning;
+    
+    selectedBtn.classList.add('done');
+    actionBtn.textContent = 'ಇನ್ನೊಂದು ಉದಾಹರಣೆ ಆಯ್ಕೆಮಾಡಿ';
+    
+    selectedExample = null;
+  }, 500);
+}
+
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var showHints = params.get('showHints');
+  if (showHints === 'false') {
+    document.querySelectorAll('.learning-panel, .takeaway').forEach(function (el) { el.style.display = 'none'; });
+  }
+  var state = params.get('initialState');
+  var exampleMap = { paper: 0, chalk: 1, ice: 2, balloon: 3, rubber: 4, spring: 5 };
+  if (state && exampleMap[state] !== undefined) {
+    setTimeout(function () {
+      var btns = document.querySelectorAll('.example-btn');
+      var idx = exampleMap[state];
+      if (btns[idx]) {
+        btns[idx].click();
+        setTimeout(function () {
+          var actionBtn = document.getElementById('action-btn');
+          if (actionBtn && !actionBtn.disabled) actionBtn.click();
+        }, 800);
+      }
+    }, 800);
+  }
+}());
+</script>
+</body>
+</html>

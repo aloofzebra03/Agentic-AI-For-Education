@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#fdd835">
+<title>ಅಲೋಹ + ಆಮ್ಲಜನಕ – ಆಮ್ಲೀಯ ಆಕ್ಸೈಡ್</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #f9a825 0%, #fdd835 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #37474f;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.85; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #f57f17;
+}
+
+.concept-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f57f17;
+  margin-bottom: 6px;
+}
+
+.concept-text {
+  font-size: 12px;
+  color: #5d4037;
+  line-height: 1.5;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.visual {
+  position: relative;
+  height: 40vh;
+  min-height: 280px;
+  background: linear-gradient(180deg, #37474f 0%, #455a64 100%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+svg { width: 100%; height: 100%; }
+
+.step-ಸೂಚಕ {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.warning-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffeb3b;
+  color: #37474f;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.ctrl-btn {
+  flex: 1;
+  padding: 14px 8px;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ctrl-btn:active { transform: scale(0.98); }
+.ctrl-btn:disabled { background: #ccc !important; color: #888; }
+
+.ctrl-btn.burn {
+  background: linear-gradient(135deg, #ff5722 0%, #ff7043 100%);
+  color: white;
+}
+
+.ctrl-btn.dissolve {
+  background: linear-gradient(135deg, #2196f3 0%, #64b5f6 100%);
+  color: white;
+}
+
+.ctrl-btn.test {
+  background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
+  color: white;
+}
+
+.equation-box {
+  background: linear-gradient(135deg, #fffde7 0%, #fff9c4 100%);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  margin-top: 10px;
+  border-left: 4px solid #fdd835;
+}
+
+.equation-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #f57f17;
+  margin-bottom: 8px;
+}
+
+.equation {
+  font-size: 14px;
+  font-weight: 700;
+  color: #37474f;
+  font-family: 'Times New Roman', serif;
+}
+
+.equation-explain {
+  font-size: 10px;
+  color: #666;
+  margin-top: 6px;
+}
+
+.litmus-result {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.litmus-card {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  border: 2px solid #e0e0e0;
+}
+
+.litmus-card .label { font-size: 10px; font-weight: 600; margin-bottom: 4px; }
+.litmus-card .strip {
+  width: 30px;
+  height: 60px;
+  margin: 8px auto;
+  border-radius: 4px;
+  transition: background 0.5s ease;
+}
+
+.litmus-card .status { font-size: 9px; color: #666; }
+
+.learning-panel {
+  background: linear-gradient(135deg, #fffde7 0%, #fff9c4 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #fdd835;
+}
+
+.learning-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f57f17;
+  margin-bottom: 6px;
+}
+
+.learning-text {
+  font-size: 11px;
+  color: #37474f;
+  line-height: 1.6;
+}
+
+.takeaway {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ef5350;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #c62828; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+@keyframes sulfurBurn {
+  0%, 100% { fill: #fdd835; }
+  50% { fill: #ffeb3b; filter: drop-ನೆರಳು(0 0 10px #2196f3); }
+}
+
+.burning-sulfur { animation: sulfurBurn 0.3s ease-in-out infinite; }
+
+@keyframes blueFlame {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+.blue-flame { animation: blueFlame 0.2s ease-in-out infinite; }
+
+@keyframes smokeRise {
+  0% { opacity: 0.8; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-50px); }
+}
+
+.smoke { animation: smokeRise 2s ease-out infinite; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🟡 ಅಲೋಹ + ಆಮ್ಲಜನಕ ಪ್ರತಿಕ್ರಿಯೆ</h1>
+  <p>ಆಮ್ಲೀಯ ಆಕ್ಸೈಡ್ ರೂಪಿಸಲು ಸಲ್ಫರ್ ಸುಡುವುದು</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ಅಲೋಹಗಳು ಆಮ್ಲಜನಕದೊಂದಿಗೆ ಪ್ರತಿಕ್ರಿಯಿಸಿದಾಗ</strong> <strong>ಅಲೋಹ ಆಕ್ಸೈಡ್‌ಗಳು</strong> ಉಂಟಾಗುತ್ತವೆ; ಅವು <strong>ಆಮ್ಲೀಯ</strong> ಸ್ವಭಾವದವು. ಅವು ನೀಲಿ ಲಿಟ್ಮಸ್‌ನ್ನು ಕೆಂಪು ಮಾಡುತ್ತವೆ.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="visual">
+    <div class="step-ಸೂಚಕ" id="step-indicator">ಹಂತ 1: ಸಲ್ಫರ್ ಪುಡಿ ಸುಡಿ</div>
+    <div class="warning-badge">⚠️ ವಿಷ SO₂ - ಲ್ಯಾಬ್‌ನಲ್ಲಿ ಮಾತ್ರ!</div>
+    <svg viewBox="0 0 400 280" id="scene">
+      <!-- Deflagrating spoon with sulfur -->
+      <g id="spoon-group" transform="translate(120, 100)">
+        <line x1="30" y1="0" x2="30" y2="-60" stroke="#9e9e9e" stroke-width="4"/>
+        <ellipse cx="30" cy="10" rx="25" ry="12" fill="#616161"/>
+        
+        <!-- ಸಲ್ಫರ್ powder -->
+        <g id="sulfur">
+          <ellipse cx="30" cy="5" rx="18" ry="8" fill="#fdd835" id="sulfur-piece"/>
+          <text x="30" y="35" font-size="10" fill="#f57f17" text-anchor="middle">ಸಲ್ಫರ್ (S)</text>
+        </g>
+        
+        <!-- ನೀಲಿ flame -->
+        <g id="blue-flame" style="display:none">
+          <ellipse cx="30" cy="-15" rx="12" ry="25" fill="#42a5f5"/>
+          <ellipse cx="30" cy="-10" rx="8" ry="18" fill="#64b5f6"/>
+          <ellipse cx="30" cy="-5" rx="4" ry="10" fill="#90caf9"/>
+        </g>
+      </g>
+      
+      <!-- Gas jar -->
+      <g transform="translate(240, 80)">
+        <rect x="0" y="0" width="100" height="140" rx="5" fill="none" stroke="#90a4ae" stroke-width="3"/>
+        <rect x="20" y="-10" width="60" height="15" rx="3" fill="#78909c"/>
+        <text x="50" y="160" font-size="9" fill="#90a4ae" text-anchor="middle">ವಾಯು ಜಾರ್</text>
+        
+        <!-- SO2 gas (hidden initially) -->
+        <g id="so2-gas" style="display:none">
+          <ellipse cx="50" cy="70" rx="35" ry="50" fill="#cfd8dc" opacity="0.6"/>
+          <text x="50" y="75" font-size="12" fill="#607d8b" text-anchor="middle">SO₂</text>
+        </g>
+        
+        <!-- Smoke particles -->
+        <g id="smoke-particles" style="display:none">
+          <circle cx="30" cy="50" r="8" fill="#b0bec5" opacity="0.4" class="smoke"/>
+          <circle cx="50" cy="40" r="10" fill="#b0bec5" opacity="0.5" class="smoke" style="animation-delay: 0.3s"/>
+          <circle cx="70" cy="55" r="7" fill="#b0bec5" opacity="0.3" class="smoke" style="animation-delay: 0.6s"/>
+        </g>
+      </g>
+      
+      <!-- ನೀರು + litmus setup -->
+      <g id="water-setup" style="opacity:0.3" transform="translate(240, 80)">
+        <rect x="5" y="90" width="90" height="45" rx="3" fill="#bbdefb" opacity="0.5"/>
+        
+        <!-- Litmus papers -->
+        <g id="litmus-papers-svg" style="display:none">
+          <rect x="25" y="95" width="12" height="35" fill="#f44336"/>
+          <rect x="60" y="95" width="12" height="35" fill="#2196f3" id="blue-litmus-svg"/>
+        </g>
+      </g>
+      
+    </svg>
+  </div>
+  
+  <div id="instruction" style="text-align: center; font-size: 12px; color: #666; padding: 8px;">
+    ಸಲ್ಫರ್ ಪುಡಿ ಉರಿಸಲು "ಸುಡಿ" ಟ್ಯಾಪ್ ಮಾಡಿ
+  </div>
+  
+  <div class="controls">
+    <button class="ctrl-btn burn" id="burn-btn" onclick="burnSulfur()">🔥 Burn S</button>
+    <button class="ctrl-btn dissolve" id="dissolve-btn" onclick="dissolveGas()" disabled>💧 ನೀರು ಸೇರಿಸಿ</button>
+    <button class="ctrl-btn test" id="test-btn" onclick="testWithLitmus()" disabled>🧪 Test pH</button>
+  </div>
+</div>
+
+<div class="equation-box" id="equation-box">
+  <div class="equation-title">⚗️ ರಾಸಾಯನಿಕ ಸಮೀಕರಣ</div>
+  <div class="equation" id="equation">S + O₂ → SO₂</div>
+  <div class="equation-explain" id="equation-explain">ಸಲ್ಫರ್ + ಆಮ್ಲಜನಕ → ಸಲ್ಫರ್ ಡೈಆಕ್ಸೈಡ್ (ಕಟುವಾದ ಅನಿಲ)</div>
+</div>
+
+<div class="litmus-result">
+  <div class="litmus-card">
+    <div class="label">ಕೆಂಪು ಲಿಟ್ಮಸ್</div>
+    <div class="strip" id="red-strip" style="background: #f44336;"></div>
+    <div class="status" id="red-status">ಪರೀಕ್ಷೆ ಮೊದಲು</div>
+  </div>
+  <div class="litmus-card">
+    <div class="label">ನೀಲಿ ಲಿಟ್ಮಸ್</div>
+    <div class="strip" id="blue-strip" style="background: #2196f3;"></div>
+    <div class="status" id="blue-status">ಪರೀಕ್ಷೆ ಮೊದಲು</div>
+  </div>
+</div>
+
+<div class="learning-panel">
+  <div class="learning-title">🔬 ಪ್ರಯೋಗ ಪ್ರಗತಿ</div>
+  <div class="learning-text" id="learning-text">
+    This experiment shows how ಅಲೋಹಗಳು ಆಮ್ಲಜನಕದೊಂದಿಗೆ ಪ್ರತಿಕ್ರಿಯಿಸುತ್ತವೆ to form <strong>acidic oxides</strong>.<br><br>
+    <strong>Step 1:</strong> SO₂ ಅನಿಲಕ್ಕೆ ಸಲ್ಫರ್ ಸುಡಿ<br>
+    <strong>Step 2:</strong> Dissolve SO₂ in ನೀರು to form acid<br>
+    <strong>Step 3:</strong> ಲಿಟ್ಮಸ್ ಪೇಪರ್‌ನಿಂದ ಪರೀಕ್ಷಿಸಿ
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೀವು ಕಲಿಯುವುದು</div>
+  <div class="takeaway-text">
+    <strong>Non-ಲೋಹ ಆಕ್ಸೈಡ್‌ಗಳು are ಆಮ್ಲೀಯ:</strong><br>
+    • ಸಲ್ಫರ್ + ಆಮ್ಲಜನಕ → ಸಲ್ಫರ್ Dioxide (acidic)<br>
+    • SO₂ + ನೀರು → H₂SO₃ (ಸಲ್ಫರ್ous acid)<br>
+    • ನೀಲಿ ಲಿಟ್ಮಸ್ ಕೆಂಪು<br><br>
+    <strong>ಲೋಹಗಳೊಂದಿಗೆ ಹೋಲಿಕೆ:</strong> ಲೋಹ oxides are ಮೂಲ, ಅಲೋಹ ಆಕ್ಸೈಡ್‌ಗಳು are acidic!
+  </div>
+</div>
+
+</div>
+
+<script>
+let step = 1;
+
+const sulfur = document.getElementById('sulfur');
+const sulfurPiece = document.getElementById('sulfur-piece');
+const blueFlame = document.getElementById('blue-flame');
+const so2Gas = document.getElementById('so2-gas');
+const smokeParticles = document.getElementById('smoke-particles');
+const ನೀರುSetup = document.getElementById('water-setup');
+const litmusPapersSvg = document.getElementById('litmus-papers-svg');
+
+const burnBtn = document.getElementById('burn-btn');
+const dissolveBtn = document.getElementById('dissolve-btn');
+const testBtn = document.getElementById('test-btn');
+
+const stepIndicator = document.getElementById('step-indicator');
+const instruction = document.getElementById('instruction');
+const equation = document.getElementById('equation');
+const equationExplain = document.getElementById('equation-explain');
+const learningText = document.getElementById('learning-text');
+
+function burnSulfur() {
+  burnBtn.disabled = true;
+  
+  instruction.textContent = '🔥 ಸಲ್ಫರ್ ಉರಿಸುತ್ತಿದೆ...';
+  
+  setTimeout(() => {
+    // Show blue flame (characteristic of sulfur)
+    blueFlame.style.display = 'block';
+    blueFlame.classList.add('blue-flame');
+    sulfurPiece.classList.add('burning-sulfur');
+    
+    stepIndicator.textContent = '🔵 ಸಲ್ಫರ್ ನೀಲಿ ಜ್ವಾಲೆಯಿಂದ ಉರಿಯುತ್ತದೆ!';
+    
+    learningText.innerHTML = `
+      <strong style="color:#2196f3">🔵 ಸಲ್ಫರ್ is burning with a BLUE flame!</strong><br><br>
+      Unlike magnesium (white light), sulfur burns with a characteristic <strong>blue flame</strong>.<br><br>
+      It produces <strong>sulfur dioxide (SO₂)</strong> - a colorless gas with a sharp, choking smell.
+    `;
+  }, 500);
+  
+  setTimeout(() => {
+    // Show SO2 gas collecting
+    smokeParticles.style.display = 'block';
+    so2Gas.style.display = 'block';
+    
+    instruction.textContent = 'ಜಾರ್‌ನಲ್ಲಿ SO₂ ಅನಿಲ ಸಂಗ್ರಹ...';
+  }, 1500);
+  
+  setTimeout(() => {
+    // ಉರಿಯುತ್ತಿದೆ ಪೂರ್ಣ
+    blueFlame.classList.remove('blue-flame');
+    blueFlame.style.display = 'none';
+    sulfurPiece.classList.remove('burning-sulfur');
+    sulfur.style.opacity = '0.3';
+    
+    stepIndicator.textContent = 'Step 2: Dissolve SO₂ in ನೀರು';
+    instruction.textContent = 'SO₂ gas collected! Now add ನೀರು.';
+    
+    dissolveBtn.disabled = false;
+    ನೀರುSetup.style.opacity = '1';
+    
+    learningText.innerHTML = `
+      <strong style="color:#2e7d32">✅ ಸಲ್ಫರ್ Dioxide (SO₂) collected!</strong><br><br>
+      The jar is now filled with SO₂ gas - it has a <strong>pungent, suffocating smell</strong>.<br><br>
+      <strong>Reaction:</strong> S + O₂ → SO₂<br><br>
+      Now let's dissolve it in ನೀರು ಮತ್ತು test its nature!
+    `;
+  }, 3000);
+}
+
+function dissolveGas() {
+  dissolveBtn.disabled = true;
+  
+  instruction.textContent = 'Adding ನೀರು to dissolve SO₂...';
+  stepIndicator.textContent = 'Dissolving SO₂ in ನೀರು...';
+  
+  setTimeout(() => {
+    smokeParticles.style.display = 'none';
+    so2Gas.style.opacity = '0.3';
+    litmusPapersSvg.style.display = 'block';
+    
+    equation.textContent = 'SO₂ + H₂O → H₂SO₃';
+    equationExplain.textContent = 'ಸಲ್ಫರ್ Dioxide + ನೀರು → ಸಲ್ಫರ್ous Acid';
+    
+    stepIndicator.textContent = 'ಹಂತ 3: ಲಿಟ್ಮಸ್ ಪೇಪರ್‌ನಿಂದ ಪರೀಕ್ಷಿಸಿ';
+    instruction.textContent = 'Acidic solution formed! Test with litmus.';
+    
+    testBtn.disabled = false;
+    
+    learningText.innerHTML = `
+      <strong style="color:#f44336">💧 ಸಲ್ಫರ್ous Acid (H₂SO₃) formed!</strong><br><br>
+      SO₂ dissolves in ನೀರು to form <strong>ಸಲ್ಫರ್ous Acid</strong> - an ACID.<br><br>
+      <strong>Reaction:</strong> SO₂ + H₂O → H₂SO₃<br><br>
+      Now let's test if this solution is really acidic using litmus paper!
+    `;
+  }, 1000);
+}
+
+function testWithLitmus() {
+  testBtn.disabled = true;
+  
+  instruction.textContent = 'ಲಿಟ್ಮಸ್ ಪೇಪರ್â€Œಗಳಿಂದ ಪರೀಕ್ಷಿಸಲಾಗುತ್ತಿದೆ...';
+  stepIndicator.textContent = 'Testing pH...';
+  
+  setTimeout(() => {
+    // ನೀಲಿ litmus turns red (acid detected!)
+    document.getElementById('blue-strip').style.background = '#f44336';
+    document.getElementById('blue-litmus-svg').setAttribute('fill', '#f44336');
+    document.getElementById('blue-status').textContent = '→ ಕೆಂಪು ಆಯಿತು!';
+    document.getElementById('blue-status').style.color = '#c62828';
+    
+    // ಕೆಂಪು litmus stays red
+    document.getElementById('red-status').textContent = 'ಬದಲಾವಣೆ ಇಲ್ಲ';
+    
+    stepIndicator.textContent = '✅ ಪ್ರಯೋಗ ಪೂರ್ಣ!';
+    instruction.textContent = 'ನೀಲಿ litmus turned RED - it\'s an ACID!';
+    
+    learningText.innerHTML = `
+      <strong style="color:#c62828">✅ ಪ್ರಯೋಗ ಪೂರ್ಣ!</strong><br><br>
+      <strong>ಫಲಿತಾಂಶ:</strong> ನೀಲಿ litmus paper turned <span style="color:#c62828; font-weight:bold">RED</span>!<br><br>
+      This proves that <strong>ಸಲ್ಫರ್ Dioxide is an ಆಮ್ಲೀಯ oxide</strong>.<br><br>
+      <strong>ತೀರ್ಮಾನ:</strong> When ಅಲೋಹಗಳು burn in ಆಮ್ಲಜನಕ, they form <strong>ಅಲೋಹ ಆಕ್ಸೈಡ್‌ಗಳು that are acidic in nature</strong>.
+    `;
+  }, 1000);
+}
+
+// ── URL-parameter initialisation ──────────────────────────────────────────
+(function () {
+  var params = new URLSearchParams(window.location.search);
+
+  // showHints: hide .concept-card when false
+  if (params.get('showHints') === 'false') {
+    var card = document.querySelector('.concept-card');
+    if (card) card.style.display = 'none';
+  }
+
+  // initialState: auto-click the sequential experiment buttons
+  // States: initial | burned | dissolved | tested
+  var state = params.get('initialState');
+  if (!state || state === 'initial') return;
+
+  // Step 1 – burn sulfur
+  setTimeout(function () {
+    var btn = document.getElementById('burn-btn');
+    if (btn && !btn.disabled) btn.click();
+  }, 800);
+
+  if (state === 'burned') return;
+
+  // Step 2 – dissolve SO₂ in water
+  setTimeout(function () {
+    var btn = document.getElementById('dissolve-btn');
+    if (btn && !btn.disabled) btn.click();
+  }, 2600);
+
+  if (state === 'dissolved') return;
+
+  // Step 3 – test with litmus
+  setTimeout(function () {
+    var btn = document.getElementById('test-btn');
+    if (btn && !btn.disabled) btn.click();
+  }, 4400);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#4caf50">
+<title>ವೇಗ ಓಟ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #4caf50 0%, #81c784 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.race-setup {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.racer-setup {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+}
+
+.racer-setup .icon { font-size: 24px; }
+.racer-setup .name { font-size: 9px; font-weight: 600; color: #333; margin: 4px 0; }
+
+.racer-setup input {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.racer-setup .unit { font-size: 8px; color: #666; }
+
+.race-track {
+  position: relative;
+  height: 200px;
+  background: linear-gradient(180deg, #87ceeb 0%, #e1f5fe 30%, #8d6e63 30%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.track-lines {
+  position: absolute;
+  top: 35%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.track-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, #fff 0, #fff 20px, transparent 20px, transparent 40px);
+}
+
+.finish-line {
+  position: absolute;
+  right: 30px;
+  top: 30%;
+  bottom: 10px;
+  width: 10px;
+  background: repeating-linear-gradient(180deg, #000 0, #000 8px, #fff 8px, #fff 16px);
+}
+
+.finish-label {
+  position: absolute;
+  right: 10px;
+  top: 35%;
+  font-size: 10px;
+  font-weight: 700;
+  color: #333;
+  writing-mode: vertical-rl;
+}
+
+.racer {
+  position: absolute;
+  left: 20px;
+  font-size: 28px;
+  transition: left 0.1s linear;
+  transform: scaleX(-1); /* Flip to face right (towards finish) */
+}
+
+.racer-walker { top: 38%; }
+.racer-cyclist { top: 52%; }
+.racer-car { top: 66%; }
+.racer-train { top: 80%; }
+
+.distance-markers {
+  position: absolute;
+  bottom: 5px;
+  left: 20px;
+  right: 40px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 8px;
+  color: #5d4037;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.control-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.start-btn { background: linear-gradient(135deg, #4caf50, #66bb6a); color: #fff; }
+.start-btn:disabled { background: #e0e0e0; color: #999; }
+.reset-btn { background: linear-gradient(135deg, #9e9e9e, #bdbdbd); color: #fff; }
+
+.timer-display {
+  text-align: center;
+  margin-top: 12px;
+}
+
+.timer-time {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  font-family: monospace;
+}
+
+.timer-label {
+  font-size: 10px;
+  color: #666;
+}
+
+.results-panel {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.results-title { font-size: 12px; font-weight: 600; color: #333; margin-bottom: 10px; text-align: center; }
+
+.result-row {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: #fff;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+
+.result-row:last-child { margin-bottom: 0; }
+
+.result-rank { font-size: 16px; width: 30px; }
+.result-icon { font-size: 20px; width: 35px; }
+.result-name { flex: 1; font-size: 11px; font-weight: 600; }
+.result-time { font-size: 12px; font-weight: 700; color: #4caf50; }
+
+.calculation-box {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2196f3;
+}
+
+.calc-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 8px; }
+.calc-text { font-size: 11px; color: #37474f; line-height: 1.6; font-family: monospace; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🏁 ವೇಗ ಓಟ</h1>
+  <p>1 ಕಿಮೀ ಯಾರು ಮೊದಲು ಪೂರ್ಣಗೊಳಿಸುತ್ತಾರೆ?</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ವೇಗ ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು</div>
+  <div class="concept-text">
+    ಎತ್ತರ ವೇಗ = ದೂರ ವೇಗವಾಗಿ ಕ್ರಮಿಸುತ್ತದೆ. ಈ ಓಟದಲ್ಲಿacers travel <strong>1 km</strong>. ಯಾರು ಮೊದಲು ಬರುತ್ತಾರೆ ಅವರ ಮೇಲೆ ಅವಲಂಬಿತ <strong>ವೇಗ</strong>!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="race-setup">
+    <div class="racer-setup">
+      <div class="icon">🚶</div>
+      <div class="name">ನಡೆದಾಡುವವನು</div>
+      <input type="number" id="speed-walker" value="5" min="1" max="10">
+      <div class="unit">km/h</div>
+    </div>
+    <div class="racer-setup">
+      <div class="icon">🚴</div>
+      <div class="name">ಸೈಕ್ಲಿಸ್ಟ್</div>
+      <input type="number" id="speed-cyclist" value="20" min="5" max="40">
+      <div class="unit">km/h</div>
+    </div>
+    <div class="racer-setup">
+      <div class="icon">🚗</div>
+      <div class="name">Car</div>
+      <input type="number" id="speed-car" value="60" min="20" max="120">
+      <div class="unit">km/h</div>
+    </div>
+    <div class="racer-setup">
+      <div class="icon">🚆</div>
+      <div class="name">ರೈಲು</div>
+      <input type="number" id="speed-train" value="100" min="50" max="200">
+      <div class="unit">km/h</div>
+    </div>
+  </div>
+  
+  <div class="race-track">
+    <div class="track-lines">
+      <div class="track-line" style="top: 20%;"></div>
+      <div class="track-line" style="top: 45%;"></div>
+      <div class="track-line" style="top: 70%;"></div>
+    </div>
+    
+    <div class="finish-line"></div>
+    <div class="finish-label">ಮುಗಿದಿದೆ</div>
+    
+    <div class="racer racer-walker" id="racer-walker">🚶</div>
+    <div class="racer racer-cyclist" id="racer-cyclist">🚴</div>
+    <div class="racer racer-car" id="racer-car">🚗</div>
+    <div class="racer racer-train" id="racer-train">🚆</div>
+    
+    <div class="distance-markers">
+      <span>0</span>
+      <span>250m</span>
+      <span>500m</span>
+      <span>750m</span>
+      <span>1km</span>
+    </div>
+  </div>
+  
+  <div class="controls">
+    <button class="control-btn start-btn" id="start-btn" onclick="startRace()">🏁 ಓಟ ಪ್ರಾರಂಭಿಸಿ!</button>
+    <button class="control-btn reset-btn" onclick="resetRace()">🔄 ಮರುಹೊಂದಿಸಿ</button>
+  </div>
+  
+  <div class="timer-display">
+    <div class="timer-time" id="timer">00:00.0</div>
+    <div class="timer-label">ಒಟ್ಟು ಸಮಯ (ಅನುಕರಣ)</div>
+  </div>
+</div>
+
+<div class="results-panel" id="results-panel" style="display: none;">
+  <div class="results-title">🏆 ಓಟ ಫಲಿತಾಂಶಗಳು</div>
+  <div id="results-list"></div>
+</div>
+
+<div class="calculation-box" id="calc-box" style="display: none;">
+  <div class="calc-title">📐 ಸಮಯ ಲೆಕ್ಕ</div>
+  <div class="calc-text" id="calc-text"></div>
+</div>
+
+</div>
+
+<script>
+let isRacing = false;
+let raceInterval;
+let raceTime = 0;
+const distance = 1; // km
+
+const racers = ['walker', 'cyclist', 'car', 'train'];
+const icons = { walker: '🚶', cyclist: '🚴', car: '🚗', train: '🚆' };
+const names = { walker: 'ನಡೆದಾಡುವವನು', cyclist: 'ಸೈಕ್ಲಿಸ್ಟ್', car: 'Car', train: 'ರೈಲು' };
+
+let positions = {};
+let ವೇಗs = {};
+let finishTimes = {};
+let finishOrder = [];
+
+function startRace() {
+  if (isRacing) return;
+  
+  isRacing = true;
+  raceTime = 0;
+  positions = { walker: 0, cyclist: 0, car: 0, train: 0 };
+  finishTimes = {};
+  finishOrder = [];
+  
+  // Get ವೇಗs
+  ವೇಗs = {
+    walker: parseFloat(document.getElementById('speed-walker').value),
+    cyclist: parseFloat(document.getElementById('speed-cyclist').value),
+    car: parseFloat(document.getElementById('speed-car').value),
+    train: parseFloat(document.getElementById('speed-train').value)
+  };
+  
+  document.getElementById('start-btn').disabled = true;
+  document.getElementById('results-panel').style.display = 'none';
+  document.getElementById('calc-box').style.display = 'none';
+  
+  // Simulation ವೇಗ factor (1 real ಸೆಕೆಂಡ್ = 30 simulated ಸೆಕೆಂಡ್ಗಳು)
+  const simFactor = 30;
+  
+  raceInterval = setInterval(() => {
+    raceTime += 0.1 * simFactor; // ಸೆಕೆಂಡ್ಗಳು
+    
+    // Update positions
+    racers.forEach(racer => {
+      if (!finishTimes[racer]) {
+        // position = ವೇಗ * time / 3600 (convert ಸೆಕೆಂಡ್ಗಳು to ಗಂಟೆಗಳು)
+        positions[racer] = ವೇಗs[racer] * (raceTime / 3600);
+        
+        if (positions[racer] >= distance) {
+          positions[racer] = distance;
+          finishTimes[racer] = raceTime;
+          finishOrder.push(racer);
+        }
+        
+        // Update visual (20px start, 300px track)
+        const leftPos = 20 + (positions[racer] / distance) * 280;
+        document.getElementById(`racer-${racer}`).style.left = `${leftPos}px`;
+      }
+    });
+    
+    // Update timer
+    const ನಿಮಿಷಗಳು = Math.floor(raceTime / 60);
+    const ಸೆಕೆಂಡ್ಗಳು = (raceTime % 60).toFixed(1);
+    document.getElementById('timer').textContent = 
+      `${ನಿಮಿಷಗಳು.toString().padStart(2, '0')}:${ಸೆಕೆಂಡ್ಗಳು.padStart(4, '0')}`;
+    
+    // Check if race ಪೂರ್ಣ
+    if (finishOrder.length === racers.length) {
+      endRace();
+    }
+  }, 100);
+}
+
+function endRace() {
+  clearInterval(raceInterval);
+  isRacing = false;
+  document.getElementById('start-btn').disabled = false;
+  
+  // Show results
+  document.getElementById('results-panel').style.display = 'block';
+  document.getElementById('calc-box').style.display = 'block';
+  
+  const ranks = ['🥇', '🥈', '🥉', '4️⃣'];
+  let resultsHTML = '';
+  let calcText = 'ಸಮಯ = ದೂರ ÷ ವೇಗ\n\n';
+  
+  finishOrder.forEach((racer, index) => {
+    const time = finishTimes[racer];
+    const ನಿಮಿಷಗಳು = Math.floor(time / 60);
+    const ಸೆಕೆಂಡ್ಗಳು = (time % 60).toFixed(1);
+    const timeStr = ನಿಮಿಷಗಳು > 0 ? `${ನಿಮಿಷಗಳು}m ${ಸೆಕೆಂಡ್ಗಳು}s` : `${ಸೆಕೆಂಡ್ಗಳು}s`;
+    
+    resultsHTML += `
+      <div class="result-row">
+        <div class="result-rank">${ranks[index]}</div>
+        <div class="result-icon">${icons[racer]}</div>
+        <div class="result-name">${names[racer]} (${ವೇಗs[racer]} km/h)</div>
+        <div class="result-time">${timeStr}</div>
+      </div>
+    `;
+    
+    const calcTime = (distance / ವೇಗs[racer] * 3600).toFixed(1);
+    calcText += `${names[racer]}: 1 km ÷ ${ವೇಗs[racer]} km/h = ${calcTime}s\n`;
+  });
+  
+  document.getElementById('results-list').innerHTML = resultsHTML;
+  document.getElementById('calc-text').textContent = calcText;
+}
+
+function resetRace() {
+  clearInterval(raceInterval);
+  isRacing = false;
+  raceTime = 0;
+  
+  racers.forEach(racer => {
+    document.getElementById(`racer-${racer}`).style.left = '20px';
+  });
+  
+  document.getElementById('timer').textContent = '00:00.0';
+  document.getElementById('start-btn').disabled = false;
+  document.getElementById('results-panel').style.display = 'none';
+  document.getElementById('calc-box').style.display = 'none';
+}
+
+// ── URL Parameter Support ──────────────────────────────────────────
+(function () {
+  var params = new URLSearchParams(window.location.search);
+
+  // showHints: no .insight-box in this sim
+  var showHints = params.get('showHints');
+  if (showHints === 'false') {
+    document.querySelectorAll('.insight-box').forEach(function (el) {
+      el.style.display = 'none';
+    });
+  }
+
+  // initialState
+  // 'setup'  → default view, no action needed
+  // 'racing' → auto-click Start Race button at 800 ms
+  var state = (params.get('initialState') || 'setup').toLowerCase();
+  if (state === 'racing') {
+    setTimeout(function () {
+      var btn = document.getElementById('start-btn');
+      if (btn && !btn.disabled) btn.click();
+    }, 800);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#f44336">
+<title>ಉಷ್ಣ ವಾಹಕತೆ - ಸಂವಾದಾತ್ಮಕ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #f44336 0%, #e57373 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #f44336;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #c62828; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.control-btn {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.control-btn:active { transform: scale(0.98); }
+.control-btn.active { border-color: #f44336; background: #ffebee; color: #c62828; }
+.control-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.heat-slider {
+  margin-bottom: 15px;
+}
+
+.heat-slider label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #37474f;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.heat-slider input[type="range"] {
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #ffeb3b, #ff9800, #f44336);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.heat-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #f44336;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.heat-value {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #f44336;
+  margin-top: 5px;
+}
+
+.experiment-visual {
+  position: relative;
+  height: 220px;
+  background: linear-gradient(180deg, #fafafa 0%, #e0e0e0 100%);
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 15px;
+}
+
+.flame-container {
+  position: absolute;
+  bottom: 15px;
+  left: 25px;
+  text-align: center;
+}
+
+.flame {
+  width: 50px;
+  height: 70px;
+  position: relative;
+}
+
+.flame-inner {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 40px;
+  background: linear-gradient(0deg, #ff9800 0%, #ffeb3b 50%, #fff 100%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: flicker 0.3s ease-in-out infinite alternate;
+}
+
+.flame-outer {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 50px;
+  background: linear-gradient(0deg, #f44336 0%, #ff9800 100%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  opacity: 0.7;
+  animation: flicker 0.5s ease-in-out infinite alternate;
+}
+
+.flame.low .flame-inner { height: 25px; width: 15px; }
+.flame.low .flame-outer { height: 35px; width: 22px; }
+.flame.high .flame-inner { height: 50px; width: 25px; }
+.flame.high .flame-outer { height: 65px; width: 38px; }
+
+@keyframes flicker {
+  0% { transform: translateX(-50%) scale(1); }
+  100% { transform: translateX(-50%) scale(1.05) translateY(-2px); }
+}
+
+.flame-label {
+  font-size: 10px;
+  color: #e65100;
+  font-weight: 600;
+  margin-top: 5px;
+}
+
+.metal-strip {
+  position: absolute;
+  bottom: 80px;
+  left: 50px;
+  width: 280px;
+  height: 18px;
+  background: linear-gradient(180deg, #bdbdbd, #9e9e9e, #bdbdbd);
+  border-radius: 4px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+
+.heat-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #f44336, #ff9800, #ffeb3b);
+  border-radius: 4px;
+  width: 0%;
+  transition: width 0.3s linear;
+}
+
+.wax-pin {
+  position: absolute;
+  bottom: 98px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.wax-pin:hover { transform: scale(1.1); }
+
+.pin {
+  width: 5px;
+  height: 22px;
+  background: linear-gradient(180deg, #5d4037, #795548);
+  border-radius: 2px;
+  transition: all 0.5s ease;
+}
+
+.wax {
+  width: 12px;
+  height: 10px;
+  background: radial-gradient(circle, #ffe082, #ffb74d);
+  border-radius: 50%;
+  margin-bottom: 3px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+.wax-pin.melted .wax {
+  background: transparent;
+  box-shadow: none;
+}
+
+.wax-pin.melted .pin {
+  transform: translateY(35px) rotate(60deg);
+  opacity: 0.6;
+}
+
+.pin-number {
+  position: absolute;
+  top: -20px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #333;
+  background: #fff;
+  padding: 2px 6px;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.timer-display {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.particle-view {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.particle-title { font-size: 12px; font-weight: 700; color: #e65100; margin-bottom: 10px; }
+
+.particles-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 15px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.particle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  transition: all 0.5s ease;
+}
+
+.particle.cold { background: #90a4ae; }
+.particle.warm { background: #ff9800; animation: ಕಂಪಿಸುತ್ತದೆ 0.3s linear infinite; }
+.particle.hot { background: #f44336; animation: ಕಂಪಿಸುತ್ತದೆ 0.15s linear infinite; }
+
+@keyframes ಕಂಪಿಸುತ್ತದೆ {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.particle-arrow {
+  font-size: 20px;
+  color: #ff9800;
+}
+
+.particle-label {
+  font-size: 9px;
+  text-align: center;
+  margin-top: 8px;
+  color: #666;
+}
+
+.results-panel {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+}
+
+.results-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 8px; }
+
+.pin-times {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.pin-time {
+  text-align: center;
+  padding: 8px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.pin-time .num { font-size: 14px; font-weight: 700; color: #333; }
+.pin-time .time { font-size: 10px; color: #666; margin-top: 2px; }
+.pin-time.dropped .time { color: #4caf50; font-weight: 600; }
+
+.takeaway {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2196f3;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🔥 ಉಷ್ಣ ವಾಹಕತೆ</h1>
+  <p>ಸಂವಾದಾತ್ಮಕ ಪ್ರಯೋಗ - ಉಷ್ಣವನ್ನು ನಿಯಂತ್ರಿಸಿ!</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ವಾಹಕತೆ</strong> ಘನಗಳ ಮೂಲಕ ಉಷ್ಣವನ್ನು ಬಿಸಿ ಪ್ರದೇಶದಿಂದ ತಂಪು ಪ್ರದೇಶಕ್ಕೆ ವರ್ಗಾವಣೆatch the wax pins drop as heat travels along the metal strip!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="controls">
+    <button class="control-btn" id="start-btn" onclick="startExperiment()">
+      🔥 ಉಷ್ಣ ಪ್ರಾರಂಭಿಸಿ
+    </button>
+    <button class="control-btn" onclick="resetExperiment()">
+      🔄 ಮರುಹೊಂದಿಸಿ
+    </button>
+  </div>
+  
+  <div class="heat-slider">
+    <label>🌡️ ಜ್ವಾಲೆ ತೀವ್ರತೆ ಸರಿಹೊಂದಿಸಿ:</label>
+    <input type="range" id="heat-level" min="1" max="3" value="2" oninput="adjustHeat(this.value)">
+    <div class="heat-value" id="heat-value">ಮಧ್ಯಮ ಉಷ್ಣ</div>
+  </div>
+  
+  <div class="experiment-visual">
+    <div class="timer-display" id="timer">⏱️ 0.0s</div>
+    
+    <div class="flame-container">
+      <div class="flame" id="flame">
+        <div class="flame-outer"></div>
+        <div class="flame-inner"></div>
+      </div>
+      <div class="flame-label">ಉಷ್ಣ ಮೂಲ</div>
+    </div>
+    
+    <div class="metal-strip">
+      <div class="heat-gradient" id="heat-gradient"></div>
+    </div>
+    
+    <div class="wax-pin" id="pin1" style="left: 90px;" onclick="showPinInfo(1)">
+      <div class="pin-number">1</div>
+      <div class="wax"></div>
+      <div class="pin"></div>
+    </div>
+    
+    <div class="wax-pin" id="pin2" style="left: 150px;" onclick="showPinInfo(2)">
+      <div class="pin-number">2</div>
+      <div class="wax"></div>
+      <div class="pin"></div>
+    </div>
+    
+    <div class="wax-pin" id="pin3" style="left: 210px;" onclick="showPinInfo(3)">
+      <div class="pin-number">3</div>
+      <div class="wax"></div>
+      <div class="pin"></div>
+    </div>
+    
+    <div class="wax-pin" id="pin4" style="left: 270px;" onclick="showPinInfo(4)">
+      <div class="pin-number">4</div>
+      <div class="wax"></div>
+      <div class="pin"></div>
+    </div>
+  </div>
+</div>
+
+<div class="particle-view">
+  <div class="particle-title">🔬 Particle View - How ವಾಹಕತೆ Works</div>
+  <div class="particles-container">
+    <div class="particle cold" id="p1">1</div>
+    <div class="particle-arrow">→</div>
+    <div class="particle cold" id="p2">2</div>
+    <div class="particle-arrow">→</div>
+    <div class="particle cold" id="p3">3</div>
+    <div class="particle-arrow">→</div>
+    <div class="particle cold" id="p4">4</div>
+  </div>
+  <div class="particle-label">ಬಿಸಿ ಕಣಗಳು ವೇಗವಾಗಿ ಕಂಪಿಸಿ ನೆರೆಯವರಿಗೆ ಶಕ್ತಿ (ಕಣ ಚಲಿಸುವುದಿಲ್ಲ, ಶಕ್ತಿ ಮಾತ್ರ!)</div>
+</div>
+
+<div class="results-panel">
+  <div class="results-title">📊 ಪಿನ್ ಡ್ರಾಪ್ ಸಮಯಗಳು</div>
+  <div class="pin-times">
+    <div class="pin-time" id="time1">
+      <div class="num">Pin 1</div>
+      <div class="time">--</div>
+    </div>
+    <div class="pin-time" id="time2">
+      <div class="num">Pin 2</div>
+      <div class="time">--</div>
+    </div>
+    <div class="pin-time" id="time3">
+      <div class="num">Pin 3</div>
+      <div class="time">--</div>
+    </div>
+    <div class="pin-time" id="time4">
+      <div class="num">Pin 4</div>
+      <div class="time">--</div>
+    </div>
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ಇದು ಏನನ್ನು ತೋರಿಸುತ್ತದೆ</div>
+  <div class="takeaway-text">
+    • ಉಷ್ಣ ಪ್ರಯಾಣ <strong>hot to cold</strong> end<br>
+    • ಜ್ವಾಲೆಗೆ ಹತ್ತಿರದ ಪಿನ್ಗಳು ಬೀಳುತ್ತವೆ <strong>ಮೊದಲ</strong><br>
+    • ಹೆಚ್ಚು ಉಷ್ಣ = <strong>ವೇಗವಾಗಿ</strong> ವಾಹಕತೆ<br>
+    • ಕಣಗಳು <strong>ಕಂಪಿಸುತ್ತದೆ</strong> ಆದರೆ ಸ್ಥಾನ ಬದಲಾಯಿಸಬೇಡಿ
+  </div>
+</div>
+
+</div>
+
+<script>
+let isRunning = false;
+let timer = 0;
+let timerInterval;
+let heatLevel = 2;
+let pinDropTimes = [0, 0, 0, 0];
+let droppedPins = [false, false, false, false];
+
+const heatGradient = document.getElementById('heat-gradient');
+const timerDisplay = document.getElementById('timer');
+const startBtn = document.getElementById('start-btn');
+const flame = document.getElementById('flame');
+const particles = [
+  document.getElementById('p1'),
+  document.getElementById('p2'),
+  document.getElementById('p3'),
+  document.getElementById('p4')
+];
+
+// Drop times based on heat level (seconds)
+const dropSchedule = {
+  1: [4, 6, 8, 10],    // Low heat
+  2: [2, 3.5, 5, 6.5], // ಮಧ್ಯಮ heat
+  3: [1, 2, 3, 4]      // High heat
+};
+
+function adjustHeat(value) {
+  heatLevel = parseInt(value);
+  const labels = ['ಕಡಿಮೆ ಉಷ್ಣ 🔥', 'ಮಧ್ಯಮ ಉಷ್ಣ 🔥🔥', 'ಅಧಿಕ ಉಷ್ಣ 🔥🔥🔥'];
+  document.getElementById('heat-value').textContent = labels[heatLevel - 1];
+  
+  flame.className = 'flame';
+  if (heatLevel === 1) flame.classList.add('low');
+  if (heatLevel === 3) flame.classList.add('high');
+}
+
+function startExperiment() {
+  if (isRunning) return;
+  
+  isRunning = true;
+  timer = 0;
+  startBtn.textContent = '🔥 ಉಷ್ಣ ಹಾಕುತ್ತಿದೆ...';
+  startBtn.disabled = true;
+  
+  // ಪ್ರಾರಂಭ timer
+  timerInterval = setInterval(() => {
+    timer += 0.1;
+    timerDisplay.textContent = `⏱️ ${timer.toFixed(1)}s`;
+    
+    // Update heat gradient
+    const maxTime = dropSchedule[heatLevel][3];
+    const progress = Math.min((timer / maxTime) * 100, 100);
+    heatGradient.style.width = `${progress}%`;
+    
+    // Check pin drops
+    const schedule = dropSchedule[heatLevel];
+    for (let i = 0; i < 4; i++) {
+      if (!droppedPins[i] && timer >= schedule[i]) {
+        dropPin(i);
+      }
+    }
+    
+    // Update particles
+    updateParticles();
+    
+    // Check if ಪೂರ್ಣ
+    if (droppedPins.every(d => d)) {
+      setTimeout(() => {
+        clearInterval(timerInterval);
+        startBtn.textContent = '✓ ಪೂರ್ಣ!';
+      }, 500);
+    }
+  }, 100);
+}
+
+function dropPin(index) {
+  droppedPins[index] = true;
+  pinDropTimes[index] = timer;
+  
+  document.getElementById(`pin${index + 1}`).classList.add('melted');
+  
+  const timeEl = document.getElementById(`time${index + 1}`);
+  timeEl.querySelector('.time').textContent = `${timer.toFixed(1)}s`;
+  timeEl.classList.add('dropped');
+}
+
+function updateParticles() {
+  const schedule = dropSchedule[heatLevel];
+  
+  particles.forEach((p, i) => {
+    p.className = 'particle';
+    
+    if (timer >= schedule[i] * 0.3) {
+      p.classList.add('hot');
+    } else if (timer >= schedule[i] * 0.1) {
+      p.classList.add('warm');
+    } else {
+      p.classList.add('cold');
+    }
+  });
+}
+
+function resetExperiment() {
+  clearInterval(timerInterval);
+  isRunning = false;
+  timer = 0;
+  pinDropTimes = [0, 0, 0, 0];
+  droppedPins = [false, false, false, false];
+  
+  timerDisplay.textContent = '⏱️ 0.0s';
+  heatGradient.style.width = '0%';
+  startBtn.textContent = '🔥 ಉಷ್ಣ ಪ್ರಾರಂಭಿಸಿ';
+  startBtn.disabled = false;
+  
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById(`pin${i}`).classList.remove('melted');
+    const timeEl = document.getElementById(`time${i}`);
+    timeEl.querySelector('.time').textContent = '--';
+    timeEl.classList.remove('dropped');
+  }
+  
+  particles.forEach(p => {
+    p.className = 'particle cold';
+  });
+}
+
+function showPinInfo(num) {
+  const distances = [3, 6, 9, 12];
+  alert(`ಪಿನ್ ${num}\nಉಷ್ಣದಿಂದ ದೂರ: ${distances[num-1]} ಸೆ.ಮೀ\n${droppedPins[num-1] ? `ಬಿದ್ದ ಸಮಯ: ${pinDropTimes[num-1].toFixed(1)} ಸೆ` : 'ಇನ್ನೂ ಬೀಳಲಿಲ್ಲ'}`);
+}
+
+// Initialize
+adjustHeat(2);
+
+// URL parameter auto-initialisation
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var initialState = params.get('initialState') || 'medium';
+  var showHints = params.get('showHints') !== 'false';
+  if (!showHints) {
+    var card = document.querySelector('.concept-card');
+    if (card) card.style.display = 'none';
+  }
+  var heatMap = { 'low': 1, 'medium': 2, 'high': 3 };
+  var level = heatMap[initialState] || 2;
+  setTimeout(function() {
+    var slider = document.getElementById('heat-level');
+    if (slider) { slider.value = level; adjustHeat(level); }
+    startExperiment();
+  }, 800);
+})();
+</script>
+</body>
+</html>

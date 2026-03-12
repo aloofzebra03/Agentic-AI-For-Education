@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ff7043">
+<title>ಕೌಮಾರದಲ್ಲಿ ಭಾವನಾತ್ಮಕ ಬದಲಾವಣೆಗಳು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #ff7043 0%, #ffab91 100%);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #ff7043;
+}
+
+.concept-title { font-size: 12px; font-weight: 700; color: #e64a19; margin-bottom: 6px; }
+.concept-text { font-size: 12px; color: #37474f; line-height: 1.5; }
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.mood-question {
+  text-align: center;
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.mood-question-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.mood-scenario {
+  font-size: 11px;
+  color: #666;
+  font-style: italic;
+}
+
+.emotions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.emotion-btn {
+  padding: 12px 6px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fafafa;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.emotion-btn:active { transform: scale(0.95); }
+.emotion-btn.selected { border-color: #ff7043; background: #fff3e0; }
+
+.emotion-btn .emoji { font-size: 28px; }
+.emotion-btn .name { font-size: 10px; color: #333; margin-top: 4px; }
+
+.response-panel {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  border-left: 4px solid #4caf50;
+  display: none;
+}
+
+.response-panel.show { display: block; }
+.response-title { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 8px; }
+.response-text { font-size: 11px; color: #37474f; line-height: 1.6; }
+
+.next-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ff7043 0%, #ff8a65 100%);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  display: none;
+}
+
+.next-btn.show { display: block; }
+
+.progress-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.progress-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e0e0e0;
+}
+
+.progress-dot.ಪೂರ್ಣd { background: #4caf50; }
+.progress-dot.current { background: #ff7043; }
+
+.coping-strategies {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2196f3;
+}
+
+.coping-title { font-size: 12px; font-weight: 700; color: #1565c0; margin-bottom: 8px; }
+
+.strategy-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.strategy-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.strategy-item .icon { font-size: 20px; margin-right: 8px; }
+.strategy-item .text { font-size: 10px; color: #333; }
+
+.takeaway {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #7b1fa2;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #7b1fa2; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>💭 ಭಾವನಾತ್ಮಕ ಬದಲಾವಣೆಗಳು</h1>
+  <p>ಕೌಮಾರದಲ್ಲಿ ನಿಮ್ಮ ಭಾವನೆಗಳನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    ಕೌಮಾರದಲ್ಲಿ, <strong>ಹಾರ್ಮೋನ್‌ಗಳು</strong> ಭಾವನೆಗಳು ಮತ್ತು ಮನಸ್ಥಿತಿ ಬದಲಾವಣೆ ಉಂಟುಮಾಡಬಹುದುy, sad, excited, or confused - sometimes all in one day - is ಪೂರ್ಣly ಸಾಮಾನ್ಯ!
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="mood-question" id="mood-question">
+    <div class="mood-question-text" id="question-text">ಈ ಪರಿಸ್ಥಿತಿಯಲ್ಲಿ ನೀವು ಹೇಗೆ ಭಾವಿಸಬಹುದು?</div>
+    <div class="mood-scenario" id="scenario-text">ನಿಮ್ಮ ಅತ್ಯುತ್ತಮ ಸ್ನೇಹಿತ ಬೇರೆಯವರೊಂದಿಗೆ ಹೆಚ್ಚು ಸಮಯ ಕಳೆಯಲಾರಂಭಿಸುತ್ತಾರೆ.</div>
+  </div>
+  
+  <div class="emotions-grid" id="emotions-grid">
+    <div class="emotion-btn" onclick="selectEmotion('sad', this)">
+      <div class="emoji">😢</div>
+      <div class="name">Sad</div>
+    </div>
+    <div class="emotion-btn" onclick="selectEmotion('angry', this)">
+      <div class="emoji">😠</div>
+      <div class="name">ಕೋಪ</div>
+    </div>
+    <div class="emotion-btn" onclick="selectEmotion('anxious', this)">
+      <div class="emoji">😰</div>
+      <div class="name">ಉದ್ವಿಗ್ನ</div>
+    </div>
+    <div class="emotion-btn" onclick="selectEmotion('jealous', this)">
+      <div class="emoji">😒</div>
+      <div class="name">ಅಸೂಯೆ</div>
+    </div>
+    <div class="emotion-btn" onclick="selectEmotion('confused', this)">
+      <div class="emoji">😕</div>
+      <div class="name">ಗೊಂದಲ</div>
+    </div>
+    <div class="emotion-btn" onclick="selectEmotion('okay', this)">
+      <div class="emoji">🙂</div>
+      <div class="name">It's okay</div>
+    </div>
+  </div>
+  
+  <div class="response-panel" id="response-panel">
+    <div class="response-title" id="response-title">✓ ಅದು ಸರಿಯಾದ ಭಾವನೆ!</div>
+    <div class="response-text" id="response-text"></div>
+  </div>
+  
+  <button class="next-btn" id="next-btn" onclick="nextScenario()">ಮುಂದಿನ ಸನ್ನಿವೇಶ →</button>
+  
+  <div class="progress-dots" id="progress-dots">
+    <div class="progress-dot current"></div>
+    <div class="progress-dot"></div>
+    <div class="progress-dot"></div>
+    <div class="progress-dot"></div>
+    <div class="progress-dot"></div>
+  </div>
+</div>
+
+<div class="coping-strategies">
+  <div class="coping-title">💪 ಭಾವನೆಗಳನ್ನು ನಿಭಾಯಿಸಲು ಧನಾತ್ಮಕ ಮಾರ್ಗಗಳು</div>
+  <div class="strategy-list">
+    <div class="strategy-item">
+      <div class="icon">🎵</div>
+      <div class="text">ಸಂಗೀತ ಮತ್ತು ನೃತ್ಯ</div>
+    </div>
+    <div class="strategy-item">
+      <div class="icon">⚽</div>
+      <div class="text">Sports & ವ್ಯಾಯಾಮ</div>
+    </div>
+    <div class="strategy-item">
+      <div class="icon">📝</div>
+      <div class="text">ಬರವಣಿಗೆ/ಜರ್ನಲ್</div>
+    </div>
+    <div class="strategy-item">
+      <div class="icon">🗣️</div>
+      <div class="text">ಯಾರಾದರೂ ಮಾತು ಮಾಡಿ</div>
+    </div>
+    <div class="strategy-item">
+      <div class="icon">🧘</div>
+      <div class="text">ಆಳ ಉಸಿರಾಟ</div>
+    </div>
+    <div class="strategy-item">
+      <div class="icon">🎨</div>
+      <div class="text">ಸೃಜನಾತ್ಮಕ ಚಟುವಟಿಕೆಗಳು</div>
+    </div>
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೆನಪಿಡಿ</div>
+  <div class="takeaway-text">
+    • <strong>ಎಲ್ಲ ಭಾವನೆಗಳು ಸರಿ</strong> - ಭಾವಿಸಲು "ತಪ್ಪಾದ" ಮಾರ್ಗವಿಲ್ಲ<br>
+    • ಮನಸ್ಥಿತಿ ಬದಲಾವಣೆಗಳು ಸಾಮಾನ್ಯ ಕೌಮಾರ್ಯದಲ್ಲಿ<br>
+    • ಭಾವನೆಗಳು ಅತಿಯಾದಾಗ ಸಹಾಯ ಕೇಳಲು ಸರಿ<br>
+    • ಭಾವನೆಗಳನ್ನು ಧನಾತ್ಮಕ ಚಟುವಟಿಕೆಗೆ ತಿರುಗಿಸುವುದು ಸಹಾಯ<br>
+    • ಅಗತ್ಯವಿದ್ದಾಗ ತಂದೆತಾಯಿ, ಶಿಕ್ಷಕ ಅಥವಾ ಸಲಹೆಗಾರರೊಂದಿಗೆ ಮಾತು
+  </div>
+</div>
+
+</div>
+
+<script>
+const scenarios = [
+  {
+    question: "ಈ ಪರಿಸ್ಥಿತಿಯಲ್ಲಿ ನೀವು ಹೇಗೆ ಭಾವಿಸಬಹುದು?",
+    scenario: "ನಿಮ್ಮ ಅತ್ಯುತ್ತಮ ಸ್ನೇಹಿತ ಬೇರೆಯವರೊಂದಿಗೆ ಹೆಚ್ಚು ಸಮಯ ಕಳೆಯಲಾರಂಭಿಸುತ್ತಾರೆ.",
+    responses: {
+      sad: "Feeling sad when friendships change is natural. ನೆನಪಿಡಿ, having multiple friends is healthy, ಮತ್ತು it doesn't mean your friendship is over!",
+      angry: "It's ಸಾಮಾನ್ಯ to feel angry sometimes. Try talking calmly to your friend about how you feel rather than acting out.",
+      anxious: "Worry about friendships is common. ನೆನಪಿಡಿ, good friendships can survive ಬದಲಾಗುತ್ತದೆ ಮತ್ತು new people.",
+      jealous: "ಅಸೂಯೆy is a very common feeling. Instead of focusing on it, try making new friends too!",
+      confused: "It's okay to feel confused. Relationships change ಕೌಮಾರ್ಯದಲ್ಲಿ - this is part of growing up.",
+      okay: "That's a mature perspective! Being supportive of friends' other relationships is healthy."
+    }
+  },
+  {
+    question: "What emotion might come up here?",
+    scenario: "You didn't do well on a test you studied hard for.",
+    responses: {
+      sad: "Disappointment is natural when hard work doesn't pay off immediately. Use this as motivation to try different study methods!",
+      angry: "Frustration with results is understಮತ್ತುable. Channel this ಶಕ್ತಿ into figuring out what to do differently next time.",
+      anxious: "Test anxiety is very common. ನೆನಪಿಡಿ, one test doesn't define you. Talk to your teacher about where to improve.",
+      jealous: "If others did better, focus on your own progress rather than comparing. Everyone learns differently.",
+      confused: "It's confusing when effort doesn't match results. Ask your teacher for feedback to understಮತ್ತು better.",
+      okay: "Accepting setbacks calmly is great! Learning from mistakes is more important than the grade."
+    }
+  },
+  {
+    question: "How might this make you feel?",
+    scenario: "Your body is changing ವೇಗವಾಗಿ (or slower) than your friends.",
+    responses: {
+      sad: "It's ಸಾಮಾನ್ಯ to feel down about being different. ನೆನಪಿಡಿ, everyone develops at their own pace - this is ಪೂರ್ಣly ಸಾಮಾನ್ಯ!",
+      angry: "Frustration with your body is common during puberty. Be patient - everyone catches up eventually.",
+      anxious: "Worry about development is very common. Talk to a parent or doctor if you have concerns - they can reassure you.",
+      jealous: "Comparing yourself to others is natural but not helpful. Focus on being healthy rather than being like others.",
+      confused: "ಯೌವನ is confusing for everyone! Learning about these ಬದಲಾಗುತ್ತದೆ (like you're doing now) helps.",
+      okay: "Accepting your unique timeline is very mature! Everyone's body has its own schedule."
+    }
+  },
+  {
+    question: "What feeling might arise?",
+    scenario: "Your parents set rules that seem unfair compared to your friends.",
+    responses: {
+      sad: "Feeling restricted can be sad. Try having a calm conversation with your parents about your feelings.",
+      angry: "Anger at rules is very common in adolescence. ನೆನಪಿಡಿ, parents usually have good reasons, even if it's hard to see.",
+      anxious: "Worry about missing out is ಸಾಮಾನ್ಯ. Rules often become more relaxed as you show responsibility.",
+      jealous: "It's natural to want what friends have. Every family is different - focus on building trust with your parents.",
+      confused: "Confusion about rules is understಮತ್ತುable. Ask your parents to explain their reasoning - communication helps!",
+      okay: "Accepting rules maturely shows responsibility. This often leads to more freedom over time."
+    }
+  },
+  {
+    question: "ಈ ಪರಿಸ್ಥಿತಿಯಲ್ಲಿ ನೀವು ಹೇಗೆ ಭಾವಿಸಬಹುದು?",
+    scenario: "Someone makes fun of how you look or something you did.",
+    responses: {
+      sad: "Being teased hurts. ನೆನಪಿಡಿ, what others say doesn't define your worth. ಯಾರಾದರೂ ಮಾತು ಮಾಡಿ you trust about it.",
+      angry: "Anger at being mocked is natural. Responding with anger rarely helps - walk away ಮತ್ತು talk to an adult.",
+      anxious: "ಸಾಮಾಜಿಕ anxiety from teasing is common. ನೆನಪಿಡಿ, the teaser often has their own insecurities.",
+      jealous: "Sometimes teasing comes from jealousy. Focus on people who appreciate you.",
+      confused: "It's confusing why people are mean. Often it's about their problems, not yours.",
+      okay: "Not letting teasing affect you shows confidence! Though it's also okay to feel hurt sometimes."
+    }
+  }
+];
+
+let currentScenario = 0;
+let answered = false;
+
+const questionText = document.getElementById('question-text');
+const scenarioText = document.getElementById('scenario-text');
+const responsePanel = document.getElementById('response-panel');
+const responseTitle = document.getElementById('response-title');
+const responseText = document.getElementById('response-text');
+const nextBtn = document.getElementById('next-btn');
+const progressDots = document.getElementById('progress-dots');
+
+function loadScenario() {
+  const scenario = scenarios[currentScenario];
+  questionText.textContent = scenario.question;
+  scenarioText.textContent = scenario.scenario;
+  
+  // ಮರುಹೊಂದಿಸಿ
+  answered = false;
+  responsePanel.classList.remove('show');
+  nextBtn.classList.remove('show');
+  document.querySelectorAll('.emotion-btn').forEach(btn => btn.classList.remove('selected'));
+  
+  // Update progress dots
+  const dots = progressDots.querySelectorAll('.progress-dot');
+  dots.forEach((dot, i) => {
+    dot.classList.remove('current', 'ಪೂರ್ಣd');
+    if (i < currentScenario) dot.classList.add('ಪೂರ್ಣd');
+    if (i === currentScenario) dot.classList.add('current');
+  });
+}
+
+function selectEmotion(emotion, btn) {
+  if (answered) return;
+  answered = true;
+  
+  document.querySelectorAll('.emotion-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  
+  const scenario = scenarios[currentScenario];
+  responseTitle.textContent = '✓ That\'s a valid feeling!';
+  responseText.textContent = scenario.responses[emotion];
+  
+  responsePanel.classList.add('show');
+  nextBtn.classList.add('show');
+}
+
+function nextScenario() {
+  currentScenario++;
+  
+  if (currentScenario >= scenarios.length) {
+    // Quiz ಪೂರ್ಣ
+    questionText.textContent = '🎉 ಭಾವನೆಗಳನ್ನು ಅನ್ವೇಷಿಸಿದ್ದಕ್ಕೆ ಶಾಭಾಶ್!';
+    scenarioText.textContent = 'ನಿಮ್ಮ ಭಾವನೆಗಳನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು ನಿರ್ವಹಣೆಯ ಮೊದಲ ಹೆಜ್ಜೆ them well.';
+    document.getElementById('emotions-grid').style.display = 'none';
+    responsePanel.classList.remove('show');
+    nextBtn.classList.remove('show');
+    
+    // Mark all dots as ಪೂರ್ಣd
+    progressDots.querySelectorAll('.progress-dot').forEach(dot => {
+      dot.classList.remove('current');
+      dot.classList.add('ಪೂರ್ಣd');
+    });
+    return;
+  }
+  
+  loadScenario();
+}
+
+// Initialize
+loadScenario();
+
+// ── URL Parameter Support ──────────────────────────────────────────────
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var state = p.get('initialState');
+  var hints = p.get('showHints');
+
+  if (hints === 'false') {
+    var cc = document.querySelector('.concept-card');
+    if (cc) cc.style.display = 'none';
+  }
+
+  if (state) {
+    var stateMap = { scenario1: 0, scenario2: 1, scenario3: 2, scenario4: 3, scenario5: 4 };
+    if (state === 'completed') {
+      // Drive to the completion screen
+      currentScenario = scenarios.length - 1;
+      setTimeout(function () { nextScenario(); }, 800);
+    } else if (stateMap[state] !== undefined) {
+      currentScenario = stateMap[state];
+      setTimeout(function () { loadScenario(); }, 800);
+    }
+  }
+}());
+</script>
+</body>
+</html>

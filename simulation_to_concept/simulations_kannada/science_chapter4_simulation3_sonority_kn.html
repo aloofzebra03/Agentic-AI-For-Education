@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#7b1fa2">
+<title>ಧ್ವನಿಮುದ್ರಣ – ಧ್ವನಿ ಪರೀಕ್ಷೆ</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #7b1fa2 0%, #ba68c8 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #f9a825;
+}
+
+.concept-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f57f17;
+  margin-bottom: 6px;
+}
+
+.concept-text {
+  font-size: 12px;
+  color: #5d4037;
+  line-height: 1.5;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.visual {
+  position: relative;
+  height: 35vh;
+  min-height: 240px;
+  background: linear-gradient(180deg, #263238 0%, #37474f 100%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+svg { width: 100%; height: 100%; }
+
+.sound-display {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.sound-display.ring { background: #e8f5e9; color: #2e7d32; }
+.sound-display.thud { background: #ffebee; color: #c62828; }
+
+.objects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.object-btn {
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 15px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.object-btn:active { transform: scale(0.95); }
+.object-btn.tested.sonorous { border-color: #4caf50; background: #e8f5e9; }
+.object-btn.tested.not-sonorous { border-color: #f44336; background: #ffebee; }
+.object-btn .icon { font-size: 32px; }
+.object-btn .name { font-size: 10px; color: #333; margin-top: 4px; }
+.object-btn .type { font-size: 8px; color: #888; margin-top: 2px; }
+
+.results-panel {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.result-card {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.result-card.sonorous { background: #e8f5e9; border: 2px solid #a5d6a7; }
+.result-card.not-sonorous { background: #ffebee; border: 2px solid #ef9a9a; }
+
+.result-card .label { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+.result-card.sonorous .label { color: #2e7d32; }
+.result-card.not-sonorous .label { color: #c62828; }
+.result-card .items { font-size: 9px; color: #666; min-height: 30px; }
+
+.learning-panel {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #7b1fa2;
+}
+
+.learning-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6a1b9a;
+  margin-bottom: 6px;
+}
+
+.learning-text {
+  font-size: 11px;
+  color: #37474f;
+  line-height: 1.6;
+}
+
+.takeaway {
+  background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2e7d32;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1b5e20; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+@keyframes ಕಂಪಿಸುತ್ತದೆ {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-3px); }
+  20% { transform: translateX(3px); }
+  30% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  50% { transform: translateX(-2px); }
+  60% { transform: translateX(2px); }
+  70% { transform: translateX(-1px); }
+  80% { transform: translateX(1px); }
+}
+
+.ಕಂಪಿಸುತ್ತದೆ { animation: ಕಂಪಿಸುತ್ತದೆ 0.8s ease-out; }
+
+@keyframes soundWave {
+  0% { r: 20; opacity: 1; }
+  100% { r: 80; opacity: 0; }
+}
+
+.sound-wave { animation: soundWave 0.6s ease-out forwards; }
+
+@keyframes thud {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
+  100% { transform: translateY(0); }
+}
+
+.thud-anim { animation: thud 0.2s ease-out; }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🔔 ಧ್ವನಿಮುದ್ರಣ</h1>
+  <p>ಈ ವಸ್ತು ಟಳ್ಳು ಧ್ವನಿ ಉತ್ಪಾದಿಸುತ್ತದೆಯೇ?</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ಧ್ವನಿಮುದ್ರಣ</strong> ಲೋಹಗಳ ಗುಣ <strong>ಘಂಟಾ ಧ್ವನಿ</strong> ಅಪ್ಪಳಿಸಿದಾಗ. ಲೋಹಗಳು ಧ್ವನಿಮುದ್ರಣ; ಅಲೋಹಗಳು ಮಂಕಾದ ಶಬ್ದ ಉತ್ಪಾದಿಸುತ್ತವೆ.
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="visual">
+    <svg viewBox="0 0 400 240" id="scene">
+      <!-- Object display area -->
+      <g id="object-display" transform="translate(200, 120)">
+        <circle id="object-shape" cx="0" cy="0" r="50" fill="#bdbdbd"/>
+        <text id="object-icon" x="0" y="15" font-size="50" text-anchor="middle">🔔</text>
+      </g>
+      
+      <!-- Sound waves (hidden initially) -->
+      <g id="sound-waves" style="display:none">
+        <circle cx="200" cy="120" r="20" fill="none" stroke="#4caf50" stroke-width="2" class="wave1"/>
+        <circle cx="200" cy="120" r="20" fill="none" stroke="#4caf50" stroke-width="2" class="wave2"/>
+        <circle cx="200" cy="120" r="20" fill="none" stroke="#4caf50" stroke-width="2" class="wave3"/>
+      </g>
+      
+      <!-- Strike ಸೂಚಕ -->
+      <g id="striker" transform="translate(280, 80)" style="opacity:0.3">
+        <text x="0" y="0" font-size="40">🪄</text>
+      </g>
+      
+      <!-- Instructions -->
+      <text x="200" y="30" font-size="12" fill="#fff" text-anchor="middle" id="instruction">👆 ಕೆಳಗೆ ವಸ್ತುವನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿ ಅಪ್ಪಳಿಸಿ</text>
+    </svg>
+    <div class="sound-display" id="sound-display" style="display:none">🔔 ಘಂಟೆ!</div>
+  </div>
+  
+  <div class="objects-grid">
+    <div class="object-btn" onclick="strikeObject('bell', '🔔', true, this)">
+      <div class="icon">🔔</div>
+      <div class="name">ಲೋಹ ಘಂಟೆ</div>
+      <div class="type">ಲೋಹ</div>
+    </div>
+    <div class="object-btn" onclick="strikeObject('spoon', '🥄', true, this)">
+      <div class="icon">🥄</div>
+      <div class="name">ಲೋಹದ ಚಮಚ</div>
+      <div class="type">ಲೋಹ</div>
+    </div>
+    <div class="object-btn" onclick="strikeObject('coin', '🪙', true, this)">
+      <div class="icon">🪙</div>
+      <div class="name">ನಾಣ್ಯ</div>
+      <div class="type">ಲೋಹ</div>
+    </div>
+    <div class="object-btn" onclick="strikeObject('wood', '🪵', false, this)">
+      <div class="icon">🪵</div>
+      <div class="name">ಮರ ಬ್ಲಾಕ್</div>
+      <div class="type">ಅಲೋಹ</div>
+    </div>
+    <div class="object-btn" onclick="strikeObject('plastic', '🧊', false, this)">
+      <div class="icon">🧊</div>
+      <div class="name">ಪ್ಲಾಸ್ಟಿಕ್ ಬಾಕ್ಸ್</div>
+      <div class="type">ಅಲೋಹ</div>
+    </div>
+    <div class="object-btn" onclick="strikeObject('rubber', '⚫', false, this)">
+      <div class="icon">⚫</div>
+      <div class="name">ರಬ್ಬರ್ ಚೆಂಡು</div>
+      <div class="type">ಅಲೋಹ</div>
+    </div>
+  </div>
+</div>
+
+<div class="results-panel">
+  <div class="result-card sonorous">
+    <div class="label">🔔 ಧ್ವನಿವಂತ (ರಿಂಗ್)</div>
+    <div class="items" id="sonorous-items">-</div>
+  </div>
+  <div class="result-card not-sonorous">
+    <div class="label">🔇 ಧ್ವನಿವಂತವಲ್ಲ (ಥಡ್)</div>
+    <div class="items" id="not-sonorous-items">-</div>
+  </div>
+</div>
+
+<div class="learning-panel">
+  <div class="learning-title">🔬 ಧ್ವನಿಮುದ್ರಣ ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು</div>
+  <div class="learning-text" id="learning-text">
+    ವಸ್ತುವನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿ ಹೊಡೆದು ಶಬ್ದ ಕೇಳಿ!<br><br>
+    <strong>ಧ್ವನಿವಂತ ವಸ್ತುಗಳು</strong> ನಿಲ್ಲುವ ಘಂಟಾ ಧ್ವನಿ ಉತ್ಪಾದಿಸುತ್ತವೆ.<br>
+    <strong>ಧ್ವನಿವಂತವಲ್ಲದ ವಸ್ತುಗಳು</strong> ಮಂದ ಥಡ್ ಶಬ್ದ ಉತ್ಪಾದಿಸುತ್ತವೆ.
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೀವು ಕಲಿಯುವುದು</div>
+  <div class="takeaway-text">
+    <strong>ಲೋಹಗಳು</strong> ಧ್ವನಿವಂತ - ಹೊಡೆದಾಗ ಶಬ್ದ! ಅದಕ್ಕೆ ಗಂಟೆ, ಜಂಗ್ಲ್ ಲೋಹ.<br><br>
+    <strong>ಅಲೋಹಗಳು</strong> ಮರ, ಪ್ಲಾಸ್ಟಿಕ್, ರಬ್ಬರ್ ಮಂದ ಶಬ್ದ - ಕಂಪನ ಹೀರಿಕೊಳ್ಳುತ್ತವೆ ಪ್ರಸರಿಸುವ ಬದಲು.
+  </div>
+</div>
+
+</div>
+
+<script>
+const sonorousList = [];
+const notSonorousList = [];
+
+const objectDisplay = document.getElementById('object-display');
+const objectIcon = document.getElementById('object-icon');
+const soundWaves = document.getElementById('sound-waves');
+const soundDisplay = document.getElementById('sound-display');
+const instruction = document.getElementById('instruction');
+const learningText = document.getElementById('learning-text');
+
+function strikeObject(name, icon, isSonorous, btn) {
+  if (btn.classList.contains('tested')) return;
+  
+  // Update display
+  objectIcon.textContent = icon;
+  
+  // Hide previous results
+  soundDisplay.style.display = 'none';
+  soundWaves.style.display = 'none';
+  
+  // ಅನಿಮೇಟ್ strike
+  objectDisplay.classList.remove('ಕಂಪಿಸುತ್ತದೆ', 'thud-anim');
+  
+  setTimeout(() => {
+    if (isSonorous) {
+      // ಲೋಹ - rings
+      objectDisplay.classList.add('ಕಂಪಿಸುತ್ತದೆ');
+      soundWaves.style.display = 'block';
+      
+      // ಅನಿಮೇಟ್ sound waves
+      const waves = soundWaves.querySelectorAll('circle');
+      waves.forEach((wave, i) => {
+        wave.classList.remove('sound-wave');
+        setTimeout(() => {
+          wave.classList.add('sound-wave');
+        }, i * 150);
+      });
+      
+      soundDisplay.textContent = '🔔 ಘಂಟೆ! ~~~';
+      soundDisplay.className = 'sound-display ring';
+      soundDisplay.style.display = 'block';
+      
+      btn.classList.add('tested', 'sonorous');
+      sonorousList.push(name);
+      
+      instruction.textContent = '🔔 ಲೋಹ ಘಂಟಾ ಧ್ವನಿ ಉತ್ಪಾದಿಸುತ್ತದೆ!';
+      
+      learningText.innerHTML = `
+        <strong style="color:#2e7d32">🔔 ಧ್ವನಿವಂತ!</strong><br><br>
+        ಹೊಡೆದಾಗ ಈ ಲೋಹ ವಸ್ತು ಸ್ವಲ್ಪ ಸಮಯ <strong>ಸ್ಪಷ್ಟ ಘಂಟಾ ಧ್ವನಿ</strong> ಉತ್ಪಾದಿಸುತ್ತದೆ.<br><br>
+        ಲೋಹದ ಅಣುಗಳು ಬಿಗಿಯಾಗಿ ಜೋಡಣೆಗೊಂಡಿರುತ್ತವೆ ಮತ್ತು <strong>ಒಟ್ಟಿಗೆ ಕಂಪಿಸಬಲ್ಲವು</strong> – ನಿರಂತರ ಧ್ವನಿ ತರಂಗಗಳನ್ನು ಉಂಟುಮಾಡುತ್ತವೆ.
+      `;
+      
+      // Play a simulated ring sound effect visual
+      setTimeout(() => {
+        soundDisplay.textContent = '🔔 ಘಂಟೆ! ~~';
+      }, 300);
+      setTimeout(() => {
+        soundDisplay.textContent = '🔔 ಘಂಟೆ! ~';
+      }, 600);
+      
+    } else {
+      // ಅಲೋಹ - thud
+      objectDisplay.classList.add('thud-anim');
+      
+      soundDisplay.textContent = '🔇 ಥಡ್.';
+      soundDisplay.className = 'sound-display thud';
+      soundDisplay.style.display = 'block';
+      
+      btn.classList.add('tested', 'not-sonorous');
+      notSonorousList.push(name);
+      
+      instruction.textContent = '🔇 ಅಲೋಹ ಮಂಕಾದ ಶಬ್ದ ಉತ್ಪಾದಿಸುತ್ತದೆ!';
+      
+      learningText.innerHTML = `
+        <strong style="color:#c62828">🔇 ಧ್ವನಿವಂತವಲ್ಲ!</strong><br><br>
+        ಹೊಡೆದಾಗ ಈ ಅಲೋಹ ವಸ್ತು ತಕ್ಷಣ ನಿಲ್ಲುವ <strong>ಮಂಕಾದ ಥಡ್ ಶಬ್ದ</strong> ಉತ್ಪಾದಿಸುತ್ತದೆ.<br><br>
+        ಅಲೋಹಗಳು ಕಂಪನಗಳನ್ನು ಪ್ರಸರಿಸುವ ಬದಲು <strong>ಹೀರಿಕೊಳ್ಳುತ್ತವೆ</strong> – ನಿರಂತರ ಧ್ವನಿ ಉತ್ಪಾದಿಸುವುದಿಲ್ಲ.
+      `;
+    }
+    
+    // Update results
+    document.getElementById('sonorous-items').textContent = sonorousList.length ? sonorousList.join(', ') : '-';
+    document.getElementById('not-sonorous-items').textContent = notSonorousList.length ? notSonorousList.join(', ') : '-';
+    
+  }, 100);
+}
+
+// ── URL parameter support ────────────────────────────────
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var state = p.get('initialState') || 'initial';
+  var hints = p.get('showHints');
+
+  if (hints === 'false') {
+    var cc = document.querySelector('.concept-card');
+    if (cc) cc.style.display = 'none';
+  }
+
+  if (state === 'metal_strike' || state === 'nonmetal_strike') {
+    var btns = document.querySelectorAll('.object-btn');
+    var isNonMetal  = (state === 'nonmetal_strike');
+    var idx         = isNonMetal ? 3 : 0;
+    var name        = isNonMetal ? 'wood'   : 'bell';
+    var icon        = isNonMetal ? '\uD83E\uDE35' : '\uD83D\uDD14';
+    var isSonorous  = !isNonMetal;
+    setTimeout(function () {
+      if (btns[idx]) strikeObject(name, icon, isSonorous, btns[idx]);
+    }, 800);
+  }
+}());
+</script>
+</body>
+</html>

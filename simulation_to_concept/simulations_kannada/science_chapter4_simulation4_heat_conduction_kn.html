@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#d32f2f">
+<title>ಉಷ್ಣ ವಾಹಕತೆ – ಲೋಹಗಳು ಮತ್ತು ಅಲೋಹಗಳು</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #d32f2f 0%, #ef5350 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 420px;
+  margin: auto;
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.header {
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.header h1 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.95; }
+
+.concept-card {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #f9a825;
+}
+
+.concept-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f57f17;
+  margin-bottom: 6px;
+}
+
+.concept-text {
+  font-size: 12px;
+  color: #5d4037;
+  line-height: 1.5;
+}
+
+.sim-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+}
+
+.visual {
+  position: relative;
+  height: 42vh;
+  min-height: 300px;
+  background: linear-gradient(180deg, #eceff1 0%, #cfd8dc 100%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+svg { width: 100%; height: 100%; }
+
+.temp-display {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.start-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  background: linear-gradient(135deg, #ff5722 0%, #ff7043 100%);
+  color: white;
+  transition: transform 0.1s ease;
+}
+
+.start-btn:active { transform: scale(0.98); }
+.start-btn:disabled { background: #ccc; }
+
+.comparison-panel {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.spoon-card {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.spoon-card .icon { font-size: 28px; }
+.spoon-card .name { font-size: 11px; font-weight: 600; margin-top: 4px; }
+.spoon-card .temp { font-size: 18px; font-weight: 700; margin-top: 6px; color: #666; }
+.spoon-card .status { font-size: 9px; color: #888; margin-top: 4px; }
+
+.spoon-card.hot {
+  border-color: #f44336;
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+}
+
+.spoon-card.hot .temp { color: #d32f2f; }
+.spoon-card.cool { border-color: #4caf50; background: #e8f5e9; }
+
+.learning-panel {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 3px solid #d32f2f;
+}
+
+.learning-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #c62828;
+  margin-bottom: 6px;
+}
+
+.learning-text {
+  font-size: 11px;
+  color: #37474f;
+  line-height: 1.6;
+}
+
+.takeaway {
+  background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #2e7d32;
+}
+
+.takeaway-title { font-size: 12px; font-weight: 700; color: #1b5e20; margin-bottom: 6px; }
+.takeaway-text { font-size: 11px; color: #37474f; line-height: 1.5; }
+
+@keyframes boil {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.boil { animation: boil 0.3s ease-in-out infinite; }
+
+@keyframes heatGlow {
+  0% { stop-color: #bdbdbd; }
+  100% { stop-color: #ff5722; }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>🔥 ಉಷ್ಣ ವಾಹಕತೆ</h1>
+  <p>ಯಾವ ಪದಾರ್ಥ ಉಷ್ಣವನ್ನು ಉತ್ತಮವಾಗಿ ಹರಿಸುತ್ತದೆ?</p>
+</div>
+
+<div class="concept-card">
+  <div class="concept-title">📚 ಮುಖ್ಯ ಪರಿಕಲ್ಪನೆ</div>
+  <div class="concept-text">
+    <strong>ಉಷ್ಣ ವಾಹಕತೆ</strong> ಪದಾರ್ಥದ ಮೂಲಕ ಉಷ್ಣ ವರ್ಗಾವಣೆ. <strong>ಲೋಹಗಳು</strong> ಉಷ್ಣದ ಉತ್ತಮ ವಾಹಕಗಳು; <strong>ಅಲೋಹಗಳು</strong> ಮರ ಮತ್ತು ಪ್ಲಾಸ್ಟಿಕ್ ಕಳಪೆ ವಾಹಕಗಳು (ಅವಾಹಕಗಳು).
+  </div>
+</div>
+
+<div class="sim-card">
+  <div class="visual">
+    <div class="temp-display" id="temp-display">🌡️ ಚಮಚಗಳನ್ನು ಬಿಸಿ ನೀರಲ್ಲಿ ಇಡಿ</div>
+    <svg viewBox="0 0 400 300" id="scene">
+      <!-- Hot ನೀರು container -->
+      <rect x="100" y="150" width="200" height="120" rx="10" fill="#1976d2"/>
+      <rect x="105" y="155" width="190" height="110" rx="8" fill="#42a5f5"/>
+      
+      <!-- Steam bubbles -->
+      <g id="steam">
+        <circle cx="150" cy="200" r="5" fill="#fff" opacity="0.5" class="bubble1"/>
+        <circle cx="200" cy="210" r="4" fill="#fff" opacity="0.4" class="bubble2"/>
+        <circle cx="250" cy="195" r="6" fill="#fff" opacity="0.5" class="bubble3"/>
+      </g>
+      
+      <!-- Steam rising -->
+      <g id="steam-rise" style="opacity:0">
+        <text x="150" y="140" font-size="20" fill="#90a4ae">~</text>
+        <text x="200" y="130" font-size="20" fill="#90a4ae">~</text>
+        <text x="250" y="140" font-size="20" fill="#90a4ae">~</text>
+      </g>
+      
+      <!-- ಲೋಹ spoon -->
+      <g id="metal-spoon" transform="translate(130, 80)">
+        <defs>
+          <linearGradient id="metalHeat" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" style="stop-color:#ff5722" id="metal-heat-stop"/>
+            <stop offset="100%" style="stop-color:#9e9e9e"/>
+          </linearGradient>
+        </defs>
+        <ellipse cx="20" cy="100" rx="18" ry="12" fill="url(#metalHeat)"/>
+        <rect x="15" y="0" width="10" height="90" rx="3" fill="url(#metalHeat)"/>
+        <circle cx="20" cy="0" r="8" fill="#9e9e9e" id="metal-handle"/>
+        <text x="20" y="-15" font-size="10" fill="#333" text-anchor="middle">ಲೋಹ</text>
+      </g>
+      
+      <!-- ಮರದ spoon -->
+      <g id="wooden-spoon" transform="translate(230, 80)">
+        <defs>
+          <linearGradient id="woodHeat" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" style="stop-color:#ff5722" id="wood-heat-stop"/>
+            <stop offset="100%" style="stop-color:#8d6e63"/>
+          </linearGradient>
+        </defs>
+        <ellipse cx="20" cy="100" rx="18" ry="12" fill="url(#woodHeat)"/>
+        <rect x="15" y="0" width="10" height="90" rx="3" fill="url(#woodHeat)"/>
+        <circle cx="20" cy="0" r="8" fill="#8d6e63" id="wood-handle"/>
+        <text x="20" y="-15" font-size="10" fill="#333" text-anchor="middle">ಮರದ</text>
+      </g>
+      
+      <!-- ಕೈ ಸ್ಪರ್ಶ ಸೂಚಕ -->
+      <g id="touch-indicator" style="display:none">
+        <text x="80" y="60" font-size="24">👆</text>
+        <text x="50" y="85" font-size="10" fill="#d32f2f" id="touch-result">ಬಿಸಿ!</text>
+      </g>
+      
+      <!-- Timer -->
+      <text x="200" y="290" font-size="11" fill="#666" text-anchor="middle" id="timer">ಸಮಯ: 0 ಸೆಕೆಂಡ್</text>
+    </svg>
+  </div>
+  
+  <button class="start-btn" id="start-btn" onclick="startExperiment()">
+    🔥 ಉಷ್ಣ ಪ್ರಯೋಗ ಪ್ರಾರಂಭಿಸಿ
+  </button>
+</div>
+
+<div class="comparison-panel">
+  <div class="spoon-card" id="metal-card">
+    <div class="icon">🥄</div>
+    <div class="name">ಲೋಹದ ಚಮಚ</div>
+    <div class="temp" id="metal-temp">25°C</div>
+    <div class="status" id="metal-status">ಕೊಂಡೆಯ ಉಷ್ಣತೆ</div>
+  </div>
+  <div class="spoon-card" id="wood-card">
+    <div class="icon">🥢</div>
+    <div class="name">ಮರದ ಚಮಚ</div>
+    <div class="temp" id="wood-temp">25°C</div>
+    <div class="status" id="wood-status">ಕೊಂಡೆಯ ಉಷ್ಣತೆ</div>
+  </div>
+</div>
+
+<div class="learning-panel">
+  <div class="learning-title">🔬 ಉಷ್ಣ ವಾಹಕತೆ ಪ್ರಯೋಗ</div>
+  <div class="learning-text" id="learning-text">
+    ಲೋಹ ಮತ್ತು ಮರದ ಚಮಚ ಬಿಸಿ ನೀರಲ್ಲಿ ಇಡುತ್ತೇವೆ ಯಾವ ಹಿಡಿಕೆ ಬೇಗ ಬಿಸಿಯಾಗುತ್ತದೆ ನೋಡುತ್ತೇವೆ.<br><br>
+    ಪ್ರಯೋಗ ಪ್ರಾರಂಭಿಸಲು ಬಟನ್ ಟ್ಯಾಪ್ ಮಾಡಿ!
+  </div>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">🎯 ನೀವು ಕಲಿಯುವುದು</div>
+  <div class="takeaway-text">
+    <strong>ಲೋಹಗಳು ಉಷ್ಣವನ್ನು ಶೀಘ್ರವಾಗಿ ವಹನ ಮಾಡುತ್ತವೆ</strong> - ಲೋಹದ ಚಮಚ ಹಿಡಿಕೆ ಬೇಗ ಬಿಸಿಯಾಗುತ್ತದೆ!<br><br>
+    <strong>ಮರ ಕಲಪೆ ವಾಹಕ</strong> - ಮರದ ಚಮಚ ಹಿಡಿಕೆ ತಂಪಾಗಿ ಉಳಿಯುತ್ತದೆ.<br><br>
+    ಅದಕ್ಕೆ ಅಡುಗೆ ಪಾತ್ರೆ ಲೋಹ (ಆಹಾರ ಬಿಸಿ) ಹಿಡಿಕೆ ಮರ ಅಥವಾ ಪ್ಲಾಸ್ಟಿಕ್ (ತಂಪಾಗಿ)!
+  </div>
+</div>
+
+</div>
+
+<script>
+let experimentRunning = false;
+let time = 0;
+let metalTemp = 25;
+let woodTemp = 25;
+let interval;
+
+const startBtn = document.getElementById('start-btn');
+const tempDisplay = document.getElementById('temp-display');
+const timer = document.getElementById('timer');
+const metalTempEl = document.getElementById('metal-temp');
+const woodTempEl = document.getElementById('wood-temp');
+const metalCard = document.getElementById('metal-card');
+const woodCard = document.getElementById('wood-card');
+const metalStatus = document.getElementById('metal-status');
+const woodStatus = document.getElementById('wood-status');
+const metalHandle = document.getElementById('metal-handle');
+const steamRise = document.getElementById('steam-rise');
+const steam = document.getElementById('steam');
+const learningText = document.getElementById('learning-text');
+const metalHeatStop = document.getElementById('metal-heat-stop');
+const woodHeatStop = document.getElementById('wood-heat-stop');
+
+function startExperiment() {
+  if (experimentRunning) return;
+  experimentRunning = true;
+  startBtn.disabled = true;
+  startBtn.textContent = '🔥 ಉಷ್ಣ ಹಾಕುತ್ತಿದೆ...';
+  
+  // ಪ್ರಾರಂಭ steam animation
+  steamRise.style.opacity = '1';
+  steam.classList.add('boil');
+  
+  tempDisplay.textContent = '🌡️ ನೀರು: 80°C - ಉಷ್ಣ ವರ್ಗಾವಣೆ ಗಮನಿಸುತ್ತಿದೆ...';
+  
+  interval = setInterval(() => {
+    time++;
+    timer.textContent = `ಸಮಯ: ${time} ಸೆಕೆಂಡ್‌ಗಳು`;
+    
+    // ಲೋಹ heats up quickly
+    if (metalTemp < 70) {
+      metalTemp += 3;
+    }
+    
+    // Wood heats up slowly
+    if (woodTemp < 35) {
+      woodTemp += 0.3;
+    }
+    
+    // Update displays
+    metalTempEl.textContent = `${Math.round(metalTemp)}°C`;
+    woodTempEl.textContent = `${Math.round(woodTemp)}°C`;
+    
+    // Update colors based on temperature
+    const metalHeatPercent = Math.min((metalTemp - 25) / 45, 1);
+    metalHeatStop.setAttribute('offset', `${metalHeatPercent * 80}%`);
+    
+    if (metalTemp > 40) {
+      metalCard.classList.add('hot');
+      metalStatus.textContent = metalTemp > 60 ? '🔥 ಬಹಳ ಬಿಸಿ!' : '⚠️ ಬಿಸಿಯಾಗುತ್ತಿದೆ';
+      metalHandle.setAttribute('fill', `rgb(${150 + metalHeatPercent * 105}, ${150 - metalHeatPercent * 100}, ${150 - metalHeatPercent * 100})`);
+    }
+    
+    if (woodTemp > 28) {
+      woodStatus.textContent = 'ಇನ್ನೂ ತಂಪಾಗಿದೆ';
+    }
+    
+    // Update learning text based on progress
+    if (time === 5) {
+      learningText.innerHTML = `
+        <strong>ನಂತರ 5 ಸೆಕೆಂಡ್‌ಗಳು:</strong><br><br>
+        ಲೋಹದ ಚಮಚ ಹಿಡಿಕೆ: <strong style="color:#d32f2f">${Math.round(metalTemp)}°C</strong> - ಬಿಸಿಯಾಗುತ್ತಿದೆ!<br>
+        ಮರದ ಚಮಚ ಹಿಡಿಕೆ: <strong style="color:#4caf50">${Math.round(woodTemp)}°C</strong> - ಇನ್ನೂ ತಂಪು<br><br>
+        ಉಷ್ಣ ಲೋಹದ ಮೂಲಕ ವೇಗವಾಗಿ ವರ್ಗಾವಣೆಯಾಗುತ್ತಿದೆ!
+      `;
+    }
+    
+    if (time === 10) {
+      learningText.innerHTML = `
+        <strong>ನಂತರ 10 ಸೆಕೆಂಡ್‌ಗಳು:</strong><br><br>
+        ಲೋಹದ ಚಮಚ: <strong style="color:#d32f2f">${Math.round(metalTemp)}°C</strong> - ಬಿಸಿ! ಸ್ಪರ್ಶಿಸಬೇಡಿ!<br>
+        ಮರದ ಚಮಚ: <strong style="color:#4caf50">${Math.round(woodTemp)}°C</strong> - ಹಿಡಿಯಲು ಸುರಕ್ಷಿತ<br><br>
+        ಲೋಹ ಮರಕ್ಕಿಂತ ಉಷ್ಣವನ್ನು ಹೆಚ್ಚು ವೇಗವಾಗಿ ವಹನ ಮಾಡುತ್ತದೆ!
+      `;
+    }
+    
+    // End experiment after 15 ಸೆಕೆಂಡ್‌ಗಳು
+    if (time >= 15) {
+      clearInterval(interval);
+      experimentRunning = false;
+      startBtn.textContent = '✅ ಪ್ರಯೋಗ ಪೂರ್ಣ';
+      tempDisplay.textContent = '🌡️ ಪ್ರಯೋಗ ಮುಗಿದಿದೆ!';
+      woodCard.classList.add('cool');
+      
+      learningText.innerHTML = `
+        <strong style="color:#2e7d32">✅ ಪ್ರಯೋಗ ಪೂರ್ಣ!</strong><br><br>
+        <strong>ಲೋಹ spoon:</strong> ${Math.round(metalTemp)}°C - Conducted heat quickly (GOOD CONDUCTOR)<br>
+        <strong>ಮರದ spoon:</strong> ${Math.round(woodTemp)}°C - Stayed cool (POOR CONDUCTOR/INSULATOR)<br><br>
+        <strong>ತೀರ್ಮಾನ:</strong> ಲೋಹಗಳು transfer heat ಶಕ್ತಿ quickly through their atoms. Wood traps heat ಮತ್ತು doesn't transfer it well.
+      `;
+    }
+  }, 1000);
+}
+
+// ── URL parameter support ────────────────────────────────
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var state = p.get('initialState') || 'initial';
+  var hints = p.get('showHints');
+
+  if (hints === 'false') {
+    var cc = document.querySelector('.concept-card');
+    if (cc) cc.style.display = 'none';
+  }
+
+  if (state === 'running') {
+    setTimeout(function () {
+      var btn = document.getElementById('start-btn');
+      if (btn && !btn.disabled) startExperiment();
+    }, 800);
+  }
+}());
+</script>
+</body>
+</html>
