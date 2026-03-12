@@ -31,7 +31,7 @@ from api_tracker_utils.error import MinuteLimitExhaustedError, DayLimitExhausted
 
 # Fallback API key (for backward compatibility, but tracker will be used)
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemma-3-27b-it")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 TEMPERATURE = float(os.getenv("TEMPERATURE", "0.7"))
 
 # API Tracker enabled flag
@@ -111,7 +111,10 @@ def validate_config():
 # ═══════════════════════════════════════════════════════════════════════
 
 # GitHub Pages base URL (set in .env for production, None for local dev)
-GITHUB_PAGES_BASE_URL = os.getenv("GITHUB_PAGES_BASE_URL", None)
+GITHUB_PAGES_BASE_URL = os.getenv(
+    "GITHUB_PAGES_BASE_URL",
+    "https://imhv0609.github.io/simulation_to_concept_version3_github_modified"
+)
 
 def get_simulation_base_url(simulation_id: str = None) -> str:
     """

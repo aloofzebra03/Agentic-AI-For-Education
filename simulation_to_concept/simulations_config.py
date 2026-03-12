@@ -740,7 +740,7 @@ SIMULATIONS["distributive"] = {
     "title": "Distributive Property",
     "file": "simulations/ch2_sim3_distributive.html",
     "description": "Understand the distributive property: a × (b + c) = a × b + a × c through multiple visual representations and mental math applications",
-    "url": "https://imhv0609.github.io/simulation_to_concept_version3_github/simulations/ch2_sim3_distributive.html",
+    "url": "https://imhv0609.github.io/simulation_to_concept_version3_github_modified/simulations/ch2_sim3_distributive.html",
     "cannot_demonstrate": [
         "Factoring expressions (reverse of distributive property)",
         "Distributive property with division",
@@ -951,9 +951,13 @@ def get_all_simulations() -> dict:
     return SIMULATIONS
 
 def get_simulation_list() -> list:
-    """Get list of available simulation IDs and titles."""
+    """Get list of available simulation IDs, titles, and language."""
     return [
-        {"id": sim_id, "title": config["title"]} 
+        {
+            "id": sim_id,
+            "title": config["title"],
+            "language": config.get("language", "english")
+        }
         for sim_id, config in SIMULATIONS.items()
     ]
 

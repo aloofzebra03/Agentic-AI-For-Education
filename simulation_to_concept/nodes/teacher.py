@@ -330,6 +330,13 @@ EXAMPLES OF BAD VAGUE QUESTIONS (AVOID):
 - "Interesting, isn't it?"
 - "What comes to mind?"
 - "Let's think about this..."
+
+RULE: ALWAYS SHOW SIMULATION WHEN YOU REFERENCE IT:
+Whenever your teacher_message asks the student to "OBSERVE:", "watch", "look at", "see", or "notice"
+the simulation in any way, you MUST set "suggests_param_change": true in your JSON response.
+This triggers the simulation to actually appear on the student's screen.
+Even if you are NOT changing values, use the current parameters with suggests_param_change=true
+so the student can actually see what you are asking them to observe.
 """
 
     # Build user prompt based on context

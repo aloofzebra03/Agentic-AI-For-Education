@@ -5,9 +5,9 @@ Verifies that the single-simulation URL changes work correctly.
 """
 
 import json
-from simulation_to_concept.api_models import ParameterChange, SimulationState
-from simulation_to_concept.api_integration import format_api_response
-from simulation_to_concept.config import build_simulation_url
+from api_models import ParameterChange, SimulationState
+from api_integration import format_api_response
+from config import build_simulation_url
 
 
 def test_parameter_change_model():

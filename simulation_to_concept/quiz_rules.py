@@ -133,10 +133,21 @@ def check_conditions_list(
         param_value = submitted_params[param_name]
         
         try:
+            # Try numeric comparison first
             if not evaluate_condition(float(param_value), operator, float(threshold)):
                 return False
         except (ValueError, TypeError):
-            return False
+            # Fall back to string comparison for non-numeric parameters
+            # (e.g., mode='learn', initialState='treated', objectType='Opaque')
+            if operator == "==":
+                if str(param_value) != str(threshold):
+                    return False
+            elif operator == "!=":
+                if str(param_value) == str(threshold):
+                    return False
+            else:
+                # Ordering operators (>=, <=, >, <) don't apply to strings
+                return False
     
     return True
 

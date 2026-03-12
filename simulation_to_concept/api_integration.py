@@ -30,6 +30,10 @@ from simulation_to_concept.translation import (
 # need it before reading state in process_student_input)
 _session_languages: dict = {}
 
+# Maps session_id -> simulation_id so concurrent sessions with different
+# simulations (including Kannada) never collide on the global env var.
+_session_simulations: dict = {}
+
 
 # ═══════════════════════════════════════════════════════════════════════
 # ENVIRONMENT CONFIGURATION
@@ -247,8 +251,9 @@ def create_teaching_session(simulation_id: str, student_id: str = None, language
     print(f"✅ Session created: {thread_id}")
     print(f"📝 Initial message: {state.get('last_teacher_message', '')[:80]}...")
     
-    # Store language for this session
+    # Store language and simulation_id for this session
     _session_languages[thread_id] = language
+    _session_simulations[thread_id] = simulation_id
     
     # Format for API
     response = format_api_response(thread_id, state, simulation_id)
@@ -279,10 +284,8 @@ def process_student_input(session_id: str, student_response: str) -> Dict[str, A
     print(f"   Student said: {student_response[:80]}...")
     print(f"{'='*60}")
     
-    # Get simulation from environment
-    simulation_id = os.environ.get('SIMULATION_ID', 'simple_pendulum')
-    
-    # Get session language
+    # Get simulation and language from per-session store
+    simulation_id = _session_simulations.get(session_id, os.environ.get('SIMULATION_ID', 'simple_pendulum'))
     language = _session_languages.get(session_id, DEFAULT_LANGUAGE)
     
     # Translate student input to English if needed
@@ -336,8 +339,8 @@ def get_session_info(session_id: str) -> Dict[str, Any]:
     if not state:
         raise KeyError(f"Session {session_id} not found")
     
-    # Determine simulation from environment
-    simulation_id = os.environ.get('SIMULATION_ID', 'simple_pendulum')
+    # Determine simulation from per-session store
+    simulation_id = _session_simulations.get(session_id, os.environ.get('SIMULATION_ID', 'simple_pendulum'))
     
     print(f"✅ Session found")
     print(f"📊 Concept: {state.get('current_concept_index', 0) + 1} of {len(state.get('concepts', []))}")

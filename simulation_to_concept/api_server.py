@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import traceback
 
-from simulation_to_concept.api_models import (
+from api_models import (
     StartSessionRequest,
     StudentResponseRequest,
     SessionResponse,
@@ -21,7 +21,7 @@ from simulation_to_concept.api_models import (
     QuizSubmissionRequest,
     QuizEvaluationResponse
 )
-from simulation_to_concept.api_integration import (
+from api_integration import (
     create_teaching_session,
     process_student_input,
     get_session_info,

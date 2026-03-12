@@ -16,6 +16,11 @@ Features:
 from typing import Dict, List, Optional, Tuple
 from deep_translator import GoogleTranslator
 import traceback
+import concurrent.futures
+
+# Timeout (seconds) for each Google Translate HTTP request.
+# Prevents Streamlit from hanging when Google rate-limits or is slow.
+_TRANSLATE_TIMEOUT_SECONDS = 8
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -85,7 +90,20 @@ def translate(text: str, source: str = "en", target: str = "kn") -> str:
     
     try:
         translator = GoogleTranslator(source=source, target=target)
-        translated = translator.translate(text)
+        
+        # Run in thread with timeout to avoid hanging when Google rate-limits.
+        # IMPORTANT: do NOT use ThreadPoolExecutor as a context manager here —
+        # executor.__exit__ calls shutdown(wait=True), which blocks until the
+        # worker thread finishes, negating the timeout entirely.
+        # Instead, call shutdown(wait=False) so the timeout is real.
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+        future = executor.submit(translator.translate, text)
+        executor.shutdown(wait=False)
+        try:
+            translated = future.result(timeout=_TRANSLATE_TIMEOUT_SECONDS)
+        except concurrent.futures.TimeoutError:
+            print(f"[TRANSLATE] Timeout ({_TRANSLATE_TIMEOUT_SECONDS}s) translating: {text[:50]}... — returning original")
+            return text
         
         if translated:
             _set_cached(text, source, target, translated)
@@ -112,27 +130,87 @@ def translate_to_kannada(text: str) -> str:
 
 def translate_batch(texts: List[str], source: str = "en", target: str = "kn") -> List[str]:
     """
-    Translate a list of texts efficiently.
-    
-    Uses cache for already-translated strings and only calls the API
-    for new ones. Returns translations in the same order as input.
-    
+    Translate a list of texts in parallel for efficiency.
+
+    Cache hits are resolved instantly; only uncached strings hit the network.
+    All uncached strings are translated concurrently (one thread per string)
+    so the total wall-clock time equals the slowest single call, not the sum.
+
     Args:
         texts: List of texts to translate
         source: Source language code
         target: Target language code
-        
+
     Returns:
         List of translated texts (same order as input)
     """
     if source == target:
         return texts
-    
-    results = []
-    for text in texts:
-        results.append(translate(text, source, target))
-    
-    return results
+
+    results: List[Optional[str]] = [None] * len(texts)
+
+    # Resolve cache hits immediately; collect indices that need network calls
+    uncached_indices = []
+    for i, text in enumerate(texts):
+        cached = _get_cached(text, source, target)
+        if cached is not None:
+            results[i] = cached
+        else:
+            uncached_indices.append(i)
+
+    if not uncached_indices:
+        return results  # type: ignore[return-value]
+
+    # Translate all uncached strings in parallel
+    def _translate_one(idx: int) -> tuple:
+        text = texts[idx]
+        if not text or not text.strip():
+            return idx, text
+        try:
+            translator = GoogleTranslator(source=source, target=target)
+            translated = translator.translate(text)
+            if translated:
+                _set_cached(text, source, target, translated)
+                return idx, translated
+        except Exception as e:
+            print(f"[TRANSLATE] Parallel translate error for '{text[:40]}...': {e}")
+        return idx, text  # fallback: return original
+
+    max_workers = min(len(uncached_indices), 10)  # cap at 10 parallel threads
+    # Do NOT use `with ThreadPoolExecutor` here — its __exit__ calls shutdown(wait=True)
+    # which blocks until every thread finishes, negating the timeout entirely.
+    pool = concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)
+    futures = {pool.submit(_translate_one, i): i for i in uncached_indices}
+    pool.shutdown(wait=False)  # detach — threads keep running but we won't block on them
+    try:
+        completed = concurrent.futures.as_completed(futures, timeout=_TRANSLATE_TIMEOUT_SECONDS + 2)
+        for future in completed:
+            try:
+                idx, translated = future.result()
+                results[idx] = translated
+            except Exception as e:
+                orig_idx = futures[future]
+                print(f"[TRANSLATE] Future error at index {orig_idx}: {e}")
+                results[orig_idx] = texts[orig_idx]  # fallback
+    except concurrent.futures.TimeoutError:
+        print(f"[TRANSLATE] Batch timeout — using results collected so far, falling back for unfinished futures.")
+        for future, orig_idx in futures.items():
+            if results[orig_idx] is None:
+                if future.done():
+                    try:
+                        idx, translated = future.result()
+                        results[orig_idx] = translated
+                    except Exception:
+                        results[orig_idx] = texts[orig_idx]
+                else:
+                    results[orig_idx] = texts[orig_idx]  # not done — use original
+
+    # Fill any None slots (shouldn't happen, but be safe)
+    for i, r in enumerate(results):
+        if r is None:
+            results[i] = texts[i]
+
+    return results  # type: ignore[return-value]
 
 
 # ═══════════════════════════════════════════════════════════════════════
