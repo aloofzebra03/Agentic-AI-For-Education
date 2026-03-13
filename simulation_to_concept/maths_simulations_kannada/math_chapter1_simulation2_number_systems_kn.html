@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0ea5e9">
+<title>ಭಾರತೀಯ vs ಅಂತರರಾಷ್ಟ್ರೀಯ ಸಂಖ್ಯಾ ವ್ಯವಸ್ಥೆ — ಅಧ್ಯಾಯ ೧</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans Kannada',system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,#0ea5e9 0%,#6366f1 100%);min-height:100vh;-webkit-font-smoothing:antialiased}
+#app{max-width:420px;margin:auto;padding:10px;padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.header{text-align:center;color:#fff;padding:12px}
+.header h1{font-size:18px;font-weight:700;margin-bottom:4px}
+.header p{font-size:12px;opacity:.9}
+.sim-card{background:#fff;border-radius:14px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.15);margin-bottom:12px}
+.card-title{font-size:13px;font-weight:700;margin-bottom:8px}
+.card-title.indian{color:#e74c3c}
+.card-title.intl{color:#3498db}
+.digit-strip{display:flex;justify-content:center;gap:0;padding:6px 0;flex-wrap:nowrap;overflow-x:auto}
+.d-box{width:30px;height:42px;display:flex;align-items:center;justify-content:center;border:2px solid #e5e7eb;border-radius:6px;font-size:18px;font-weight:700;color:#1e293b;flex-shrink:0;background:#f8fafc}
+.d-comma{width:14px;height:42px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;flex-shrink:0}
+.d-comma.indian{color:#e74c3c}
+.d-comma.intl{color:#3498db}
+.word-display{text-align:center;font-size:13px;font-weight:600;padding:6px 8px;border-radius:8px;margin-top:6px}
+.word-display.indian{background:#fef2f2;color:#b91c1c}
+.word-display.intl{background:#eff6ff;color:#1d4ed8}
+.mode-tabs{display:flex;gap:6px;margin-bottom:12px}
+.mode-tab{flex:1;padding:10px 6px;border:2px solid #e0e0e0;border-radius:8px;background:#fafafa;font-size:11px;font-weight:600;text-align:center;cursor:pointer}
+.mode-tab:active{transform:scale(.98)}
+.mode-tab.active{border-color:#0ea5e9;background:#f0f9ff;color:#0369a1}
+.slider-group{margin-top:10px}
+.slider-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px}
+.slider-label .name{color:#555}
+.slider-label .val{font-weight:700;color:#0ea5e9}
+input[type="range"]{width:100%;height:6px;border-radius:3px;background:#e0e0e0;-webkit-appearance:none;outline:none}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#0ea5e9;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.2);cursor:pointer}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.preset-btn{padding:8px 10px;border-radius:16px;border:2px solid #bae6fd;background:#fff;font-size:10px;font-weight:600;cursor:pointer;color:#0369a1}
+.preset-btn:active{transform:scale(.95)}
+.quiz-q{font-size:15px;font-weight:700;color:#1e293b;text-align:center;padding:12px;background:#f0f9ff;border-radius:10px;margin-bottom:10px}
+.quiz-opts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}
+.quiz-opt{padding:12px 16px;border-radius:10px;border:2px solid #e5e7eb;font-size:13px;font-weight:600;cursor:pointer;background:#fff;min-width:70px;text-align:center;transition:all .15s}
+.quiz-opt:active{transform:scale(.96)}
+.quiz-opt.correct{border-color:#16a34a;background:#dcfce7;color:#166534}
+.quiz-opt.wrong{border-color:#dc2626;background:#fef2f2;color:#991b1b}
+.feedback-box{text-align:center;font-size:12px;padding:10px;border-radius:8px;margin-bottom:8px;min-height:20px}
+.next-btn{display:block;margin:0 auto;padding:12px 28px;border-radius:10px;border:none;background:#0ea5e9;color:#fff;font-weight:600;font-size:13px;cursor:pointer}
+.next-btn:active{transform:scale(.97)}
+.score-bar{display:flex;justify-content:center;gap:20px;margin-bottom:10px;font-size:12px;font-weight:600;color:#555}
+.score-bar b{color:#0ea5e9}
+.insight-box{background:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%);border-radius:10px;padding:12px;margin-top:12px;border-left:4px solid #0ea5e9;font-size:12px;line-height:1.5}
+.insight-title{font-weight:700;color:#0369a1;margin-bottom:4px}
+.eq-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
+.eq-table th{background:#f0f9ff;padding:6px 8px;text-align:center;font-weight:600;color:#0369a1;border-bottom:2px solid #bae6fd}
+.eq-table td{padding:5px 8px;text-align:center;border-bottom:1px solid #f0f0f0;color:#333}
+.help-btn{position:fixed;bottom:20px;right:20px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#6366f1);color:#fff;border:3px solid #fff;box-shadow:0 4px 15px rgba(14,165,233,.4);font-size:20px;font-weight:700;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center}
+.help-btn:active{transform:scale(.9)}
+.help-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.help-overlay.open{display:flex}
+.help-panel{background:#fff;border-radius:20px 20px 0 0;max-width:420px;width:100%;max-height:75vh;overflow-y:auto;padding:20px 16px env(safe-area-inset-bottom);animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.help-close{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.help-close h2{font-size:16px;font-weight:700;color:#333}
+.help-close button{width:32px;height:32px;border-radius:50%;border:none;background:#f1f5f9;font-size:18px;cursor:pointer;color:#64748b}
+.help-section{margin-bottom:14px}
+.help-section-title{font-size:12px;font-weight:700;color:#0ea5e9;margin-bottom:6px}
+.help-step{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:12px;line-height:1.5;color:#475569}
+.help-step:last-child{border-bottom:none}
+.help-step-num{width:22px;height:22px;border-radius:50%;background:#0ea5e9;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.help-try{background:#f0f9ff;border-radius:8px;padding:8px 10px;font-size:11px;color:#0369a1;line-height:1.5;margin-top:4px}
+.help-try b{color:#0c4a6e}
+.help-key{background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:8px;padding:8px 10px;font-size:11px;color:#92400e;line-height:1.5;margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="header">
+  <h1>ಭಾರತೀಯ vs ಅಂತರರಾಷ್ಟ್ರೀಯ</h1>
+  <p>ಎರಡು ವ್ಯವಸ್ಥೆಗಳಲ್ಲಿ ಒಂದೇ ಸಂಖ್ಯೆ ಹೇಗೆ ಕಾಣುತ್ತದೆ ನೋಡಿ</p>
+</div>
+<div class="sim-card" id="sim"></div>
+<div class="insight-box">
+  <div class="insight-title">ಅಲ್ಪವಿರಾಮ ಸ್ಥಾನ ನಿಯಮಗಳು</div>
+  <strong>ಭಾರತೀಯ:</strong> ಬಲದಿಂದ 3-2-2-2 ರೀತಿ (ಸಾವಿರ, ಲಕ್ಷ, ಕೋಟಿ, ಅರಬ್)<br>
+  <strong>ಅಂತರರಾಷ್ಟ್ರೀಯ:</strong> ಬಲದಿಂದ 3-3-3 ರೀತಿ (ಸಾವಿರ, ಮಿಲಿಯನ್, ಬಿಲಿಯನ್)
+  <table class="eq-table">
+    <tr><th>ಭಾರತೀಯ</th><th>= ಅಂತರರಾಷ್ಟ್ರೀಯ</th></tr>
+    <tr><td>1 Lakh (1,00,000)</td><td>100 Thousand</td></tr>
+    <tr><td>10 Lakhs (10,00,000)</td><td>1 Million</td></tr>
+    <tr><td>1 Crore (1,00,00,000)</td><td>10 Million</td></tr>
+    <tr><td>1 Arab (1,00,00,00,000)</td><td>1 Billion</td></tr>
+  </table>
+</div>
+<button class="help-btn" id="helpBtn">?</button>
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-panel">
+    <div class="help-close"><h2>ಈ ಸಿಮ್ಯುಲೇಶನ್ ಹೇಗೆ ಬಳಸುವುದು</h2><button id="helpClose">&times;</button></div>
+    <div class="help-section">
+      <div class="help-section-title">ಏನು ಮಾಡಬೇಕು</div>
+      <div class="help-step"><span class="help-step-num">1</span><span><b>ಅನ್ವೇಷಣೆ</b> ಮೋಡ್‌ನಲ್ಲಿ ಸ್ಲೈಡರ್ ಎಳೆದು ಸಂಖ್ಯೆ ಬದಲಾಯಿಸಿ. ಭಾರತೀಯ ಮತ್ತು ಅಂತರರಾಷ್ಟ್ರೀಯ ವ್ಯವಸ್ಥೆಗಳಲ್ಲಿ ಒಂದೇ ಸಂಖ್ಯೆ ವಿಭಿನ್ನವಾಗಿ ಹೇಗೆ ಕಾಣುತ್ತದೆ ನೋಡಿ.</span></div>
+      <div class="help-step"><span class="help-step-num">2</span><span><b>ರಂಗಿನ ಅಲ್ಪವಿರಾಮಗಳು</b> — ಕೆಂಪು (ಭಾರತೀಯ) 3-2-2-2, ನೀಲಿ (ಅಂತರರಾಷ್ಟ್ರೀಯ) 3-3-3.</span></div>
+      <div class="help-step"><span class="help-step-num">3</span><span>ಪ್ರತಿ ಪ್ರದರ್ಶನದ ಕೆಳಗೆ <b>ಪದ ರೂಪ</b> ಓದಿ. "Lakh", "Crore" ಭಾರತೀಯ; "Million", "Billion" ಅಂತರರಾಷ್ಟ್ರೀಯ.</span></div>
+      <div class="help-step"><span class="help-step-num">4</span><span><b>ರಸಪ್ರಶ್ನೆ</b> ಮೋಡ್‌ಗೆ ಬದಲಾಯಿಸಿ! &lt;, &gt;, ಅಥವಾ = ಬಳಸಿ ಹೋಲಿಕೆ ಮಾಡಿ.</span></div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">ಇದನ್ನು ಪ್ರಯತ್ನಿಸಿ</div>
+      <div class="help-try"><b>ಅನ್ವೇಷಣೆ:</b> "1 Lakh" ಪ್ರೀಸೆಟ್ ಒತ್ತಿ. ಭಾರತೀಯದಲ್ಲಿ 1,00,000, ಅಂತರರಾಷ್ಟ್ರೀಯದಲ್ಲಿ 100,000 — ಒಂದೇ ಸಂಖ್ಯೆ, ವಿಭಿನ್ನ ಅಲ್ಪವಿರಾಮ!</div>
+      <div class="help-try"><b>ಅನ್ವೇಷಣೆ:</b> "1 Crore" ಪ್ರೀಸೆಟ್. ಭಾರತೀಯದಲ್ಲಿ 1,00,00,000; ಅಂತರರಾಷ್ಟ್ರೀಯದಲ್ಲಿ 10,000,000 (Ten Million).</div>
+      <div class="help-try"><b>ರಸಪ್ರಶ್ನೆ:</b> 500 Lakhs, 5 Million ಗಿಂತ ದೊಡ್ಡದೇ ಚಿಕ್ಕದೇ? 1 Lakh = 1,00,000, ಆದ್ದರಿಂದ 500 Lakhs = 5,00,00,000. 5 Million = 50,00,000. ಆದ್ದರಿಂದ 500 Lakhs &gt; 5 Million!</div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">ಮುಖ್ಯ ಕಲ್ಪನೆ</div>
+      <div class="help-key"><b>ಭಾರತೀಯ</b> ಅಲ್ಪವಿರಾಮ: ಬಲದಿಂದ 3-2-2-2. <b>ಅಂತರರಾಷ್ಟ್ರೀಯ</b> ಅಲ್ಪವಿರಾಮ: ಬಲದಿಂದ 3-3-3.<br><br><b>1 Lakh = 100 Thousand</b> | <b>10 Lakhs = 1 Million</b> | <b>1 Crore = 10 Million</b> | <b>1 Arab = 1 Billion</b></div>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+document.getElementById('helpBtn').onclick=()=>document.getElementById('helpOverlay').classList.add('open');
+document.getElementById('helpClose').onclick=()=>document.getElementById('helpOverlay').classList.remove('open');
+document.getElementById('helpOverlay').onclick=(e)=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open')};
+
+function fmtI(n){if(n===0)return"0";let s=n.toString();if(s.length<=3)return s;let l=s.slice(-3),r=s.slice(0,-3),p=[];while(r.length>2){p.unshift(r.slice(-2));r=r.slice(0,-2)}if(r.length)p.unshift(r);return p.join(",")+","+l}
+function fmtX(n){return n.toLocaleString("en-US")}
+function toWordsI(n){if(n===0)return"Zero";const o=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];const t=["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];function tw(x){if(x<20)return o[x];return t[Math.floor(x/10)]+(x%10?" "+o[x%10]:"")}function th(x){if(x<100)return tw(x);return o[Math.floor(x/100)]+" Hundred"+(x%100?" "+tw(x%100):"")}let p=[];if(n>=10000000){p.push(tw(Math.floor(n/10000000))+" Crore");n%=10000000}if(n>=100000){p.push(tw(Math.floor(n/100000))+" Lakh");n%=100000}if(n>=1000){p.push(tw(Math.floor(n/1000))+" Thousand");n%=1000}if(n>0)p.push(th(n));return p.join(" ")}
+function toWordsX(n){if(n===0)return"Zero";const o=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];const t=["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];function tw(x){if(x<20)return o[x];return t[Math.floor(x/10)]+(x%10?" "+o[x%10]:"")}function th(x){if(x<100)return tw(x);return o[Math.floor(x/100)]+" Hundred"+(x%100?" "+tw(x%100):"")}let p=[];if(n>=1000000000){p.push(th(Math.floor(n/1000000000))+" Billion");n%=1000000000}if(n>=1000000){p.push(th(Math.floor(n/1000000))+" Million");n%=1000000}if(n>=1000){p.push(th(Math.floor(n/1000))+" Thousand");n%=1000}if(n>0)p.push(th(n));return p.join(" ")}
+function digitStrip(n,sys){const s=n.toString();let cp=[];if(sys==="indian"){if(s.length>3)cp.push(s.length-3);let pos=s.length-3;while(pos>2){pos-=2;cp.push(pos)}}else{let pos=s.length-3;while(pos>0){cp.push(pos);pos-=3}}let h="";for(let i=0;i<s.length;i++){if(cp.includes(i)&&i>0)h+=`<span class="d-comma ${sys}">,</span>`;h+=`<span class="d-box">${s[i]}</span>`}return h}
+
+const T={explore:"ಅನ್ವೇಷಣೆ",quiz:"ರಸಪ್ರಶ್ನೆ",indianSys:"ಭಾರತೀಯ ವ್ಯವಸ್ಥೆ (3-2-2-2)",intlSys:"ಅಂತರರಾಷ್ಟ್ರೀಯ ವ್ಯವಸ್ಥೆ (3-3-3)",adjustNum:"ಸಂಖ್ಯೆ ಸರಿಹೊಂದಿಸಿ",score:"ಸ್ಕೋರ್",question:"ಪ್ರಶ್ನೆ",nextQ:"ಮುಂದಿನ ಪ್ರಶ್ನೆ",correct:"ಸರಿ!",answer:"ಉತ್ತರ:"};
+
+const c=document.getElementById("sim");
+let expMode="explore",currentNum=4050678;
+
+const QUIZ=[
+  {q:"30 Thousand ___ 3 Lakhs",opts:["<",">","="],ans:"<",ex:"30,000 < 3,00,000"},
+  {q:"500 Lakhs ___ 5 Million",opts:["<",">","="],ans:">",ex:"5,00,00,000 > 50,00,000"},
+  {q:"800 Thousand ___ 8 Million",opts:["<",">","="],ans:"<",ex:"8,00,000 < 80,00,000"},
+  {q:"10 Lakhs ___ 1 Million",opts:["<",">","="],ans:"=",ex:"10,00,000 = 10,00,000"},
+  {q:"1 Crore ___ 10 Million",opts:["<",">","="],ans:"=",ex:"1,00,00,000 = 1,00,00,000"},
+  {q:"1 Lakh ___ 1 Million",opts:["<",">","="],ans:"<",ex:"1,00,000 < 10,00,000"},
+  {q:"100 Crore ___ 1 Billion",opts:["<",">","="],ans:"=",ex:"1,00,00,00,000 = 1,00,00,00,000"},
+  {q:"50 Lakhs ___ 500 Thousand",opts:["<",">","="],ans:">",ex:"50,00,000 > 5,00,000"},
+  {q:"640 Crore ___ 60 Billion",opts:["<",">","="],ans:"<",ex:"64,00,00,00,000 < 60,00,00,00,000"},
+  {q:"2 Crore ___ 20 Million",opts:["<",">","="],ans:"=",ex:"2,00,00,000 = 2,00,00,000"}
+];
+let qIdx=0,score=0,total=0,answered=false;
+;(function(){
+  var p=new URLSearchParams(window.location.search);
+  if(p.has("mode")){var m=p.get("mode");if(m==="explore"||m==="quiz")expMode=m;}
+  if(p.has("number")){var n=parseInt(p.get("number"),10);if(!isNaN(n)&&n>=1&&n<=999999999)currentNum=n;}
+})();
+
+function renderExplore(){
+  const n=currentNum;
+  c.innerHTML=`
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-m="explore">${T.explore}</button>
+    <button class="mode-tab" data-m="quiz">${T.quiz}</button>
+  </div>
+  <div class="card-title indian">${T.indianSys}</div>
+  <div class="digit-strip">${digitStrip(n,"indian")}</div>
+  <div class="word-display indian">${toWordsI(n)}</div>
+  <div class="card-title intl" style="margin-top:12px">${T.intlSys}</div>
+  <div class="digit-strip">${digitStrip(n,"intl")}</div>
+  <div class="word-display intl">${toWordsX(n)}</div>
+  <div class="slider-group">
+    <div class="slider-label"><span class="name">${T.adjustNum}</span><span class="val">${fmtI(n)}</span></div>
+    <input type="range" id="num-sl" min="1000" max="999999999" step="1" value="${n}">
+  </div>
+  <div class="presets">
+    <button class="preset-btn" data-v="100000">1 Lakh</button>
+    <button class="preset-btn" data-v="1000000">10 Lakhs</button>
+    <button class="preset-btn" data-v="10000000">1 Crore</button>
+    <button class="preset-btn" data-v="1000000000">1 Arab</button>
+    <button class="preset-btn" data-v="4050678">40,50,678</button>
+    <button class="preset-btn" data-v="48121620">4,81,21,620</button>
+    <button class="preset-btn" data-v="246813579">24,68,13,579</button>
+  </div>`;
+  c.querySelector("#num-sl").oninput=function(){currentNum=parseInt(this.value);renderExplore()};
+  c.querySelectorAll(".preset-btn").forEach(b=>b.onclick=()=>{currentNum=parseInt(b.dataset.v);renderExplore()});
+  c.querySelectorAll(".mode-tab").forEach(b=>b.onclick=()=>{if(b.dataset.m==="quiz"){expMode="quiz";qIdx=0;score=0;total=0;renderQuiz()}});
+}
+
+function renderQuiz(){
+  if(qIdx>=QUIZ.length){qIdx=0;for(let i=QUIZ.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[QUIZ[i],QUIZ[j]]=[QUIZ[j],QUIZ[i]]}}
+  const q=QUIZ[qIdx];
+  c.innerHTML=`
+  <div class="mode-tabs">
+    <button class="mode-tab" data-m="explore">${T.explore}</button>
+    <button class="mode-tab active" data-m="quiz">${T.quiz}</button>
+  </div>
+  <div class="score-bar">${T.score}: <b>${score}/${total}</b> &nbsp; ${T.question} <b>${qIdx+1}</b></div>
+  <div class="quiz-q">${q.q}</div>
+  <div class="quiz-opts" id="qopts">${q.opts.map(o=>`<button class="quiz-opt" data-v="${o}">${o}</button>`).join("")}</div>
+  <div class="feedback-box" id="fb"></div>
+  <button class="next-btn" id="nxt" style="display:none">${T.nextQ}</button>`;
+  answered=false;
+  c.querySelector("#qopts").addEventListener("click",e=>{
+    const b=e.target.closest(".quiz-opt");if(!b||answered)return;answered=true;total++;
+    if(b.dataset.v===q.ans){b.classList.add("correct");score++;c.querySelector("#fb").innerHTML=`<div style="background:#dcfce7;color:#166534;padding:8px;border-radius:8px">${T.correct} ${q.ex}</div>`}
+    else{b.classList.add("wrong");c.querySelectorAll(".quiz-opt").forEach(x=>{if(x.dataset.v===q.ans)x.classList.add("correct")});c.querySelector("#fb").innerHTML=`<div style="background:#fef2f2;color:#991b1b;padding:8px;border-radius:8px">${T.answer} ${q.ans} — ${q.ex}</div>`}
+    c.querySelector("#nxt").style.display="block";
+  });
+  c.querySelector("#nxt").onclick=()=>{qIdx++;renderQuiz()};
+  c.querySelectorAll(".mode-tab").forEach(b=>b.onclick=()=>{if(b.dataset.m==="explore"){expMode="explore";renderExplore()}});
+}
+
+renderExplore();
+</script>
+</body>
+</html>

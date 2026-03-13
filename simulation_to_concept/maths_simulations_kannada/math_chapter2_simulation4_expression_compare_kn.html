@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0369a1">
+<title>ಸಮೀಕರಣ ಹೋಲಿಕೆ — ಲೆಕ್ಕ ಮಾಡದೆ ತರ್ಕಿಸಿ — ಅಧ್ಯಾಯ ೨</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans Kannada',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0369a1 0%,#7c3aed 100%);min-height:100vh;-webkit-font-smoothing:antialiased}#app{max-width:420px;margin:auto;padding:10px;padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.header{text-align:center;color:#fff;padding:12px}
+.header h1{font-size:18px;font-weight:700;margin-bottom:4px}
+.header p{font-size:12px;opacity:.9}
+.sim-card{background:#fff;border-radius:14px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.15);margin-bottom:12px}
+.score-bar{display:flex;justify-content:center;gap:20px;padding:10px;background:rgba(255,255,255,.15);border-radius:10px;margin-bottom:12px;color:#fff;font-size:12px;font-weight:600}
+.score-bar b{font-size:18px}
+/* Versus display */
+.vs-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.vs-expr{flex:1;background:#f0f9ff;border-radius:10px;padding:14px 8px;text-align:center;font-family:'Courier New',monospace;font-size:14px;font-weight:700;color:#0c4a6e;border:2px solid #bae6fd}
+.vs-middle{font-size:22px;font-weight:800;color:#cbd5e1;width:36px;text-align:center;flex-shrink:0}
+/* Answer buttons */
+.ans-row{display:flex;gap:8px;justify-content:center;margin:12px 0}
+.ans-btn{padding:14px 20px;border-radius:10px;border:2px solid #e5e7eb;font-size:18px;font-weight:700;cursor:pointer;background:#fff;min-width:60px;text-align:center;transition:all .15s}
+.ans-btn:active{transform:scale(.96)}
+.ans-btn.correct{border-color:#16a34a;background:#dcfce7;color:#166534}
+.ans-btn.wrong{border-color:#dc2626;background:#fef2f2;color:#991b1b}
+/* Explanation */
+.explain-box{background:#f0f9ff;border-radius:10px;padding:12px;border-left:4px solid #0369a1;font-size:12px;line-height:1.6;color:#475569;min-height:40px;margin-bottom:10px}
+.explain-box b{color:#0369a1}
+/* Next button */
+.next-btn{display:block;margin:0 auto;padding:12px 28px;border-radius:10px;border:none;background:linear-gradient(135deg,#0369a1,#7c3aed);color:#fff;font-weight:600;font-size:13px;cursor:pointer}
+.next-btn:active{transform:scale(.97)}
+/* Reasoning hint */
+.hint-box{background:#fffbeb;border-radius:10px;padding:10px;border-left:4px solid #f59e0b;font-size:11px;line-height:1.5;color:#92400e;margin-bottom:10px}
+/* Insight */
+.insight-box{background:linear-gradient(135deg,#f0f9ff,#dbeafe);border-radius:10px;padding:12px;margin-top:12px;border-left:4px solid #0369a1;font-size:12px;line-height:1.5}
+.insight-title{font-weight:700;color:#0369a1;margin-bottom:4px}
+/* Help */
+.help-btn{position:fixed;bottom:20px;right:20px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#0369a1,#7c3aed);color:#fff;border:3px solid #fff;box-shadow:0 4px 15px rgba(3,105,161,.4);font-size:20px;font-weight:700;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center}
+.help-btn:active{transform:scale(.9)}
+.help-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.help-overlay.open{display:flex}
+.help-panel{background:#fff;border-radius:20px 20px 0 0;max-width:420px;width:100%;max-height:75vh;overflow-y:auto;padding:20px 16px env(safe-area-inset-bottom);animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.help-close{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.help-close h2{font-size:16px;font-weight:700;color:#333}
+.help-close button{width:32px;height:32px;border-radius:50%;border:none;background:#f1f5f9;font-size:18px;cursor:pointer;color:#64748b}
+.help-section{margin-bottom:14px}
+.help-section-title{font-size:12px;font-weight:700;color:#0369a1;margin-bottom:6px}
+.help-step{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:12px;line-height:1.5;color:#475569}
+.help-step:last-child{border-bottom:none}
+.help-step-num{width:22px;height:22px;border-radius:50%;background:#0369a1;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.help-try{background:#f0f9ff;border-radius:8px;padding:8px 10px;font-size:11px;color:#0c4a6e;line-height:1.5;margin-top:4px}
+.help-try b{color:#0369a1}
+.help-key{background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:8px;padding:8px 10px;font-size:11px;color:#92400e;line-height:1.5;margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="header">
+  <h1>ಸಮೀಕರಣಗಳನ್ನು ಹೋಲಿಸಿ</h1>
+  <p>ಲೆಕ್ಕ ಮಾಡದೆ ತರ್ಕಿಸಿ — ಪದಗಳನ್ನು ಬಳಸಿ!</p>
+</div>
+<div class="score-bar">ಸ್ಕೋರ್: <b id="score">0</b>/<b id="total">0</b> &nbsp; ಪ್ರಶ್ನೆ: <b id="qnum">1</b></div>
+<div class="sim-card" id="sim"></div>
+<div class="insight-box">
+  <div class="insight-title">ಹೋಲಿಕೆ ತಂತ್ರ</div>
+  ಎರಡೂ ಬದಿ ಲೆಕ್ಕ ಹಾಕಬೇಡಿ! ಬದಲಾಗಿ ಎರಡು ಸಮೀಕರಣಗಳ ನಡುವೆ <b>ಏನು ಬದಲಾಯಿತು</b> ನೋಡಿ. ಒಂದು ಪದ ಹೆಚ್ಚಾಗಿ ಬೇರೆ ಏನೂ ಬದಲಾಗದಿದ್ದರೆ, ಸಂಪೂರ್ಣ ಸಮೀಕರಣ ಹೆಚ್ಚಾಗುತ್ತದೆ.
+</div>
+
+<button class="help-btn" id="helpBtn">?</button>
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-panel">
+    <div class="help-close"><h2>ಈ ಸಿಮ್ಯುಲೇಶನ್ ಹೇಗೆ ಬಳಸುವುದು</h2><button id="helpClose">&times;</button></div>
+    <div class="help-section">
+      <div class="help-section-title">ಏನು ಮಾಡಬೇಕು</div>
+      <div class="help-step"><span class="help-step-num">1</span><span>ಎರಡು ಸಮೀಕರಣಗಳನ್ನು ಪಕ್ಕಪಕ್ಕ ಓದಿ. <b>ಲೆಕ್ಕ ಹಾಕಬೇಡಿ</b> — ಯಾವುದು ಹೆಚ್ಚು ತರ್ಕಿಸಿ.</span></div>
+      <div class="help-step"><span class="help-step-num">2</span><span>ಉತ್ತರಿಸಲು <b>&lt;</b>, <b>&gt;</b> ಅಥವಾ <b>=</b> ಒತ್ತಿ.</span></div>
+      <div class="help-step"><span class="help-step-num">3</span><span><b>ವಿವರಣೆ</b> ಓದಿ — ಪದಗಳು ಹೇಗೆ ಬದಲಾಗುತ್ತವೆ, ಏನು ಕೂಡಿಸಲ್ಪಟ್ಟಿದೆ ಅಥವಾ ಕಳೆಯಲ್ಪಟ್ಟಿದೆ.</span></div>
+      <div class="help-step"><span class="help-step-num">4</span><span>ಹೆಚ್ಚು ಪ್ರಶ್ನೆಗಳಿಗೆ <b>ಮುಂದೆ</b> ಒತ್ತಿ. ಸಂಖ್ಯಾ ಜ್ಞಾನ ಬೆಳೆಸಿ!</span></div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">ಇದನ್ನು ಪ್ರಯತ್ನಿಸಿ</div>
+      <div class="help-try"><b>ಉದಾಹರಣೆ:</b> 1023+125 vs 1022+128. ಎಡದಲ್ಲಿ ಮೊದಲ ಭಾಗದಲ್ಲಿ 1 ಹೆಚ್ಚು, ಬಲದಲ್ಲಿ ಎರಡನೇ ಭಾಗದಲ್ಲಿ 3 ಹೆಚ್ಚು. ಒಟ್ಟು: ಬಲ 2 ಹೆಚ್ಚು. ಆದ್ದರಿಂದ ಎಡ &lt; ಬಲ.</div>
+      <div class="help-try"><b>ವಿಭಾಜಕ:</b> (34−28)×42 vs 34×42−28×42. ವಿಭಾಜಕ ಗುಣದಿಂದ ಸಮಾನ! ಉತ್ತರ: =</div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">ಮುಖ್ಯ ಕಲ್ಪನೆ</div>
+      <div class="help-key">ಲೆಕ್ಕ ಮಾಡದೆ ಹೋಲಿಸಲು: ಯಾವ ಪದಗಳು ಬದಲಾಗಿದೆ ಮತ್ತು ಎಷ್ಟರಿಂದ ಎಂದು ಗುರುತಿಸಿ. ಒಂದು ಬದಿ ಇನ್ನೊಂದಿಗೆ ಹೋಲಿಸಿದರೆ ಕಳೆದದ್ದಕ್ಕಿಂತ ಹೆಚ್ಚು ಪಡೆದಿದ್ದರೆ ಅದು ಹೆಚ್ಚು. ಸಮೀಕರಣಗಳು ಸಮವಾದಾಗ ಗುರುತಿಸಲು ಗುಣಗಳನ್ನು (ಕ್ರಮವಿನಿಮಯ, ವಿಭಾಜಕ) ಬಳಸಿ.</div>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+document.getElementById('helpBtn').onclick=()=>document.getElementById('helpOverlay').classList.add('open');
+document.getElementById('helpClose').onclick=()=>document.getElementById('helpOverlay').classList.remove('open');
+document.getElementById('helpOverlay').onclick=(e)=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open')};
+
+const QUIZ=[
+  {l:"1023 + 125",r:"1022 + 128",ans:"<",hint:"ಎಡ 1 ಹೆಚ್ಚು ಆರಂಭ, ಆದರೆ ಬಲ 3 ಹೆಚ್ಚು ಕೂಡಿಸುತ್ತದೆ",ex:"ಎಡ: 1148. ಬಲ: 1150. ಬಲ 2 ಹೆಚ್ಚು."},
+  {l:"245 + 289",r:"246 + 285",ans:">",hint:"ಎಡದಲ್ಲಿ ಮೊದಲಲ್ಲಿ 1 ಕಡಿಮೆ, ಎರಡನೆಯಲ್ಲಿ 4 ಹೆಚ್ಚು",ex:"ಎಡ: 534. ಬಲ: 531. ಎಡ 3 ಹೆಚ್ಚು."},
+  {l:"273 − 145",r:"272 − 144",ans:"=",hint:"ಎಡ 1 ಹೆಚ್ಚು ಆರಂಭ, ಆದರೆ 1 ಹೆಚ್ಚು ಕಳೆಯುತ್ತದೆ",ex:"ಎರಡೂ 128. ಬದಲಾವಣೆಗಳು ರದ್ದು."},
+  {l:"364 + 587",r:"363 + 589",ans:"<",hint:"ಎಡ 1 ಹೆಚ್ಚು, ಆದರೆ ಬಲ 2 ಹೆಚ್ಚು ಕೂಡಿಸುತ್ತದೆ",ex:"ಎಡ: 951. ಬಲ: 952. ಬಲ 1 ಹೆಚ್ಚು."},
+  {l:"124 + 245",r:"129 + 245",ans:"<",hint:"ಎರಡನೇ ಪದ ಒಂದೇ, ಬಲದ ಮೊದಲಲ್ಲಿ 5 ಹೆಚ್ಚು",ex:"129 > 124, 245 ಒಂದೇ. ಬಲ ಹೆಚ್ಚು."},
+  {l:"213 − 77",r:"214 − 76",ans:"<",hint:"ಬಲ 1 ಹೆಚ್ಚು ಆರಂಭ ಮತ್ತು 1 ಕಡಿಮೆ ಕಳೆಯುತ್ತದೆ",ex:"ಎಡ: 136. ಬಲ: 138. ಬಲ ಎರಡರಷ್ಟು."},
+  {l:"(8 − 3) × 29",r:"(3 − 8) × 29",ans:">",hint:"8−3=5 (ಧನ), 3−8=−5 (ಋಣ)",ex:"ಎಡ: 5×29=145. ಬಲ: −5×29=−145."},
+  {l:"15 + 9 × 18",r:"(15 + 9) × 18",ans:"<",hint:"ಬಲ 15+9 ಅಷ್ಟನ್ನೂ 18 ರಿಂದ ಗುಣಿಸುತ್ತದೆ, 9 ಮಾತ್ರ ಅಲ್ಲ",ex:"ಎಡ: 15+162=177. ಬಲ: 24×18=432."},
+  {l:"23 × (17 − 9)",r:"23 × 17 + 23 × 9",ans:"<",hint:"ಎಡ: 23×8. ಬಲ: 23×17+23×9 (ಮೊತ್ತ, ವ್ಯತ್ಯಾಸ ಅಲ್ಲ!)",ex:"ಎಡ: 184. ಬಲ: 391+207=598."},
+  {l:"(34 − 28) × 42",r:"34 × 42 − 28 × 42",ans:"=",hint:"ವಿಭಾಜಕ ಗುಣ: (a−b)×c = a×c − b×c",ex:"ಎರಡೂ 6×42 = 252."},
+  {l:"(16 − 11) × 12",r:"−11 × 12 + 16 × 12",ans:"=",hint:"ಬಲ ಮತ್ತೆ: 16×12 − 11×12 = (16−11)×12",ex:"ಎರಡೂ 5×12 = 60."},
+  {l:"25 × (42 + 16)",r:"25 × (43 + 15)",ans:"=",hint:"42+16 = 43+15 = 58",ex:"ಎರಡೂ 25×58 = 1450."},
+  {l:"83 × 42 − 18",r:"83 × 40 − 18",ans:">",hint:"−18 ಒಂದೇ, ಎಡ 83×42 > 83×40",ex:"42 > 40, ಆದ್ದರಿಂದ 83×42 > 83×40."},
+  {l:"145 − 17 × 8",r:"145 − 17 × 6",ans:"<",hint:"ಎಡ 17×8 (ಹೆಚ್ಚು) ಕಳೆಯುತ್ತದೆ, ಬಲ 17×6 (ಕಡಿಮೆ)",ex:"ಎಡ ಹೆಚ್ಚು ಕಳೆಯುತ್ತದೆ, ಆದ್ದರಿಂದ ಎಡ ಚಿಕ್ಕದು."},
+  {l:"49 − 7 + 8",r:"49 − 7 + 8",ans:"=",hint:"ಒಂದೇ ಸಮೀಕರಣ!",ex:"ಒಂದೇ ಸಮೀಕರಣ, ಒಂದೇ ಮೌಲ್ಯ: 50."}
+];
+
+const c=document.getElementById("sim");
+let qIdx=0,score=0,total=0,answered=false;
+
+/* ======================================================
+ * URL Parameter Support — Expression Comparison (Kannada)
+ *
+ * questionIndex  — 0..14  (integer, default 0)
+ *                  After the questions are shuffled on load, sets the
+ *                  starting index into the shuffled deck.
+ * showHints      — "true" (default) | "false"
+ *                  When "false", hides the .insight-box at the bottom.
+ * ====================================================== */
+(function(){
+  var p=new URLSearchParams(window.location.search);
+  var qi=parseInt(p.get('questionIndex'),10);
+  if(!isNaN(qi)&&qi>=0&&qi<=14)qIdx=qi;
+  if(p.get('showHints')==='false'){var ib=document.querySelector('.insight-box');if(ib)ib.style.display='none';}
+})();
+for(let i=QUIZ.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[QUIZ[i],QUIZ[j]]=[QUIZ[j],QUIZ[i]]}
+
+function render(){
+  if(qIdx>=QUIZ.length)qIdx=0;
+  const q=QUIZ[qIdx];
+  document.getElementById("score").textContent=score;
+  document.getElementById("total").textContent=total;
+  document.getElementById("qnum").textContent=qIdx+1;
+
+  c.innerHTML=`
+  <div class="vs-row">
+    <div class="vs-expr">${q.l}</div>
+    <div class="vs-middle">?</div>
+    <div class="vs-expr">${q.r}</div>
+  </div>
+  <div class="hint-box">${q.hint}</div>
+  <div class="ans-row" id="ans-row">
+    <button class="ans-btn" data-v="<">&lt;</button>
+    <button class="ans-btn" data-v="=">=</button>
+    <button class="ans-btn" data-v=">">&gt;</button>
+  </div>
+  <div class="explain-box" id="explain"></div>
+  <button class="next-btn" id="nxt" style="display:none">ಮುಂದಿನ ಪ್ರಶ್ನೆ</button>`;
+
+  answered=false;
+  const TXT={correct:"ಸರಿ!",answer:"ಉತ್ತರ"};
+  c.querySelector("#ans-row").addEventListener("click",e=>{
+    const b=e.target.closest(".ans-btn");if(!b||answered)return;answered=true;total++;
+    if(b.dataset.v===q.ans){b.classList.add("correct");score++;c.querySelector("#explain").innerHTML=`<b style="color:#16a34a">${TXT.correct}</b> ${q.ex}`}
+    else{b.classList.add("wrong");c.querySelectorAll(".ans-btn").forEach(x=>{if(x.dataset.v===q.ans)x.classList.add("correct")});c.querySelector("#explain").innerHTML=`<b style="color:#dc2626">${TXT.answer}: ${q.ans}</b> — ${q.ex}`}
+    document.getElementById("score").textContent=score;document.getElementById("total").textContent=total;
+    c.querySelector("#nxt").style.display="block";
+  });
+  c.querySelector("#nxt").onclick=()=>{qIdx++;render()};
+}
+render();
+</script>
+</body>
+</html>

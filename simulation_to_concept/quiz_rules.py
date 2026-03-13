@@ -204,7 +204,15 @@ def check_thresholds(
                 if not evaluate_condition(float(param_value), operator, float(threshold_value)):
                     return False
             except (ValueError, TypeError):
-                return False
+                # Fall back to string comparison for non-numeric threshold values
+                if operator == "==":
+                    if str(param_value) != str(threshold_value):
+                        return False
+                elif operator == "!=":
+                    if str(param_value) == str(threshold_value):
+                        return False
+                else:
+                    return False
     
     return True
 

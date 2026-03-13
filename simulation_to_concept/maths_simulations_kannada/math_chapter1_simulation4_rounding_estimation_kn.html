@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#f59e0b">
+<title>ಪೂರ್ಣಾಂಕನ ಮತ್ತು ಅಂದಾಜು — ಅಧ್ಯಾಯ ೧</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans Kannada',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#f59e0b 0%,#ef4444 100%);min-height:100vh;-webkit-font-smoothing:antialiased}#app{max-width:420px;margin:auto;padding:10px;padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.header{text-align:center;color:#fff;padding:12px}
+.header h1{font-size:18px;font-weight:700;margin-bottom:4px}
+.header p{font-size:12px;opacity:.9}
+.sim-card{background:#fff;border-radius:14px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.15);margin-bottom:12px}
+.card-title{font-size:13px;font-weight:700;color:#d97706;margin-bottom:8px}
+.visual{min-height:180px;background:linear-gradient(145deg,#fffbeb 0%,#fef3c7 100%);border-radius:12px;padding:10px;overflow:hidden}
+svg{width:100%;height:100%;display:block}
+.mode-tabs{display:flex;gap:6px;margin-bottom:12px}
+.mode-tab{flex:1;padding:10px 6px;border:2px solid #e0e0e0;border-radius:8px;background:#fafafa;font-size:11px;font-weight:600;text-align:center;cursor:pointer}
+.mode-tab:active{transform:scale(.98)}
+.mode-tab.active{border-color:#f59e0b;background:#fffbeb;color:#92400e}
+/* Number line rows */
+.nl-row{margin-bottom:14px}
+.nl-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.nl-place{font-size:10px;font-weight:600;color:#92400e;background:#fef3c7;padding:2px 8px;border-radius:10px}
+.nl-rounded{font-size:12px;font-weight:700;color:#d97706}
+.nl-track{position:relative;height:24px;background:#f3f4f6;border-radius:12px;overflow:visible}
+.nl-fill{position:absolute;top:0;left:0;height:100%;background:linear-gradient(90deg,#fde68a,#fbbf24);border-radius:12px}
+.nl-marker{position:absolute;top:-4px;width:16px;height:32px;background:#ef4444;border-radius:4px;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transform:translateX(-50%)}
+.nl-snap{position:absolute;top:2px;width:10px;height:20px;border:2px solid #3b82f6;border-radius:3px;background:transparent;transform:translateX(-50%)}
+.nl-labels{display:flex;justify-content:space-between;font-size:9px;color:#9ca3af;margin-top:4px}
+/* Slider */
+.slider-group{margin-bottom:10px}
+.slider-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px}
+.slider-label .name{color:#555}
+.slider-label .val{font-weight:700;color:#d97706}
+input[type="range"]{width:100%;height:6px;border-radius:3px;background:#e5e7eb;-webkit-appearance:none;outline:none}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#f59e0b;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.2);cursor:pointer}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.preset-btn{padding:6px 10px;border-radius:16px;border:2px solid #fde68a;background:#fff;font-size:10px;font-weight:600;cursor:pointer;color:#92400e}
+.preset-btn:active{transform:scale(.95)}
+/* Quiz */
+.quiz-q{font-size:14px;font-weight:700;color:#1e293b;text-align:center;padding:14px;background:#fffbeb;border-radius:10px;margin-bottom:10px;line-height:1.4}
+.quiz-opts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}
+.quiz-opt{padding:12px 14px;border-radius:10px;border:2px solid #e5e7eb;font-size:12px;font-weight:600;cursor:pointer;background:#fff;min-width:80px;text-align:center}
+.quiz-opt:active{transform:scale(.96)}
+.quiz-opt.correct{border-color:#16a34a;background:#dcfce7;color:#166534}
+.quiz-opt.wrong{border-color:#dc2626;background:#fef2f2;color:#991b1b}
+.feedback-box{text-align:center;font-size:12px;padding:8px;border-radius:8px;min-height:20px;margin-bottom:8px}
+.next-btn{display:block;margin:0 auto;padding:12px 28px;border-radius:10px;border:none;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-weight:600;font-size:13px;cursor:pointer}
+.next-btn:active{transform:scale(.97)}
+.score-bar{text-align:center;font-size:12px;font-weight:600;color:#555;margin-bottom:10px}
+.score-bar b{color:#d97706}
+.insight-box{background:linear-gradient(135deg,#fffbeb 0%,#fef3c7 100%);border-radius:10px;padding:12px;margin-top:12px;border-left:4px solid #f59e0b;font-size:12px;line-height:1.5}
+.insight-title{font-weight:700;color:#92400e;margin-bottom:4px}
+/* Help system */
+.help-btn{position:fixed;bottom:20px;right:20px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border:3px solid #fff;box-shadow:0 4px 15px rgba(245,158,11,.4);font-size:20px;font-weight:700;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center}
+.help-btn:active{transform:scale(.9)}
+.help-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.help-overlay.open{display:flex}
+.help-panel{background:#fff;border-radius:20px 20px 0 0;max-width:420px;width:100%;max-height:75vh;overflow-y:auto;padding:20px 16px env(safe-area-inset-bottom);animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.help-close{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.help-close h2{font-size:16px;font-weight:700;color:#333}
+.help-close button{width:32px;height:32px;border-radius:50%;border:none;background:#f1f5f9;font-size:18px;cursor:pointer;color:#64748b}
+.help-section{margin-bottom:14px}
+.help-section-title{font-size:12px;font-weight:700;color:#d97706;margin-bottom:6px}
+.help-step{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:12px;line-height:1.5;color:#475569}
+.help-step:last-child{border-bottom:none}
+.help-step-num{width:22px;height:22px;border-radius:50%;background:#f59e0b;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.help-try{background:#fffbeb;border-radius:8px;padding:8px 10px;font-size:11px;color:#92400e;line-height:1.5;margin-top:4px}
+.help-try b{color:#78350f}
+.help-key{background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:8px;padding:8px 10px;font-size:11px;color:#92400e;line-height:1.5;margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="header">
+  <h1>ಪೂರ್ಣಾಂಕನ ಮತ್ತು ಅಂದಾಜು</h1>
+  <p>ಹತ್ತಿರದ ನೆರೆಹೊರೆ ಹುಡುಕಿ ಮತ್ತು ಮೊತ್ತ ಅಂದಾಜು ಮಾಡಿ</p>
+</div>
+<div class="sim-card" id="sim"></div>
+<div class="insight-box">
+  <div class="insight-title">ಏಕೆ ಅಂದಾಜು?</div>
+  ನಿಖರ ಸಂಖ್ಯೆ ಯಾವಾಗಲೂ ಬೇಕಿಲ್ಲ. ಚಿಂತಾಮಣಿ ಜನಸಂಖ್ಯೆ "ಸುಮಾರು 75,000" ಎಂದು ತಿಳಿದರೆ ಸಾಕು. ಪೂರ್ಣಾಂಕನದಿಂದ ದೊಡ್ಡ ಸಂಖ್ಯೆಗಳನ್ನು ತ್ವರಿತವಾಗಿ ಹೋಲಿಸಿ, ಕೂಡಿಸಿ, ತರ್ಕಿಸಬಹುದು.
+</div>
+
+<button class="help-btn" id="helpBtn">?</button>
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-panel">
+    <div class="help-close"><h2>ಈ ಸಿಮ್ಯುಲೇಶನ್ ಹೇಗೆ ಬಳಸುವುದು</h2><button id="helpClose">&times;</button></div>
+    <div class="help-section">
+      <div class="help-section-title">ಏನು ಮಾಡಬೇಕು</div>
+      <div class="help-step"><span class="help-step-num">1</span><span><b>ಪೂರ್ಣಾಂಕನ ಅನ್ವೇಷಣೆ</b>ಯಲ್ಲಿ ಸ್ಲೈಡರ್ ಎಳೆದು ಯಾವುದೇ ದೊಡ್ಡ ಸಂಖ್ಯೆ ಹಾಕಿ. ಐದು ಸಂಖ್ಯಾ ರೇಖೆಗಳು — ಪ್ರತಿ ಪೂರ್ಣಾಂಕನ ಮಟ್ಟಕ್ಕೆ ಒಂದು.</span></div>
+      <div class="help-step"><span class="help-step-num">2</span><span><b>ಕೆಂಪು ಮಾರ್ಕರ್</b> ನಿಮ್ಮ ಸಂಖ್ಯೆ ಎರಡು ಹತ್ತಿರದ ಪೂರ್ಣ ಸಂಖ್ಯೆಗಳ ನಡುವೆ ಎಲ್ಲಿದೆ ತೋರಿಸುತ್ತದೆ. <b>ನೀಲಿ ಮಾರ್ಕರ್</b> ಯಾವ ಕಡೆಗೆ ಪೂರ್ಣಾಂಕನ.</span></div>
+      <div class="help-step"><span class="help-step-num">3</span><span><b>ಅಂದಾಜು ರಸಪ್ರಶ್ನೆ</b>ಯಲ್ಲಿ ಪ್ರತಿ ಪ್ರಶ್ನೆ ಓದಿ, ಒತ್ತುವ ಮೊದಲೇ ಉತ್ತರ ಅಂದಾಜು ಮಾಡಿ. ಲೆಕ್ಕ ಬದಲು ತರ್ಕಿಸಿ!</span></div>
+      <div class="help-step"><span class="help-step-num">4</span><span>ಉತ್ತರ ನೀಡಿದ ನಂತರ ವಿವರಣೆ ಓದಿ. ಗುರಿ <b>ಸಂಖ್ಯಾ ಅರ್ಥ</b> ಕಟ್ಟುವುದು, ಜ್ಞಾಪಕವಲ್ಲ.</span></div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">ಇದನ್ನು ಪ್ರಯತ್ನಿಸಿ</div>
+      <div class="help-try"><b>ಅನ್ವೇಷಣೆ:</b> 3,87,69,957 ಹಾಕಿ. "ನಿಕಟ ಕೋಟಿ" ನೋಡಿ — ಕೆಂಪು ಮಾರ್ಕರ್ ಅರ್ಧದಾಟಿದೆ, ಆದ್ದರಿಂದ 4,00,00,000 ಕ್ಕೆ ಮೇಲ್ಮುಖ. "ನಿಕಟ ಹತ್ತು ಲಕ್ಷ" 3,90,00,000 ಕ್ಕೆ ಕೆಳಮುಖ. ವಿಭಿನ್ನ ಮಟ್ಟಗಳು ವಿಭಿನ್ನವಾಗಿ ಪೂರ್ಣಾಂಕನ!</div>
+      <div class="help-try"><b>ರಸಪ್ರಶ್ನೆ ಸಲಹೆ:</b> "4,63,128 + 4,19,682 — 8 ಅಥವಾ 9 ಲಕ್ಷಕ್ಕೆ ಹತ್ತಿರ?" ಎರಡೂ 4 ಲಕ್ಷಕ್ಕಿಂತ ದೊಡ್ಡದು, ಮೊತ್ತ 8 ಲಕ್ಷಕ್ಕಿಂತ ಹೆಚ್ಚು. 4.7 ಲಕ್ಷಕ್ಕಿಂತ ಕಡಿಮೆ, ಆದ್ದರಿಂದ 9.4 ಲಕ್ಷಕ್ಕಿಂತ ಕಡಿಮೆ. 9 ಲಕ್ಷಕ್ಕೆ ಹತ್ತಿರ!</div>
+      <div class="help-try"><b>ಅನ್ವೇಷಣೆ:</b> "Mumbai Pop." ಪ್ರೀಸೆಟ್ (1,24,42,373) ಪ್ರಯತ್ನಿಸಿ. ನಿಕಟ ಕೋಟಿ = 1,00,00,000. ನಿಕಟ ಹತ್ತು ಲಕ್ಷ = 1,20,00,000. ವಿಭಿನ್ನ ಅಳತೆ ವಿಭಿನ್ನ ಅಂದಾಜು.</div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">ಮುಖ್ಯ ಕಲ್ಪನೆ</div>
+      <div class="help-key">ನಿಕಟ ಲಕ್ಷಕ್ಕೆ ಪೂರ್ಣಾಂಕನ ಮಾಡಲು <b>ಹತ್ತು ಸಾವಿರದ ಅಂಕಿ</b> ನೋಡಿ. 5 ಅಥವಾ ಹೆಚ್ಚಿದ್ದರೆ ಮೇಲ್ಮುಖ, 5 ಕ್ಕಿಂತ ಕಡಿಮೆಯಿದ್ದರೆ ಕೆಳಮುಖ. ಈ ನಿಯಮ ಪ್ರತಿ ಮಟ್ಟದಲ್ಲೂ — ಪೂರ್ಣಾಂಕನ ಮಾಡುವ ಸ್ಥಾನದ ಕೆಳಗಿನ ಅಂಕಿ ಪರಿಶೀಲಿಸಿ.</div>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+document.getElementById('helpBtn').onclick=()=>document.getElementById('helpOverlay').classList.add('open');
+document.getElementById('helpClose').onclick=()=>document.getElementById('helpOverlay').classList.remove('open');
+document.getElementById('helpOverlay').onclick=(e)=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open')};
+
+function fmtI(n){if(n===0)return"0";let neg=n<0;if(neg)n=-n;let s=Math.round(n).toString();if(s.length<=3)return(neg?"-":"")+s;let l=s.slice(-3),r=s.slice(0,-3),p=[];while(r.length>2){p.unshift(r.slice(-2));r=r.slice(0,-2)}if(r.length)p.unshift(r);return(neg?"-":"")+p.join(",")+","+l}
+function roundTo(n,p){return Math.round(n/p)*p}
+
+const PLACES=[{v:1000,l:"ಸಾವಿರ"},{v:10000,l:"ಹತ್ತು ಸಾವಿರ"},{v:100000,l:"ಲಕ್ಷ"},{v:1000000,l:"ಹತ್ತು ಲಕ್ಷ"},{v:10000000,l:"ಕೋಟಿ"}];
+const T={exploreRound:"ಪೂರ್ಣಾಂಕನ ಅನ್ವೇಷಣೆ",estQuiz:"ಅಂದಾಜು ರಸಪ್ರಶ್ನೆ",adjustNum:"ಸಂಖ್ಯೆ ಸರಿಹೊಂದಿಸಿ",redBlue:"ಕೆಂಪು = ನಿಜ ಸ್ಥಾನ &nbsp; ನೀಲಿ = ಪೂರ್ಣಾಂಕನ ಮೌಲ್ಯ",score:"ಸ್ಕೋರ್",question:"ಪ್ರಶ್ನೆ",nextQ:"ಮುಂದಿನ ಪ್ರಶ್ನೆ",correct:"ಸರಿ!"};
+const c=document.getElementById("sim");
+let mode="explore",currentNum=38769957;
+
+// Quiz data
+const QUIZ=[
+  {q:"Is 4,63,128 + 4,19,682 near 8 lakh or 9 lakh?",opts:["8 Lakh","9 Lakh"],ans:"9 Lakh",ex:"Exact: 8,82,810 — closer to 9 lakh"},
+  {q:"Is 4,63,128 + 4,19,682 greater or less than 8,50,000?",opts:["Greater","Less"],ans:"Greater",ex:"8,82,810 > 8,50,000"},
+  {q:"Is 14,63,128 − 4,90,020 near 10 lakh or 9 lakh?",opts:["10 Lakh","9 Lakh"],ans:"10 Lakh",ex:"Exact: 9,73,108 — closer to 10 lakh"},
+  {q:"Nearest thousand of 3,87,69,957?",opts:["3,87,70,000","3,87,69,000"],ans:"3,87,70,000",ex:"957 rounds up to 000 → +1"},
+  {q:"Nearest lakh of 3,87,69,957?",opts:["3,88,00,000","3,87,00,000"],ans:"3,88,00,000",ex:"69,957 > 50,000 → rounds up"},
+  {q:"Nearest crore of 3,87,69,957?",opts:["4,00,00,000","3,00,00,000"],ans:"4,00,00,000",ex:"87,69,957 > 50,00,000 → rounds up"},
+  {q:"Nearest crore of 29,05,32,481?",opts:["29,00,00,000","30,00,00,000"],ans:"29,00,00,000",ex:"5,32,481 < 50,00,000 → rounds down"},
+  {q:"Which city roughly doubled (2001→2011)?",opts:["Bengaluru","Chennai","Kolkata"],ans:"Bengaluru",ex:"43 lakh → 84 lakh"},
+  {q:"Pune's population grew by approximately?",opts:["~6 Lakh","~16 Lakh"],ans:"~6 Lakh",ex:"25,38,473 → 31,15,431"},
+  {q:"Multiply Patna by ___ to get near Mumbai",opts:["~3","~7","~12"],ans:"~7",ex:"16,84,222 × 7.39 ≈ 1,24,42,373"}
+];
+let qIdx=0,score=0,total=0,answered=false;
+;(function(){
+  var p=new URLSearchParams(window.location.search);
+  if(p.has("mode")){var m=p.get("mode");if(m==="explore"||m==="quiz")mode=m;}
+  if(p.has("number")){var n=parseInt(p.get("number"),10);if(!isNaN(n)&&n>=1&&n<=99999999)currentNum=n;}
+})();
+
+function renderExplore(){
+  const n=currentNum;
+  let rowsHtml=PLACES.map(pl=>{
+    const rounded=roundTo(n,pl.v);
+    const lower=Math.floor(n/pl.v)*pl.v;
+    const upper=lower+pl.v;
+    const pct=((n-lower)/(upper-lower))*100;
+    const snapPct=rounded===lower?0:100;
+    return`<div class="nl-row">
+      <div class="nl-header"><span class="nl-place">${pl.l}</span><span class="nl-rounded">${fmtI(rounded)}</span></div>
+      <div class="nl-track">
+        <div class="nl-fill" style="width:${pct}%"></div>
+        <div class="nl-marker" style="left:${pct}%"></div>
+        <div class="nl-snap" style="left:${snapPct}%"></div>
+      </div>
+      <div class="nl-labels"><span>${fmtI(lower)}</span><span>${fmtI(upper)}</span></div>
+    </div>`;
+  }).join("");
+
+  c.innerHTML=`
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-m="explore">${T.exploreRound}</button>
+    <button class="mode-tab" data-m="quiz">${T.estQuiz}</button>
+  </div>
+  <div style="text-align:center;font-size:18px;font-weight:800;color:#1e293b;margin-bottom:10px">${fmtI(n)}</div>
+  ${rowsHtml}
+  <div style="margin-top:4px;text-align:center;font-size:10px;color:#9ca3af">${T.redBlue}</div>
+  <div class="slider-group" style="margin-top:10px">
+    <div class="slider-label"><span class="name">${T.adjustNum}</span><span class="val">${fmtI(n)}</span></div>
+    <input type="range" id="num-sl" min="10000" max="999999999" step="1" value="${n}">
+  </div>
+  <div class="presets">
+    <button class="preset-btn" data-v="38769957">3,87,69,957</button>
+    <button class="preset-btn" data-v="290532481">29,05,32,481</button>
+    <button class="preset-btn" data-v="67285183">6,72,85,183</button>
+    <button class="preset-btn" data-v="12442373">Mumbai Pop.</button>
+  </div>`;
+  c.querySelector("#num-sl").oninput=function(){currentNum=parseInt(this.value);renderExplore()};
+  c.querySelectorAll(".preset-btn").forEach(b=>b.onclick=()=>{currentNum=parseInt(b.dataset.v);renderExplore()});
+  c.querySelectorAll(".mode-tab").forEach(b=>b.onclick=()=>{if(b.dataset.m==="quiz"){mode="quiz";qIdx=0;score=0;total=0;renderQuiz()}});
+}
+
+function renderQuiz(){
+  if(qIdx>=QUIZ.length){qIdx=0;for(let i=QUIZ.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[QUIZ[i],QUIZ[j]]=[QUIZ[j],QUIZ[i]]}}
+  const q=QUIZ[qIdx];
+  c.innerHTML=`
+  <div class="mode-tabs">
+    <button class="mode-tab" data-m="explore">${T.exploreRound}</button>
+    <button class="mode-tab active" data-m="quiz">${T.estQuiz}</button>
+  </div>
+  <div class="score-bar">${T.score}: <b>${score}/${total}</b> &nbsp; ${T.question} <b>${qIdx+1}</b></div>
+  <div class="quiz-q">${q.q}</div>
+  <div class="quiz-opts" id="qopts">${q.opts.map(o=>`<button class="quiz-opt" data-v="${o}">${o}</button>`).join("")}</div>
+  <div class="feedback-box" id="fb"></div>
+  <button class="next-btn" id="nxt" style="display:none">${T.nextQ}</button>`;
+  answered=false;
+  c.querySelector("#qopts").addEventListener("click",e=>{
+    const b=e.target.closest(".quiz-opt");if(!b||answered)return;answered=true;total++;
+    if(b.dataset.v===q.ans){b.classList.add("correct");score++;c.querySelector("#fb").innerHTML=`<div style="background:#dcfce7;color:#166534;padding:8px;border-radius:8px">${T.correct} ${q.ex}</div>`}
+    else{b.classList.add("wrong");c.querySelectorAll(".quiz-opt").forEach(x=>{if(x.dataset.v===q.ans)x.classList.add("correct")});c.querySelector("#fb").innerHTML=`<div style="background:#fef2f2;color:#991b1b;padding:8px;border-radius:8px">${q.ex}</div>`}
+    c.querySelector("#nxt").style.display="block";
+  });
+  c.querySelector("#nxt").onclick=()=>{qIdx++;renderQuiz()};
+  c.querySelectorAll(".mode-tab").forEach(b=>b.onclick=()=>{if(b.dataset.m==="explore"){mode="explore";renderExplore()}});
+}
+
+renderExplore();
+</script>
+</body>
+</html>

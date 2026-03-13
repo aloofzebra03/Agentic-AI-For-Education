@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#7c3aed">
+<title>ಪದಗಳು ಮತ್ತು ಸಮೀಕರಣ ಮೌಲ್ಯಮಾಪನ — ಅಧ್ಯಾಯ ೨</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans Kannada',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#7c3aed 0%,#2563eb 100%);min-height:100vh;-webkit-font-smoothing:antialiased}#app{max-width:420px;margin:auto;padding:10px;padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.header{text-align:center;color:#fff;padding:12px}
+.header h1{font-size:18px;font-weight:700;margin-bottom:4px}
+.header p{font-size:12px;opacity:.9}
+.sim-card{background:#fff;border-radius:14px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.15);margin-bottom:12px}
+.mode-tabs{display:flex;gap:6px;margin-bottom:12px}
+.mode-tab{flex:1;padding:10px 4px;border:2px solid #e0e0e0;border-radius:8px;background:#fafafa;font-size:10px;font-weight:600;text-align:center;cursor:pointer}
+.mode-tab.active{border-color:#7c3aed;background:#f5f3ff;color:#7c3aed}
+/* Expression display */
+.expr-display{background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:12px;padding:16px;text-align:center;margin-bottom:10px}
+.expr-text{font-size:22px;font-weight:700;color:#fff;letter-spacing:1px;font-family:'Courier New',monospace}
+.expr-value{font-size:13px;color:rgba(255,255,255,.6);margin-top:6px}
+/* Term boxes */
+.terms-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px 0}
+.term-box{padding:10px 14px;border-radius:10px;font-size:14px;font-weight:700;text-align:center;font-family:'Courier New',monospace;min-width:50px}
+.term-box.t0{background:#ede9fe;color:#6d28d9;border:2px solid #c4b5fd}
+.term-box.t1{background:#dbeafe;color:#1d4ed8;border:2px solid #93c5fd}
+.term-box.t2{background:#dcfce7;color:#166534;border:2px solid #86efac}
+.term-box.t3{background:#fef3c7;color:#92400e;border:2px solid #fcd34d}
+.term-box.t4{background:#fce4ec;color:#c62828;border:2px solid #f48fb1}
+.term-plus{font-size:18px;font-weight:700;color:#666;display:flex;align-items:center}
+/* Steps */
+.step-card{background:#f8fafc;border-radius:10px;padding:10px;margin-bottom:8px;border-left:4px solid #7c3aed;font-size:12px;line-height:1.6;color:#475569}
+.step-card b{color:#7c3aed}
+.step-num{display:inline-block;width:20px;height:20px;border-radius:50%;background:#7c3aed;color:#fff;font-size:10px;font-weight:700;text-align:center;line-height:20px;margin-right:6px}
+/* Result */
+.result-panel{background:linear-gradient(135deg,#f5f3ff,#ede9fe);border-radius:12px;padding:16px;text-align:center;border:2px solid #a78bfa;margin:10px 0}
+.result-label{font-size:11px;color:#6d28d9;font-weight:600}
+.result-value{font-size:28px;font-weight:800;color:#4c1d95;margin:4px 0}
+/* Controls */
+.slider-group{margin-bottom:10px}
+.slider-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px}
+.slider-label .name{color:#555}
+.slider-label .val{font-weight:700;color:#7c3aed}
+input[type="range"]{width:100%;height:6px;border-radius:3px;background:#e5e7eb;-webkit-appearance:none;outline:none}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#7c3aed;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.2);cursor:pointer}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.preset-btn{padding:6px 10px;border-radius:16px;border:2px solid #c4b5fd;background:#fff;font-size:10px;font-weight:600;cursor:pointer;color:#7c3aed;font-family:'Courier New',monospace}
+.preset-btn:active{transform:scale(.95)}
+/* Insight */
+.insight-box{background:linear-gradient(135deg,#f5f3ff,#ede9fe);border-radius:10px;padding:12px;margin-top:12px;border-left:4px solid #7c3aed;font-size:12px;line-height:1.5}
+.insight-title{font-weight:700;color:#7c3aed;margin-bottom:4px}
+/* Help */
+.help-btn{position:fixed;bottom:20px;right:20px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;border:3px solid #fff;box-shadow:0 4px 15px rgba(124,58,237,.4);font-size:20px;font-weight:700;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center}
+.help-btn:active{transform:scale(.9)}
+.help-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.help-overlay.open{display:flex}
+.help-panel{background:#fff;border-radius:20px 20px 0 0;max-width:420px;width:100%;max-height:75vh;overflow-y:auto;padding:20px 16px env(safe-area-inset-bottom);animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.help-close{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.help-close h2{font-size:16px;font-weight:700;color:#333}
+.help-close button{width:32px;height:32px;border-radius:50%;border:none;background:#f1f5f9;font-size:18px;cursor:pointer;color:#64748b}
+.help-section{margin-bottom:14px}
+.help-section-title{font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:6px}
+.help-step{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:12px;line-height:1.5;color:#475569}
+.help-step:last-child{border-bottom:none}
+.help-step-num{width:22px;height:22px;border-radius:50%;background:#7c3aed;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.help-try{background:#f5f3ff;border-radius:8px;padding:8px 10px;font-size:11px;color:#6d28d9;line-height:1.5;margin-top:4px}
+.help-try b{color:#4c1d95}
+.help-key{background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:8px;padding:8px 10px;font-size:11px;color:#92400e;line-height:1.5;margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="header">
+  <h1>ಸಮೀಕರಣ ಮೌಲ್ಯಮಾಪನ</h1>
+  <p>ಪದಗಳಾಗಿ ವಿಭಜಿಸಿ, ಹಂತ ಹಂತವಾಗಿ ಮೌಲ್ಯಮಾಪನ ಮಾಡಿ</p>
+</div>
+<div class="sim-card" id="sim"></div>
+<div class="insight-box">
+  <div class="insight-title">ಮುಖ್ಯ ನಿಯಮ</div>
+  <strong>ಪದಗಳು</strong> '+' ನಿಂದ ಬೇರ್ಪಡುವ ಭಾಗಗಳು. ಎಲ್ಲಾ ವ್ಯವಕಲನವನ್ನು ಮೊದಲು ವಿಲೋಮಗಳ ಸಂಕಲನವಾಗಿ ಬದಲಾಯಿಸಿ. ನಂತರ ಪ್ರತಿ ಪದವನ್ನು (ಪದದೊಳಗೆ ಗುಣಾಕಾರ/ಭಾಗಾಕಾರ) ಮೌಲ್ಯಮಾಪನ ಮಾಡಿ, ಕೊನೆಗೆ ಎಲ್ಲಾ ಪದಗಳನ್ನು ಕೂಡಿಸಿ.
+</div>
+
+<button class="help-btn" id="helpBtn">?</button>
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-panel">
+    <div class="help-close"><h2>ಈ ಸಿಮ್ಯುಲೇಶನ್ ಹೇಗೆ ಬಳಸುವುದು</h2><button id="helpClose">&times;</button></div>
+    <div class="help-section">
+      <div class="help-section-title">ಏನು ಮಾಡಬೇಕು</div>
+      <div class="help-step"><span class="help-step-num">1</span><span><b>ಪ್ರೀಸೆಟ್‌ಗಳಿಂದ</b> ಒಂದು ಸಮೀಕರಣ ಆಯ್ಕೆಮಾಡಿ ಅಥವಾ ಪಠ್ಯಪುಸ್ತಕದ ಸಮಸ್ಯೆಗಳ ಮೂಲಕ ಸ್ಲೈಡರ್ ಬಳಸಿ.</span></div>
+      <div class="help-step"><span class="help-step-num">2</span><span><b>ರಂಗಿನ ಪದ ಪೆಟ್ಟಿಗೆಗಳನ್ನು</b> ನೋಡಿ — ಪ್ರತಿ ಪೆಟ್ಟಿಗೆ ಸಮೀಕರಣದ ಒಂದು ಪದ. ಗುಣಾಕಾರ (ಉದಾ. 2×6) ಒಂದೇ ಪದವಾಗಿ ಒಟ್ಟಿಗೆ ಇರುವುದನ್ನು ಗಮನಿಸಿ.</span></div>
+      <div class="help-step"><span class="help-step-num">3</span><span>ಕೆಳಗಿನ <b>ಹಂತಗಳನ್ನು</b> ಓದಿ: ಮೊದಲು ಪ್ರತಿ ಪದದ ಮೌಲ್ಯ ಲೆಕ್ಕ, ನಂತರ ಎಲ್ಲಾ ಪದಗಳನ್ನು ಕೂಡಿಸಲಾಗುತ್ತದೆ.</span></div>
+      <div class="help-step"><span class="help-step-num">4</span><span><b>ರಸಪ್ರಶ್ನೆ ಮೋಡ್</b> ಪ್ರಯತ್ನಿಸಿ — ಉತ್ತರ ನೋಡುವ ಮೊದಲೇ ಪದಗಳ ಸಂಖ್ಯೆ ಊಹಿಸಿ!</span></div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">ಇದನ್ನು ಪ್ರಯತ್ನಿಸಿ</div>
+      <div class="help-try"><b>ಉದಾಹರಣೆ:</b> 39 – 2×6 + 11 ರಲ್ಲಿ ಪದಗಳು 39, –2, 6, 11 ಅಲ್ಲ. ಪದಗಳು: <b>39</b>, <b>–2×6</b>, <b>11</b>. "2×6" ಒಂದು ಪದ — ಅದನ್ನು ಬೇರ್ಪಡಿಸುವ + ಚಿಹ್ನೆ ಇಲ್ಲ!</div>
+      <div class="help-try"><b>ಟ್ರಿಕಿ:</b> 6×3 – 4×8×5 ರಲ್ಲಿ ಪದಗಳು <b>6×3</b> (=18) ಮತ್ತು <b>–4×8×5</b> (=–160). ಮೊತ್ತ = 18 + (–160) = –142.</div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">ಮುಖ್ಯ ಕಲ್ಪನೆ</div>
+      <div class="help-key">'+' ಚಿಹ್ನೆ ಪದಗಳನ್ನು ಬೇರ್ಪಡಿಸುತ್ತದೆ. ವ್ಯವಕಲನ = ಋಣ ಸಂಕಲನ. ಪದದೊಳಗೆ ಗುಣಾಕಾರ ಮತ್ತು ಭಾಗಾಕಾರ ಮೊದಲು ಲೆಕ್ಕ. ನಂತರ ಎಲ್ಲಾ ಪದ ಮೌಲ್ಯಗಳನ್ನು ಕೂಡಿಸಲಾಗುತ್ತದೆ. ಇದೇ ಸರಿಯಾದ ಕ್ರಿಯಾ ಕ್ರಮ!</div>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+document.getElementById('helpBtn').onclick=()=>document.getElementById('helpOverlay').classList.add('open');
+document.getElementById('helpClose').onclick=()=>document.getElementById('helpOverlay').classList.remove('open');
+document.getElementById('helpOverlay').onclick=(e)=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open')};
+
+const PROBLEMS=[
+  {expr:"28 − 7 + 8",terms:["28","−7","8"],vals:[28,-7,8],result:29},
+  {expr:"39 − 2×6 + 11",terms:["39","−2×6","11"],vals:[39,-12,11],result:38},
+  {expr:"40 − 10 + 10 + 10",terms:["40","−10","10","10"],vals:[40,-10,10,10],result:50},
+  {expr:"48 − 10×2 + 16÷2",terms:["48","−10×2","16÷2"],vals:[48,-20,8],result:36},
+  {expr:"6×3 − 4×8×5",terms:["6×3","−4×8×5"],vals:[18,-160],result:-142},
+  {expr:"30 + 5×4",terms:["30","5×4"],vals:[30,20],result:50},
+  {expr:"4×23 + 5",terms:["4×23","5"],vals:[92,5],result:97},
+  {expr:"6×5 + 3",terms:["6×5","3"],vals:[30,3],result:33},
+  {expr:"89 + 21 − 10",terms:["89","21","−10"],vals:[89,21,-10],result:100},
+  {expr:"5×12 − 6",terms:["5×12","−6"],vals:[60,-6],result:54},
+  {expr:"4×9 + 2×6",terms:["4×9","2×6"],vals:[36,12],result:48},
+  {expr:"13 − 2 + 6",terms:["13","−2","6"],vals:[13,-2,6],result:17}
+];
+const TCOLS=["t0","t1","t2","t3","t4"];
+const T={exprToEval:"ಮೌಲ್ಯಮಾಪನ ಮಾಡಲು ಸಮೀಕರಣ",termsColored:"ಪದಗಳು (ರಂಗಿನ ಪೆಟ್ಟಿಗೆಗಳು):",identifyTerms:"ಪದಗಳನ್ನು ಗುರುತಿಸಿ:",evalEach:"ಪ್ರತಿ ಪದ ಮೌಲ್ಯಮಾಪನ:",addAll:"ಎಲ್ಲಾ ಪದ ಕೂಡಿಸಿ:",finalValue:"ಅಂತಿಮ ಮೌಲ್ಯ",expression:"ಸಮೀಕರಣ",of:" / ",orTap:"ಅಥವಾ ಒಂದು ಸಮೀಕರಣ ಒತ್ತಿ:"};
+const c=document.getElementById("sim");
+let pIdx=0;
+;(function(){
+  var p=new URLSearchParams(window.location.search);
+  if(p.has("problem")){var i=parseInt(p.get("problem"),10);if(!isNaN(i)&&i>=0&&i<PROBLEMS.length)pIdx=i;}
+})();
+
+function render(){
+  const p=PROBLEMS[pIdx];
+  let termsHtml=p.terms.map((t,i)=>{
+    const col=TCOLS[i%TCOLS.length];
+    return(i>0?`<span class="term-plus">+</span>`:"")+`<span class="term-box ${col}">${t}</span>`;
+  }).join("");
+
+  let stepsHtml="";
+  stepsHtml+=`<div class="step-card"><span class="step-num">1</span><b>${T.identifyTerms}</b> ${p.terms.length} ಪದ → ${p.terms.join(", ")}</div>`;
+  let evalParts=p.terms.map((t,i)=>`${t} = <b>${p.vals[i]}</b>`).join(", ");
+  stepsHtml+=`<div class="step-card"><span class="step-num">2</span><b>${T.evalEach}</b> ${evalParts}</div>`;
+  stepsHtml+=`<div class="step-card"><span class="step-num">3</span><b>${T.addAll}</b> ${p.vals.join(" + ")} = <b>${p.result}</b></div>`;
+
+  let presetsHtml=PROBLEMS.map((pr,i)=>`<button class="preset-btn${i===pIdx?" active":""}" data-i="${i}">${pr.expr}</button>`).join("");
+
+  c.innerHTML=`
+  <div class="expr-display">
+    <div class="expr-text">${p.expr}</div>
+    <div class="expr-value">${T.exprToEval}</div>
+  </div>
+  <div style="text-align:center;font-size:11px;color:#888;margin-bottom:4px">${T.termsColored}</div>
+  <div class="terms-row">${termsHtml}</div>
+  ${stepsHtml}
+  <div class="result-panel">
+    <div class="result-label">${T.finalValue}</div>
+    <div class="result-value">${p.result}</div>
+  </div>
+  <div class="slider-group">
+    <div class="slider-label"><span class="name">${T.expression}</span><span class="val">${pIdx+1} ${T.of} ${PROBLEMS.length}</span></div>
+    <input type="range" id="prob-sl" min="0" max="${PROBLEMS.length-1}" step="1" value="${pIdx}">
+  </div>
+  <div style="font-size:10px;color:#888;margin-bottom:4px">${T.orTap}</div>
+  <div class="presets">${presetsHtml}</div>`;
+
+  c.querySelector("#prob-sl").oninput=function(){pIdx=parseInt(this.value);render()};
+  c.querySelectorAll(".preset-btn").forEach(b=>b.onclick=()=>{pIdx=parseInt(b.dataset.i);render()});
+}
+render();
+</script>
+</body>
+</html>

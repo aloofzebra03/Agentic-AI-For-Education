@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#059669">
+<title>ವಿಭಾಜಕ ಗುಣ — ದೃಶ್ಯ ಅನ್ವೇಷಕ — ಅಧ್ಯಾಯ ೨</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans Kannada',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#059669 0%,#0d9488 50%,#2563eb 100%);min-height:100vh;-webkit-font-smoothing:antialiased}#app{max-width:420px;margin:auto;padding:10px;padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.header{text-align:center;color:#fff;padding:14px 12px}
+.header h1{font-size:20px;font-weight:800;margin-bottom:4px}
+.header p{font-size:13px;opacity:.9}
+.sim-card{background:#fff;border-radius:16px;padding:14px;box-shadow:0 8px 24px rgba(0,0,0,.12);margin-bottom:14px}
+.mode-tabs{display:flex;gap:4px;margin-bottom:14px}
+.mode-tab{flex:1;padding:10px 2px;border:2px solid #e5e7eb;border-radius:10px;background:#fafafa;font-size:10px;font-weight:600;text-align:center;cursor:pointer;transition:all .15s}
+.mode-tab:active{transform:scale(.97)}
+.mode-tab.active{border-color:#059669;background:#ecfdf5;color:#065f46}
+/* --- Shared visual container --- */
+.viz{background:linear-gradient(145deg,#f0fdf4,#ecfdf5);border-radius:14px;padding:12px;margin-bottom:12px;min-height:100px}
+svg{width:100%;display:block}
+/* --- Equation display --- */
+.eq-panel{background:linear-gradient(135deg,#064e3b,#065f46);border-radius:14px;padding:16px 12px;margin-bottom:12px;text-align:center}
+.eq-row{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;margin:4px 0}
+.eq-chunk{font-size:18px;font-weight:800;color:#fff;font-family:system-ui,sans-serif}
+.eq-chunk.blue{color:#93c5fd}
+.eq-chunk.green{color:#86efac}
+.eq-chunk.orange{color:#fdba74}
+.eq-chunk.op{font-size:16px;color:rgba(255,255,255,.5);font-weight:400}
+.eq-sub{font-size:13px;color:#4ade80;margin-top:6px;font-weight:600}
+/* --- Result panel --- */
+.result-panel{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-radius:14px;padding:16px;text-align:center;border:2px solid #34d399;margin-bottom:12px}
+.result-label{font-size:12px;color:#065f46;font-weight:600}
+.result-value{font-size:30px;font-weight:800;color:#064e3b;margin:4px 0}
+.result-sub{font-size:11px;color:#059669}
+/* --- Steps --- */
+.step-card{background:#ecfdf5;border-radius:10px;padding:10px 12px;margin-bottom:8px;border-left:4px solid #059669;font-size:13px;line-height:1.6;color:#334155}
+.step-card b{color:#059669}
+.step-num{display:inline-flex;width:22px;height:22px;border-radius:50%;background:#059669;color:#fff;font-size:10px;font-weight:700;align-items:center;justify-content:center;margin-right:8px;flex-shrink:0}
+/* --- Sliders --- */
+.slider-group{margin-bottom:12px}
+.slider-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
+.slider-label .name{color:#555;font-weight:500}
+.slider-label .val{font-weight:700;color:#059669;font-size:13px}
+input[type="range"]{width:100%;height:8px;border-radius:4px;background:#d4d4d8;-webkit-appearance:none;outline:none}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#059669;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.2);cursor:pointer}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.preset-btn{padding:7px 12px;border-radius:20px;border:2px solid #86efac;background:#fff;font-size:11px;font-weight:600;cursor:pointer;color:#065f46}
+.preset-btn:active{transform:scale(.95)}
+.preset-btn.active{background:#059669;color:#fff;border-color:#059669}
+/* --- Quiz --- */
+.quiz-q{font-size:16px;font-weight:700;color:#1e293b;text-align:center;padding:16px;background:#ecfdf5;border-radius:12px;margin-bottom:12px;line-height:1.5}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.quiz-opt{padding:14px;border-radius:12px;border:2px solid #e5e7eb;font-size:15px;font-weight:600;cursor:pointer;background:#fff;text-align:center}
+.quiz-opt:active{transform:scale(.97)}
+.quiz-opt.correct{border-color:#16a34a;background:#dcfce7;color:#166534}
+.quiz-opt.wrong{border-color:#dc2626;background:#fef2f2;color:#991b1b}
+.feedback-box{text-align:center;font-size:13px;padding:12px;border-radius:10px;min-height:20px;margin-bottom:10px}
+.next-btn{display:block;margin:0 auto;padding:14px 32px;border-radius:12px;border:none;background:linear-gradient(135deg,#059669,#2563eb);color:#fff;font-weight:700;font-size:14px;cursor:pointer}
+.next-btn:active{transform:scale(.97)}
+.score-bar{text-align:center;font-size:13px;font-weight:600;color:#555;margin-bottom:12px}
+.score-bar b{color:#059669}
+/* --- Insight --- */
+.insight-box{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-radius:12px;padding:14px;margin-top:14px;border-left:4px solid #059669;font-size:13px;line-height:1.5}
+.insight-title{font-weight:700;color:#065f46;margin-bottom:6px;font-size:14px}
+.rule-highlight{background:#fff;border-radius:10px;padding:12px;margin-top:8px;text-align:center;font-size:16px;font-weight:800;color:#065f46}
+/* --- Help --- */
+.help-btn{position:fixed;bottom:20px;right:20px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#059669,#2563eb);color:#fff;border:3px solid #fff;box-shadow:0 4px 15px rgba(5,150,105,.4);font-size:20px;font-weight:700;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center}
+.help-btn:active{transform:scale(.9)}
+.help-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.help-overlay.open{display:flex}
+.help-panel{background:#fff;border-radius:20px 20px 0 0;max-width:420px;width:100%;max-height:75vh;overflow-y:auto;padding:20px 16px env(safe-area-inset-bottom);animation:helpUp .3s ease}
+@keyframes helpUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.help-close{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.help-close h2{font-size:16px;font-weight:700;color:#333}
+.help-close button{width:32px;height:32px;border-radius:50%;border:none;background:#f1f5f9;font-size:18px;cursor:pointer;color:#64748b}
+.help-section{margin-bottom:14px}
+.help-section-title{font-size:12px;font-weight:700;color:#059669;margin-bottom:6px}
+.help-step{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:12px;line-height:1.5;color:#475569}
+.help-step:last-child{border-bottom:none}
+.help-step .sn{width:22px;height:22px;border-radius:50%;background:#059669;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.help-try{background:#ecfdf5;border-radius:8px;padding:8px 10px;font-size:11px;color:#065f46;line-height:1.5;margin-top:4px}
+.help-try b{color:#064e3b}
+.help-key{background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:8px;padding:8px 10px;font-size:11px;color:#92400e;line-height:1.5;margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="header">
+  <h1>ವಿಭಾಜಕ ಗುಣ</h1>
+  <p>ಮೊತ್ತದ ಗುಣಕ = ಗುಣಕಗಳ ಮೊತ್ತ</p>
+</div>
+<div class="sim-card" id="sim"></div>
+<div class="insight-box">
+  <div class="insight-title">ವಿಭಾಜಕ ಗುಣ</div>
+  <b>ವಿಭಾಜಕ ಗುಣ</b> ಎಂದರೆ ಎರಡು ಅಥವಾ ಹೆಚ್ಚು ಸಂಖ್ಯೆಗಳ ಮೊತ್ತವನ್ನು ಗುಣಿಸುವುದು, ಪ್ರತಿ ಸಂಕಲನಿಯನ್ನು ಪ್ರತ್ಯೇಕವಾಗಿ ಗುಣಿಸಿದರೆ ಸಮನೇ.
+  <div class="rule-highlight">a &times; (b + c) &nbsp;=&nbsp; a &times; b &nbsp;+&nbsp; a &times; c</div>
+  ಸಮಾನ ಸಮೀಕರಣಗಳನ್ನು ಯಾವ ರೀತಿ ಬಿಡಿಸಿದರೂ ಗುಣಲಬ್ಧ ಒಂದೇ.
+</div>
+
+<button class="help-btn" id="helpBtn">?</button>
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-panel">
+    <div class="help-close"><h2>ಈ ಸಿಮ್ಯುಲೇಶನ್ ಹೇಗೆ ಬಳಸುವುದು</h2><button id="helpClose">&times;</button></div>
+    <div class="help-section">
+      <div class="help-section-title">ಏನು ಮಾಡಬೇಕು</div>
+      <div class="help-step"><span class="sn">1</span><span><b>ಚುಕ್ಕೆ ಜಾಲ:</b> ಸಾಲುಗಳಲ್ಲಿ ಜೋಡಿಸಿದ ಬಣ್ಣದ ಚುಕ್ಕೆಗಳನ್ನು ನೋಡಿ. ನೀಲಿ ಮತ್ತು ಹಸಿರು ಗುಂಪುಗಳು ಗುಣಲಬ್ಧ ಎರಡು ಭಾಗಗಳಾಗಿ ಹೇಗೆ split ಆಗುತ್ತದೆ ತೋರಿಸುತ್ತವೆ.</span></div>
+      <div class="help-step"><span class="sn">2</span><span><b>ವಿಸ್ತೀರ್ಣ ಮಾದರಿ:</b> ನೀಲಿ ಮತ್ತು ಹಸಿರು ಭಾಗಗಳಾಗಿ ವಿಭಜಿಸಿದ ಆಯತ. ಗ್ರಿಡ್ ರೇಖೆಗಳು ಎಣಿಸಬಹುದಾದ ಏಕಕ ಚೌಕಗಳನ್ನು ತೋರಿಸುತ್ತವೆ.</span></div>
+      <div class="help-step"><span class="sn">3</span><span><b>ಮಾನಸಿಕ ಗಣಿತ:</b> ವಿಭಾಜಕ ಗುಣ ಬಳಸಿ ಗುಣಾಕಾರ ಶಾರ್ಟ್‌ಕಟ್‌ಗಳು.</span></div>
+      <div class="help-step"><span class="sn">4</span><span><b>ರಸಪ್ರಶ್ನೆ:</b> ವಿಭಾಜಕ ಸಮೀಕರಣಗಳಲ್ಲಿ ಬಿಟ್ಟಿರುವ ಚಿಹ್ನೆ ಅಥವಾ ಸಂಖ್ಯೆ ನಿಮ್ಮಡಿ.</span></div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">ಇದನ್ನು ಪ್ರಯತ್ನಿಸಿ</div>
+      <div class="help-try"><b>ಚುಕ್ಕೆ ಜಾಲ:</b> a=2, b=3, c=5 ಹಾಕಿ. 6 ನೀಲಿ + 10 ಹಸಿರು = 16. ಅದೇ 2 &times; 8!</div>
+      <div class="help-try"><b>ಮಾನಸಿಕ ಗಣಿತ:</b> 97 &times; 25 → (100 &minus; 3) &times; 25 = 2500 &minus; 75 = 2425.</div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">ಮುಖ್ಯ ಕಲ್ಪನೆ</div>
+      <div class="help-key">a &times; (b + c) ನ ಆಯತವನ್ನು a &times; b + a &times; c ಆಗಿ ವಿಭಜಿಸಬಹುದು. ಚುಕ್ಕೆ ಜಾಲ, ವಿಸ್ತೀರ್ಣ ಮಾದರಿ ಮತ್ತು ಸಮೀಕರಣ ಎಲ್ಲವೂ ವಿವಿಧ ಕೋನಗಳಿಂದ ಅದೇ ಸತ್ಯ ತೋರಿಸುತ್ತವೆ!</div>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+document.getElementById('helpBtn').onclick=()=>document.getElementById('helpOverlay').classList.add('open');
+document.getElementById('helpClose').onclick=()=>document.getElementById('helpOverlay').classList.remove('open');
+document.getElementById('helpOverlay').onclick=e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open')};
+
+const T={dots:"ಚುಕ್ಕೆ ಜಾಲ",area:"ವಿಸ್ತೀರ್ಣ ಮಾದರಿ",mental:"ಮಾನಸಿಕ ಗಣಿತ",quiz:"ರಸಪ್ರಶ್ನೆ",anyWay:"ಯಾವ ರೀತಿ ಎಣಿಸಿದರೂ ಒಟ್ಟು ಒಂದೇ",totalArea:"ಒಟ್ಟು ವಿಸ್ತೀರ್ಣ = ಎರಡೂ ಬದಿ ಸಮ",blueDots:"ನೀಲಿ ಚುಕ್ಕೆಗಳು",greenDots:"ಹಸಿರು ಚುಕ್ಕೆಗಳು",blueSq:"ನೀಲಿ ಚೌಕಗಳು",greenSq:"ಹಸಿರು ಚೌಕಗಳು",cols:"cols",rows:"rows",originalMult:"ಮೂಲ ಗುಣಾಕಾರ",decompose:"ವಿಭಜಿಸಿ",distribute:"ವಿತರಿಸಿ",compute:"ಲೆಕ್ಕಹಾಕಿ",tryAnother:"ಬೇರೆ ಪ್ರಯತ್ನಿಸಿ",score:"ಸ್ಕೋರ್",question:"ಪ್ರಶ್ನೆ",nextQ:"ಮುಂದಿನ ಪ್ರಶ್ನೆ",correct:"ಸರಿ!",answer:"ಉತ್ತರ",aRows:"a (ಸಾಲುಗಳು)",bBlue:"b (ನೀಲಿ ಕಾಲಂಗಳು)",cGreen:"c (ಹಸಿರು ಕಾಲಂಗಳು)"};
+const ct=document.getElementById("sim");
+let mode="dots",a=3,b=4,c2=6,mmIdx=0,qIdx=0,qScore=0,qTotal=0,qAns=false;
+/* ======================================================
+ * URL Parameter Support — Distributive Property (Kannada)
+ *
+ * mode             — "dots" (default) | "area" | "mental" | "quiz"
+ *                    Selects the active visualisation tab on load.
+ * a                — 1..8   (integer, default 3)
+ *                    Sets the rows/multiplier value (used in dots and area).
+ * b                — 1..10  (integer, default 4)
+ *                    Sets blue columns (first addend).
+ * c                — 1..10  (integer, default 6)
+ *                    Sets green columns (second addend).
+ * mentalMathIndex  — 0..4   (integer, default 0)
+ *                    In mental-math tab, selects which preset example.
+ * showHints        — "true" (default) | "false"
+ *                    When "false", hides the .insight-box at the bottom.
+ * ====================================================== */
+(function(){
+  var p=new URLSearchParams(window.location.search);
+  var mP=p.get('mode');
+  if(['dots','area','mental','quiz'].indexOf(mP)!==-1)mode=mP;
+  var av=parseInt(p.get('a'),10);
+  if(!isNaN(av)&&av>=1&&av<=8)a=av;
+  var bv=parseInt(p.get('b'),10);
+  if(!isNaN(bv)&&bv>=1&&bv<=10)b=bv;
+  var cv=parseInt(p.get('c'),10);
+  if(!isNaN(cv)&&cv>=1&&cv<=10)c2=cv;
+  var mi=parseInt(p.get('mentalMathIndex'),10);
+  if(!isNaN(mi)&&mi>=0&&mi<=4)mmIdx=mi;
+  if(p.get('showHints')==='false'){var ib=document.querySelector('.insight-box');if(ib)ib.style.display='none';}
+})();
+const MM=[
+  {num:97,by:25,decomp:"(100 &minus; 3)",parts:["100 &times; 25","3 &times; 25"],vals:[2500,75],op:"&minus;",result:2425},
+  {num:95,by:8,decomp:"(100 &minus; 5)",parts:["100 &times; 8","5 &times; 8"],vals:[800,40],op:"&minus;",result:760},
+  {num:104,by:15,decomp:"(100 + 4)",parts:["100 &times; 15","4 &times; 15"],vals:[1500,60],op:"+",result:1560},
+  {num:49,by:50,decomp:"(50 &minus; 1)",parts:["50 &times; 50","1 &times; 50"],vals:[2500,50],op:"&minus;",result:2450},
+  {num:998,by:7,decomp:"(1000 &minus; 2)",parts:["1000 &times; 7","2 &times; 7"],vals:[7000,14],op:"&minus;",result:6986}
+];
+
+const QUIZ=[
+  {q:"3 &times; (5 + 8) = 3 &times; 5 <b>___</b> 3 &times; 8",ans:"+",opts:["+","&minus;","&times;"],ex:"Sum inside bracket &rarr; + outside. 15 + 24 = 39"},
+  {q:"(9 + 2) &times; 4 = 9 &times; 4 <b>___</b> 2 &times; 4",ans:"+",opts:["+","&minus;","&times;"],ex:"Sum inside &rarr; + outside. 36 + 8 = 44"},
+  {q:"5 &times; (9 &minus; 2) = 5 &times; 9 <b>___</b> 5 &times; 2",ans:"&minus;",opts:["+","&minus;","&times;"],ex:"Difference inside &rarr; &minus; outside. 45 &minus; 10 = 35"},
+  {q:"(8 &minus; 3) &times; 7 = 8 &times; 7 <b>___</b> 3 &times; 7",ans:"&minus;",opts:["+","&minus;","&times;"],ex:"Difference inside &rarr; &minus; outside. 56 &minus; 21 = 35"},
+  {q:"97 &times; 25 = 100 &times; 25 <b>___</b> 3 &times; 25",ans:"&minus;",opts:["+","&minus;","&times;"],ex:"97 = 100 &minus; 3, so subtract. 2500 &minus; 75 = 2425"},
+  {q:"104 &times; 15 = 100 &times; 15 <b>___</b> 4 &times; 15",ans:"+",opts:["+","&minus;","&times;"],ex:"104 = 100 + 4, so add. 1500 + 60 = 1560"},
+  {q:"3 &times; (6 + 7) = <b>___</b> &times; 6 + <b>___</b> &times; 7<br>What fills the blanks?",ans:"3",opts:["3","6","7","13"],ex:"The multiplier 3 distributes to each addend"},
+  {q:"(8 + 3) &times; 4 = 8 &times; <b>___</b> + 3 &times; <b>___</b><br>What fills the blanks?",ans:"4",opts:["3","4","8","11"],ex:"The multiplier 4 distributes to each addend"},
+  {q:"95 &times; 8 = (100 &minus; <b>___</b>) &times; 8",ans:"5",opts:["3","5","8","95"],ex:"95 = 100 &minus; 5"},
+  {q:"49 &times; 50 = (<b>___</b> &minus; 1) &times; 50",ans:"50",opts:["49","50","51","100"],ex:"49 = 50 &minus; 1"}
+];
+
+// ═══════ TABS ═══════
+function tabs(active){
+  return['dots','area','mental','quiz'].map(m=>`<button class="mode-tab${m===active?' active':''}" data-m="${m}">${T[m]||m}</button>`).join('');
+}
+function wireMode(){ct.querySelectorAll('.mode-tab').forEach(b=>b.onclick=()=>{mode=b.dataset.m;go()})}
+function go(){if(mode==='dots')renderDots();else if(mode==='area')renderArea();else if(mode==='mental')renderMental();else{qIdx=0;qScore=0;qTotal=0;renderQuiz()}}
+
+// ═══════ 1. DOT ARRAY ═══════
+function renderDots(){
+  const total=a*(b+c2),pB=a*b,pC=a*c2;
+  const W=370;
+  const cols=b+c2,rows=a;
+  const dotR=Math.min(10,Math.floor((W-40)/(cols*2.5)),Math.floor(120/(rows*2.5)));
+  const gap=dotR*2.4;
+  const ox=(W-cols*gap)/2+dotR,oy=dotR+4;
+  const H=rows*gap+dotR+8;
+  let dots='';
+  for(let r=0;r<rows;r++){
+    for(let cc=0;cc<cols;cc++){
+      const x=ox+cc*gap,y=oy+r*gap;
+      const isBlue=cc<b;
+      dots+=`<circle cx="${x}" cy="${y}" r="${dotR}" fill="${isBlue?'#3b82f6':'#22c55e'}" opacity=".85"/>`;
+    }
+    // Separator line after blue dots
+    if(b>0&&c2>0){
+      const sx=ox+b*gap-gap/2;
+      dots+=`<line x1="${sx}" y1="${oy+r*gap-dotR-2}" x2="${sx}" y2="${oy+r*gap+dotR+2}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>`;
+    }
+  }
+  // Labels below
+  const blueCenter=ox+(b-1)*gap/2;
+  const greenCenter=ox+b*gap+(c2-1)*gap/2;
+  const labelY=oy+rows*gap+dotR+2;
+
+  ct.innerHTML=`
+  <div class="mode-tabs">${tabs('dots')}</div>
+  <div class="viz">
+    <svg viewBox="0 0 ${W} ${H+20}" style="min-height:${Math.max(H+20,80)}px">
+      ${dots}
+      <text x="${blueCenter}" y="${labelY+12}" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">${b} cols</text>
+      <text x="${greenCenter}" y="${labelY+12}" text-anchor="middle" font-size="11" font-weight="700" fill="#166534">${c2} cols</text>
+      <text x="${ox-dotR-6}" y="${oy+(rows-1)*gap/2+4}" text-anchor="end" font-size="11" font-weight="700" fill="#333">${a} rows</text>
+    </svg>
+  </div>
+  <div class="eq-panel">
+    <div class="eq-row">
+      <span class="eq-chunk">${a} &times; ${b+c2}</span>
+      <span class="eq-chunk op">&nbsp;=&nbsp;</span>
+      <span class="eq-chunk">${a} &times; (</span>
+      <span class="eq-chunk blue">${b}</span>
+      <span class="eq-chunk"> + </span>
+      <span class="eq-chunk green">${c2}</span>
+      <span class="eq-chunk">)</span>
+      <span class="eq-chunk op">&nbsp;=&nbsp;</span>
+      <span class="eq-chunk blue">${a}&times;${b}</span>
+      <span class="eq-chunk"> + </span>
+      <span class="eq-chunk green">${a}&times;${c2}</span>
+    </div>
+    <div class="eq-sub">${a} &times; ${b+c2} = ${pB} + ${pC} = ${total}</div>
+  </div>
+  <div class="result-panel">
+    <div class="result-label">${T.anyWay}</div>
+    <div class="result-value">${total}</div>
+    <div class="result-sub"><span style="color:#3b82f6;font-weight:700">${pB} ${T.blueDots}</span> + <span style="color:#22c55e;font-weight:700">${pC} ${T.greenDots}</span></div>
+  </div>
+  ${sliders()}`;
+  wireMode();wireSliders();
+}
+
+// ═══════ 2. AREA MODEL ═══════
+function renderArea(){
+  const total=a*(b+c2),pB=a*b,pC=a*c2;
+  const W=370,maxH=170;
+  const cell=Math.max(6,Math.min(Math.floor((W-50)/(b+c2)),Math.floor(maxH/a),22));
+  const rw1=b*cell,rw2=c2*cell,rh=a*cell;
+  const ox=32,oy=10,H=rh+42;
+  let grid='';
+  for(let r=0;r<=a;r++){grid+=`<line x1="${ox}" y1="${oy+r*cell}" x2="${ox+rw1}" y2="${oy+r*cell}" stroke="#93c5fd" stroke-width=".6"/>`;grid+=`<line x1="${ox+rw1}" y1="${oy+r*cell}" x2="${ox+rw1+rw2}" y2="${oy+r*cell}" stroke="#86efac" stroke-width=".6"/>`}
+  for(let cc=0;cc<=b;cc++)grid+=`<line x1="${ox+cc*cell}" y1="${oy}" x2="${ox+cc*cell}" y2="${oy+rh}" stroke="#93c5fd" stroke-width=".6"/>`;
+  for(let cc=0;cc<=c2;cc++)grid+=`<line x1="${ox+rw1+cc*cell}" y1="${oy}" x2="${ox+rw1+cc*cell}" y2="${oy+rh}" stroke="#86efac" stroke-width=".6"/>`;
+  const fs=Math.min(15,cell);
+
+  ct.innerHTML=`
+  <div class="mode-tabs">${tabs('area')}</div>
+  <div class="viz">
+    <svg viewBox="0 0 ${W} ${H}" style="min-height:${Math.max(H,100)}px">
+      <rect x="${ox}" y="${oy}" width="${rw1}" height="${rh}" fill="#3b82f6" opacity=".12"/>
+      <rect x="${ox+rw1}" y="${oy}" width="${rw2}" height="${rh}" fill="#22c55e" opacity=".12"/>
+      ${grid}
+      <rect x="${ox}" y="${oy}" width="${rw1}" height="${rh}" fill="none" stroke="#3b82f6" stroke-width="2.5" rx="3"/>
+      <rect x="${ox+rw1}" y="${oy}" width="${rw2}" height="${rh}" fill="none" stroke="#22c55e" stroke-width="2.5" rx="3"/>
+      <line x1="${ox+rw1}" y1="${oy}" x2="${ox+rw1}" y2="${oy+rh}" stroke="#334155" stroke-width="2" stroke-dasharray="5,3"/>
+      <text x="${ox+rw1/2}" y="${oy+rh/2+fs/3}" text-anchor="middle" font-size="${fs}" font-weight="800" fill="#1d4ed8">${a}&times;${b}=${pB}</text>
+      <text x="${ox+rw1+rw2/2}" y="${oy+rh/2+fs/3}" text-anchor="middle" font-size="${fs}" font-weight="800" fill="#166534">${a}&times;${c2}=${pC}</text>
+      <text x="${ox-8}" y="${oy+rh/2+5}" text-anchor="end" font-size="13" font-weight="700" fill="#333">${a}</text>
+      <text x="${ox+rw1/2}" y="${oy+rh+16}" text-anchor="middle" font-size="12" font-weight="700" fill="#1d4ed8">${b}</text>
+      <text x="${ox+rw1+rw2/2}" y="${oy+rh+16}" text-anchor="middle" font-size="12" font-weight="700" fill="#166534">${c2}</text>
+      <line x1="${ox}" y1="${oy+rh+24}" x2="${ox+rw1+rw2}" y2="${oy+rh+24}" stroke="#64748b" stroke-width="1"/>
+      <text x="${ox+(rw1+rw2)/2}" y="${oy+rh+38}" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">${b} + ${c2} = ${b+c2}</text>
+    </svg>
+  </div>
+  <div class="eq-panel">
+    <div class="eq-row">
+      <span class="eq-chunk">${a} &times; (</span>
+      <span class="eq-chunk blue">${b}</span>
+      <span class="eq-chunk"> + </span>
+      <span class="eq-chunk green">${c2}</span>
+      <span class="eq-chunk">)</span>
+      <span class="eq-chunk op">&nbsp;=&nbsp;</span>
+      <span class="eq-chunk blue">${a} &times; ${b}</span>
+      <span class="eq-chunk"> + </span>
+      <span class="eq-chunk green">${a} &times; ${c2}</span>
+    </div>
+    <div class="eq-sub">${a} &times; ${b+c2} = ${pB} + ${pC} = ${total}</div>
+  </div>
+  <div class="result-panel">
+    <div class="result-label">${T.totalArea}</div>
+    <div class="result-value">${total}</div>
+    <div class="result-sub"><span style="color:#3b82f6;font-weight:700">${pB} ${T.blueSq}</span> + <span style="color:#22c55e;font-weight:700">${pC} ${T.greenSq}</span></div>
+  </div>
+  ${sliders()}`;
+  wireMode();wireSliders();
+}
+
+// ═══════ 3. MENTAL MATH ═══════
+function renderMental(){
+  const p=MM[mmIdx];
+  ct.innerHTML=`
+  <div class="mode-tabs">${tabs('mental')}</div>
+  <div class="eq-panel" style="padding:20px 14px">
+    <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px">${T.originalMult}</div>
+    <div style="font-size:28px;font-weight:800;color:#fff">${p.num} &times; ${p.by}</div>
+  </div>
+  <div class="step-card"><span class="step-num">1</span><b>${T.decompose}:</b> ${p.num} = ${p.decomp}</div>
+  <div class="step-card"><span class="step-num">2</span><b>${T.distribute}:</b> ${p.decomp} &times; ${p.by} = ${p.parts[0]} ${p.op} ${p.parts[1]}</div>
+  <div class="step-card"><span class="step-num">3</span><b>${T.compute}:</b> ${p.vals[0]} ${p.op} ${p.vals[1]} = <b>${p.result}</b></div>
+  <div class="result-panel"><div class="result-label">${p.num} &times; ${p.by}</div><div class="result-value">${p.result}</div></div>
+  <div style="font-size:11px;color:#888;margin-bottom:6px">${T.tryAnother}</div>
+  <div class="presets">${MM.map((pr,i)=>`<button class="preset-btn${i===mmIdx?' active':''}" data-mi="${i}">${pr.num}&times;${pr.by}</button>`).join('')}</div>`;
+  wireMode();
+  ct.querySelectorAll('[data-mi]').forEach(b=>b.onclick=()=>{mmIdx=parseInt(b.dataset.mi);renderMental()});
+}
+
+// ═══════ 4. QUIZ ═══════
+function renderQuiz(){
+  if(qIdx>=QUIZ.length)qIdx=0;
+  const q=QUIZ[qIdx];
+  ct.innerHTML=`
+  <div class="mode-tabs">${tabs('quiz')}</div>
+  <div class="score-bar">${T.score}: <b>${qScore}/${qTotal}</b> &nbsp;&bull;&nbsp; ${T.question} <b>${qIdx+1}/${QUIZ.length}</b></div>
+  <div class="quiz-q">${q.q}</div>
+  <div class="quiz-opts" id="qo">${q.opts.map(o=>`<button class="quiz-opt" data-v="${o}">${o}</button>`).join('')}</div>
+  <div class="feedback-box" id="fb"></div>
+  <button class="next-btn" id="nxt" style="display:none">${T.nextQ}</button>`;
+  qAns=false;wireMode();
+  ct.querySelector('#qo').addEventListener('click',e=>{
+    const b=e.target.closest('.quiz-opt');if(!b||qAns)return;qAns=true;qTotal++;
+    if(b.dataset.v===q.ans){b.classList.add('correct');qScore++;ct.querySelector('#fb').innerHTML=`<div style="background:#dcfce7;color:#166534;padding:12px;border-radius:10px"><b>${T.correct}</b> ${q.ex}</div>`}
+    else{b.classList.add('wrong');ct.querySelectorAll('.quiz-opt').forEach(x=>{if(x.dataset.v===q.ans)x.classList.add('correct')});ct.querySelector('#fb').innerHTML=`<div style="background:#fef2f2;color:#991b1b;padding:12px;border-radius:10px"><b>${T.answer}: ${q.ans}</b> &mdash; ${q.ex}</div>`}
+    ct.querySelector('#nxt').style.display='block';
+  });
+  ct.querySelector('#nxt').onclick=()=>{qIdx++;renderQuiz()};
+}
+
+// ═══════ SHARED SLIDERS ═══════
+function sliders(){
+  return`
+  <div class="slider-group"><div class="slider-label"><span class="name">${T.aRows}</span><span class="val">${a}</span></div><input type="range" data-k="a" min="1" max="8" step="1" value="${a}"></div>
+  <div class="slider-group"><div class="slider-label"><span class="name">${T.bBlue}</span><span class="val">${b}</span></div><input type="range" data-k="b" min="1" max="10" step="1" value="${b}"></div>
+  <div class="slider-group"><div class="slider-label"><span class="name">${T.cGreen}</span><span class="val">${c2}</span></div><input type="range" data-k="c2" min="1" max="10" step="1" value="${c2}"></div>
+  <div class="presets">
+    <button class="preset-btn" data-a="2" data-b="2" data-c="6">2&times;(2+6)</button>
+    <button class="preset-btn" data-a="4" data-b="3" data-c="5">4&times;(3+5)</button>
+    <button class="preset-btn" data-a="3" data-b="6" data-c="7">3&times;(6+7)</button>
+    <button class="preset-btn" data-a="5" data-b="4" data-c="3">5&times;(4+3)</button>
+  </div>`;
+}
+function wireSliders(){
+  ct.querySelectorAll('input[type="range"]').forEach(sl=>{sl.oninput=function(){
+    if(this.dataset.k==='a')a=parseInt(this.value);else if(this.dataset.k==='b')b=parseInt(this.value);else c2=parseInt(this.value);
+    if(mode==='dots')renderDots();else renderArea();
+  }});
+  ct.querySelectorAll('.preset-btn[data-a]').forEach(btn=>btn.onclick=()=>{
+    a=parseInt(btn.dataset.a);b=parseInt(btn.dataset.b);c2=parseInt(btn.dataset.c);
+    if(mode==='dots')renderDots();else renderArea();
+  });
+}
+
+go();
+</script>
+</body>
+</html>

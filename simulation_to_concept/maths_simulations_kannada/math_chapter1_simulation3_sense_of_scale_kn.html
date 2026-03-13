@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#059669">
+<title>ಸ್ಕೇಲ್ ಅರಿವು — ದೊಡ್ಡ ಸಂಖ್ಯೆ ದೃಶ್ಯೀಕರಣ — ಅಧ್ಯಾಯ ೧</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans Kannada',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#059669 0%,#0ea5e9 100%);min-height:100vh;-webkit-font-smoothing:antialiased}#app{max-width:420px;margin:auto;padding:10px;padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.header{text-align:center;color:#fff;padding:12px}
+.header h1{font-size:18px;font-weight:700;margin-bottom:4px}
+.header p{font-size:12px;opacity:.9}
+.sim-card{background:#fff;border-radius:14px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.15);margin-bottom:12px}
+.card-title{font-size:13px;font-weight:700;color:#059669;margin-bottom:8px}
+.visual{position:relative;min-height:160px;background:linear-gradient(145deg,#ecfdf5 0%,#d1fae5 100%);border-radius:12px;overflow:hidden}
+svg{width:100%;height:100%;display:block}
+.result-panel{background:linear-gradient(135deg,#ecfdf5 0%,#d1fae5 100%);border-radius:12px;padding:16px;text-align:center;border:2px solid #10b981;margin-top:10px}
+.result-label{font-size:11px;color:#065f46;font-weight:600}
+.result-value{font-size:26px;font-weight:800;color:#065f46;margin:4px 0}
+.result-sub{font-size:11px;color:#047857}
+/* Progress bars */
+.progress-item{margin-bottom:10px}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px}
+.progress-label .name{color:#333}
+.progress-label .pct{color:#059669}
+.progress-track{height:20px;background:#e5e7eb;border-radius:10px;overflow:hidden;position:relative}
+.progress-fill{height:100%;border-radius:10px;transition:width .3s ease;display:flex;align-items:center;padding-left:8px;font-size:9px;font-weight:600;color:#fff;min-width:0}
+.progress-fill.green{background:linear-gradient(90deg,#10b981,#059669)}
+.progress-fill.blue{background:linear-gradient(90deg,#3b82f6,#1d4ed8)}
+.progress-fill.red{background:linear-gradient(90deg,#ef4444,#b91c1c)}
+.progress-fill.yellow{background:linear-gradient(90deg,#f59e0b,#d97706)}
+/* Controls */
+.slider-group{margin-bottom:10px}
+.slider-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px}
+.slider-label .name{color:#555}
+.slider-label .val{font-weight:700;color:#059669}
+input[type="range"]{width:100%;height:6px;border-radius:3px;background:#d4d4d8;-webkit-appearance:none;outline:none}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#059669;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.2);cursor:pointer}
+.mode-tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.mode-tab{flex:1;min-width:70px;padding:8px 4px;border:2px solid #e0e0e0;border-radius:8px;background:#fafafa;font-size:9px;font-weight:600;text-align:center;cursor:pointer}
+.mode-tab:active{transform:scale(.98)}
+.mode-tab.active{border-color:#059669;background:#ecfdf5;color:#065f46}
+.insight-box{background:linear-gradient(135deg,#ecfdf5 0%,#d1fae5 100%);border-radius:10px;padding:12px;margin-top:12px;border-left:4px solid #059669;font-size:12px;line-height:1.5}
+.insight-title{font-weight:700;color:#065f46;margin-bottom:4px}
+.apply-btn{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#059669,#0ea5e9);color:#fff;font-weight:600;font-size:13px;cursor:pointer;margin-top:8px}
+.apply-btn:active{transform:scale(.98)}
+/* Help system */
+.help-btn{position:fixed;bottom:20px;right:20px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#059669,#0ea5e9);color:#fff;border:3px solid #fff;box-shadow:0 4px 15px rgba(5,150,105,.4);font-size:20px;font-weight:700;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center}
+.help-btn:active{transform:scale(.9)}
+.help-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.help-overlay.open{display:flex}
+.help-panel{background:#fff;border-radius:20px 20px 0 0;max-width:420px;width:100%;max-height:75vh;overflow-y:auto;padding:20px 16px env(safe-area-inset-bottom);animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.help-close{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.help-close h2{font-size:16px;font-weight:700;color:#333}
+.help-close button{width:32px;height:32px;border-radius:50%;border:none;background:#f1f5f9;font-size:18px;cursor:pointer;color:#64748b}
+.help-section{margin-bottom:14px}
+.help-section-title{font-size:12px;font-weight:700;color:#059669;margin-bottom:6px}
+.help-step{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:12px;line-height:1.5;color:#475569}
+.help-step:last-child{border-bottom:none}
+.help-step-num{width:22px;height:22px;border-radius:50%;background:#059669;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.help-try{background:#ecfdf5;border-radius:8px;padding:8px 10px;font-size:11px;color:#065f46;line-height:1.5;margin-top:4px}
+.help-try b{color:#064e3b}
+.help-key{background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:8px;padding:8px 10px;font-size:11px;color:#92400e;line-height:1.5;margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="header">
+  <h1>ಸ್ಕೇಲ್ ಅರಿವು</h1>
+  <p>ದೊಡ್ಡ ಸಂಖ್ಯೆಗಳು ನಿಜವಾಗಿ ಎಷ್ಟು ದೊಡ್ಡವು?</p>
+</div>
+<div class="sim-card" id="sim"></div>
+<div class="insight-box" id="takeaway" style="display:none">
+  <div class="insight-title">ನೀವು ಕಂಡುಕೊಂಡದ್ದು</div>
+  <span id="takeaway-text"></span>
+</div>
+
+<button class="help-btn" id="helpBtn">?</button>
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-panel">
+    <div class="help-close"><h2>ಈ ಸಿಮ್ಯುಲೇಶನ್ ಹೇಗೆ ಬಳಸುವುದು</h2><button id="helpClose">&times;</button></div>
+    <div class="help-section">
+      <div class="help-section-title">ಏನು ಮಾಡಬೇಕು</div>
+      <div class="help-step"><span class="help-step-num">1</span><span>ಮೇಲೆ ಟ್ಯಾಬ್‌ಗಳಿಂದ <b>ದೃಶ್ಯ</b> ಆಯ್ಕೆಮಾಡಿ: ಪ್ರಯಾಣ, ಬಸ್‌ಗಳು, ತೂಕ, ಎಣಿಕೆ ಅಥವಾ ತಥ್ಯಗಳು.</span></div>
+      <div class="help-step"><span class="help-step-num">2</span><span><b>ಸ್ಲೈಡರ್‌ಗಳನ್ನು</b> ಎಳೆದು ಮೌಲ್ಯಗಳನ್ನು ಬದಲಾಯಿಸಿ (ವೇಗ, ವಾಹನಗಳ ಸಂಖ್ಯೆ, ತೂಕ, ಇತ್ಯಾದಿ). ಫಲಿತಾಂಶ ತಕ್ಷಣ ನವೀಕರಣ.</span></div>
+      <div class="help-step"><span class="help-step-num">3</span><span><b>ಪ್ರೋಗ್ರೆಸ್ ಬಾರ್‌ಗಳನ್ನು</b> ನೋಡಿ — ನಿಮ್ಮ ಫಲಿತಾಂಶ ವಾಸ್ತವ ಬೆಂಚ್‌ಮಾರ್ಕ್‌ಗಳೊಂದಿಗೆ (ಚಂದ್ರ ದೂರ, ನಗರ ಜನಸಂಖ್ಯೆ, ಇತ್ಯಾದಿ) ಹೇಗೆ ಹೋಲುತ್ತದೆ.</span></div>
+      <div class="help-step"><span class="help-step-num">4</span><span>ಕೆಳಗೆ <b>ಕಂಡುಕೊಂಡದ್ದು</b> ಓದಿ — ಸಂಖ್ಯೆಗಳ ಅರ್ಥ ಸಂದರ್ಭದಲ್ಲಿ ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ.</span></div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">ಇದನ್ನು ಪ್ರಯತ್ನಿಸಿ</div>
+      <div class="help-try"><b>ಪ್ರಯಾಣ:</b> ವೇಗ 100 km/day ಮತ್ತು ವರ್ಷ 10 ಹಾಕಿ. 3,65,000 km ಪ್ರಯಾಣ — ಚಂದ್ರ (3,84,400 km) ಸುಮಾರು! 1000 km/day ಪ್ರಯತ್ನಿಸಿ — 100 ವರ್ಷದಲ್ಲಿ ಸೂರ್ಯ ತಲುಪಬಹುದೇ?</div>
+      <div class="help-try"><b>ಬಸ್‌ಗಳು:</b> ಬಸ್‌ಗೆ 50 ಜನ ಮತ್ತು 1,00,000 ಬಸ್‌ಗಳು. 50 ಲಕ್ಷ ಜನ — ಮುಂಬೈಗೆ 1.24 ಕೋಟಿ! ಸುಮಾರು 2.5 ಲಕ್ಷ ಬಸ್‌ಗಳು ಬೇಕು.</div>
+      <div class="help-try"><b>ತೂಕ:</b> ವಸ್ತುವಿಗೆ 5 ಗ್ರಾಂ ಮತ್ತು 1,00,000 ವಸ್ತುಗಳು. 500 kg — ಯಾರೂ ಎತ್ತಲಾರರು! 1 ಲಕ್ಷ ಹಾಳೆ ಅಸಾಧ್ಯ ಭಾರ.</div>
+      <div class="help-try"><b>ಎಣಿಕೆ:</b> ಸೆಕೆಂಡಿಗೆ 1 ರಂತೆ 10,00,000 ವಸ್ತುಗಳು. 11.6 ದಿನ! 1 ಮಿಲಿಯನ್ ನಾಣ್ಯ ಒಂದು ದಿನದಲ್ಲಿ ಎಣಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.</div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">ಮುಖ್ಯ ಕಲ್ಪನೆ</div>
+      <div class="help-key">ದೊಡ್ಡ ಸಂಖ್ಯೆಗಳು <b>ಸಂದರ್ಭ</b>ಕ್ಕೆ ತಕ್ಕಂತೆ ವಿಭಿನ್ನ. 1 ಲಕ್ಷ ಅನ್ನ ಜಾತಿ ರುಚಿಸಲು ಬಹಳ (274 ವರ್ಷ!), ಆದರೆ 1 ಲಕ್ಷ ಜನ ಒಂದು ಕ್ರಿಕೆಟ್ ಸ್ಟೇಡಿಯಂನಲ್ಲಿ ಸೇರುತ್ತಾರೆ. ದೊಡ್ಡ ಸಂಖ್ಯೆಗಳನ್ನು ಅರ್ಥಮಾಡಲು <b>ಪರಿಚಿತದೊಂದಿಗೆ ಹೋಲಿಸಿ</b> — ಕಟ್ಟಡ ಎತ್ತರ, ಜೀವನ, ಬಸ್ ಸಾಮರ್ಥ್ಯ.</div>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+document.getElementById('helpBtn').onclick=()=>document.getElementById('helpOverlay').classList.add('open');
+document.getElementById('helpClose').onclick=()=>document.getElementById('helpOverlay').classList.remove('open');
+document.getElementById('helpOverlay').onclick=(e)=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open')};
+
+function fmtI(n){if(n===0)return"0";let s=Math.round(n).toString();if(s.length<=3)return s;let l=s.slice(-3),r=s.slice(0,-3),p=[];while(r.length>2){p.unshift(r.slice(-2));r=r.slice(0,-2)}if(r.length)p.unshift(r);return p.join(",")+","+l}
+
+const c=document.getElementById("sim");
+const tk=document.getElementById("takeaway"),tkt=document.getElementById("takeaway-text");
+const T={journey:"ಪ್ರಯಾಣ",buses:"ಬಸ್‌ಗಳು",weight:"ತೂಕ",counting:"ಎಣಿಕೆ",facts:"ತಥ್ಯಗಳು",totalDist:"ಒಟ್ಟು ಪ್ರಯಾಣದ ದೂರ",reached:"ತಲುಪಿದೆ!",speed:"ವೇಗ",duration:"ಅವಧಿ",totalCap:"ಒಟ್ಟು ಸಾಮರ್ಥ್ಯ",people:"ಜನ",vehicles:"ವಾಹನಗಳು",yes:"ಹೌದು!",no:"ಇಲ್ಲ",canFit:"ಸೇರಬಹುದು!",peoplePerV:"ವಾಹನಕ್ಕೆ ಜನ",numVehicles:"ವಾಹನಗಳ ಸಂಖ್ಯೆ",totalWeight:"ಒಟ್ಟು ತೂಕ",weightPerItem:"ವಸ್ತುವಿಗೆ ತೂಕ",grams:"ಗ್ರಾಂ",numItems:"ವಸ್ತುಗಳ ಸಂಖ್ಯೆ",canLift:"ಎತ್ತಬಹುದು",tooHeavy:"ಅತಿ ಭಾರಿ",timeNeeded:"ಅಗತ್ಯ ಸಮಯ",itemsToCount:"ಎಣಿಸಲು ವಸ್ತುಗಳು",itemsPerSec:"ಸೆಕೆಂಡಿಗೆ ವಸ್ತುಗಳು",fits:"ಸೇರಿದೆ",exceeds:"ಮೀರಿದೆ",problem:"ಸಮಸ್ಯೆ",update:"ನವೀಕರಿಸಿ"};
+const SCENARIOS=[
+  {id:"journey",title:T.journey,emoji:"🚀"},
+  {id:"buses",title:T.buses,emoji:"🚌"},
+  {id:"weight",title:T.weight,emoji:"⚖️"},
+  {id:"time",title:T.counting,emoji:"⏱️"},
+  {id:"facts",title:T.facts,emoji:"🔢"}
+];
+let scIdx=0;
+let state={speed:100,years:10,capacity:50,count:100000,item_weight:5,item_count:100000,target:1000000,rate:1,prob:0};
+;(function(){
+  var p=new URLSearchParams(window.location.search);
+  if(p.has("scenario")){var s=parseInt(p.get("scenario"),10);if(!isNaN(s)&&s>=0&&s<SCENARIOS.length)scIdx=s;}
+})();
+
+function render(){
+  const sc=SCENARIOS[scIdx];
+  let body="",controls="",resultHtml="",takeawayMsg="";
+
+  if(sc.id==="journey"){
+    const dist=state.speed*365*state.years;
+    const targets=[{name:"ಭೂಮಿ → ಚಂದ್ರ",d:384400,c:"green"},{name:"ಭೂಮಿ → ಸೂರ್ಯ",d:147000000,c:"red"},{name:"ಅತಿ ಉದ್ದ ರೈಲು (ರಷ್ಯಾ)",d:9300,c:"blue"}];
+    resultHtml=`<div class="result-panel"><div class="result-label">${T.totalDist}</div><div class="result-value">${fmtI(dist)} km</div><div class="result-sub">${state.speed} km/day × 365 × ${state.years} years</div></div>`;
+    body=targets.map(t=>{const pct=Math.min(100,dist/t.d*100);return`<div class="progress-item"><div class="progress-label"><span class="name">${t.name} (${fmtI(t.d)} km)</span><span class="pct">${pct.toFixed(1)}%</span></div><div class="progress-track"><div class="progress-fill ${t.c}" style="width:${Math.max(1,pct)}%">${pct>=100?T.reached:""}</div></div></div>`}).join("");
+    controls=`<div class="slider-group"><div class="slider-label"><span class="name">${T.speed}</span><span class="val">${fmtI(state.speed)} km/day</span></div><input type="range" data-k="speed" min="10" max="5000" step="10" value="${state.speed}"></div><div class="slider-group"><div class="slider-label"><span class="name">${T.duration}</span><span class="val">${state.years} years</span></div><input type="range" data-k="years" min="1" max="500" step="1" value="${state.years}"></div>`;
+    takeawayMsg=dist>=384400?`${fmtI(state.speed)} km/day ನಲ್ಲಿ ಚಂದ್ರನನ್ನು ${(384400/state.speed/365).toFixed(1)} ವರ್ಷಗಳಲ್ಲಿ ತಲುಪುವಿರಿ!`:`${state.years} ವರ್ಷಗಳಿಗೆ ${fmtI(state.speed)} km/day ನಲ್ಲಿ ಚಂದ್ರನವರೆಗಿನ ದಾರಿಯ ${(dist/384400*100).toFixed(1)}% ಕ್ರಮಿಸುವಿರಿ.`;
+  } else if(sc.id==="buses"){
+    const total=state.capacity*state.count;
+    const targets=[{name:"ಚಿಂತಾಮಣಿ (75,000)",p:75000,c:"green"},{name:"ಜೈಪುರ (30,46,163)",p:3046163,c:"blue"},{name:"ಮುಂಬೈ (1,24,42,373)",p:12442373,c:"red"}];
+    resultHtml=`<div class="result-panel"><div class="result-label">${T.totalCap}</div><div class="result-value">${fmtI(total)} ${T.people}</div><div class="result-sub">${state.capacity} × ${fmtI(state.count)} ${T.vehicles}</div></div>`;
+    body=targets.map(t=>{const pct=Math.min(100,total/t.p*100);return`<div class="progress-item"><div class="progress-label"><span class="name">${t.name}</span><span class="pct">${pct>=100?T.yes:T.no} (${pct.toFixed(0)}%)</span></div><div class="progress-track"><div class="progress-fill ${t.c}" style="width:${Math.max(1,pct)}%">${pct>=100?T.canFit:""}</div></div></div>`}).join("");
+    controls=`<div class="slider-group"><div class="slider-label"><span class="name">${T.peoplePerV}</span><span class="val">${state.capacity}</span></div><input type="range" data-k="capacity" min="1" max="500" step="1" value="${state.capacity}"></div><div class="slider-group"><div class="slider-label"><span class="name">${T.numVehicles}</span><span class="val">${fmtI(state.count)}</span></div><input type="range" data-k="count" min="100" max="1000000" step="100" value="${state.count}"></div>`;
+    takeawayMsg=total>=12442373?`ವಾಹನಕ್ಕೆ ${state.capacity} ಜನರಂತೆ ${fmtI(state.count)} ವಾಹನಗಳು ಮುಂಬೈ ಮೊತ್ತ ಸೇರಿಸಬಲ್ಲವು!`:`1 ಲಕ್ಷ ಬಸ್‌ಗಳು ಪ್ರತಿ 50 ಜನ = 50 ಲಕ್ಷ. ಮುಂಬೈಗೆ 1.24 ಕೋಟಿ. ಸಾಲದು!`;
+  } else if(sc.id==="weight"){
+    const totalG=state.item_weight*state.item_count,totalKg=totalG/1000;
+    const targets=[{name:"ಮಗು (~20 kg)",w:20000,c:"green"},{name:"ವಯಸ್ಕ (~50 kg)",w:50000,c:"blue"},{name:"ವೇಟ್‌ಲಿಫ್ಟರ್ (~250 kg)",w:250000,c:"red"}];
+    resultHtml=`<div class="result-panel"><div class="result-label">${T.totalWeight}</div><div class="result-value">${fmtI(totalKg)} kg</div><div class="result-sub">${state.item_weight}g × ${fmtI(state.item_count)} items</div></div>`;
+    body=targets.map(t=>{const pct=Math.min(100,totalG/t.w*100);return`<div class="progress-item"><div class="progress-label"><span class="name">${t.name}</span><span class="pct">${pct<=100?T.canLift:T.tooHeavy}</span></div><div class="progress-track"><div class="progress-fill ${t.c}" style="width:${Math.max(1,Math.min(100,pct))}%">${pct>100?Math.round(pct)+"%":""}</div></div></div>`}).join("");
+    controls=`<div class="slider-group"><div class="slider-label"><span class="name">${T.weightPerItem}</span><span class="val">${state.item_weight} ${T.grams}</span></div><input type="range" data-k="item_weight" min="1" max="100" step="1" value="${state.item_weight}"></div><div class="slider-group"><div class="slider-label"><span class="name">${T.numItems}</span><span class="val">${fmtI(state.item_count)}</span></div><input type="range" data-k="item_count" min="1000" max="1000000" step="1000" value="${state.item_count}"></div>`;
+    takeawayMsg=`ಪ್ರತಿ 5g ನ 1 ಲಕ್ಷ ಹಾಳೆ = 500 kg. ಯಾರೂ ಅದನ್ನು ಎತ್ತಲಾರರು!`;
+  } else if(sc.id==="time"){
+    const secs=state.target/state.rate,days=secs/86400,years=days/365;
+    const targets=[{name:"1 ಗಂಟೆ",t:3600,c:"green"},{name:"1 ದಿನ",t:86400,c:"blue"},{name:"1 ವರ್ಷ",t:31536000,c:"yellow"}];
+    resultHtml=`<div class="result-panel"><div class="result-label">${T.timeNeeded}</div><div class="result-value">${days<1?fmtI(Math.round(secs))+" sec":days<365?days.toFixed(1)+" days":years.toFixed(1)+" years"}</div><div class="result-sub">${fmtI(state.target)} items at ${state.rate}/sec</div></div>`;
+    body=targets.map(t=>{const pct=Math.min(100,secs/t.t*100);return`<div class="progress-item"><div class="progress-label"><span class="name">${t.name}</span><span class="pct">${pct<=100?T.fits:T.exceeds} (${pct.toFixed(0)}%)</span></div><div class="progress-track"><div class="progress-fill ${t.c}" style="width:${Math.max(1,Math.min(100,pct))}%"></div></div></div>`}).join("");
+    controls=`<div class="slider-group"><div class="slider-label"><span class="name">${T.itemsToCount}</span><span class="val">${fmtI(state.target)}</span></div><input type="range" data-k="target" min="1000" max="10000000" step="1000" value="${state.target}"></div><div class="slider-group"><div class="slider-label"><span class="name">${T.itemsPerSec}</span><span class="val">${state.rate}</span></div><input type="range" data-k="rate" min="1" max="10" step="1" value="${state.rate}"></div>`;
+    takeawayMsg=`ಸೆಕೆಂಡಿಗೆ 1 ರಂತೆ 1 ಮಿಲಿಯನ್ ಎಣಿಸಲು ${(1000000/86400).toFixed(1)} ದಿನ ಬೇಕು. ಒಂದು ದಿನದಲ್ಲಿ ಮುಗಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ!`;
+  } else {
+    const probs=[
+      {expr:"1250 × 380",r:475000,fact:"ಪುರಂದರದಾಸರಿಂದ ರಚಿತ ಕೀರ್ತನೆಗಳು"},
+      {expr:"2100 × 70,000",r:147000000,fact:"ಭೂಮಿ ಮತ್ತು ಸೂರ್ಯ ನಡುವೆ km"},
+      {expr:"6400 × 62,500",r:400000000,fact:"ಆಮೆಜಾನ್ ಸೆಕೆಂಡಿಗೆ ಡಿಸ್ಚಾರ್ಜ್ ಲೀಟರ್"},
+      {expr:"13,95,000 ÷ 150",r:9300,fact:"km — ಅತಿ ಉದ್ದ ರೈಲು ಪ್ರಯಾಣ (ರಷ್ಯಾ)"},
+      {expr:"10,50,00,000 ÷ 700",r:150000,fact:"kg — ವಯಸ್ಕ ನೀಲಿ ತಿಮಿಂಗಿಲ ತೂಕ"}
+    ];
+    const p=probs[state.prob];
+    resultHtml=`<div class="result-panel"><div class="result-label">${p.expr}</div><div class="result-value">${fmtI(p.r)}</div><div class="result-sub">${p.fact}</div></div>`;
+    body="";
+    controls=`<div class="slider-group"><div class="slider-label"><span class="name">${T.problem}</span><span class="val">${p.expr}</span></div><input type="range" data-k="prob" min="0" max="${probs.length-1}" step="1" value="${state.prob}"></div>`;
+    takeawayMsg=`${p.expr} = ${fmtI(p.r)} — ${p.fact}`;
+  }
+
+  let tabs=SCENARIOS.map((s,i)=>`<button class="mode-tab${i===scIdx?" active":""}" data-i="${i}"><span style="font-size:14px">${s.emoji}</span><br>${s.title}</button>`).join("");
+
+  c.innerHTML=`
+  <div class="mode-tabs">${tabs}</div>
+  ${resultHtml}
+  <div style="margin-top:10px">${body}</div>
+  ${controls}
+  <button class="apply-btn" id="apply-btn">${T.update}</button>`;
+
+  tk.style.display="block";tkt.innerHTML=takeawayMsg;
+
+  c.querySelectorAll(".mode-tab").forEach(b=>b.onclick=()=>{scIdx=parseInt(b.dataset.i);render()});
+  c.querySelectorAll("input[type='range']").forEach(sl=>{sl.oninput=function(){state[this.dataset.k]=parseFloat(this.value);render()}});
+  c.querySelector("#apply-btn").onclick=()=>render();
+}
+render();
+</script>
+</body>
+</html>

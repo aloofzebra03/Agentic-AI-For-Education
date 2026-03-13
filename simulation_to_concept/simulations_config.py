@@ -2563,3 +2563,22 @@ except ImportError:
 except Exception as _kn_err:
     print(f"[simulations_config] ⚠️  Could not load Kannada simulations: {_kn_err}")
     raise Exception("Failed to load Kannada simulations")
+
+# ═══════════════════════════════════════════════════════════════════════
+# KANNADA MATHS SIMULATIONS — Load and merge at runtime
+# ═══════════════════════════════════════════════════════════════════════
+# maths_simulations_config_kannada.py lives in the same directory and follows
+# the exact same schema. Merging here means ALL existing helper functions
+# (get_simulation, get_quiz_questions, get_simulation_list, etc.) work
+# transparently for Kannada maths simulations without any code changes elsewhere.
+
+try:
+    from simulation_to_concept.maths_simulations_config_kannada import SIMULATIONS_MATHS_KN, QUIZ_QUESTIONS_MATHS_KN
+    SIMULATIONS.update(SIMULATIONS_MATHS_KN)
+    QUIZ_QUESTIONS.update(QUIZ_QUESTIONS_MATHS_KN)
+    print(f"[simulations_config] ✅ Loaded {len(SIMULATIONS_MATHS_KN)} Kannada Maths simulation(s): "
+          f"{', '.join(SIMULATIONS_MATHS_KN.keys())}")
+except ImportError:
+    pass  # File not present — silently skip
+except Exception as _maths_kn_err:
+    print(f"[simulations_config] ⚠️  Could not load Kannada Maths simulations: {_maths_kn_err}")

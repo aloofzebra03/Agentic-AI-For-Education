@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ea580c">
+<title>ಸಮೀಕರಣ ಎಂಜಿನಿಯರ್ — ಗುರಿ ಮೌಲ್ಯಗಳನ್ನು ನಿರ್ಮಿಸಿ — ಅಧ್ಯಾಯ ೨</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans Kannada',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#ea580c 0%,#dc2626 100%);min-height:100vh;-webkit-font-smoothing:antialiased}#app{max-width:420px;margin:auto;padding:10px;padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.header{text-align:center;color:#fff;padding:12px}
+.header h1{font-size:18px;font-weight:700;margin-bottom:4px}
+.header p{font-size:12px;opacity:.9}
+.sim-card{background:#fff;border-radius:14px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.15);margin-bottom:12px}
+.mode-tabs{display:flex;gap:6px;margin-bottom:12px}
+.mode-tab{flex:1;padding:10px 4px;border:2px solid #e0e0e0;border-radius:8px;background:#fafafa;font-size:10px;font-weight:600;text-align:center;cursor:pointer}
+.mode-tab.active{border-color:#ea580c;background:#fff7ed;color:#9a3412}
+/* Rule box */
+.rule-box{background:linear-gradient(135deg,#fff7ed,#fed7aa);border-radius:12px;padding:12px;margin-bottom:10px;border:2px solid #fdba74}
+.rule-box h3{font-size:13px;color:#9a3412;margin-bottom:6px}
+.rule-box p{font-size:12px;color:#7c2d12;line-height:1.5}
+.rule-box .rule-digits{display:flex;gap:6px;margin-top:8px;justify-content:center}
+.rule-box .digit-chip{padding:8px 14px;background:#ea580c;color:#fff;border-radius:10px;font-size:16px;font-weight:800;font-family:'Courier New',monospace}
+.rule-box .op-chip{padding:6px 10px;background:#fff;color:#9a3412;border-radius:8px;font-size:13px;font-weight:700;border:1px solid #fdba74}
+/* Target display */
+.target-display{background:linear-gradient(135deg,#7c2d12,#9a3412);border-radius:12px;padding:14px;text-align:center;margin-bottom:10px}
+.target-label{font-size:10px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px}
+.target-value{font-size:36px;font-weight:800;color:#fff;margin:4px 0}
+.target-sub{font-size:11px;color:rgba(255,255,255,.5)}
+/* Expression builder */
+.builder{background:#fff7ed;border-radius:12px;padding:12px;margin-bottom:10px}
+.builder-expr{font-size:24px;font-weight:700;text-align:center;color:#1e293b;min-height:40px;font-family:'Courier New',monospace;margin-bottom:8px;word-break:break-all;letter-spacing:1px}
+.builder-result{text-align:center;font-size:14px;font-weight:600;margin-bottom:4px}
+.builder-result .val{color:#ea580c;font-size:20px}
+.builder-result .match{color:#16a34a;font-weight:700}
+.builder-result .no-match{color:#94a3b8}
+/* Buttons */
+.btn-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:4px 0}
+.calc-btn{width:52px;height:46px;border-radius:10px;border:none;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .08s}
+.calc-btn:active{transform:scale(.9)}
+.calc-btn.num{background:#f1f5f9;color:#1e293b;font-family:'Courier New',monospace}
+.calc-btn.op{background:#ea580c;color:#fff}
+.calc-btn.bracket{background:#fbbf24;color:#7c2d12}
+.calc-btn.action{background:#fef2f2;color:#dc2626}
+.calc-btn.eval{background:#16a34a;color:#fff;width:80px}
+/* Progress grid */
+.progress-section{margin:10px 0}
+.progress-title{font-size:11px;font-weight:600;color:#888;margin-bottom:6px}
+.results-grid{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.result-cell{width:42px;padding:8px 4px;border-radius:8px;text-align:center;font-size:12px;font-weight:700}
+.result-cell.found{background:#dcfce7;color:#166534}
+.result-cell.missing{background:#f1f5f9;color:#cbd5e1}
+.result-cell.current{background:#fef3c7;color:#92400e;border:2px solid #f59e0b}
+/* Status */
+.status-bar{text-align:center;font-size:12px;font-weight:600;padding:10px;border-radius:10px;margin:8px 0}
+.status-bar.success{background:#dcfce7;color:#166534}
+.status-bar.try{background:#fff7ed;color:#9a3412}
+.status-bar.info{background:#eff6ff;color:#1e40af}
+/* Solutions list */
+.solutions{margin-top:8px}
+.solution-item{font-size:11px;color:#555;padding:3px 0;font-family:'Courier New',monospace;border-bottom:1px solid #f1f5f9}
+/* Insight */
+.insight-box{background:linear-gradient(135deg,#fff7ed,#fed7aa);border-radius:10px;padding:12px;margin-top:12px;border-left:4px solid #ea580c;font-size:12px;line-height:1.5}
+.insight-title{font-weight:700;color:#9a3412;margin-bottom:4px}
+/* Help */
+.help-btn{position:fixed;bottom:20px;right:20px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#ea580c,#dc2626);color:#fff;border:3px solid #fff;box-shadow:0 4px 15px rgba(234,88,12,.4);font-size:20px;font-weight:700;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center}
+.help-btn:active{transform:scale(.9)}
+.help-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.help-overlay.open{display:flex}
+.help-panel{background:#fff;border-radius:20px 20px 0 0;max-width:420px;width:100%;max-height:75vh;overflow-y:auto;padding:20px 16px env(safe-area-inset-bottom);animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.help-close{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.help-close h2{font-size:16px;font-weight:700;color:#333}
+.help-close button{width:32px;height:32px;border-radius:50%;border:none;background:#f1f5f9;font-size:18px;cursor:pointer;color:#64748b}
+.help-section{margin-bottom:14px}
+.help-section-title{font-size:12px;font-weight:700;color:#ea580c;margin-bottom:6px}
+.help-step{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:12px;line-height:1.5;color:#475569}
+.help-step:last-child{border-bottom:none}
+.help-step-num{width:22px;height:22px;border-radius:50%;background:#ea580c;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.help-try{background:#fff7ed;border-radius:8px;padding:8px 10px;font-size:11px;color:#9a3412;line-height:1.5;margin-top:4px}
+.help-try b{color:#7c2d12}
+.help-key{background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:8px;padding:8px 10px;font-size:11px;color:#92400e;line-height:1.5;margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="header">
+  <h1>ಸಮೀಕರಣ ಎಂಜಿನಿಯರ್</h1>
+  <p>ಗುರಿ ಮೌಲ್ಯಗಳನ್ನು ತಲುಪಲು ಸಮೀಕರಣ ನಿರ್ಮಿಸಿ!</p>
+</div>
+<div class="sim-card" id="sim"></div>
+<div class="insight-box">
+  <div class="insight-title">ಪಾಠಪುಸ್ತಕದಿಂದ (ಪುಟ ೪೫)</div>
+  ಮೂರು 3ಗಳು: (3+3)/3 = 2, 3+3−3 = 3, 3×3+3 = 12.<br>
+  ನಾಲ್ಕು 4ಗಳು: 1 ರಿಂದ 20 ವರೆಗೆ ಪ್ರತಿ ಸಂಖ್ಯೆ ಮಾಡಿ!<br>
+  ಅದೇ ಅಂಕೆಗಳು ವಿಭಿನ್ನ ಕ್ರಿಯೆಗಳು ಮತ್ತು ಆವರಣಗಳಿಂದ ಸಂಪೂರ್ಣ ವಿಭಿನ್ನ ಮೌಲ್ಯಗಳನ್ನು ಉಂಟುಮಾಡುತ್ತವೆ. ಅಂಕಗಣಿತ ಸಮೀಕರಣಗಳ ಶಕ್ತಿ!
+</div>
+
+<button class="help-btn" id="helpBtn">?</button>
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-panel">
+    <div class="help-close"><h2>ಈ ಸಿಮ್ಯುಲೇಶನ್ ಹೇಗೆ ಬಳಸುವುದು</h2><button id="helpClose">&times;</button></div>
+    <div class="help-section">
+      <div class="help-section-title">ಏನು ಮಾಡಬೇಕು</div>
+      <div class="help-step"><span class="help-step-num">1</span><span><b>ಸವಾಲು</b> ಆಯ್ಕೆಮಾಡಿ — ಯಾವ ಅಂಕೆಗಳನ್ನು ಎಷ್ಟು ಬಳಸಬಹುದು ಎಂದು ಪ್ರತಿಯೊಂದೂ ಹೇಳುತ್ತದೆ.</span></div>
+      <div class="help-step"><span class="help-step-num">2</span><span><b>ಗುರಿ ಸಂಖ್ಯೆ</b> ಹೈಲೈಟ್ ಆಗಿರುತ್ತದೆ. ಅನುಮತಿ ಅಂಕೆಗಳನ್ನು ಮಾತ್ರ ಬಳಸಿ ಸಮೀಕರಣ ನಿರ್ಮಿಸಿ.</span></div>
+      <div class="help-step"><span class="help-step-num">3</span><span>ಅಂಕೆಗಳನ್ನು ಜೋಡಿಸಲು <b>+, −, ×, ÷</b> ಮತ್ತು <b>ಆವರಣ ( )</b> ಬಳಸಿ. ಪರಿಶೀಲಿಸಲು <b>=</b> ಒತ್ತಿ.</span></div>
+      <div class="help-step"><span class="help-step-num">4</span><span>ಗುರಿ ಹೊಂದಿಸಿದರೆ ಅದು <b>ಹಸಿರು</b> ಆಗುತ್ತದೆ. ಪ್ರತಿ ಸವಾಲಿನಲ್ಲಿ ಎಲ್ಲಾ ಗುರಿಗಳನ್ನು ಕಂಡುಹಿಡಿಯಲು ಪ್ರಯತ್ನಿಸಿ!</span></div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">ಇದನ್ನು ಪ್ರಯತ್ನಿಸಿ</div>
+      <div class="help-try"><b>ನಾಲ್ಕು 4ಗಳು → 1:</b> (4+4)÷(4+4) ಪ್ರಯತ್ನಿಸಿ. 8÷8 = 1!</div>
+      <div class="help-try"><b>ನಾಲ್ಕು 4ಗಳು → 5:</b> (4×4+4)÷4 ಪ್ರಯತ್ನಿಸಿ. 20÷4 = 5!</div>
+      <div class="help-try"><b>2,3,5 → 0:</b> 5−3−2 ಅಥವಾ 2+3−5. ಎರಡೂ ಸರಿ!</div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">ಮುಖ್ಯ ಕಲ್ಪನೆ</div>
+      <div class="help-key">ಆವರಣ ಎಲ್ಲವನ್ನೂ ಬದಲಾಯಿಸುತ್ತದೆ! 4+4÷4+4 = 9, ಆದರೆ (4+4)÷(4+4) = 1. ಅದೇ ಅಂಕೆಗಳು, ಅದೇ ಕ್ರಿಯೆಗಳು, ವಿಭಿನ್ನ ಆವರಣ → ಸಂಪೂರ್ಣ ವಿಭಿನ್ನ ಮೌಲ್ಯ.</div>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+document.getElementById('helpBtn').onclick=()=>document.getElementById('helpOverlay').classList.add('open');
+document.getElementById('helpClose').onclick=()=>document.getElementById('helpOverlay').classList.remove('open');
+document.getElementById('helpOverlay').onclick=(e)=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open')};
+
+const CHALLENGES=[
+  {id:"three3s",name:"ಮೂರು 3ಗಳು",digits:["3","3","3"],digitDisplay:"3, 3, 3",
+   rule:"ಪ್ರತಿ ಗುರಿ ಮೌಲ್ಯಕ್ಕೆ ನಿಖರವಾಗಿ ಮೂರು 3ಗಳನ್ನು +, −, ×, ÷ ಮತ್ತು ಆವರಣದಿಂದ ಬಳಸಿ.",
+   targets:[0,1,2,3,4,5,6,7,8,9,10,11,12],
+   hints:{0:"3−3+3−3? ಇಲ್ಲ... 3×3−3×3? ಪ್ರಯತ್ನ: (3−3)×3",1:"ಭಾಗಿಸಿ! 3÷3÷3? (3−3+3)÷3? ಪ್ರಯತ್ನ: (3+3−3)÷3",2:"(3+3)÷3",3:"3+3−3",6:"3×3−3",9:"3+3+3",12:"3×3+3"}},
+  {id:"four4s",name:"ನಾಲ್ಕು 4ಗಳು",digits:["4","4","4","4"],digitDisplay:"4, 4, 4, 4",
+   rule:"1 ರಿಂದ 20 ವರೆಗೆ ಪ್ರತಿ ಸಂಖ್ಯೆಗೆ ನಿಖರವಾಗಿ ನಾಲ್ಕು 4ಗಳನ್ನು +, −, ×, ÷ ಮತ್ತು ಆವರಣದಿಂದ ಬಳಸಿ.",
+   targets:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
+   hints:{1:"(4+4)÷(4+4)",2:"4÷4+4÷4",3:"(4+4+4)÷4",4:"4+(4−4)×4",5:"(4×4+4)÷4",7:"4+4−4÷4",8:"4+4+4−4",10:"(44−4)÷4",12:"4×(4−4÷4)",15:"4×4−4÷4",16:"4×4+4−4",17:"4×4+4÷4",20:"4×(4+4÷4)"}},
+  {id:"use235",name:"2, 3, 5 ಬಳಸಿ",digits:["2","3","5"],digitDisplay:"2, 3, 5",
+   rule:"2, 3 ಮತ್ತು 5 ಸಂಖ್ಯೆಗಳನ್ನು ಪ್ರತಿಯೊಂದನ್ನು ಒಂದೇ ಬಾರಿ ಬಳಸಿ. +, − ಮತ್ತು ಆವರಣ ಬಳಸಿ.",
+   targets:[-6,-4,0,1,4,6,10],
+   hints:{0:"5−3−2 ಅಥವಾ 2+3−5",4:"5+2−3 ಅಥವಾ 2−3+5",10:"5+3+2","-6":"2−3−5","-4":"3−2−5",6:"5−2+3"}},
+  {id:"pay432",name:"₹432 ಪಾವತಿ",digits:["₹1","₹5","₹10","₹20","₹50","₹100"],digitDisplay:"ನಾಣ್ಯ ಮತ್ತು ನೋಟು",
+   rule:"₹1, ₹5, ₹10, ₹20, ₹50, ₹100 ನೋಟುಗಳಿಂದ ₹432 ವ್ಯಕ್ತಪಡಿಸಿ. ಗುಣಲಬ್ಧಗಳ ಮೊತ್ತವಾಗಿ ಬರೆಯಿರಿ (ಉದಾ: 4×100+1×20+...).",
+   targets:[432],
+   hints:{432:"4×100+1×20+1×10+2×1 ಅಥವಾ 8×50+1×10+4×5+2×1"}}
+];
+
+const T={targetsTap:"ಗುರಿಗಳು — ಗೋಲ್ ಹಾಕಲು ಒಂದನ್ನು ಒತ್ತಿ",tapDigits:"ಕೆಳಗೆ ಅಂಕೆಗಳು ಮತ್ತು ಚಿಹ್ನೆಗಳನ್ನು ಒತ್ತಿ",match:"✓ ಹೊಂದಿಕೆ!",allFound:"ಎಲ್ಲಾ ಗುರಿಗಳು ಸಿಕ್ಕಿದವು! ಅದ್ಭುತ!",youMade:"ನೀವು ಮಾಡಿದ್ದೀರಿ!",targetBuild:"ಗುರಿ:","buildExpr":"ಇದಕ್ಕೆ ಸಮನಾದ ಸಮೀಕರಣ ನಿರ್ಮಿಸಿ.","found":"ಸಿಕ್ಕಿದವು","yourSolutions":"ನಿಮ್ಮ ಪರಿಹಾರಗಳು"};
+const c=document.getElementById("sim");
+let chIdx=0,expr="",found={},currentTarget=null,solutions={};
+/* ======================================================
+ * URL Parameter Support — Expression Engineer (Kannada)
+ *
+ * challenge  — "three3s" (default) | "four4s" | "use235" | "pay432"
+ *               Selects which digit challenge opens on load.
+ *               three3s = index 0, four4s = index 1,
+ *               use235  = index 2, pay432 = index 3.
+ * showHints  — "true" (default) | "false"
+ *               When "false", hides the .insight-box at the bottom.
+ * ====================================================== */
+(function(){
+  var p=new URLSearchParams(window.location.search);
+  var ch=p.get('challenge');
+  var chMap={three3s:0,four4s:1,use235:2,pay432:3};
+  if(ch&&chMap[ch]!==undefined)chIdx=chMap[ch];
+  if(p.get('showHints')==='false'){var ib=document.querySelector('.insight-box');if(ib)ib.style.display='none';}
+})();
+function safeEval(s){
+  try{s=s.replace(/÷/g,'/').replace(/×/g,'*');if(!/^[0-9+\-*/().₹ ]+$/.test(s))return NaN;const v=Function('"use strict"; return ('+s+')')();if(!isFinite(v))return NaN;return Math.round(v*10000)/10000}catch(e){return NaN}
+}
+
+function render(){
+  const ch=CHALLENGES[chIdx];
+  if(!found[ch.id])found[ch.id]=new Set();
+  if(!solutions[ch.id])solutions[ch.id]={};
+  if(currentTarget===null)currentTarget=ch.targets.find(t=>!found[ch.id].has(t));
+  if(currentTarget===null)currentTarget=ch.targets[0];
+
+  const val=safeEval(expr);
+  const isMatch=!isNaN(val)&&ch.targets.includes(val);
+  const foundCount=found[ch.id].size;
+
+  // Challenge tabs
+  let chTabs=CHALLENGES.map((cx,i)=>`<button class="mode-tab${i===chIdx?" active":""}" data-ch="${i}">${cx.name}</button>`).join("");
+
+  // Rule box
+  let digitChips=ch.id==="pay432"
+    ?`<span class="op-chip">₹1, ₹5, ₹10, ₹20, ₹50, ₹100</span>`
+    :ch.digits.map(d=>`<span class="digit-chip">${d}</span>`).join("");
+
+  // Progress grid
+  let gridHtml=ch.targets.map(t=>{
+    const f=found[ch.id].has(t);
+    const cur=t===currentTarget&&!f;
+    return`<div class="result-cell ${f?"found":cur?"current":"missing"}" data-tgt="${t}">${t}${f?" ✓":""}</div>`;
+  }).join("");
+
+  // Solutions for current target
+  let solHtml="";
+  if(solutions[ch.id][currentTarget]){
+    solHtml=`<div class="solutions"><div style="font-size:10px;color:#888;margin-bottom:2px">${currentTarget} ಗೆ ನಿಮ್ಮ ಪರಿಹಾರಗಳು:</div>`;
+    solutions[ch.id][currentTarget].forEach(s=>{solHtml+=`<div class="solution-item">${s}</div>`});
+    solHtml+=`</div>`;
+  }
+
+  // Hint for current target
+  let hintText="";
+  if(ch.hints&&ch.hints[currentTarget]!==undefined){
+    hintText=`<div style="font-size:10px;color:#888;margin-top:6px">Stuck? Hint: <span style="color:#ea580c;font-weight:600">${ch.hints[currentTarget]}</span></div>`;
+  }
+
+  // Available buttons
+  let numBtns;
+  if(ch.id==="pay432"){
+    numBtns=[1,5,10,20,50,100].map(n=>`<button class="calc-btn num" data-v="${n}" style="font-size:12px">${n}</button>`).join("");
+  } else {
+    numBtns=ch.digits.filter((v,i,a)=>a.indexOf(v)===i).map(d=>`<button class="calc-btn num" data-v="${d}">${d}</button>`).join("");
+  }
+
+  let statusHtml;
+  if(foundCount===ch.targets.length){
+    statusHtml=`<div class="status-bar success">${ch.targets.length} ${T.allFound}</div>`;
+  } else if(isMatch&&expr){
+    statusHtml=`<div class="status-bar success">${T.youMade} ${val}! ${foundCount+(!found[ch.id].has(val)?1:0)}/${ch.targets.length} ${T.found}.</div>`;
+  } else {
+    statusHtml=`<div class="status-bar try">${T.targetBuild} <b>${currentTarget}</b> — ${T.buildExpr} (${foundCount}/${ch.targets.length} ${T.found})</div>`;
+  }
+
+  c.innerHTML=`
+  <div class="mode-tabs">${chTabs}</div>
+
+  <div class="rule-box">
+    <h3>${ch.name}</h3>
+    <p>${ch.rule}</p>
+    <div class="rule-digits">${digitChips}<span class="op-chip">+ − × ÷ ( )</span></div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-title">${T.targetsTap}</div>
+    <div class="results-grid" id="target-grid">${gridHtml}</div>
+  </div>
+
+  ${statusHtml}
+
+  <div class="builder">
+    <div class="builder-expr">${expr||T.tapDigits}</div>
+    <div class="builder-result">${expr&&expr.length>0?`= <span class="val">${isNaN(val)?"...":val}</span> ${isMatch?'<span class="match">'+T.match+'</span>':'<span class="no-match">'+(isNaN(val)?'':'≠ '+currentTarget)+'</span>'}`:""}</div>
+  </div>
+
+  <div class="btn-grid">
+    ${numBtns}
+    <button class="calc-btn op" data-v="+">+</button>
+    <button class="calc-btn op" data-v="−">−</button>
+    <button class="calc-btn op" data-v="×">×</button>
+    <button class="calc-btn op" data-v="÷">÷</button>
+    <button class="calc-btn bracket" data-v="(">(</button>
+    <button class="calc-btn bracket" data-v=")">)</button>
+    <button class="calc-btn action" data-v="⌫">⌫</button>
+    <button class="calc-btn action" data-v="C">C</button>
+    <button class="calc-btn eval" data-v="=">=</button>
+  </div>
+
+  ${solHtml}
+  ${hintText}`;
+
+  // Wire events
+  c.querySelectorAll(".mode-tab[data-ch]").forEach(b=>b.onclick=()=>{chIdx=parseInt(b.dataset.ch);expr="";currentTarget=null;render()});
+  c.querySelector("#target-grid").addEventListener("click",e=>{
+    const cell=e.target.closest(".result-cell");if(!cell)return;
+    currentTarget=parseInt(cell.dataset.tgt);expr="";render();
+  });
+  c.querySelectorAll(".calc-btn[data-v]").forEach(b=>b.onclick=()=>{
+    const v=b.dataset.v;
+    if(v==="C"){expr=""}
+    else if(v==="⌫"){expr=expr.slice(0,-1)}
+    else if(v==="="){
+      const result=safeEval(expr);
+      if(!isNaN(result)&&ch.targets.includes(result)){
+        found[ch.id].add(result);
+        if(!solutions[ch.id][result])solutions[ch.id][result]=[];
+        if(!solutions[ch.id][result].includes(expr))solutions[ch.id][result].push(expr);
+        // Auto-advance to next unfound target
+        const nextUnfound=ch.targets.find(t=>!found[ch.id].has(t));
+        if(nextUnfound!==undefined)setTimeout(()=>{currentTarget=nextUnfound;expr="";render()},800);
+      }
+    }
+    else{expr+=v}
+    render();
+  });
+}
+render();
+</script>
+</body>
+</html>

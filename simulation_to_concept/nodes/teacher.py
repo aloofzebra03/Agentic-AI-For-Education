@@ -730,7 +730,35 @@ REMEMBER: Output ONLY the JSON object. Start your response with {{ and end with 
         }
     
     teacher_message = result.get("teacher_message", response.content)
-    
+
+    # ─── Post-process: force simulation display when teacher references it ───
+    # If the teacher message contains observation/watch keywords but the LLM
+    # forgot to set suggests_param_change=true, we enforce it here so the
+    # student can actually see what is being referenced.
+    _msg_lower = teacher_message.lower()
+    _observe_keywords = [
+        "observe:", "observe the", "observe our", "observe your",
+        "watch the simulation", "watch now", "watch it",
+        "see the simulation", "see it", "see our",
+        "look at the simulation", "look at it",
+        "take a moment to observe", "take a look",
+        "notice how", "notice the",
+        "show you the simulation", "showing you", "let me show",
+        "here's the simulation", "here is the simulation",
+    ]
+    if not result.get("suggests_param_change") and any(kw in _msg_lower for kw in _observe_keywords):
+        _first_param = list(PARAMETER_INFO.keys())[0] if PARAMETER_INFO else None
+        if _first_param:
+            result["suggests_param_change"] = True
+            if not result.get("param_to_change"):
+                result["param_to_change"] = _first_param
+            if result.get("new_value") is None:
+                result["new_value"] = current_params.get(_first_param, 0)
+            if not result.get("change_reason"):
+                result["change_reason"] = "Display simulation as referenced in teacher message"
+            print(f"   🔄 POST-PROCESS: Forced suggests_param_change=True (teacher said 'observe/watch/see')")
+    # ─────────────────────────────────────────────────────────────────────────
+
     # Handle parameter change suggestion
     updates = {
         "last_teacher_message": teacher_message,

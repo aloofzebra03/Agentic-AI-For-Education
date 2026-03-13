@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="kn" dir="ltr">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#6366f1">
+<title>ಸ್ಥಾನ ಬೆಲೆ ನಿರ್ಮಾಣ — ಅಧ್ಯಾಯ ೧</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans Kannada',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#6366f1 0%,#a855f7 100%);min-height:100vh;-webkit-font-smoothing:antialiased}
+#app{max-width:420px;margin:auto;padding:10px;padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.header{text-align:center;color:#fff;padding:12px}
+.header h1{font-size:18px;font-weight:700;margin-bottom:4px}
+.header p{font-size:12px;opacity:.9}
+.sim-card{background:#fff;border-radius:14px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.15);margin-bottom:12px}
+.card-title{font-size:13px;font-weight:700;color:#6366f1;margin-bottom:10px}
+.visual{position:relative;min-height:180px;background:linear-gradient(145deg,#f5f3ff 0%,#ede9fe 100%);border-radius:12px;overflow:hidden}
+svg{width:100%;height:100%;display:block}
+.metrics-row{display:flex;gap:8px;margin-top:10px}
+.metric-card{flex:1;background:linear-gradient(145deg,#f5f3ff 0%,#ede9fe 100%);border-radius:10px;padding:10px;text-align:center}
+.metric-label{font-size:9px;font-weight:600;color:#7c3aed;text-transform:uppercase;letter-spacing:.5px}
+.metric-value{font-size:20px;font-weight:700;color:#4c1d95;margin-top:2px}
+.number-display{background:linear-gradient(135deg,#1e1b4b 0%,#312e81 100%);border-radius:12px;padding:14px;text-align:center;margin-bottom:10px}
+.number-big{font-size:28px;font-weight:800;color:#fff;letter-spacing:1px;font-variant-numeric:tabular-nums}
+.number-words{font-size:11px;color:rgba(255,255,255,.65);margin-top:4px}
+.btn-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center}
+.pv-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 8px;border-radius:10px;border:none;cursor:pointer;min-width:52px;flex:1;max-width:80px;transition:transform .1s;-webkit-tap-highlight-color:transparent}
+.pv-btn:active{transform:scale(.92)}
+.pv-btn .bv{font-size:13px;font-weight:700;color:#fff}
+.pv-btn .bl{font-size:7px;color:rgba(255,255,255,.75);margin-top:2px;text-transform:uppercase}
+.pv-btn.c0{background:#ef4444}.pv-btn.c1{background:#f97316}.pv-btn.c2{background:#eab308}
+.pv-btn.c3{background:#22c55e}.pv-btn.c4{background:#3b82f6}.pv-btn.c5{background:#8b5cf6}.pv-btn.c6{background:#1e293b}
+.pv-btn.c2 .bv,.pv-btn.c2 .bl{color:#422006}
+.action-row{display:flex;gap:8px;margin-top:10px}
+.act-btn{flex:1;padding:12px;border-radius:10px;border:none;font-size:12px;font-weight:600;cursor:pointer}
+.act-btn:active{transform:scale(.97)}
+.act-btn.undo{background:#f1f5f9;color:#475569}
+.act-btn.reset{background:#fef2f2;color:#b91c1c}
+.control-panel{background:linear-gradient(145deg,#f5f3ff 0%,#ede9fe 100%);border-radius:10px;padding:12px;margin-top:10px}
+.slider-group{margin-bottom:10px}
+.slider-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px}
+.slider-label .name{color:#555;font-weight:500}
+.slider-label .val{font-weight:700;color:#6366f1}
+input[type="range"]{width:100%;height:6px;border-radius:3px;background:#d4d4d8;-webkit-appearance:none;outline:none}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#6366f1;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.2);cursor:pointer}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.presets-label{font-size:11px;font-weight:600;color:#555;margin-bottom:6px}
+.preset-btn{padding:8px 12px;border-radius:16px;border:2px solid #c4b5fd;background:#fff;font-size:11px;font-weight:600;cursor:pointer;color:#6366f1;transition:transform .1s}
+.preset-btn:active{transform:scale(.95)}
+.preset-btn.active{background:#6366f1;color:#fff;border-color:#6366f1}
+.mode-tabs{display:flex;gap:6px;margin-bottom:12px}
+.mode-tab{flex:1;padding:10px 6px;border:2px solid #e0e0e0;border-radius:8px;background:#fafafa;font-size:11px;font-weight:600;text-align:center;cursor:pointer}
+.mode-tab:active{transform:scale(.98)}
+.mode-tab.active{border-color:#6366f1;background:#f5f3ff;color:#6366f1}
+.insight-box{background:linear-gradient(135deg,#f5f3ff 0%,#ede9fe 100%);border-radius:10px;padding:12px;margin-top:12px;border-left:4px solid #6366f1;font-size:12px;line-height:1.5}
+.insight-title{font-weight:700;color:#6366f1;margin-bottom:4px}
+.status-badge{display:inline-block;padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600;margin:4px 0}
+.status-badge.success{background:#dcfce7;color:#166534}
+.status-badge.warning{background:#fef3c7;color:#92400e}
+.status-badge.info{background:#dbeafe;color:#1e40af}
+.segmented{display:flex;gap:4px;flex-wrap:wrap}
+.seg-btn{flex:1;min-width:55px;padding:8px 4px;border-radius:8px;border:2px solid #e0e0e0;background:#fff;font-size:10px;font-weight:600;cursor:pointer;text-align:center}
+.seg-btn.active{border-color:#6366f1;background:#6366f1;color:#fff}
+.help-btn{position:fixed;bottom:20px;right:20px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border:3px solid #fff;box-shadow:0 4px 15px rgba(99,102,241,.4);font-size:20px;font-weight:700;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.help-btn:active{transform:scale(.9)}
+.help-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.help-overlay.open{display:flex}
+.help-panel{background:#fff;border-radius:20px 20px 0 0;max-width:420px;width:100%;max-height:75vh;overflow-y:auto;padding:20px 16px env(safe-area-inset-bottom);animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.help-close{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.help-close h2{font-size:16px;font-weight:700;color:#333}
+.help-close button{width:32px;height:32px;border-radius:50%;border:none;background:#f1f5f9;font-size:18px;cursor:pointer;color:#64748b}
+.help-section{margin-bottom:14px}
+.help-section-title{font-size:12px;font-weight:700;color:#6366f1;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.help-step{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:12px;line-height:1.5;color:#475569}
+.help-step:last-child{border-bottom:none}
+.help-step-num{width:22px;height:22px;border-radius:50%;background:#6366f1;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.help-try{background:#f5f3ff;border-radius:8px;padding:8px 10px;font-size:11px;color:#6d28d9;line-height:1.5;margin-top:4px}
+.help-try b{color:#4c1d95}
+.help-key{background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:8px;padding:8px 10px;font-size:11px;color:#92400e;line-height:1.5;margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div class="header">
+  <h1>ಸೃಜನಾತ್ಮಕ ಚಿಟ್ಟಿ ಕ್ಯಾಲ್ಕುಲೇಟರ್</h1>
+  <p>ಸ್ಥಾನ ಬೆಲೆ ಬಟನ್‌ಗಳಿಂದ ಸಂಖ್ಯೆಗಳನ್ನು ನಿರ್ಮಿಸಿ!</p>
+</div>
+
+<div class="sim-card" id="sim"></div>
+
+<div class="insight-box">
+  <div class="insight-title">ನಿಯಮ</div>
+  ಯಾವುದೇ ಸಂಖ್ಯೆಯನ್ನು ನಿರ್ಮಿಸಲು <strong>ಕಡಿಮೆ ಕ್ಲಿಕ್‌ಗಳು</strong> ಅದರ <strong>ಅಂಕಿಗಳ ಮೊತ್ತ</strong>ಕ್ಕೆ ಸಮ. ಪ್ರತಿ ಸ್ಥಾನ ಬೆಲೆಗೆ ದೊಡ್ಡ ಬಟನ್ ಬಳಸುವುದು ಅತ್ಯಂತ ಕಾರ್ಯಕ್ಷಮ ತಂತ್ರ — ಅದೇ ಭಾರತೀಯ ಸ್ಥಾನ ಬೆಲೆ ಸಂಕೇತ!
+</div>
+
+<button class="help-btn" id="helpBtn">?</button>
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-panel">
+    <div class="help-close"><h2>ಈ ಸಿಮ್ಯುಲೇಶನ್ ಹೇಗೆ ಬಳಸುವುದು</h2><button id="helpClose">&times;</button></div>
+    <div class="help-section">
+      <div class="help-section-title">ಏನು ಮಾಡಬೇಕು</div>
+      <div class="help-step"><span class="help-step-num">1</span><span><b>ರಂಗಿನ ಬಟನ್‌ಗಳನ್ನು</b> (+1, +10, +100, ಇತ್ಯಾದಿ) ಒತ್ತಿ ನಿಮ್ಮ ಸಂಖ್ಯೆಗೆ ಸೇರಿಸಿ. ಪ್ರತಿ ಒತ್ತುವಿಕೆ ಆ ಸ್ಥಾನ ಬೆಲೆಯನ್ನು ಸೇರಿಸುತ್ತದೆ.</span></div>
+      <div class="help-step"><span class="help-step-num">2</span><span><b>ಬಾರ್ ಚಾರ್ಟ್</b> ಬದಲಾಗುವುದನ್ನು ನೋಡಿ — ಪ್ರತಿ ಬಾರ್ ಆ ಸ್ಥಾನ ಬೆಲೆ ಎಷ್ಟು ಬಾರಿ ತುಂಬಿದೆ (0–9) ತೋರಿಸುತ್ತದೆ.</span></div>
+      <div class="help-step"><span class="help-step-num">3</span><span>ನಿಮ್ಮ <b>„ಬಳಸಿದ ಕ್ಲಿಕ್‌ಗಳು“</b> ಮತ್ತು <b>„ಕನಿಷ್ಠ ಸಾಧ್ಯ“</b> ಹೋಲಿಕೆ ಮಾಡಿ. ಕಡಿಮೆ ಕ್ಲಿಕ್‌ಗಳಲ್ಲಿ ಗುರಿ ತಲುಪಬಹುದೇ?</span></div>
+      <div class="help-step"><span class="help-step-num">4</span><span><b>ಸವಾಲು ಮೋಡ್</b>ನಲ್ಲಿ, ಪ್ರೀಸೆಟ್‌ಗಳಿಂದ ಗುರಿ ಸಂಖ್ಯೆ ಆಯ್ಕೆಮಾಡಿ ನಿರ್ಮಿಸಿ. <b>ಉಚಿತ ಅನ್ವೇಷಣೆ</b>ಯಲ್ಲಿ ಯಾವುದೇ ಸಂಖ್ಯೆ ನಿರ್ಮಿಸಿ.</span></div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">ಇದನ್ನು ಪ್ರಯತ್ನಿಸಿ</div>
+      <div class="help-try"><b>ಸವಾಲು 1:</b> 5,072 ನಿರ್ಮಿಸಿ. +1000, +10 ಮತ್ತು +1 ಮಾತ್ರ ಬಳಸಿ. ಕ್ಲಿಕ್‌ಗಳನ್ನು ಎಣಿಸಿ. ಮರುಹೊಂದಿಸಿ ಬೇರೆ ಸಂಯೋಜನೆ ಪ್ರಯತ್ನಿಸಿ — ನಿಮ್ಮ ಸ್ಕೋರ್ ಮೀರಬಹುದೇ?</div>
+      <div class="help-try"><b>ಸವಾಲು 2:</b> „+1K ಮಾತ್ರ“ ನಿರ್ಬಂಧ ಮೋಡ್‌ಗೆ ಬದಲಾಯಿಸಿ. 1,00,000 ತಲುಪಲು ಎಷ್ಟು ಕ್ಲಿಕ್‌ಗಳು? (ಉತ್ತರ: 100 ಕ್ಲಿಕ್‌ಗಳು — ಒಂದು ಲಕ್ಷಕ್ಕೆ ಎಷ್ಟು ಸಾವಿರ!)</div>
+      <div class="help-try"><b>ಸವಾಲು 3:</b> 997 ನಿರ್ಮಿಸಿ. ಕನಿಷ್ಠ 25 ಕ್ಲಿಕ್‌ಗಳು (9+9+7). ಆದರೆ (8×100)+(19×10)+(7×1) = 34 ಕ್ಲಿಕ್‌ಗಳು ಪ್ರಯತ್ನಿಸಿ. ಒಂದೇ ಸಂಖ್ಯೆ, ಹೆಚ್ಚು ಕ್ಲಿಕ್‌ಗಳು!</div>
+    </div>
+    <div class="help-section">
+      <div class="help-section-title">ಮುಖ್ಯ ಕಲ್ಪನೆ</div>
+      <div class="help-key">ಯಾವುದೇ ಸಂಖ್ಯೆ ನಿರ್ಮಿಸಲು <b>ಕನಿಷ್ಠ ಕ್ಲಿಕ್‌ಗಳು</b> = <b>ಅಂಕಿಗಳ ಮೊತ್ತ</b>. ಉದಾಹರಣೆ: 5072 ಅಂಕಿಗಳು 5+0+7+2 = 14 ಕನಿಷ್ಠ ಕ್ಲಿಕ್‌ಗಳು. ಪ್ರತಿ ಅಂಕಿ ಪ್ರತಿ ಸ್ಥಾನ ಬೆಲೆ ಬಟನ್ ಎಷ್ಟು ಬಾರಿ ಒತ್ತಬೇಕು ತಿಳಿಸುತ್ತದೆ — ಅದೇ ಭಾರತೀಯ ಸ್ಥಾನ ಬೆಲೆ ವ್ಯವಸ್ಥೆ!</div>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+document.getElementById('helpBtn').onclick=()=>document.getElementById('helpOverlay').classList.add('open');
+document.getElementById('helpClose').onclick=()=>document.getElementById('helpOverlay').classList.remove('open');
+document.getElementById('helpOverlay').onclick=(e)=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open')};
+
+const PV=[
+  {v:1,label:"ಒಂದು",short:"+1"},
+  {v:10,label:"ಹತ್ತು",short:"+10"},
+  {v:100,label:"ನೂರು",short:"+100"},
+  {v:1000,label:"ಸಾವಿರ",short:"+1K"},
+  {v:10000,label:"ಹ.ಸಾವಿರ",short:"+10K"},
+  {v:100000,label:"ಲಕ್ಷ",short:"+1L"},
+  {v:1000000,label:"ಹ.ಲಕ್ಷ",short:"+10L"}
+];
+const COLORS=["#ef4444","#f97316","#eab308","#22c55e","#3b82f6","#8b5cf6","#1e293b"];
+function fmtI(n){if(n===0)return"0";let s=n.toString();if(s.length<=3)return s;let l=s.slice(-3),r=s.slice(0,-3),p=[];while(r.length>2){p.unshift(r.slice(-2));r=r.slice(0,-2)}if(r.length)p.unshift(r);return p.join(",")+","+l}
+function digitSum(n){let s=0;while(n>0){s+=n%10;n=Math.floor(n/10)}return s}
+function getDigits(n){let d=[];for(let i=0;i<7;i++){d.push(Math.floor(n/PV[i].v)%10)}return d}
+function toWords(n){if(n===0)return"Zero";const o=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];const t=["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];function tw(x){if(x<20)return o[x];return t[Math.floor(x/10)]+(x%10?" "+o[x%10]:"")}function th(x){if(x<100)return tw(x);return o[Math.floor(x/100)]+" Hundred"+(x%100?" "+tw(x%100):"")}let p=[];if(n>=10000000){p.push(tw(Math.floor(n/10000000))+" Crore");n%=10000000}if(n>=100000){p.push(tw(Math.floor(n/100000))+" Lakh");n%=100000}if(n>=1000){p.push(tw(Math.floor(n/1000))+" Thousand");n%=1000}if(n>0)p.push(th(n));return p.join(" ")||"Zero"}
+
+const TARGETS=[
+  {n:5072,hint:"ಪಠ್ಯಪುಸ್ತಕದಿಂದ — 5,072 ನಿರ್ಮಿಸಿ!"},
+  {n:8300,hint:"8,300 ನಿರ್ಮಿಸಿ — ಎಷ್ಟು ಕಡಿಮೆ ಕ್ಲಿಕ್‌ಗಳು?"},
+  {n:40629,hint:"40,629 ತಲುಪಿ."},
+  {n:56354,hint:"56,354 ಮಾಡಿ."},
+  {n:66666,hint:"ಎಲ್ಲಾ ಆರೆ — 66,666!"},
+  {n:367813,hint:"ದೊಡ್ಡದೊಂದು — 3,67,813."},
+  {n:997,hint:"997 ಮಾಡಿ — ಕನಿಷ್ಠ 25 ಕ್ಲಿಕ್‌ಗಳು!"},
+  {n:100000,hint:"ಒಂದು ಲಕ್ಷ — 1,00,000!"},
+  {n:75000,hint:"ಚಿಂತಾಮಣಿ ಜನಸಂಖ್ಯೆ."},
+  {n:321,hint:"ಸರಳ ಪ್ರಾರಂಭ — 321."}
+];
+
+const c=document.getElementById("sim");
+let num=0,clicks=0,history=[],tIdx=0,mode="challenge",restrict="all";
+
+// ── URL Query Parameter Support ─────────────────────────────────────────────
+// Supported parameters:
+//   ?mode=challenge          → start in Challenge mode (default)
+//   ?mode=free               → start in Free Explore mode
+//   ?targetIndex=<0-9>       → pre-select the target number (Challenge mode only)
+//   ?restrict=all            → allow all place-value buttons (default)
+//   ?restrict=1000           → restrict to +1K button only
+//   ?restrict=100            → restrict to +100 button only
+//   ?restrict=10             → restrict to +10 button only
+// ─────────────────────────────────────────────────────────────────────────────
+(function applyUrlParams() {
+  var p = new URLSearchParams(window.location.search);
+
+  var modeParam = (p.get('mode') || 'challenge').toLowerCase();
+  if (modeParam === 'free' || modeParam === 'explore') mode = 'free';
+  else mode = 'challenge';
+
+  var tiParam = parseInt(p.get('targetIndex'), 10);
+  if (!isNaN(tiParam) && tiParam >= 0 && tiParam < 10) tIdx = tiParam;
+
+  var restrictParam = (p.get('restrict') || 'all').toLowerCase();
+  if (restrictParam === '1000') restrict = '1000';
+  else if (restrictParam === '100') restrict = '100';
+  else if (restrictParam === '10') restrict = '10';
+  else restrict = 'all';
+})();
+
+const TXT={challengeMode:"ಸವಾಲು ಮೋಡ್",freeExplore:"ಉಚಿತ ಅನ್ವೇಷಣೆ",clicksUsed:"ಬಳಸಿದ ಕ್ಲಿಕ್‌ಗಳು",minPossible:"ಕನಿಷ್ಠ ಸಾಧ್ಯ",digits:"ಅಂಕಿಗಳು",undo:"ರದ್ದು",reset:"ಮರುಹೊಂದಿಸಿ",targetNumbers:"ಗುರಿ ಸಂಖ್ಯೆಗಳು:",restrictButtons:"ಬಟನ್‌ಗಳನ್ನು ನಿರ್ಬಂಧಿಸಿ:",all:"ಎಲ್ಲಾ",only1K:"+1K ಮಾತ್ರ",only100:"+100 ಮಾತ್ರ",only10:"+10 ಮಾತ್ರ",targetReachedMin:"ಗುರಿ ತಲುಪಿದೆ — ಕನಿಷ್ಠ ಕ್ಲಿಕ್‌ಗಳು!",targetReachedFewer:"ಗುರಿ ತಲುಪಿದೆ! ಕಡಿಮೆ ಮಾಡಬಹುದೇ?",overBy:" ಕ್ಕಿಂತ ಹೆಚ್ಚು — ರದ್ದು ಮಾಡಿ",toGo:" ಬಾಕಿ"};
+
+function render(){
+  const challenge=TARGETS[tIdx];
+  const d=getDigits(num);
+  const W=370,H=160,barW=38,gap=8,baseY=130,maxH=100;
+  let bars="";
+  for(let i=6;i>=0;i--){
+    const x=16+(6-i)*(barW+gap);
+    const h=d[i]===0?2:d[i]/9*maxH;
+    const y=baseY-h;
+    bars+=`<rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="4" fill="${COLORS[i]}" opacity=".85"/>`;
+    bars+=`<text x="${x+barW/2}" y="${y-5}" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${d[i]}</text>`;
+    bars+=`<text x="${x+barW/2}" y="${baseY+14}" text-anchor="middle" font-size="7" fill="#888">${PV[i].label}</text>`;
+  }
+  bars+=`<line x1="12" y1="${baseY}" x2="${W-12}" y2="${baseY}" stroke="#d4d4d8" stroke-width="1"/>`;
+
+  let statusHtml="";
+  if(mode==="challenge"){
+    const diff=challenge.n-num;
+    if(diff===0){
+      statusHtml=clicks===digitSum(challenge.n)?`<div class="status-badge success">${TXT.targetReachedMin}</div>`:`<div class="status-badge success">${TXT.targetReachedFewer}</div>`;
+    } else if(diff<0){
+      statusHtml=`<div class="status-badge warning">${fmtI(-diff)}${TXT.overBy}</div>`;
+    } else {
+      statusHtml=`<div class="status-badge info">${challenge.hint} (${fmtI(diff)}${TXT.toGo})</div>`;
+    }
+  }
+
+  let btnsHtml=PV.map((p,i)=>{
+    const disabled=restrict!=="all"&&p.v!==parseInt(restrict);
+    return`<button class="pv-btn c${i}" data-i="${i}" style="${disabled?"opacity:.3;pointer-events:none":""}"><span class="bv">${p.short}</span><span class="bl">${p.label}</span></button>`;
+  }).reverse().join("");
+
+  let presetsHtml=TARGETS.map((t,i)=>`<button class="preset-btn${i===tIdx?" active":""}" data-i="${i}">${fmtI(t.n)}</button>`).join("");
+
+  c.innerHTML=`
+  <div class="mode-tabs">
+    <button class="mode-tab${mode==="challenge"?" active":""}" data-m="challenge">${TXT.challengeMode}</button>
+    <button class="mode-tab${mode==="free"?" active":""}" data-m="free">${TXT.freeExplore}</button>
+  </div>
+
+  <div class="number-display">
+    <div class="number-big">${fmtI(num)}</div>
+    <div class="number-words">${toWords(num)}</div>
+  </div>
+
+  <div class="visual">
+    <svg viewBox="0 0 ${W} ${H}" style="min-height:${H}px">${bars}</svg>
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric-card"><div class="metric-label">${TXT.clicksUsed}</div><div class="metric-value">${clicks}</div></div>
+    <div class="metric-card"><div class="metric-label">${TXT.minPossible}</div><div class="metric-value">${digitSum(num)}</div></div>
+    <div class="metric-card"><div class="metric-label">${TXT.digits}</div><div class="metric-value">${num===0?1:num.toString().length}</div></div>
+  </div>
+
+  ${statusHtml?`<div style="text-align:center;margin-top:8px">${statusHtml}</div>`:""}
+
+  <div class="btn-grid">${btnsHtml}</div>
+
+  <div class="action-row">
+    <button class="act-btn undo" id="undo-btn">${TXT.undo}</button>
+    <button class="act-btn reset" id="reset-btn">${TXT.reset}</button>
+  </div>
+
+  <div class="control-panel">
+    ${mode==="challenge"?`<div class="presets-label">${TXT.targetNumbers}</div><div class="presets" id="presets">${presetsHtml}</div>`:""}
+    <div class="slider-group">
+      <div class="presets-label">${TXT.restrictButtons}</div>
+      <div class="segmented" id="restrict-seg">
+        <button class="seg-btn${restrict==="all"?" active":""}" data-v="all">${TXT.all}</button>
+        <button class="seg-btn${restrict==="1000"?" active":""}" data-v="1000">${TXT.only1K}</button>
+        <button class="seg-btn${restrict==="100"?" active":""}" data-v="100">${TXT.only100}</button>
+        <button class="seg-btn${restrict==="10"?" active":""}" data-v="10">${TXT.only10}</button>
+      </div>
+    </div>
+  </div>`;
+
+  c.querySelectorAll(".pv-btn").forEach(b=>b.onclick=()=>{
+    const idx=parseInt(b.dataset.i);
+    if(restrict!=="all"&&PV[idx].v!==parseInt(restrict))return;
+    const before=num;num=Math.min(num+PV[idx].v,9999999);clicks++;
+    history.push({idx,before});render();
+  });
+  c.querySelector("#undo-btn").onclick=()=>{if(!history.length)return;const h=history.pop();num=h.before;clicks--;render()};
+  c.querySelector("#reset-btn").onclick=()=>{num=0;clicks=0;history=[];render()};
+  c.querySelectorAll(".mode-tab").forEach(b=>b.onclick=()=>{mode=b.dataset.m;num=0;clicks=0;history=[];render()});
+  if(c.querySelector("#presets"))c.querySelector("#presets").addEventListener("click",e=>{const b=e.target.closest(".preset-btn");if(!b)return;tIdx=parseInt(b.dataset.i);num=0;clicks=0;history=[];render()});
+  c.querySelector("#restrict-seg").addEventListener("click",e=>{const b=e.target.closest(".seg-btn");if(!b)return;restrict=b.dataset.v;num=0;clicks=0;history=[];render()});
+}
+render();
+</script>
+</body>
+</html>
