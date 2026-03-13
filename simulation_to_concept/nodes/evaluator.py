@@ -113,6 +113,8 @@ def understanding_evaluator_node(state: Dict[str, Any]) -> Dict[str, Any]:
     
     current_concept = concepts[current_idx]
     last_teacher_msg = state.get("last_teacher_message", "")
+    session_language = state.get("language", "english")
+    language_instruction = "English" if session_language.lower() == "english" else session_language.capitalize()
     
     print(f"   Student said: \"{student_response[:100]}...\"" if len(student_response) > 100 else f"   Student said: \"{student_response}\"")
     
@@ -162,7 +164,9 @@ PARAMETER EFFECTS (use these to judge correctness):
         physics_rules += f"\n{param_info['label']} ({param_info['range']}): {param_info['effect']}"
     
     # Build the combined classification + evaluation prompt
-    eval_prompt = f"""You are analyzing a student's response in a science teaching session.
+    eval_prompt = f"""⚠️ LANGUAGE REQUIREMENT: All free-text fields in your JSON response (understanding_reasoning, question_asked, correction_explanation) MUST be written in {language_instruction} only. Do not use any other language, even if the simulation topic contains text in another language.
+
+You are analyzing a student's response in a science teaching session.
 
 ═══════════════════════════════════════════════════════════════
 {physics_rules}

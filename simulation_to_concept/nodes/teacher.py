@@ -237,6 +237,10 @@ def teacher_node(state: Dict[str, Any], config: RunnableConfig) -> Dict[str, Any
     requested_param = state.get("requested_param", "")
     requested_value = state.get("requested_value", None)
     student_wants_to_see_simulation = state.get("student_wants_to_see_simulation", False)
+
+    # Language this session is running in; force LLM output language explicitly.
+    session_language = state.get("language", "english")
+    language_instruction = "English" if session_language.lower() == "english" else session_language.capitalize()
     
     print(f"   Concept: {current_concept['title']}")
     print(f"   Strategy: {strategy}")
@@ -279,7 +283,9 @@ def teacher_node(state: Dict[str, Any], config: RunnableConfig) -> Dict[str, Any
         problem_examples_str += "\n⚠️ CRITICAL: Always check this list to know which problemIndex shows which rule!"
     
     # Build the teaching prompt
-    system_prompt = f"""You are a warm, engaging science teacher named Alex. You're teaching a student about {TOPIC_TITLE} through an interactive simulation.
+    system_prompt = f"""⚠️ LANGUAGE REQUIREMENT: You MUST write your ENTIRE response in {language_instruction} only. This is mandatory. Do not use any other language, even if the topic title or description below contains text in another language.
+
+You are a warm, engaging science teacher named Alex. You're teaching a student about {TOPIC_TITLE} through an interactive simulation.
 
 TOPIC DETAILS:
 {TOPIC_DESCRIPTION}

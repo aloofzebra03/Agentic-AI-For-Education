@@ -1030,11 +1030,22 @@ def start_simulation_session(request: SimStartSessionRequest):
                 }
             )
         
+        # Generate consistent thread_id using same naming scheme as teaching sessions
+        language = request.language or "english"
+        thread_id = generate_thread_id(
+            concept_title=request.simulation_id,
+            is_kannada=(language == "kannada"),
+            label="sim",
+            user_id=request.student_id,
+        )
+        print(f"📌 Generated simulation thread_id: {thread_id}")
+
         # Create session
         session_id, response = create_teaching_session(
             simulation_id=request.simulation_id,
             student_id=request.student_id,
-            language=request.language or "english"
+            language=language,
+            thread_id=thread_id,
         )
         
         return response

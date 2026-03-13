@@ -187,7 +187,7 @@ def format_api_response(thread_id: str, state: Dict[str, Any], simulation_id: st
 # MAIN API FUNCTIONS
 # ═══════════════════════════════════════════════════════════════════════
 
-def create_teaching_session(simulation_id: str, student_id: str = None, language: str = "english") -> Tuple[str, Dict[str, Any]]:
+def create_teaching_session(simulation_id: str, student_id: str = None, language: str = "english", thread_id: str = None) -> Tuple[str, Dict[str, Any]]:
     """
     Create a new teaching session for specified simulation.
     
@@ -195,7 +195,8 @@ def create_teaching_session(simulation_id: str, student_id: str = None, language
         simulation_id: Which simulation to use
         student_id: Optional student identifier
         language: Session language ('english' or 'kannada')
-        
+        thread_id: Optional pre-generated thread ID. If None, a UUID-based one is generated.
+
     Returns:
         Tuple of (session_id, formatted_api_response)
     """
@@ -234,8 +235,9 @@ def create_teaching_session(simulation_id: str, student_id: str = None, language
     # Validate config
     validate_config()
     
-    # Create unique session ID
-    thread_id = f"api_session_{uuid.uuid4().hex[:8]}"
+    # Use provided thread_id or generate a UUID-based fallback
+    if not thread_id:
+        thread_id = f"api_session_{uuid.uuid4().hex[:8]}"
     
     # Create initial state with simulation_id for downstream nodes
     initial_state = create_initial_state(
