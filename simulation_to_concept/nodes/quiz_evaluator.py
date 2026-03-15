@@ -26,6 +26,7 @@ from simulation_to_concept.config import (
     GOOGLE_API_KEY, GEMINI_MODEL, TEMPERATURE, USE_API_TRACKER,
     get_best_api_key_for_model, track_model_call
 )
+from api_tracker_utils.error import MinuteLimitExhaustedError, DayLimitExhaustedError
 from simulation_to_concept.state import TeachingState
 from simulation_to_concept.simulations_config import get_quiz_questions
 from simulation_to_concept.quiz_rules import (
@@ -43,6 +44,8 @@ def get_llm():
             # Get best API key for this model from tracker
             api_key = get_best_api_key_for_model(GEMINI_MODEL)
             print(f"[QUIZ_EVALUATOR] Using tracked API key ...{api_key[-6:]} for {GEMINI_MODEL}")
+        except (MinuteLimitExhaustedError, DayLimitExhaustedError):
+            raise  # Propagate rate-limit errors up to the API server
         except Exception as e:
             print(f"[QUIZ_EVALUATOR] Tracker error: {e}, falling back to GOOGLE_API_KEY")
             api_key = GOOGLE_API_KEY

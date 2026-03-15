@@ -27,6 +27,7 @@ from langchain_core.prompts import PromptTemplate
 
 from api_tracker_utils.tracker import track_model_call,get_next_available_api_model_pair
 from api_tracker_utils.config import AVAILABLE_MODELS, DEFAULT_MODEL
+from api_tracker_utils.error import MinuteLimitExhaustedError, DayLimitExhaustedError
 
 dotenv.load_dotenv(dotenv_path=".env", override=True)
 print(os.getenv("LANGCHAIN_PROJECT"))
@@ -276,6 +277,8 @@ def translate_to_english_gemini(text: str) -> str:
         translated = response.content.strip()
         print(f"✅ Translated to English: {translated[:80]}...")
         return translated
+    except (MinuteLimitExhaustedError, DayLimitExhaustedError):
+        raise
     except Exception as e:
         print(f"⚠️ Gemini translation error: {str(e)}. Returning original text.")
         return text
@@ -1247,6 +1250,8 @@ Respond with JSON only:
             print(f"Invalid image selection index: {selected_index}")
             return None
             
+    except (MinuteLimitExhaustedError, DayLimitExhaustedError):
+        raise
     except Exception as e:
         print(f"Error selecting image for concept '{concept}': {e}")
         import traceback

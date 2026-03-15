@@ -24,6 +24,7 @@ from simulation_to_concept.config import (
     TOPIC_TITLE, TOPIC_DESCRIPTION, PARAMETER_INFO, USE_API_TRACKER,
     get_best_api_key_for_model, track_model_call
 )
+from api_tracker_utils.error import MinuteLimitExhaustedError, DayLimitExhaustedError
 from simulation_to_concept.state import add_message_to_history
 
 
@@ -34,6 +35,8 @@ def get_llm():
             # Get best API key for this model from tracker
             api_key = get_best_api_key_for_model(GEMINI_MODEL)
             print(f"[EVALUATOR] Using tracked API key ...{api_key[-6:]} for {GEMINI_MODEL}")
+        except (MinuteLimitExhaustedError, DayLimitExhaustedError):
+            raise  # Propagate rate-limit errors up to the API server
         except Exception as e:
             print(f"[EVALUATOR] Tracker error: {e}, falling back to GOOGLE_API_KEY")
             api_key = GOOGLE_API_KEY
