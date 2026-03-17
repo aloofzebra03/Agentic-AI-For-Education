@@ -6,6 +6,12 @@ import os
 # API Configuration
 BASE_URL = os.getenv("LOAD_TEST_BASE_URL", "http://localhost:8000")
 
+# Task mode selection:
+# - regular: calls /session/* endpoints
+# - simulation: calls /simulation/session/* endpoints
+# - mixed: calls both flows in one workload
+LOAD_TEST_TASK_MODE = os.getenv("LOAD_TEST_TASK_MODE", "mixed").strip().lower()
+
 # Default test parameters
 DEFAULT_CONCEPT = "Pendulum and its Time Period"
 DEFAULT_STUDENT_ID = "load_test_student"
@@ -76,6 +82,7 @@ print("=" * 80)
 print("🔬 Load Testing Configuration Loaded")
 print("=" * 80)
 print(f"Base URL: {BASE_URL}")
+print(f"Task Mode: {LOAD_TEST_TASK_MODE}")
 print(f"Default Concept: {DEFAULT_CONCEPT}")
 print(f"Request Timeout: {REQUEST_TIMEOUT}s")
 print(f"Think Time: {MIN_WAIT_TIME}-{MAX_WAIT_TIME}s")

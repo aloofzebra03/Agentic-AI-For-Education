@@ -1,12 +1,24 @@
 from locust import HttpUser, between, events
-from tasks.session_tasks import SessionTaskSet
 from utils.metrics_collector import global_metrics
-from config import MIN_WAIT_TIME, MAX_WAIT_TIME, REQUEST_TIMEOUT
+from config import MIN_WAIT_TIME, MAX_WAIT_TIME, REQUEST_TIMEOUT, LOAD_TEST_TASK_MODE
 import sys
 import os
 import json
 from datetime import datetime
 from pathlib import Path
+
+
+if LOAD_TEST_TASK_MODE == "regular":
+    from tasks.session_tasks import SessionTaskSet
+elif LOAD_TEST_TASK_MODE == "simulation":
+    from tasks.session_tasks_simulation import SessionTaskSet
+elif LOAD_TEST_TASK_MODE == "mixed":
+    from tasks.session_tasks_mixed import SessionTaskSet
+else:
+    raise ValueError(
+        f"Invalid LOAD_TEST_TASK_MODE='{LOAD_TEST_TASK_MODE}'. "
+        "Use one of: regular, simulation, mixed."
+    )
 
 # # Add parent directory to path to ensure imports work
 # sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
