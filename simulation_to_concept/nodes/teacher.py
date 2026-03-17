@@ -36,7 +36,7 @@ from simulation_to_concept.simulations_config import get_simulation
 
 
 def get_llm():
-    """Get configured LLM instance with API tracking."""
+    """Get configured LLM instance and the exact API key used."""
     if USE_API_TRACKER:
         try:
             # Get best API key for this model from tracker
@@ -50,11 +50,12 @@ def get_llm():
     else:
         api_key = GOOGLE_API_KEY
     
-    return ChatGoogleGenerativeAI(
+    llm = ChatGoogleGenerativeAI(
         model=GEMINI_MODEL,
         google_api_key=api_key,
         temperature=TEMPERATURE
     )
+    return llm, api_key
 
 
 def is_gemma_model() -> bool:
@@ -97,16 +98,17 @@ def invoke_llm_with_prompts(llm, system_prompt: str, user_prompt: str, api_key: 
     ) as rt:
         # Also pass parent config to llm.invoke for callback chain continuity
         config = parent_config or {}
+
+        # Track BEFORE invocation for accurate quota accounting
+        if USE_API_TRACKER and api_key:
+            try:
+                track_model_call(api_key, GEMINI_MODEL)
+                print(f"[TEACHER] Tracked API call: ...{api_key[-6:]} + {GEMINI_MODEL}")
+            except Exception as e:
+                print(f"[TEACHER] Warning: Failed to track API call: {e}")
+
         response = llm.invoke(messages, config=config)
         rt.outputs = {"response_length": len(response.content) if response.content else 0}
-    
-    # Track the API call if tracker is enabled
-    if USE_API_TRACKER and api_key:
-        try:
-            track_model_call(api_key, GEMINI_MODEL)
-            print(f"[TEACHER] Tracked API call: ...{api_key[-6:]} + {GEMINI_MODEL}")
-        except Exception as e:
-            print(f"[TEACHER] Warning: Failed to track API call: {e}")
     
     return response
 
@@ -660,15 +662,7 @@ Example flow:
 REMEMBER: Output ONLY the JSON object. Start your response with {{ and end with }}.
 """
 
-    llm = get_llm()
-    
-    # Get the API key that was used (for tracking)
-    used_api_key = None
-    if USE_API_TRACKER:
-        try:
-            used_api_key = get_best_api_key_for_model(GEMINI_MODEL)
-        except:
-            pass
+    llm, used_api_key = get_llm()
     
     # Build simulation URL for LangSmith metadata
     # Use the simulation_id from state (already loaded at top of function)

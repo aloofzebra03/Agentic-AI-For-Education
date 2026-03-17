@@ -29,6 +29,7 @@ from api_integration import (
     validate_simulation_id,
     submit_quiz_answer
 )
+from api_tracker_utils.error import MinuteLimitExhaustedError, DayLimitExhaustedError
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -164,6 +165,23 @@ async def start_session(request: StartSessionRequest):
                 "message": str(e)
             }
         )
+    except MinuteLimitExhaustedError as e:
+        raise HTTPException(
+            status_code=501,
+            detail={
+                "error": "Rate Limit Exhausted",
+                "message": str(e),
+                "retry_after_seconds": getattr(e, "retry_after_seconds", 60)
+            }
+        )
+    except DayLimitExhaustedError as e:
+        raise HTTPException(
+            status_code=502,
+            detail={
+                "error": "Daily Limit Exhausted",
+                "message": str(e)
+            }
+        )
     except Exception as e:
         # Unexpected error
         print(f"\n❌ Error creating session:")
@@ -228,6 +246,25 @@ async def send_response(session_id: str, request: StudentResponseRequest):
                 "error": "Session Not Found",
                 "message": f"Session '{session_id}' does not exist or has expired",
                 "session_id": session_id
+            }
+        )
+    except MinuteLimitExhaustedError as e:
+        raise HTTPException(
+            status_code=501,
+            detail={
+                "error": "Rate Limit Exhausted",
+                "message": str(e),
+                "retry_after_seconds": getattr(e, "retry_after_seconds", 60),
+                "session_id": session_id,
+            }
+        )
+    except DayLimitExhaustedError as e:
+        raise HTTPException(
+            status_code=502,
+            detail={
+                "error": "Daily Limit Exhausted",
+                "message": str(e),
+                "session_id": session_id,
             }
         )
     except Exception as e:
@@ -382,6 +419,23 @@ async def submit_quiz(session_id: str, request: QuizSubmissionRequest):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={
                 "error": "Invalid Request",
+                "message": str(e)
+            }
+        )
+    except MinuteLimitExhaustedError as e:
+        raise HTTPException(
+            status_code=501,
+            detail={
+                "error": "Rate Limit Exhausted",
+                "message": str(e),
+                "retry_after_seconds": getattr(e, "retry_after_seconds", 60)
+            }
+        )
+    except DayLimitExhaustedError as e:
+        raise HTTPException(
+            status_code=502,
+            detail={
+                "error": "Daily Limit Exhausted",
                 "message": str(e)
             }
         )

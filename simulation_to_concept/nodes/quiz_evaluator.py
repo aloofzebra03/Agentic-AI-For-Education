@@ -38,7 +38,7 @@ from simulation_to_concept.quiz_rules import (
 
 
 def get_llm():
-    """Get configured LLM instance with API tracking."""
+    """Get configured LLM instance and the exact API key used."""
     if USE_API_TRACKER:
         try:
             # Get best API key for this model from tracker
@@ -52,11 +52,12 @@ def get_llm():
     else:
         api_key = GOOGLE_API_KEY
     
-    return ChatGoogleGenerativeAI(
+    llm = ChatGoogleGenerativeAI(
         model=GEMINI_MODEL,
         google_api_key=api_key,
         temperature=TEMPERATURE
     )
+    return llm, api_key
 
 
 def is_gemma_model() -> bool:
@@ -270,7 +271,7 @@ def quiz_evaluator_node(state: TeachingState, config: RunnableConfig) -> Dict[st
     # ========================================
     # STEP 4: Generate LLM feedback (adaptive)
     # ========================================
-    llm = get_llm()
+    llm, used_api_key = get_llm()
     
     # Build context for LLM
     system_prompt = f"""⚠️ LANGUAGE REQUIREMENT: You MUST write your ENTIRE response in {language_instruction} only. This is mandatory. Do not use any other language, even if the challenge text below contains text in another language.
@@ -322,14 +323,6 @@ They configured the simulation with these parameters:
 Generate your feedback now:"""
 
     user_prompt = f"Status: {status}, Attempt: {attempts}, Hint: {hint}"
-    
-    # Get the API key that was used (for tracking)
-    used_api_key = None
-    if USE_API_TRACKER:
-        try:
-            used_api_key = get_best_api_key_for_model(GEMINI_MODEL)
-        except:
-            pass
     
     # Build simulation URL for LangSmith metadata
     from simulation_to_concept.simulations_config import get_simulation
@@ -401,16 +394,17 @@ Generate your feedback now:"""
             inputs={"status": status, "attempt": attempts, "score": score},
         ) as trace_rt:
             llm_config = config or {}
+
+            # Track BEFORE invocation for accurate quota accounting
+            if USE_API_TRACKER and used_api_key:
+                try:
+                    track_model_call(used_api_key, GEMINI_MODEL)
+                    print(f"[QUIZ_EVALUATOR] Tracked API call: ...{used_api_key[-6:]} + {GEMINI_MODEL}")
+                except Exception as e:
+                    print(f"[QUIZ_EVALUATOR] Warning: Failed to track API call: {e}")
+
             response = llm.invoke(messages, config=llm_config)
             trace_rt.outputs = {"response_length": len(response.content) if response.content else 0}
-        
-        # Track the API call
-        if USE_API_TRACKER and used_api_key:
-            try:
-                track_model_call(used_api_key, GEMINI_MODEL)
-                print(f"[QUIZ_EVALUATOR] Tracked API call: ...{used_api_key[-6:]} + {GEMINI_MODEL}")
-            except Exception as e:
-                print(f"[QUIZ_EVALUATOR] Warning: Failed to track API call: {e}")
         
         feedback = response.content.strip()
         

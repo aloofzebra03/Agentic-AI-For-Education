@@ -29,7 +29,7 @@ from simulation_to_concept.state import add_message_to_history
 
 
 def get_llm():
-    """Get configured LLM instance with API tracking."""
+    """Get configured LLM instance and the exact API key used."""
     if USE_API_TRACKER:
         try:
             # Get best API key for this model from tracker
@@ -43,11 +43,12 @@ def get_llm():
     else:
         api_key = GOOGLE_API_KEY
     
-    return ChatGoogleGenerativeAI(
+    llm = ChatGoogleGenerativeAI(
         model=GEMINI_MODEL,
         google_api_key=api_key,
         temperature=0.3  # Lower temperature for more consistent evaluation
     )
+    return llm, api_key
 
 
 def parse_json_safe(text: str) -> dict:
@@ -273,25 +274,17 @@ RESPOND WITH ONLY THIS JSON:
     else:
         print(f"   🔎 DEBUG - No param_history available!")
     
-    llm = get_llm()
-    
-    # Get the API key that was used (for tracking)
-    used_api_key = None
-    if USE_API_TRACKER:
-        try:
-            used_api_key = get_best_api_key_for_model(GEMINI_MODEL)
-        except:
-            pass
-    
-    response = llm.invoke([HumanMessage(content=eval_prompt)])
-    
-    # Track the API call
+    llm, used_api_key = get_llm()
+
+    # Track BEFORE invocation for accurate quota accounting
     if USE_API_TRACKER and used_api_key:
         try:
             track_model_call(used_api_key, GEMINI_MODEL)
             print(f"[EVALUATOR] Tracked API call: ...{used_api_key[-6:]} + {GEMINI_MODEL}")
         except Exception as e:
             print(f"[EVALUATOR] Warning: Failed to track API call: {e}")
+
+    response = llm.invoke([HumanMessage(content=eval_prompt)])
     
     result = parse_json_safe(response.content)
     
