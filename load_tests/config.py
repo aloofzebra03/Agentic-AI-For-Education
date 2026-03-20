@@ -10,7 +10,7 @@ BASE_URL = os.getenv("LOAD_TEST_BASE_URL", "http://localhost:8000")
 # - regular: calls /session/* endpoints
 # - simulation: calls /simulation/session/* endpoints
 # - mixed: calls both flows in one workload
-LOAD_TEST_TASK_MODE = os.getenv("LOAD_TEST_TASK_MODE", "mixed").strip().lower()
+LOAD_TEST_TASK_MODE = os.getenv("LOAD_TEST_TASK_MODE", "simulation").strip().lower()
 
 # Default test parameters
 DEFAULT_CONCEPT = "Pendulum and its Time Period"
