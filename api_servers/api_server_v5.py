@@ -1,4 +1,6 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.openapi.docs import get_swagger_ui_html
+from api_servers.auth import get_current_user, get_docs_username
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
@@ -88,8 +90,20 @@ from contextlib import contextmanager
 app = FastAPI(
     title="Educational Agent API",
     version="1.0.0",
-    description="Stateful API for personalized education with LangGraph-based agent"
+    description="Stateful API for personalized education with LangGraph-based agent",
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None
 )
+
+@app.get("/docs", include_in_schema=False)
+async def get_documentation(username: str = Depends(get_docs_username)):
+    return get_swagger_ui_html(openapi_url="/openapi.json", title="docs")
+
+@app.get("/openapi.json", include_in_schema=False)
+async def openapi(username: str = Depends(get_docs_username)):
+    return app.openapi()
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -359,7 +373,7 @@ def health_check():
 
 
 @app.get("/concepts", response_model=ConceptsListResponse)
-def list_available_concepts():
+def list_available_concepts(user: dict = Depends(get_current_user)):
     """List all available concepts that can be taught by the educational agent."""
     try:
         print("API /concepts - Retrieving all available concepts")
@@ -382,7 +396,7 @@ def list_available_concepts():
 
 
 @app.post("/session/start", response_model=StartSessionResponse)
-def start_session(request: StartSessionRequest):
+def start_session(request: StartSessionRequest, user: dict = Depends(get_current_user)):
     try:
         print(f"API /session/start - concept: {request.concept_title}, student: {request.student_id}, language: {'Kannada' if request.is_kannada else 'English'}")
         
@@ -481,7 +495,7 @@ def start_session(request: StartSessionRequest):
 
 
 @app.post("/session/continue", response_model=ContinueSessionResponse)
-def continue_session(request: ContinueSessionRequest):
+def continue_session(request: ContinueSessionRequest, user: dict = Depends(get_current_user)):
     try:
         print(f"API /session/continue - thread: {request.thread_id}, message: {request.user_message[:50]}...")
         
@@ -577,7 +591,7 @@ def continue_session(request: ContinueSessionRequest):
 
 
 @app.get("/session/status/{thread_id}", response_model=SessionStatusResponse)
-def get_session_status(thread_id: str):
+def get_session_status(thread_id: str, user: dict = Depends(get_current_user)):
     try:
         print(f"API /session/status - thread: {thread_id}")
         
@@ -622,7 +636,7 @@ def get_session_status(thread_id: str):
 
 
 @app.get("/session/history/{thread_id}", response_model=SessionHistoryResponse)
-def get_session_history(thread_id: str):
+def get_session_history(thread_id: str, user: dict = Depends(get_current_user)):
     try:
         print(f"API /session/history - thread: {thread_id}")
         
@@ -658,7 +672,7 @@ def get_session_history(thread_id: str):
 
 
 @app.get("/session/summary/{thread_id}", response_model=SessionSummaryResponse)
-def get_session_summary(thread_id: str):
+def get_session_summary(thread_id: str, user: dict = Depends(get_current_user)):
     try:
         print(f"API /session/summary - thread: {thread_id}")
         
@@ -692,7 +706,7 @@ def get_session_summary(thread_id: str):
 
 
 @app.delete("/session/{thread_id}")
-def delete_session(thread_id: str):
+def delete_session(thread_id: str, user: dict = Depends(get_current_user)):
     try:
         print(f"API /session DELETE - thread: {thread_id}")
         
@@ -765,7 +779,7 @@ def delete_session(thread_id: str):
 
 
 @app.get("/test/personas", response_model=PersonasListResponse)
-def list_available_personas():
+def list_available_personas(user: dict = Depends(get_current_user)):
     try:
         print("API /test/personas - listing available personas")
         
@@ -792,7 +806,7 @@ def list_available_personas():
 
 
 @app.post("/test/persona")
-def test_with_persona(request: TestPersonaRequest):
+def test_with_persona(request: TestPersonaRequest, user: dict = Depends(get_current_user)):
     try:
         print(f"API /test/persona - persona: {request.persona_name}, concept: {request.concept_title}")
         
@@ -816,7 +830,7 @@ def test_with_persona(request: TestPersonaRequest):
 
 
 @app.post("/test/images", response_model=TestImageResponse)
-def get_test_image(request: TestImageRequest):
+def get_test_image(request: TestImageRequest, user: dict = Depends(get_current_user)):
     try:
         print(f"API /test/images - concept: {request.concept_title}, language: {request.language}")
         
@@ -849,7 +863,7 @@ def get_test_image(request: TestImageRequest):
 
 
 @app.post("/test/simulation", response_model=TestSimulationResponse)
-def get_test_simulation(request: TestSimulationRequest):
+def get_test_simulation(request: TestSimulationRequest, user: dict = Depends(get_current_user)):
     try:
         print(f"API /test/simulation - concept: {request.concept_title}, type: {request.simulation_type}")
         
@@ -877,7 +891,7 @@ def get_test_simulation(request: TestSimulationRequest):
 
 
 @app.post("/concept-map/generate", response_model=ConceptMapResponse)
-def generate_concept_map(request: ConceptMapRequest):
+def generate_concept_map(request: ConceptMapRequest, user: dict = Depends(get_current_user)):
     """
     Generate concept map timeline from educational description.
     
@@ -1357,7 +1371,7 @@ def get_revision_state_from_checkpoint(thread_id: str) -> Optional[Dict[str, Any
 # --------------- Endpoints ---------------------------------------------------
 
 @app.get("/revision/chapters", response_model=RevChaptersListResponse, tags=["Revision"], summary="List available revision chapters")
-def list_revision_chapters():
+def list_revision_chapters(user: dict = Depends(get_current_user)):
     """
     List all chapters available in the revision agent's question bank.
 
@@ -1384,7 +1398,7 @@ def list_revision_chapters():
 
 
 @app.post("/revision/session/start", response_model=RevStartSessionResponse, tags=["Revision"], summary="Start a new revision session")
-def start_revision_session(request: RevStartSessionRequest):
+def start_revision_session(request: RevStartSessionRequest, user: dict = Depends(get_current_user)):
     """
     Start a new revision session for the given chapter.
 
@@ -1462,7 +1476,7 @@ def start_revision_session(request: RevStartSessionRequest):
 
 
 @app.post("/revision/session/continue", response_model=RevContinueSessionResponse, tags=["Revision"], summary="Continue an existing revision session")
-def continue_revision_session(request: RevContinueSessionRequest):
+def continue_revision_session(request: RevContinueSessionRequest, user: dict = Depends(get_current_user)):
     """
     Send a student message and receive the agent's next response.
 
@@ -1526,7 +1540,7 @@ def continue_revision_session(request: RevContinueSessionRequest):
 
 
 @app.get("/revision/session/status/{thread_id}", response_model=RevSessionStatusResponse, tags=["Revision"], summary="Get revision session status")
-def get_revision_session_status(thread_id: str):
+def get_revision_session_status(thread_id: str, user: dict = Depends(get_current_user)):
     """Get the current status and progress of a revision session."""
     try:
         state = get_revision_state_from_checkpoint(thread_id)
@@ -1570,7 +1584,7 @@ def get_revision_session_status(thread_id: str):
 
 
 @app.get("/revision/session/history/{thread_id}", response_model=RevSessionHistoryResponse, tags=["Revision"], summary="Get revision conversation history")
-def get_revision_session_history(thread_id: str):
+def get_revision_session_history(thread_id: str, user: dict = Depends(get_current_user)):
     """Get the full conversation history of a revision session."""
     try:
         state = get_revision_state_from_checkpoint(thread_id)
@@ -1601,7 +1615,7 @@ def get_revision_session_history(thread_id: str):
 
 
 @app.delete("/revision/session/{thread_id}", tags=["Revision"], summary="Delete a revision session")
-def delete_revision_session(thread_id: str):
+def delete_revision_session(thread_id: str, user: dict = Depends(get_current_user)):
     """
     Delete a revision session.
 
@@ -1632,7 +1646,7 @@ def delete_revision_session(thread_id: str):
 
 
 @app.post("/translate/to-kannada", response_model=TranslationResponse, tags=["Translation"], summary="Translate text to Kannada using Azure Translator")
-def translate_text(request: TranslationRequest):
+def translate_text(request: TranslationRequest, user: dict = Depends(get_current_user)):
     """
     Translate text to Kannada using Azure Translator.
     
@@ -1667,7 +1681,7 @@ def translate_text(request: TranslationRequest):
 
 
 @app.post("/translate/to-english", response_model=TranslationResponse, tags=["Translation"], summary="Translate text to English using Gemini")
-def translate_to_english(request: TranslationRequest):
+def translate_to_english(request: TranslationRequest, user: dict = Depends(get_current_user)):
     """
     Translate text from Kannada (or any language) to English using Gemini.
 

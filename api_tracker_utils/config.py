@@ -5,8 +5,8 @@ load_dotenv(dotenv_path = ".env", override=True)
 
 AVAILABLE_MODELS = [
     "gemini-2.5-flash",
-    "gemini-2.5-flash-lite",
     "gemma-3-27b-it",
+    
 ]
 
 # Default model
