@@ -250,6 +250,41 @@ def translate_to_kannada_azure(text: str,
         raise Exception(f"Azure translation error: {str(e)}. Returning original text.")
 
 
+def translate_to_kannada_google(text: str,
+                                source: str = "en",
+                                target: str = "kn") -> str:
+    """
+    Translate text to Kannada using deep_translator GoogleTranslator.
+
+    Args:
+        text: Text to translate
+        source: Source language code (default: "en")
+        target: Target language code (default: "kn")
+
+    Returns:
+        Translated text in Kannada.
+
+    Notes:
+        This helper is intentionally standalone and is not wired into routing yet.
+    """
+    try:
+        # Lazy import keeps this module import-safe if deep_translator is absent.
+        from deep_translator import GoogleTranslator
+
+        translated_text = GoogleTranslator(source=source, target=target).translate(text)
+        print(f"✅ GoogleTranslator translation success: {translated_text[:50]}...")
+        return translated_text
+    except ImportError as e:
+        error_msg = (
+            "⚠️ deep_translator is not installed. Install with `pip install deep-translator`."
+        )
+        print(error_msg)
+        raise ImportError(error_msg) from e
+    except Exception as e:
+        print(f"⚠️ GoogleTranslator translation error: {str(e)}")
+        raise Exception(f"GoogleTranslator translation error: {str(e)}")
+
+
 def translate_to_english_gemini(text: str) -> str:
     """
     Translate text from Kannada (or any language) to English using the Gemini API.
