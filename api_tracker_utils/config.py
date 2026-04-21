@@ -6,6 +6,8 @@ load_dotenv(dotenv_path = ".env", override=True)
 AVAILABLE_MODELS = [
     "gemini-2.5-flash",
     "gemma-3-27b-it",
+    "gemma-4-26b-a4b-it",
+    "gemma-4-31b-it",
     
 ]
 
@@ -30,17 +32,26 @@ DEFAULT_MODEL = "gemma-3-27b-it"
 
 RATE_LIMITS = {
     "gemini-2.5-flash": {
-        "per_minute": 2,
+        "per_minute": 5,
         "per_day": 20
     },
-    "gemini-2.5-flash-lite": {
-        "per_minute": 2,
-        "per_day": 20
-    },  
+    # "gemini-2.5-flash-lite": {
+    #     "per_minute": 2,
+    #     "per_day": 20
+    # },  
     "gemma-3-27b-it": {
-        "per_minute": 2,
+        "per_minute": 30,
         "per_day": 14400
-    }
+    },
+    "gemma-4-26b-a4b-it": {
+        "per_minute": 15,
+        "per_day": 1500
+    },
+    "gemma-4-31b-it": {
+        "per_minute": 15,
+        "per_day": 1500
+    },
+
 }
 
 

@@ -324,19 +324,23 @@ def translate_if_kannada(state: AgentState, content: str) -> str:
     """
     Translate content to Kannada if is_kannada flag is set.
     This is the single point of translation - use before setting agent_output.
-    
+
+    Uses deep_translator GoogleTranslator (free, no API key required).
+    Skips the API call entirely when the content is already pure Kannada
+    (i.e. contains no English letters).
+
     Args:
         state: AgentState to check for is_kannada flag
         content: Text to potentially translate
-    
+
     Returns:
         Translated text if is_kannada=True, otherwise original content
     """
     import re
     if state.get("is_kannada", False):
-        # If content contains ANY English letters, call Azure
+        # If content contains ANY English letters, translate it
         if re.search(r"[a-zA-Z]", content):
-            return translate_to_kannada_azure(content)
+            return translate_to_kannada_google(content)
         print("✅ Content is pure Kannada, no translation needed.")
         # If pure Kannada (no English), skip API call
     return content

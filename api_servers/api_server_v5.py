@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.openapi.docs import get_swagger_ui_html
-from api_servers.auth import get_current_user, get_docs_username
+from api_servers.auth import get_current_user, get_current_user_rate_limited, get_docs_username
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
@@ -66,7 +66,7 @@ from utils.shared_utils import (
     select_most_relevant_image_for_concept_introduction,
     create_simulation_config,
     get_all_available_concepts,
-    translate_to_kannada_azure,
+    translate_to_kannada_google,
     translate_to_english_gemini,
 )
 
@@ -396,7 +396,7 @@ def list_available_concepts(user: dict = Depends(get_current_user)):
 
 
 @app.post("/session/start", response_model=StartSessionResponse)
-def start_session(request: StartSessionRequest, user: dict = Depends(get_current_user)):
+def start_session(request: StartSessionRequest, user: dict = Depends(get_current_user_rate_limited)):
     try:
         print(f"API /session/start - concept: {request.concept_title}, student: {request.student_id}, language: {'Kannada' if request.is_kannada else 'English'}")
         
@@ -495,7 +495,7 @@ def start_session(request: StartSessionRequest, user: dict = Depends(get_current
 
 
 @app.post("/session/continue", response_model=ContinueSessionResponse)
-def continue_session(request: ContinueSessionRequest, user: dict = Depends(get_current_user)):
+def continue_session(request: ContinueSessionRequest, user: dict = Depends(get_current_user_rate_limited)):
     try:
         print(f"API /session/continue - thread: {request.thread_id}, message: {request.user_message[:50]}...")
         
@@ -806,7 +806,7 @@ def list_available_personas(user: dict = Depends(get_current_user)):
 
 
 @app.post("/test/persona")
-def test_with_persona(request: TestPersonaRequest, user: dict = Depends(get_current_user)):
+def test_with_persona(request: TestPersonaRequest, user: dict = Depends(get_current_user_rate_limited)):
     try:
         print(f"API /test/persona - persona: {request.persona_name}, concept: {request.concept_title}")
         
@@ -891,7 +891,7 @@ def get_test_simulation(request: TestSimulationRequest, user: dict = Depends(get
 
 
 @app.post("/concept-map/generate", response_model=ConceptMapResponse)
-def generate_concept_map(request: ConceptMapRequest, user: dict = Depends(get_current_user)):
+def generate_concept_map(request: ConceptMapRequest, user: dict = Depends(get_current_user_rate_limited)):
     """
     Generate concept map timeline from educational description.
     
@@ -1004,7 +1004,7 @@ def simulation_root():
     tags=["Simulation"],
     summary="Start New Simulation Teaching Session"
 )
-def start_simulation_session(request: SimStartSessionRequest):
+def start_simulation_session(request: SimStartSessionRequest, user: dict = Depends(get_current_user_rate_limited)):
     """
     Start a new teaching session for a specific simulation.
     
@@ -1101,7 +1101,7 @@ def start_simulation_session(request: SimStartSessionRequest):
     tags=["Simulation"],
     summary="Send Student Response to Simulation Session"
 )
-def send_simulation_response(session_id: str, request: SimStudentResponseRequest):
+def send_simulation_response(session_id: str, request: SimStudentResponseRequest, user: dict = Depends(get_current_user_rate_limited)):
     """
     Send a student's response and receive teacher's reply.
     
@@ -1174,7 +1174,7 @@ def send_simulation_response(session_id: str, request: SimStudentResponseRequest
     tags=["Simulation"],
     summary="Get Simulation Session State"
 )
-def get_simulation_session(session_id: str):
+def get_simulation_session(session_id: str, user: dict = Depends(get_current_user)):
     """
     Retrieve current state of a simulation teaching session.
     
@@ -1233,7 +1233,7 @@ def get_simulation_session(session_id: str):
     tags=["Simulation"],
     summary="Submit Quiz Answer for Simulation Session"
 )
-def submit_simulation_quiz(session_id: str, request: SimQuizSubmissionRequest):
+def submit_simulation_quiz(session_id: str, request: SimQuizSubmissionRequest, user: dict = Depends(get_current_user_rate_limited)):
     """
     Submit quiz answer with parameters from simulation.
     
@@ -1323,7 +1323,7 @@ def submit_simulation_quiz(session_id: str, request: SimQuizSubmissionRequest):
     tags=["Simulation"],
     summary="List Available Simulations"
 )
-def list_available_simulations():
+def list_available_simulations(user: dict = Depends(get_current_user)):
     """
     Get list of all available simulations.
     
@@ -1398,7 +1398,7 @@ def list_revision_chapters(user: dict = Depends(get_current_user)):
 
 
 @app.post("/revision/session/start", response_model=RevStartSessionResponse, tags=["Revision"], summary="Start a new revision session")
-def start_revision_session(request: RevStartSessionRequest, user: dict = Depends(get_current_user)):
+def start_revision_session(request: RevStartSessionRequest, user: dict = Depends(get_current_user_rate_limited)):
     """
     Start a new revision session for the given chapter.
 
@@ -1476,7 +1476,7 @@ def start_revision_session(request: RevStartSessionRequest, user: dict = Depends
 
 
 @app.post("/revision/session/continue", response_model=RevContinueSessionResponse, tags=["Revision"], summary="Continue an existing revision session")
-def continue_revision_session(request: RevContinueSessionRequest, user: dict = Depends(get_current_user)):
+def continue_revision_session(request: RevContinueSessionRequest, user: dict = Depends(get_current_user_rate_limited)):
     """
     Send a student message and receive the agent's next response.
 
@@ -1645,15 +1645,15 @@ def delete_revision_session(thread_id: str, user: dict = Depends(get_current_use
         raise HTTPException(status_code=500, detail=f"Error deleting revision session: {str(e)}")
 
 
-@app.post("/translate/to-kannada", response_model=TranslationResponse, tags=["Translation"], summary="Translate text to Kannada using Azure Translator")
+@app.post("/translate/to-kannada", response_model=TranslationResponse, tags=["Translation"], summary="Translate text to Kannada using Google Translator")
 def translate_text(request: TranslationRequest, user: dict = Depends(get_current_user)):
     """
-    Translate text to Kannada using Azure Translator.
+    Translate text to Kannada using deep_translator GoogleTranslator.
     
     Returns original and translated text with success status.
     """
     try:
-        translated_text = translate_to_kannada_azure(request.text)
+        translated_text = translate_to_kannada_google(request.text)
         return TranslationResponse(
             original=request.text,
             translated=translated_text,
@@ -1681,7 +1681,7 @@ def translate_text(request: TranslationRequest, user: dict = Depends(get_current
 
 
 @app.post("/translate/to-english", response_model=TranslationResponse, tags=["Translation"], summary="Translate text to English using Gemini")
-def translate_to_english(request: TranslationRequest, user: dict = Depends(get_current_user)):
+def translate_to_english(request: TranslationRequest, user: dict = Depends(get_current_user_rate_limited)):
     """
     Translate text from Kannada (or any language) to English using Gemini.
 

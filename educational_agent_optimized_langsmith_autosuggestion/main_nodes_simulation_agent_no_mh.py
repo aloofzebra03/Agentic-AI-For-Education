@@ -21,7 +21,7 @@ from utils.shared_utils import (
     add_ai_message_to_conversation,
     add_system_message_to_conversation,
     translate_if_kannada,
-    translate_to_kannada_azure,
+    translate_to_kannada_google,
     # Import autosuggestion pool constants (single source of truth)
     POSITIVE_POOL,
     NEGATIVE_POOL,
@@ -57,25 +57,25 @@ KANNADA_AUTOSUGGESTION_CACHE = {
 def get_cached_kannada_translation(text: str) -> str:
     """
     Get Kannada translation from cache for predefined autosuggestions.
-    Falls back to Azure translation for dynamic/non-cached text.
-    
+    Falls back to GoogleTranslator (deep_translator) for dynamic/non-cached text.
+
     Args:
         text: English text to translate
-    
+
     Returns:
-        Kannada translation (from cache if available, otherwise from Azure)
+        Kannada translation (from cache if available, otherwise from GoogleTranslator)
     """
     if not text:
         return text
-    
+
     # Check cache first
     if text in KANNADA_AUTOSUGGESTION_CACHE:
         print(f"✅ Using cached Kannada translation for: '{text}'")
         return KANNADA_AUTOSUGGESTION_CACHE[text]
-    
-    # Fall back to Azure for dynamic suggestions
-    print(f"🌐 No cache found, translating via Azure: '{text[:50]}...'")
-    return translate_to_kannada_azure(text)
+
+    # Fall back to GoogleTranslator for dynamic suggestions
+    print(f"🌐 No cache found, translating via GoogleTranslator: '{text[:50]}...'")
+    return translate_to_kannada_google(text)
 
 PEDAGOGICAL_MOVES: Dict[str, Dict[str, str]] = {
     "APK": {

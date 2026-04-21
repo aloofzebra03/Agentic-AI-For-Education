@@ -14,7 +14,7 @@ from utils.shared_utils import (
     POSITIVE_POOL,
     NEGATIVE_POOL,
     SPECIAL_HANDLING_POOL,
-    translate_to_kannada_azure,
+    translate_to_kannada_google,
 )
 
 from .constants import (
@@ -41,9 +41,9 @@ def get_cached_kannada_translation(text: str) -> str:
         print(f"✅ Using cached Kannada translation for: '{text}'")
         return KANNADA_AUTOSUGGESTION_CACHE[text]
     
-    # Fall back to Azure for dynamic content
-    print(f"🌐 No cache found, translating via Azure: '{text[:50]}...'")
-    return translate_to_kannada_azure(text)
+    # Fall back to GoogleTranslator (deep_translator) for dynamic content
+    print(f"🌐 No cache found, translating via GoogleTranslator: '{text[:50]}...'")
+    return translate_to_kannada_google(text)
 
 
 def should_suppress_positive(agent_output: str) -> bool:
