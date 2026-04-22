@@ -1068,7 +1068,7 @@ def start_simulation_session(request: SimStartSessionRequest, user: dict = Depen
         raise  # Pass through 400/404 errors without wrapping them in a 500
     except MinuteLimitExhaustedError as e:
         print(f"[API] Simulation start - minute limit: {e}")
-        raise HTTPException(status_code=501, detail=f"Rate limit error: {e}")
+        raise HTTPException(status_code=501, detail=f"Per Minute Rate limit error: {e}")
     except DayLimitExhaustedError as e:
         print(f"[API] Simulation start - day limit: {e}")
         raise HTTPException(status_code=502, detail=f"Daily limit error: {e}")
@@ -1132,7 +1132,8 @@ def send_simulation_response(session_id: str, request: SimStudentResponseRequest
         # Process student input
         response = process_student_input(
             session_id=session_id,
-            student_response=request.student_response
+            student_response=request.student_response,
+            student_changed_params=request.student_changed_params
         )
         
         return response

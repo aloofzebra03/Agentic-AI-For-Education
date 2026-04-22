@@ -35,19 +35,21 @@ from simulation_to_concept.state import add_message_to_history
 from simulation_to_concept.simulations_config import get_simulation
 
 
-def get_llm_with_key():
-    """Get configured LLM instance and the selected API key.
-
-    MinuteLimitExhaustedError / DayLimitExhaustedError propagate naturally
-    to the caller — never caught here.
-    """
+def get_llm():
+    """Get configured LLM instance and the exact API key used."""
     if USE_API_TRACKER:
-        # Limit errors propagate to the caller — do NOT wrap in try/except
-        api_key = get_best_api_key_for_model(GEMINI_MODEL)
-        print(f"[TEACHER] Using tracked API key ...{api_key[-6:]} for {GEMINI_MODEL}")
+        try:
+            # Get best API key for this model from tracker
+            api_key = get_best_api_key_for_model(GEMINI_MODEL)
+            print(f"[TEACHER] Using tracked API key ...{api_key[-6:]} for {GEMINI_MODEL}")
+        except (MinuteLimitExhaustedError, DayLimitExhaustedError):
+            raise  # Propagate rate-limit errors up to the API server
+        except Exception as e:
+            print(f"[TEACHER] Tracker error: {e}, falling back to GOOGLE_API_KEY")
+            api_key = GOOGLE_API_KEY
     else:
         api_key = GOOGLE_API_KEY
-
+    
     llm = ChatGoogleGenerativeAI(
         model=GEMINI_MODEL,
         google_api_key=api_key,
@@ -88,12 +90,6 @@ def invoke_llm_with_prompts(llm, system_prompt: str, user_prompt: str, api_key: 
     # This ensures metadata (simulation_url, etc.) appears in LangSmith UI
     # as a child span under the node, with all metadata fields visible.
     trace_metadata = metadata or {}
-
-    # Track BEFORE invoking — counts attempts, not just successes (per usage guide Section 5)
-    if USE_API_TRACKER and api_key:
-        track_model_call(api_key, GEMINI_MODEL)
-        print(f"[TEACHER] Tracked API call: ...{api_key[-6:]} + {GEMINI_MODEL}")
-
     with langsmith.trace(
         name="teacher_llm_call",
         run_type="llm",
@@ -102,34 +98,19 @@ def invoke_llm_with_prompts(llm, system_prompt: str, user_prompt: str, api_key: 
     ) as rt:
         # Also pass parent config to llm.invoke for callback chain continuity
         config = parent_config or {}
+
+        # Track BEFORE invocation for accurate quota accounting
+        if USE_API_TRACKER and api_key:
+            try:
+                track_model_call(api_key, GEMINI_MODEL)
+                print(f"[TEACHER] Tracked API call: ...{api_key[-6:]} + {GEMINI_MODEL}")
+            except Exception as e:
+                print(f"[TEACHER] Warning: Failed to track API call: {e}")
+
         response = llm.invoke(messages, config=config)
-        rt.outputs = {"response_length": len(extract_text_content(response.content)) if response.content else 0}
-
+        rt.outputs = {"response_length": len(response.content) if response.content else 0}
+    
     return response
-
-
-def extract_text_content(content) -> str:
-    """
-    Normalise response.content to a plain string.
-    Multimodal models (e.g. Gemma 4) return content as a list of parts
-    such as [{'type': 'text', 'text': '...'}] or [AIMessageChunk(...)],
-    while text-only models return a plain string.
-    """
-    if isinstance(content, str):
-        return content
-    if isinstance(content, list):
-        parts = []
-        for part in content:
-            if isinstance(part, str):
-                parts.append(part)
-            elif isinstance(part, dict):
-                parts.append(part.get("text", ""))
-            elif hasattr(part, "text"):
-                parts.append(part.text)
-            else:
-                parts.append(str(part))
-        return "".join(parts)
-    return str(content)
 
 
 def parse_json_safe(text: str) -> dict:
@@ -154,46 +135,6 @@ def parse_json_safe(text: str) -> dict:
             pass
     
     raise ValueError(f"Could not parse JSON from response")
-
-
-def clean_teacher_message(text: str) -> str:
-    """
-    Strip any accidentally-leaked JSON from a teacher message string.
-
-    The LLM is instructed to return *only* JSON, but it occasionally prepends
-    the human-readable reply as plain text and appends the JSON block without
-    proper code-fence markers (or with a malformed one that the regex misses).
-    In that situation parse_json_safe falls back to using the entire
-    response.content as teacher_message, which causes the raw JSON to be
-    rendered in the UI alongside the actual message.
-
-    This function removes any trailing JSON-like block so only the readable
-    part of the message reaches the student.
-    """
-    if not text:
-        return text
-
-    # Remove ```json ... ``` or ``` ... ``` fenced blocks at the end
-    cleaned = re.sub(r'\s*```(?:json)?\s*\{[\s\S]*?\}\s*```\s*$', '', text).strip()
-    if cleaned != text:
-        return cleaned
-
-    # Remove a bare JSON object that contains known structural keys
-    cleaned = re.sub(
-        r'\s*\{[\s\S]*?"teacher_message"[\s\S]*?\}\s*$',
-        '',
-        text
-    ).strip()
-    if cleaned != text:
-        return cleaned
-
-    # Catch any trailing { ... } block that looks like JSON output
-    cleaned = re.sub(
-        r'\s*\{[\s\S]*?"suggests_param_change"[\s\S]*?\}\s*$',
-        '',
-        text
-    ).strip()
-    return cleaned if cleaned else text
 
 
 def format_parameter_history(history: list) -> str:
@@ -302,16 +243,10 @@ def teacher_node(state: Dict[str, Any], config: RunnableConfig) -> Dict[str, Any
     requested_value = state.get("requested_value", None)
     student_wants_to_see_simulation = state.get("student_wants_to_see_simulation", False)
 
-    # NEW: Student-driven simulation parameter changes
-    student_changed_params_this_turn = state.get("student_changed_params_this_turn", False)
-    student_changed_params = state.get("student_changed_params", {})
-
-    # Language this session is running in — controls what language the LLM must respond in.
-    # This is critical for Kannada simulations: their titles/descriptions are in Kannada,
-    # which would otherwise cause the LLM to infer and respond in Kannada even for English sessions.
+    # Language this session is running in; force LLM output language explicitly.
     session_language = state.get("language", "english")
     language_instruction = "English" if session_language.lower() == "english" else session_language.capitalize()
-
+    
     print(f"   Concept: {current_concept['title']}")
     print(f"   Strategy: {strategy}")
     print(f"   Mode: {teacher_mode}")
@@ -620,43 +555,6 @@ The student's answer is FACTUALLY INCORRECT. You MUST start with:
 🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
 """
         
-        # Build instruction for student INDEPENDENTLY CHANGED params (new feature)
-        student_exploration_instruction = ""
-        if student_changed_params_this_turn and student_changed_params:
-            changed_lines = []
-            for param_key, new_val in student_changed_params.items():
-                info = PARAMETER_INFO.get(param_key, {})
-                label = info.get("label", param_key)
-                effect = info.get("effect", "")
-                old_val = current_params.get(param_key, "?")
-                changed_lines.append(f"  - {label}: {old_val} → {new_val}  (Effect: {effect})")
-            
-            student_text = student_response.strip()
-            if student_text:
-                student_context_note = f'The student also said: "{student_text}"'
-            else:
-                student_context_note = "(The student did not type anything — they only changed the simulation parameter.)" 
-
-            student_exploration_instruction = f"""
-🎛️🎛️🎛️ STUDENT INDEPENDENTLY CHANGED SIMULATION PARAMETERS 🎛️🎛️🎛️
-Parameters changed this turn:
-{chr(10).join(changed_lines)}
-{student_context_note}
-
-This is an EXPLORATORY action — the student is experimenting on their own!
-⚠️ YOUR RESPONSE MUST:
-1. Acknowledge what they changed with genuine excitement: "Oh, I see you changed [X] to [Y]..."
-2. Ask what they OBSERVED or NOTICED: "What did you notice happen to the simulation?"
-3. Connect their exploration to the concept we are teaching
-4. Set suggests_param_change=true so the simulation updates to their chosen values
-
-⚠️ DO NOT:
-- Correct them or redirect them to different values (they chose these!)
-- Evaluate their response as right or wrong (they made a change, not an answer)
-- Ask for a prediction (they already changed it — ask for an OBSERVATION instead)
-🎛️🎛️🎛️🎛️🎛️🎛️🎛️🎛️🎛️🎛️🎛️🎛️🎛️🎛️🎛️🎛️🎛️🎛️🎛️
-"""
-
         user_prompt = f"""{wrong_answer_alert}
 CONCEPT BEING TAUGHT:
 Title: {current_concept['title']}
@@ -664,7 +562,6 @@ Key Insight: {current_concept['key_insight']}
 
 STUDENT'S UNDERSTANDING LEVEL: {understanding}
 EXCHANGE NUMBER: {exchange_count}
-{student_exploration_instruction}
 {question_instruction}
 {param_request_instruction}
 {correction_instruction}
@@ -765,9 +662,8 @@ Example flow:
 REMEMBER: Output ONLY the JSON object. Start your response with {{ and end with }}.
 """
 
-    # Single selection — key flows through to tracking and LLM construction
-    llm, used_api_key = get_llm_with_key()
-
+    llm, used_api_key = get_llm()
+    
     # Build simulation URL for LangSmith metadata
     # Use the simulation_id from state (already loaded at top of function)
     # sim_config should already be available from the function scope
@@ -822,19 +718,16 @@ REMEMBER: Output ONLY the JSON object. Start your response with {{ and end with 
     response = invoke_llm_with_prompts(llm, system_prompt, user_prompt, api_key=used_api_key, metadata=langsmith_metadata, parent_config=config)
     
     try:
-        result = parse_json_safe(extract_text_content(response.content))
+        result = parse_json_safe(response.content)
     except Exception as e:
         print(f"   ⚠️ JSON parse failed, using raw response")
-        # Attempt to salvage the human-readable portion by stripping any
-        # leaked JSON block that the model appended to its plain-text reply.
-        salvaged = clean_teacher_message(extract_text_content(response.content))
         result = {
-            "teacher_message": salvaged,
+            "teacher_message": response.content,
             "suggests_param_change": False
         }
     
-    teacher_message = clean_teacher_message(result.get("teacher_message", extract_text_content(response.content)))
-    
+    teacher_message = result.get("teacher_message", response.content)
+
     # ─── Post-process: force simulation display when teacher references it ───
     # If the teacher message contains observation/watch keywords but the LLM
     # forgot to set suggests_param_change=true, we enforce it here so the
@@ -864,13 +757,10 @@ REMEMBER: Output ONLY the JSON object. Start your response with {{ and end with 
     # ─────────────────────────────────────────────────────────────────────────
 
     # Handle parameter change suggestion
-    # If this was a pure exploration turn, do not charge them an exchange count
-    next_exchange_count = exchange_count if student_changed_params_this_turn else exchange_count + 1
-    
     updates = {
         "last_teacher_message": teacher_message,
         "waiting_for_input": True,
-        "exchange_count": next_exchange_count,
+        "exchange_count": exchange_count + 1,
         "needs_deeper": False  # Reset after handling
     }
     
@@ -878,94 +768,34 @@ REMEMBER: Output ONLY the JSON object. Start your response with {{ and end with 
     new_message = add_message_to_history(state, "teacher", teacher_message)
     updates["conversation_history"] = state.get("conversation_history", []) + [new_message]
     
-    # ── Simulation display logic ──────────────────────────────────────────────
-    # Tracks two things:
-    #   1. show_simulation (Feature 1): explicit per-turn flag so the API can
-    #      tell the frontend "display now" vs stale param_change from the past.
-    #   2. last_displayed_params (Feature 2): suppress consecutive renders of
-    #      the exact same parameter set unless the student explicitly asked.
-    last_displayed_params = state.get("last_displayed_params", {})
-    student_wants_to_see = state.get("student_wants_to_see_simulation", False)
-    show_simulation = False
-
+    # Handle parameter change
     if result.get("suggests_param_change") and result.get("param_to_change"):
         param = result["param_to_change"]
         new_val = result.get("new_value")
         
         if param and new_val is not None:
-            # Build the candidate params if this change is applied
-            new_params = current_params.copy()
-            new_params[param] = new_val
-
-            # Feature 2: suppress repeat if params are unchanged from last display
-            # UNLESS the student explicitly asked to see the simulation
-            if new_params == last_displayed_params and not student_wants_to_see:
-                print(f"\n   ⏭️ SKIP: Params unchanged from last display — suppressing repeat simulation")
-                # show_simulation stays False; no history entry added
-            else:
-                # Record the parameter change
-                change_record = {
-                    "parameter": param,
-                    "old_value": current_params.get(param, 0),
-                    "new_value": new_val,
-                    "reason": result.get("change_reason", "To illustrate the concept"),
-                    "prediction_asked": result.get("prediction_question", ""),
-                    "student_reaction": "",
-                    "understanding_before": understanding,
-                    "understanding_after": "",
-                    "was_effective": False,
-                    "initiated_by": "agent"
-                }
-                
-                updates["current_params"] = new_params
-                updates["parameter_history"] = state.get("parameter_history", []) + [change_record]
-                updates["last_displayed_params"] = new_params
-                show_simulation = True  # Feature 1: mark display for this turn
-                print(f"\n   📊 Parameter Change: {param} = {change_record['old_value']} → {new_val}")
-    
-    # Feature 1: always write the flag so API response is accurate this turn
-    updates["show_simulation"] = show_simulation
-    # ─────────────────────────────────────────────────────────────────────────
-
-    # ── NEW: Merge student-changed params into current_params ─────────────────
-    # When the student dragged sliders this turn, we need to:
-    # 1. Apply their chosen values to current_params (so the next simulation URL is correct)
-    # 2. Add a history entry tagged as student-initiated
-    # 3. Reset the flag so it doesn't fire again next turn
-    if student_changed_params_this_turn and student_changed_params:
-        # Start from whatever current_params already are (possibly updated by agent above)
-        merged_params = dict(updates.get("current_params", current_params))
-        student_history_entries = list(updates.get("parameter_history", state.get("parameter_history", [])))
-
-        for param_key, new_val in student_changed_params.items():
-            old_val = current_params.get(param_key)
-            merged_params[param_key] = new_val
-            student_history_entries.append({
-                "parameter": param_key,
-                "old_value": old_val,
+            # Record the parameter change
+            change_record = {
+                "parameter": param,
+                "old_value": current_params.get(param, 0),
                 "new_value": new_val,
-                "reason": "Student changed independently",
-                "prediction_asked": "",
-                "student_reaction": student_response,
+                "reason": result.get("change_reason", "To illustrate the concept"),
+                "prediction_asked": result.get("prediction_question", ""),
+                "student_reaction": "",
                 "understanding_before": understanding,
                 "understanding_after": "",
-                "was_effective": None,          # Unknown until next evaluation
-                "initiated_by": "student"       # Tag as student-driven
-            })
-            print(f"   🎛️ Applied student param: {param_key} {old_val} → {new_val}")
-
-        updates["current_params"] = merged_params
-        updates["parameter_history"] = student_history_entries
-        updates["last_displayed_params"] = merged_params
-        updates["show_simulation"] = True  # Always show when student changed params
-
-        print(f"   ✅ Student-driven params merged into current_params: {merged_params}")
-
-    # Always reset student params flag so it doesn't persist into next turn
-    updates["student_changed_params_this_turn"] = False
-    updates["student_changed_params"] = {}
-    # ─────────────────────────────────────────────────────────────────────────
-
+                "was_effective": False
+            }
+            
+            # Update params
+            new_params = current_params.copy()
+            new_params[param] = new_val
+            
+            updates["current_params"] = new_params
+            updates["parameter_history"] = state.get("parameter_history", []) + [change_record]
+            
+            print(f"\n   📊 Parameter Change: {param} = {change_record['old_value']} → {new_val}")
+    
     # Print the teacher's message
     print(f"\n🎓 Teacher says:")
     print(f"   {teacher_message}")

@@ -1074,18 +1074,6 @@ The simulation teaches:
                 "  'false' → insight box hidden (tests unguided reasoning)"
             )
         },
-        "score": {
-            "label": "Current Score",
-            "range": "0-15 (integer)",
-            "url_key": "score",
-            "effect": "Number of questions the student has answered correctly so far."
-        },
-        "total": {
-            "label": "Total Attempted",
-            "range": "0-15 (integer)",
-            "url_key": "total",
-            "effect": "Total number of questions the student has attempted so far."
-        },
     },
     "concepts": [
         {

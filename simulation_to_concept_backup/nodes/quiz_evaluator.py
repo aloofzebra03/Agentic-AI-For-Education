@@ -37,41 +37,21 @@ from simulation_to_concept.quiz_rules import (
 )
 
 
-def extract_text_content(content) -> str:
-    """
-    Normalise response.content to a plain string.
-    Multimodal models (e.g. Gemma 4) return content as a list of parts.
-    """
-    if isinstance(content, str):
-        return content
-    if isinstance(content, list):
-        parts = []
-        for part in content:
-            if isinstance(part, str):
-                parts.append(part)
-            elif isinstance(part, dict):
-                parts.append(part.get("text", ""))
-            elif hasattr(part, "text"):
-                parts.append(part.text)
-            else:
-                parts.append(str(part))
-        return "".join(parts)
-    return str(content)
-
-
-def get_llm_with_key():
-    """Get configured LLM instance and the selected API key.
-
-    MinuteLimitExhaustedError / DayLimitExhaustedError propagate naturally
-    to the caller — never caught here.
-    """
+def get_llm():
+    """Get configured LLM instance and the exact API key used."""
     if USE_API_TRACKER:
-        # Limit errors propagate to the caller — do NOT wrap in try/except
-        api_key = get_best_api_key_for_model(GEMINI_MODEL)
-        print(f"[QUIZ_EVALUATOR] Using tracked API key ...{api_key[-6:]} for {GEMINI_MODEL}")
+        try:
+            # Get best API key for this model from tracker
+            api_key = get_best_api_key_for_model(GEMINI_MODEL)
+            print(f"[QUIZ_EVALUATOR] Using tracked API key ...{api_key[-6:]} for {GEMINI_MODEL}")
+        except (MinuteLimitExhaustedError, DayLimitExhaustedError):
+            raise  # Propagate rate-limit errors up to the API server
+        except Exception as e:
+            print(f"[QUIZ_EVALUATOR] Tracker error: {e}, falling back to GOOGLE_API_KEY")
+            api_key = GOOGLE_API_KEY
     else:
         api_key = GOOGLE_API_KEY
-
+    
     llm = ChatGoogleGenerativeAI(
         model=GEMINI_MODEL,
         google_api_key=api_key,
@@ -284,15 +264,14 @@ def quiz_evaluator_node(state: TeachingState, config: RunnableConfig) -> Dict[st
     # ========================================
     allow_retry = should_allow_retry(attempts)
 
-    # Session language — ensure LLM feedback is in the right language
+    # Session language — ensure LLM feedback uses the active session language.
     session_language = state.get("language", "english")
     language_instruction = "English" if session_language.lower() == "english" else session_language.capitalize()
-
+    
     # ========================================
     # STEP 4: Generate LLM feedback (adaptive)
     # ========================================
-    # Single selection — key flows through to tracking and LLM construction
-    llm, used_api_key = get_llm_with_key()
+    llm, used_api_key = get_llm()
     
     # Build context for LLM
     system_prompt = f"""⚠️ LANGUAGE REQUIREMENT: You MUST write your ENTIRE response in {language_instruction} only. This is mandatory. Do not use any other language, even if the challenge text below contains text in another language.
@@ -344,12 +323,7 @@ They configured the simulation with these parameters:
 Generate your feedback now:"""
 
     user_prompt = f"Status: {status}, Attempt: {attempts}, Hint: {hint}"
-
-    # Track BEFORE invoking — counts attempts, not just successes (per usage guide Section 5)
-    if USE_API_TRACKER and used_api_key:
-        track_model_call(used_api_key, GEMINI_MODEL)
-        print(f"[QUIZ_EVALUATOR] Tracked API call: ...{used_api_key[-6:]} + {GEMINI_MODEL}")
-
+    
     # Build simulation URL for LangSmith metadata
     from simulation_to_concept.simulations_config import get_simulation
     simulation_id = os.environ.get("SIMULATION_ID", "simple_pendulum")
@@ -420,13 +394,20 @@ Generate your feedback now:"""
             inputs={"status": status, "attempt": attempts, "score": score},
         ) as trace_rt:
             llm_config = config or {}
+
+            # Track BEFORE invocation for accurate quota accounting
+            if USE_API_TRACKER and used_api_key:
+                try:
+                    track_model_call(used_api_key, GEMINI_MODEL)
+                    print(f"[QUIZ_EVALUATOR] Tracked API call: ...{used_api_key[-6:]} + {GEMINI_MODEL}")
+                except Exception as e:
+                    print(f"[QUIZ_EVALUATOR] Warning: Failed to track API call: {e}")
+
             response = llm.invoke(messages, config=llm_config)
-            trace_rt.outputs = {"response_length": len(extract_text_content(response.content)) if response.content else 0}
+            trace_rt.outputs = {"response_length": len(response.content) if response.content else 0}
         
-        feedback = extract_text_content(response.content).strip()
+        feedback = response.content.strip()
         
-    except (MinuteLimitExhaustedError, DayLimitExhaustedError):
-        raise  # Propagate limit errors to the entry-point handler
     except Exception as e:
         print(f"❌ LLM feedback generation failed: {e}")
         # Fallback feedback

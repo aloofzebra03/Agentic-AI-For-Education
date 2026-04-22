@@ -20,12 +20,16 @@ class MinuteLimitExhaustedError(APITrackerError):
 
     This is a HARD backpressure condition.
     """
-    def __init__(self, retry_after_seconds: int = 60):
+    def __init__(self, message: str | None = None, retry_after_seconds: int = 60):
         self.retry_after_seconds = retry_after_seconds
-        super().__init__(
-            f"All API-model combinations exhausted per-minute limits. "
-            f"Retry after {retry_after_seconds} seconds."
-        )
+        if message:
+            self.message = f"{message} Retry after {retry_after_seconds} seconds."
+        else:
+            self.message = (
+                f"All API-model combinations exhausted per-minute limits. "
+                f"Retry after {retry_after_seconds} seconds."
+            )
+        super().__init__(self.message)
 
 
 class DayLimitExhaustedError(APITrackerError):

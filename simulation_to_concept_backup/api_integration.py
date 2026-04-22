@@ -91,13 +91,10 @@ def format_api_response(thread_id: str, state: Dict[str, Any], simulation_id: st
     # Build current simulation URL with correct simulation_id
     sim_url = build_simulation_url(current_params, autostart=True, simulation_id=simulation_id)
     
-    # Check for parameter changes this turn.
-    # show_simulation is True ONLY when the teacher node decided to display the
-    # simulation in the current turn (Feature 1 fix: no stale param_change).
-    show_simulation = state.get('show_simulation', False)
+    # Check for parameter changes (metadata only — single simulation URL via html_url)
     param_change = None
     param_history = state.get('parameter_history', [])
-    if show_simulation and param_history:
+    if param_history:
         last_change = param_history[-1]
         
         param_change = {
@@ -138,7 +135,6 @@ def format_api_response(thread_id: str, state: Dict[str, Any], simulation_id: st
             "id": simulation_id,
             "title": sim_config['title'],
             "html_url": sim_url,
-            "show_simulation": show_simulation,
             "current_params": current_params,
             "param_change": param_change
         },
@@ -199,8 +195,8 @@ def create_teaching_session(simulation_id: str, student_id: str = None, language
         simulation_id: Which simulation to use
         student_id: Optional student identifier
         language: Session language ('english' or 'kannada')
-        thread_id: Optional predefined session thread ID
-        
+        thread_id: Optional pre-generated thread ID. If None, a UUID-based one is generated.
+
     Returns:
         Tuple of (session_id, formatted_api_response)
     """
@@ -270,15 +266,13 @@ def create_teaching_session(simulation_id: str, student_id: str = None, language
     return thread_id, response
 
 
-def process_student_input(session_id: str, student_response: str, student_changed_params: dict = None) -> Dict[str, Any]:
+def process_student_input(session_id: str, student_response: str) -> Dict[str, Any]:
     """
     Process student's response and return formatted API response.
     
     Args:
         session_id: The session thread ID
         student_response: What the student said
-        student_changed_params: Optional dict of params student manually changed
-                                in the simulation. E.g. {"length": 3}.
         
     Returns:
         Formatted API response dictionary
@@ -289,21 +283,19 @@ def process_student_input(session_id: str, student_response: str, student_change
     print(f"\n{'='*60}")
     print(f"💬 Processing student response")
     print(f"   Session: {session_id}")
-    print(f"   Student said: {student_response[:80]}..." if len(student_response) > 80 else f"   Student said: {student_response}")
-    if student_changed_params:
-        print(f"   🎛️ Student changed params: {student_changed_params}")
+    print(f"   Student said: {student_response[:80]}...")
     print(f"{'='*60}")
     
     # Get simulation and language from per-session store
     simulation_id = _session_simulations.get(session_id, os.environ.get('SIMULATION_ID', 'simple_pendulum'))
     language = _session_languages.get(session_id, DEFAULT_LANGUAGE)
     
-    # Translate student input to English if needed (only text, not params)
+    # Translate student input to English if needed
     if needs_translation(language):
         student_response = translate_student_input(student_response, language)
     
-    # Continue conversation using graph — pass student_changed_params through
-    state = continue_session(student_response, session_id, student_changed_params=student_changed_params)
+    # Continue conversation using graph
+    state = continue_session(student_response, session_id)
     
     print(f"✅ Response generated")
     print(f"📝 Teacher: {state.get('last_teacher_message', '')[:80]}...")
@@ -313,8 +305,7 @@ def process_student_input(session_id: str, student_response: str, student_change
     param_history = state.get('parameter_history', [])
     if param_history:
         last_change = param_history[-1]
-        initiated_by = last_change.get('initiated_by', 'agent')
-        print(f"⚙️  Parameter changed ({initiated_by}): {last_change['parameter']} "
+        print(f"⚙️  Parameter changed: {last_change['parameter']} "
               f"{last_change['old_value']} → {last_change['new_value']}")
     
     # Format for API
@@ -350,7 +341,7 @@ def get_session_info(session_id: str) -> Dict[str, Any]:
     if not state:
         raise KeyError(f"Session {session_id} not found")
     
-    # Get simulation from per-session store (never fall back to global env var alone)
+    # Determine simulation from per-session store
     simulation_id = _session_simulations.get(session_id, os.environ.get('SIMULATION_ID', 'simple_pendulum'))
     
     print(f"✅ Session found")

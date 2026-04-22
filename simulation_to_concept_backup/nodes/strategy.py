@@ -92,23 +92,7 @@ def strategy_selector_node(state: Dict[str, Any]) -> Dict[str, Any]:
     print("\n" + "="*60)
     print("🧠 STRATEGY SELECTOR: Choosing next approach")
     print("="*60)
-
-    # ── NEW: Short-circuit for student-driven exploration turns ────────────────
-    # When the student changed a param themselves (response_type = "student_param_change"),
-    # we do NOT run normal strategy logic and do NOT increment exchange_count.
-    # Exploration is free — it shouldn't count against the teaching exchange limit.
-    if state.get("response_type") == "student_param_change":
-        current_strategy = state.get("strategy", "continue")
-        current_exchange = state.get("exchange_count", 0)
-        print(f"   🎛️ Student exploration turn — preserving strategy '{current_strategy}', exchange_count stays at {current_exchange}")
-        return {
-            "strategy": current_strategy,
-            "teacher_mode": "encouraging",   # Always be encouraging when student explores
-            "should_scaffold": False,
-            "exchange_count": current_exchange,  # Do NOT increment
-        }
-    # ─────────────────────────────────────────────────────────────────────────
-
+    
     # Gather inputs
     understanding = state.get("understanding_level", "none")
     trajectory = state.get("trajectory_status", "improving")

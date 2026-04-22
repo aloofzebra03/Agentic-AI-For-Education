@@ -1039,6 +1039,12 @@ def start_simulation_session(request: SimStartSessionRequest, user: dict = Depen
                 "message": str(e)
             }
         )
+    except MinuteLimitExhaustedError as e:
+        print(f"[API] Simulation create - minute limit: {e}")
+        raise HTTPException(status_code=501, detail=f"Rate limit error: {e}")
+    except DayLimitExhaustedError as e:
+        print(f"[API] Simulation create - day limit: {e}")
+        raise HTTPException(status_code=502, detail=f"Daily limit error: {e}")
     except Exception as e:
         # Unexpected error
         print(f"\n❌ Error creating simulation session:")
@@ -1090,7 +1096,8 @@ def send_simulation_response(session_id: str, request: SimStudentResponseRequest
         # Process student input
         response = process_student_input(
             session_id=session_id,
-            student_response=request.student_response
+            student_response=request.student_response,
+            student_changed_params=request.student_changed_params
         )
         
         return response
@@ -1105,6 +1112,12 @@ def send_simulation_response(session_id: str, request: SimStudentResponseRequest
                 "session_id": session_id
             }
         )
+    except MinuteLimitExhaustedError as e:
+        print(f"[API] Simulation respond - minute limit: {e}")
+        raise HTTPException(status_code=501, detail=f"Rate limit error: {e}")
+    except DayLimitExhaustedError as e:
+        print(f"[API] Simulation respond - day limit: {e}")
+        raise HTTPException(status_code=502, detail=f"Daily limit error: {e}")
     except Exception as e:
         # Unexpected error
         print(f"\n❌ Error processing simulation response:")

@@ -28,8 +28,7 @@ class ParameterChange(TypedDict):
     student_reaction: str               # How student responded
     understanding_before: str           # Level before this change
     understanding_after: str            # Level after this change
-    was_effective: Optional[bool]       # Did this help understanding? None if student-driven (unknown yet)
-    initiated_by: Optional[str]         # "agent" (default) or "student" for slider-driven changes
+    was_effective: bool                 # Did this help understanding?
 
 
 class Concept(TypedDict):
@@ -103,12 +102,6 @@ class TeachingState(TypedDict):
     cannot_demonstrate: List[str]       # Topics NOT in this simulation (don't mention)
     
     # ═══════════════════════════════════════════════════════════════════════
-    # SIMULATION DISPLAY TRACKING
-    # ═══════════════════════════════════════════════════════════════════════
-    show_simulation: bool               # True ONLY when simulation should display this turn
-    last_displayed_params: Dict[str, float]  # Params the last time simulation was actually shown
-
-    # ═══════════════════════════════════════════════════════════════════════
     # STUDENT RESPONSE TYPE FLAGS (set by evaluator)
     # ═══════════════════════════════════════════════════════════════════════
     student_asked_question: bool        # True if student asked a question
@@ -122,12 +115,6 @@ class TeachingState(TypedDict):
     # LANGUAGE
     # ═══════════════════════════════════════════════════════════════════════
     language: str                       # "english" | "kannada" — controls API translation
-
-    # ═══════════════════════════════════════════════════════════════════════
-    # STUDENT-DRIVEN SIMULATION CHANGES (new feature)
-    # ═══════════════════════════════════════════════════════════════════════
-    student_changed_params: Dict[str, Any]    # params the student manually changed this turn
-    student_changed_params_this_turn: bool    # True if student changed params this turn
     
     # ═══════════════════════════════════════════════════════════════════════
     # QUIZ MODE (activated after all concepts taught)
@@ -196,11 +183,7 @@ def create_initial_state(topic_description: str, initial_params: Dict[str, float
         
         # Language (for API translation layer)
         "language": language,
-
-        # Student-driven simulation changes (initialized empty each session)
-        "student_changed_params": {},
-        "student_changed_params_this_turn": False,
-
+        
         # Student response type flags
         "student_asked_question": False,
         "question_asked": "",
@@ -208,11 +191,7 @@ def create_initial_state(topic_description: str, initial_params: Dict[str, float
         "requested_param": "",
         "requested_value": None,
         "is_factually_wrong": False,
-
-        # Simulation display tracking
-        "show_simulation": False,
-        "last_displayed_params": {},
-
+        
         # Quiz mode (initialized as False, activated after concepts complete)
         "quiz_mode": False,
         "quiz_questions": [],
@@ -282,7 +261,6 @@ def add_parameter_change(
         "student_reaction": "",  # Filled later
         "understanding_before": state.get("understanding_level", "none"),
         "understanding_after": "",  # Filled after evaluation
-        "was_effective": False,  # Determined later
-        "initiated_by": "agent"  # Default: agent-driven
+        "was_effective": False  # Determined later
     }
     return change

@@ -288,7 +288,7 @@ def start_session(initial_state: Dict[str, Any], thread_id: str) -> Dict[str, An
     return dict(snapshot.values)
 
 
-def continue_session(student_response: str, thread_id: str, student_changed_params: dict = None) -> Dict[str, Any]:
+def continue_session(student_response: str, thread_id: str) -> Dict[str, Any]:
     """
     Continue session with student's response.
     
@@ -297,8 +297,6 @@ def continue_session(student_response: str, thread_id: str, student_changed_para
     Args:
         student_response: What the student said
         thread_id: Session ID
-        student_changed_params: Optional dict of params the student manually changed
-                                in the simulation this turn. E.g. {"length": 3}.
         
     Returns:
         Updated state after processing and teacher's next message
@@ -310,25 +308,10 @@ def continue_session(student_response: str, thread_id: str, student_changed_para
     print("📥 PROCESSING STUDENT RESPONSE")
     print("="*60)
     print(f"   Response: \"{student_response[:100]}...\"" if len(student_response) > 100 else f"   Response: \"{student_response}\"")
-    if student_changed_params:
-        print(f"   🎛️ Student changed params: {student_changed_params}")
     
     # Check current state before updating
     current_state = graph.get_state(config)
     print(f"   DEBUG: Before update - next nodes = {current_state.next}")
-    
-    # Build state update — always include student_response
-    state_update = {"student_response": student_response}
-    
-    # Inject student-changed params if provided
-    if student_changed_params:
-        state_update["student_changed_params"] = student_changed_params
-        state_update["student_changed_params_this_turn"] = True
-        print(f"   🎛️ Injecting student_changed_params into state: {student_changed_params}")
-    else:
-        # Always reset the flag each turn so it doesn't persist from previous turns
-        state_update["student_changed_params"] = {}
-        state_update["student_changed_params_this_turn"] = False
     
     # Update state with student response - preserve the current checkpoint position
     if current_state.next:
@@ -345,13 +328,13 @@ def continue_session(student_response: str, thread_id: str, student_changed_para
             as_node = as_node_map.get(last_node, None)
             if as_node:
                 print(f"   DEBUG: Updating state as_node={as_node}")
-                graph.update_state(config, state_update, as_node=as_node)
+                graph.update_state(config, {"student_response": student_response}, as_node=as_node)
             else:
-                graph.update_state(config, state_update)
+                graph.update_state(config, {"student_response": student_response})
         else:
-            graph.update_state(config, state_update)
+            graph.update_state(config, {"student_response": student_response})
     else:
-        graph.update_state(config, state_update)
+        graph.update_state(config, {"student_response": student_response})
     
     # Check state after updating
     updated_state = graph.get_state(config)

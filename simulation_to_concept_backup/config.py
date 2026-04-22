@@ -110,9 +110,7 @@ def validate_config():
 # SIMULATION HOSTING CONFIGURATION
 # ═══════════════════════════════════════════════════════════════════════
 
-# GitHub Pages base URL (set in .env for production, falls back to hardcoded URL)
-# The hardcoded fallback ensures simulation URLs are always fully qualified on AWS
-# even when the .env file is not deployed.
+# GitHub Pages base URL (set in .env for production, None for local dev)
 GITHUB_PAGES_BASE_URL = os.getenv(
     "GITHUB_PAGES_BASE_URL",
     "https://imhv0609.github.io/simulation_to_concept_version3_github_modified"
@@ -125,9 +123,8 @@ def get_simulation_base_url(simulation_id: str = None) -> str:
     Args:
         simulation_id: Which simulation to get URL for. If None, uses CURRENT_SIMULATION_ID.
     
-    Always returns a fully-qualified GitHub Pages URL. GITHUB_PAGES_BASE_URL is read
-    from the environment (or .env file) with a hardcoded fallback so that simulation
-    URLs are never relative paths — avoiding broken URLs on AWS where .env is absent.
+    Returns GitHub Pages URL if GITHUB_PAGES_BASE_URL is set,
+    otherwise returns relative path for local development.
     """
     # Dynamically get the simulation file based on simulation_id
     if simulation_id:

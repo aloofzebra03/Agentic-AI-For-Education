@@ -28,41 +28,21 @@ from api_tracker_utils.error import MinuteLimitExhaustedError, DayLimitExhausted
 from simulation_to_concept.state import add_message_to_history
 
 
-def extract_text_content(content) -> str:
-    """
-    Normalise response.content to a plain string.
-    Multimodal models (e.g. Gemma 4) return content as a list of parts.
-    """
-    if isinstance(content, str):
-        return content
-    if isinstance(content, list):
-        parts = []
-        for part in content:
-            if isinstance(part, str):
-                parts.append(part)
-            elif isinstance(part, dict):
-                parts.append(part.get("text", ""))
-            elif hasattr(part, "text"):
-                parts.append(part.text)
-            else:
-                parts.append(str(part))
-        return "".join(parts)
-    return str(content)
-
-
-def get_llm_with_key():
-    """Get configured LLM instance and the selected API key.
-
-    MinuteLimitExhaustedError / DayLimitExhaustedError propagate naturally
-    to the caller — never caught here.
-    """
+def get_llm():
+    """Get configured LLM instance and the exact API key used."""
     if USE_API_TRACKER:
-        # Limit errors propagate to the caller — do NOT wrap in try/except
-        api_key = get_best_api_key_for_model(GEMINI_MODEL)
-        print(f"[EVALUATOR] Using tracked API key ...{api_key[-6:]} for {GEMINI_MODEL}")
+        try:
+            # Get best API key for this model from tracker
+            api_key = get_best_api_key_for_model(GEMINI_MODEL)
+            print(f"[EVALUATOR] Using tracked API key ...{api_key[-6:]} for {GEMINI_MODEL}")
+        except (MinuteLimitExhaustedError, DayLimitExhaustedError):
+            raise  # Propagate rate-limit errors up to the API server
+        except Exception as e:
+            print(f"[EVALUATOR] Tracker error: {e}, falling back to GOOGLE_API_KEY")
+            api_key = GOOGLE_API_KEY
     else:
         api_key = GOOGLE_API_KEY
-
+    
     llm = ChatGoogleGenerativeAI(
         model=GEMINI_MODEL,
         google_api_key=api_key,
@@ -112,34 +92,9 @@ def understanding_evaluator_node(state: Dict[str, Any]) -> Dict[str, Any]:
     print("\n" + "="*60)
     print("🔍 EVALUATOR NODE: Classifying & Assessing")
     print("="*60)
-
-    # ── NEW: Short-circuit if student changed params independently ────────────
-    # When a student drags a slider and presses Send (with or without typing anything),
-    # we don't need the LLM to "evaluate" a slider drag as an answer.
-    # The teacher node will handle the reaction to the param change.
-    if state.get("student_changed_params_this_turn", False):
-        changed = state.get("student_changed_params", {})
-        print(f"   🎛️ Student changed params this turn: {changed}")
-        print(f"   ⏭️ Short-circuiting LLM evaluation — passing through as 'student_param_change'")
-        return {
-            "response_type": "student_param_change",
-            # Preserve existing understanding level — exploring ≠ wrong answer
-            "understanding_level": state.get("understanding_level", "none"),
-            "understanding_reasoning": "Student explored the simulation independently",
-            "understanding_trajectory": state.get("understanding_trajectory", []),
-            "is_factually_wrong": False,
-            "needs_deeper": False,
-            "student_asked_question": False,
-            "question_asked": "",
-            "student_requested_param": False,
-            "requested_param": "",
-            "requested_value": None,
-            "student_wants_to_see_simulation": False,
-        }
-    # ─────────────────────────────────────────────────────────────────────────
-
+    
     student_response = state.get("student_response", "")
-
+    
     if not student_response:
         print("   ⚠️ No student response to evaluate")
         return {
@@ -212,11 +167,6 @@ PARAMETER EFFECTS (use these to judge correctness):
     for param_name, param_info in PARAMETER_INFO.items():
         physics_rules += f"\n{param_info['label']} ({param_info['range']}): {param_info['effect']}"
     
-    # Pre-compute dynamic param strings (can't have complex expressions inside f-string with {{}} escapes)
-    _param_bullets = chr(10).join([f'      - "{k}" (valid values: {v["range"]})' for k, v in PARAMETER_INFO.items()])
-    _param_names_list = ', '.join(PARAMETER_INFO.keys())
-    _param_names_enum = '" or "'.join(PARAMETER_INFO.keys())
-
     # Build the combined classification + evaluation prompt
     eval_prompt = f"""⚠️ LANGUAGE REQUIREMENT: All free-text fields in your JSON response (understanding_reasoning, question_asked, correction_explanation) MUST be written in {language_instruction} only. Do not use any other language, even if the simulation topic contains text in another language.
 
@@ -251,12 +201,10 @@ First, determine what TYPE of response this is:
 
 3. "param_request" - Student wants to CHANGE simulation parameters OR see the simulation
    Examples: 
-   - "Change to vinegar", "Set it to 5 units", "Make it shorter", "Try with soap", "Use baking soda"
+   - "Change length to 3", "Set it to 5 units", "Make it shorter", "Try with 20 oscillations"
    - "Can you show the simulation?", "Show me", "Let me see it", "Display the simulation", "Show simulation as well"
    NOTE: Student may request MULTIPLE params at once
    ⚠️ IMPORTANT: If student asks to "show", "see", or "display" the simulation, treat as param_request with "show_simulation": true
-   ⚠️ CRITICAL: The param_requested field MUST be one of the exact parameter names listed below:
-{_param_bullets}
 
 ═══════════════════════════════════════════════════════════════
 STEP 2: BASED ON TYPE, FILL RELEVANT FIELDS
@@ -271,8 +219,8 @@ IF response_type == "question":
 - Set level to current understanding (don't change it)
 
 IF response_type == "param_request":
-- Extract which parameter — MUST use the exact parameter name from this list: {_param_names_list}
-- Extract the requested value (must match the valid range for that parameter)
+- Extract which parameter (length or number_of_oscillations)
+- Extract the requested value
 - Validate it's in range
 - Set level to current understanding (don't change it)
 - **SPECIAL CASE**: If student asks to "show"/"see"/"display" simulation (without specifying values), set "show_simulation": true
@@ -308,10 +256,12 @@ RESPOND WITH ONLY THIS JSON:
     // For "question" type:
     "question_asked": "The question the student is asking",
     
-    // For "param_request" type:
-    "param_requested": "{_param_names_enum}" or null,
-    "param_value": value or null,
+    // For "param_request" type (can have BOTH if student requested multiple):
+    "param_requested": "length" or "number_of_oscillations" or "both" or null,
+    "param_value": number or null,
     "param_valid": true/false,
+    "length_value": number or null (if length was requested),
+    "oscillations_value": number or null (if oscillations was requested),
     "show_simulation": true/false (true if student asked to see/show/display simulation without specific values)
 }}
 ```
@@ -324,17 +274,19 @@ RESPOND WITH ONLY THIS JSON:
     else:
         print(f"   🔎 DEBUG - No param_history available!")
     
-    # Single selection — key flows through to tracking and LLM construction
-    llm, used_api_key = get_llm_with_key()
+    llm, used_api_key = get_llm()
 
-    # Track BEFORE invoking — counts attempts, not just successes (per usage guide Section 5)
+    # Track BEFORE invocation for accurate quota accounting
     if USE_API_TRACKER and used_api_key:
-        track_model_call(used_api_key, GEMINI_MODEL)
-        print(f"[EVALUATOR] Tracked API call: ...{used_api_key[-6:]} + {GEMINI_MODEL}")
+        try:
+            track_model_call(used_api_key, GEMINI_MODEL)
+            print(f"[EVALUATOR] Tracked API call: ...{used_api_key[-6:]} + {GEMINI_MODEL}")
+        except Exception as e:
+            print(f"[EVALUATOR] Warning: Failed to track API call: {e}")
 
     response = llm.invoke([HumanMessage(content=eval_prompt)])
     
-    result = parse_json_safe(extract_text_content(response.content))
+    result = parse_json_safe(response.content)
     
     # Extract response type (default to "answer")
     response_type = result.get("response_type", "answer")
@@ -396,20 +348,14 @@ RESPOND WITH ONLY THIS JSON:
         
     elif response_type == "param_request":
         # Student requested parameter change
-        param = result.get("param_requested")
+        param =result.get("param_requested")
         value = result.get("param_value")
         is_valid = result.get("param_valid", False)
         show_simulation = result.get("show_simulation", False)
         
-        # Validate that param_requested is an actual parameter name from PARAMETER_INFO
-        valid_param_names = set(PARAMETER_INFO.keys())
-        if param and param not in valid_param_names and not show_simulation:
-            print(f"   ⚠️ LLM returned unknown param '{param}', attempting to match to valid params: {valid_param_names}")
-            # Try to fuzzy-match: if there's only one param (besides showHints), use it
-            content_params = [k for k in valid_param_names if k != "showHints"]
-            if len(content_params) == 1:
-                param = content_params[0]
-                print(f"   🔧 Auto-corrected to: {param}")
+        # Handle "both" - multiple params requested
+        length_val = result.get("length_value")
+        osc_val = result.get("oscillations_value")
         
         if show_simulation:
             print(f"   🖥️ Student requested to SEE/SHOW simulation")
@@ -418,6 +364,10 @@ RESPOND WITH ONLY THIS JSON:
             output["requested_param"] = "show"  # Special marker
             output["requested_value"] = None
             output["param_request_valid"] = True
+        elif param == "both":
+            print(f"   🎛️ Multiple Parameters Requested:")
+            print(f"      - length = {length_val}")
+            print(f"      - oscillations = {osc_val}")
         else:
             print(f"   🎛️ Parameter Request: {param} = {value}")
             print(f"   ✓ Valid: {is_valid}")
@@ -431,12 +381,20 @@ RESPOND WITH ONLY THIS JSON:
         # If valid, update the params (only for actual value changes, not show requests)
         if not show_simulation:
             new_params = current_params.copy()
-            if is_valid and param and param in valid_param_names and value is not None:
+            if param == "both":
+                # Handle both parameters
+                if length_val is not None:
+                    new_params["length"] = length_val
+                    print(f"   ✅ Updating length → {length_val}")
+                if osc_val is not None:
+                    new_params["number_of_oscillations"] = osc_val
+                    print(f"   ✅ Updating oscillations → {osc_val}")
+                if length_val is not None or osc_val is not None:
+                    output["current_params"] = new_params
+            elif is_valid and param and value is not None:
                 new_params[param] = value
                 output["current_params"] = new_params
                 print(f"   ✅ Updating params: {param} → {value}")
-            elif param and param not in valid_param_names:
-                print(f"   ⚠️ Skipping update — '{param}' is not a recognized parameter")
         
         # Don't update trajectory for param requests
         output["understanding_trajectory"] = state.get("understanding_trajectory", [])

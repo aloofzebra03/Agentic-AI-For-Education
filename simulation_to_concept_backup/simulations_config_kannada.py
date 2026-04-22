@@ -343,23 +343,13 @@ SIMULATIONS_KN["turmeric_indicator_kn"] = {
     "parameter_info": {
         "initialState": {
             "label": "Solution Type",
-            "range": "lemon, vinegar, amla, soap, baking, lime, water, salt, sugar (or categories: acidic, basic, neutral)",
+            "range": "acidic, basic, neutral",
             "url_key": "initialState",
             "effect": (
-                "Selects a specific solution and auto-runs the turmeric test.\n"
-                "ACIDS (turmeric stays yellow — no change):\n"
-                "  'lemon'   → lemon juice (ನಿಂಬೆ ರಸ)\n"
-                "  'vinegar' → vinegar (ವಿನೆಗರ್)\n"
-                "  'amla'    → amla/gooseberry (ನೆಲ್ಲಿಕಾಯಿ)\n"
-                "BASES (turmeric turns red/brown):\n"
-                "  'soap'    → soap solution (ಸೋಪು)\n"
-                "  'baking'  → baking soda (ಅಡುಗೆ ಸೋಡಾ)\n"
-                "  'lime'    → lime water (ಸುಣ್ಣದ ನೀರು)\n"
-                "NEUTRAL (turmeric stays yellow — same as acid!):\n"
-                "  'water'   → tap water (ನೀರು)\n"
-                "  'salt'    → salt solution (ಉಪ್ಪು)\n"
-                "  'sugar'   → sugar solution (ಸಕ್ಕರೆ)\n"
-                "You can also use 'acidic' (=lemon), 'basic' (=soap), 'neutral' (=water)."
+                "Selects a solution and auto-runs the turmeric test.\n"
+                "  'acidic'  → lemon juice — turmeric stays yellow (no change)\n"
+                "  'basic'   → soap solution — turmeric turns red/brown\n"
+                "  'neutral' → tap water — turmeric stays yellow (same as acid!)"
             )
         },
         "showHints": {
@@ -511,23 +501,13 @@ SIMULATIONS_KN["red_rose_indicator_kn"] = {
     "parameter_info": {
         "initialState": {
             "label": "Solution Type",
-            "range": "lemon, vinegar, orange, soap, baking, lime, water, milk, salt (or categories: acidic, basic, neutral)",
+            "range": "acidic, basic, neutral",
             "url_key": "initialState",
             "effect": (
-                "Selects a specific solution and auto-runs the colour test.\n"
-                "ACIDS (rose extract turns RED):\n"
-                "  'lemon'   → lemon juice\n"
-                "  'vinegar' → vinegar\n"
-                "  'orange'  → orange juice\n"
-                "BASES (rose extract turns GREEN):\n"
-                "  'soap'    → soap solution\n"
-                "  'baking'  → baking soda\n"
-                "  'lime'    → lime water\n"
-                "NEUTRAL (rose extract stays PINK — no change):\n"
-                "  'water'   → tap water\n"
-                "  'milk'    → milk\n"
-                "  'salt'    → salt solution\n"
-                "You can also use 'acidic' (=lemon), 'basic' (=soap), 'neutral' (=water)."
+                "Selects a solution and auto-runs the colour test.\n"
+                "  'acidic'  → lemon juice — rose extract turns RED\n"
+                "  'basic'   → soap solution — rose extract turns GREEN\n"
+                "  'neutral' → tap water — rose extract stays PINK (no change)"
             )
         },
         "showHints": {
@@ -838,23 +818,13 @@ SIMULATIONS_KN["litmus_indicator_kn"] = {
     "parameter_info": {
         "initialState": {
             "label": "Solution Type",
-            "range": "lemon, vinegar, curd, soap, baking, lime, water, salt, sugar (or categories: acidic, basic, neutral)",
+            "range": "acidic, basic, neutral",
             "url_key": "initialState",
             "effect": (
-                "Selects a specific solution and auto-runs the litmus dip animation.\n"
-                "ACIDS (blue paper → RED, red unchanged):\n"
-                "  'lemon'   → lemon juice (ನಿಂಬೆ ರಸ)\n"
-                "  'vinegar' → vinegar (ವಿನೆಗರ್)\n"
-                "  'curd'    → curd (ಮೊಸರು)\n"
-                "BASES (red paper → BLUE, blue unchanged):\n"
-                "  'soap'    → soap solution (ಸೋಪು)\n"
-                "  'baking'  → baking soda (ಅಡುಗೆ ಸೋಡಾ)\n"
-                "  'lime'    → lime water (ಸುಣ್ಣದ ನೀರು)\n"
-                "NEUTRAL (NEITHER paper changes colour):\n"
-                "  'water'   → tap water (ನೀರು)\n"
-                "  'salt'    → salt solution (ಉಪ್ಪು)\n"
-                "  'sugar'   → sugar solution (ಸಕ್ಕರೆ)\n"
-                "You can also use 'acidic' (=lemon), 'basic' (=soap), 'neutral' (=water)."
+                "Selects a solution and auto-runs the litmus dip animation.\n"
+                "  'acidic'  → lemon juice: blue paper turns RED, red unchanged\n"
+                "  'basic'   → soap: red paper turns BLUE, blue unchanged\n"
+                "  'neutral' → tap water: NEITHER paper changes colour"
             )
         },
         "showHints": {
@@ -1166,17 +1136,12 @@ SIMULATIONS_KN["olfactory_indicator_kn"] = {
     "parameter_info": {
         "initialState": {
             "label": "Solution Type",
-            "range": "tamarind, vinegar, soap, baking (or categories: acidic, basic)",
+            "range": "acidic, basic",
             "url_key": "initialState",
             "effect": (
-                "Selects a specific solution and auto-runs the mixing test.\n"
-                "ACIDS (smell stays strong — acid confirmed):\n"
-                "  'tamarind' → tamarind water (ಹುಣಸೆ ಹಣ್ಣಿನ ನೀರು)\n"
-                "  'vinegar'  → vinegar (ವಿನೆಗರ್)\n"
-                "BASES (smell disappears — base confirmed):\n"
-                "  'soap'    → soap solution (ಸೋಪು)\n"
-                "  'baking'  → baking soda (ಅಡುಗೆ ಸೋಡಾ)\n"
-                "You can also use 'acidic' (=tamarind), 'basic' (=baking)."
+                "Selects a solution and auto-runs the mixing test.\n"
+                "  'acidic' → tamarind water — smell stays strong (acid confirmed)\n"
+                "  'basic'  → baking soda — smell disappears (base confirmed)"
             )
         },
         "showHints": {
@@ -5214,17 +5179,6 @@ SIMULATIONS_KN["weathering_erosion_kn"] = {
                 "  true  → show the key concept explanation card (default)\n"
                 "  false → hide the concept card"
             )
-        },
-        "timeLevel": {
-            "label": "Erosion Time Level",
-            "range": "0-100 (integer)",
-            "url_key": "timeLevel",
-            "effect": (
-                "Sets the time slider position controlling erosion progress.\n"
-                "  0   → freshly formed landscape (no erosion)\n"
-                "  50  → mid-stage erosion\n"
-                "  100 → fully eroded landscape"
-            )
         }
     },
     "concepts": [
@@ -8232,15 +8186,6 @@ SIMULATIONS_KN["growth_chart_kn"] = {
             "range": "true/false",
             "url_key": "showHints",
             "effect": "Shows or hides the concept card, puberty highlight fact box, and takeaway."
-        },
-        "age": {
-            "label": "Age (years)",
-            "range": "5-20 (integer)",
-            "url_key": "age",
-            "effect": (
-                "Sets the age slider and updates growth statistics accordingly.\n"
-                "Reports the student's currently selected age value."
-            )
         }
     },
     "concepts": [
@@ -14375,18 +14320,6 @@ SIMULATIONS_KN["speed_calculator_kn"] = {
             "range": "true/false",
             "url_key": "showHints",
             "effect": "Shows or hides the insight explanation box (if present)."
-        },
-        "distance": {
-            "label": "Distance (km)",
-            "range": "0-1000 (number)",
-            "url_key": "distance",
-            "effect": "The distance value entered by the student in the calculator."
-        },
-        "time": {
-            "label": "Time (hours)",
-            "range": "0-100 (number)",
-            "url_key": "time",
-            "effect": "The time value entered by the student in the calculator."
         }
     },
     "concepts": [
@@ -14716,18 +14649,6 @@ SIMULATIONS_KN["uniform_motion_kn"] = {
             "range": "true/false",
             "url_key": "showHints",
             "effect": "Shows or hides the insight explanation box (if present)."
-        },
-        "speed": {
-            "label": "Speed (km/h)",
-            "range": "0-100 (number)",
-            "url_key": "speed",
-            "effect": "The current speed of the moving object set by the student slider."
-        },
-        "time": {
-            "label": "Elapsed Time (s)",
-            "range": "0+ (number)",
-            "url_key": "time",
-            "effect": "The current elapsed time in the animation."
         }
     },
     "concepts": [
@@ -14894,18 +14815,6 @@ SIMULATIONS_KN["nonuniform_motion_kn"] = {
             "range": "true/false",
             "url_key": "showHints",
             "effect": "Shows or hides the insight explanation box (if present)."
-        },
-        "speed": {
-            "label": "Current Speed (km/h)",
-            "range": "0-100 (number)",
-            "url_key": "speed",
-            "effect": "The instantaneous speed of the vehicle at the current time."
-        },
-        "time": {
-            "label": "Elapsed Time (s)",
-            "range": "0+ (number)",
-            "url_key": "time",
-            "effect": "The current elapsed time in the animation."
         }
     },
     "concepts": [

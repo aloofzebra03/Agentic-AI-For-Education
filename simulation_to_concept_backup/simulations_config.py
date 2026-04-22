@@ -2558,9 +2558,11 @@ try:
     print(f"[simulations_config] ✅ Loaded {len(SIMULATIONS_KN)} Kannada simulation(s): "
           f"{', '.join(SIMULATIONS_KN.keys())}")
 except ImportError:
-    pass  # File not present — silently skip
+    print("[simulations_config] ⚠️ Kannada simulations not found - skipping")
+    raise ImportError("Kannada simulations not found")
 except Exception as _kn_err:
     print(f"[simulations_config] ⚠️  Could not load Kannada simulations: {_kn_err}")
+    raise Exception("Failed to load Kannada simulations")
 
 # ═══════════════════════════════════════════════════════════════════════
 # KANNADA MATHS SIMULATIONS — Load and merge at runtime

@@ -6,7 +6,7 @@ These define the structure of data exchanged between Android app and API.
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -17,7 +17,7 @@ class StartSessionRequest(BaseModel):
     """Request to start a new teaching session"""
     simulation_id: str = Field(
         ..., 
-        description="ID of simulation: 'simple_pendulum', 'simple_pendulum_new', 'earth_rotation_revolution', 'light_shadows', 'time_units', 'speed_race', 'speed_calculator', 'brackets_signs', 'distributive', etc. Kannada maths: 'brackets_signs_kn', 'distributive_kn', 'expression_compare_kn', 'expression_engineer_kn', 'decimal_number_line_kn', etc."
+        description="ID of simulation: 'simple_pendulum', 'simple_pendulum_new', 'earth_rotation_revolution', 'light_shadows', 'time_units', 'speed_race', 'speed_calculator', 'brackets_signs', 'distributive', etc."
     )
     student_id: Optional[str] = Field(
         None, 
@@ -41,21 +41,14 @@ class StartSessionRequest(BaseModel):
 class StudentResponseRequest(BaseModel):
     """Request to send student's response"""
     student_response: str = Field(
-        default="",
-        description="What the student typed/said. Can be empty if student only changed simulation parameters."
-    )
-    student_changed_params: Optional[Dict[str, Any]] = Field(
-        None,
-        description="Parameters the student manually changed in the simulation this turn. "
-                    "Keys are parameter names (e.g. 'length'), values are the new values. "
-                    "Omit or pass null if the student did not change any parameters."
+        ..., 
+        description="What the student typed/said"
     )
     
     class Config:
         json_schema_extra = {
             "example": {
-                "student_response": "I made it shorter",
-                "student_changed_params": {"length": 3}
+                "student_response": "I think it swings faster?"
             }
         }
 
@@ -78,13 +71,12 @@ class SimulationState(BaseModel):
     title: str
     html_url: str
     current_params: Dict[str, Any]
-    show_simulation: Optional[bool] = False
     param_change: Optional[ParameterChange] = None
 
 
 class ConceptInfo(BaseModel):
     """Information about a concept"""
-    id: int
+    id: Union[int, str]
     title: str
     description: str
     key_insight: str
