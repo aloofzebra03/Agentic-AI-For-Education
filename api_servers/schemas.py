@@ -680,3 +680,139 @@ class RevChaptersListResponse(BaseModel):
         default="Available chapters retrieved successfully.",
         description="Human-readable status message."
     )
+
+
+# ============================================================================
+# MATH AGENT SCHEMAS
+# ============================================================================
+
+# ── Request Models ──────────────────────────────────────────────────────────
+
+class MathStartSessionRequest(BaseModel):
+    """Request to start a new math tutoring session."""
+    problem_id: str = Field(
+        ...,
+        description="Unique problem identifier from problems_json (e.g., 'add_frac_same_den_01')."
+    )
+    student_id: Optional[str] = Field(
+        default=None,
+        description="Optional unique identifier for the student (for tracking and analytics)."
+    )
+    session_label: Optional[str] = Field(
+        default=None,
+        description="Optional custom label for this session (used in thread_id generation)."
+    )
+    is_kannada: bool = Field(
+        default=False,
+        description="Whether to conduct the session in Kannada language. Default is False (English)."
+    )
+
+
+# ── Response Models ─────────────────────────────────────────────────────────
+
+class MathStartSessionResponse(BaseModel):
+    """Response from starting a new math tutoring session."""
+    success: bool = Field(description="Whether the session was started successfully.")
+    session_id: str = Field(description="Unique session identifier for tracking purposes.")
+    thread_id: str = Field(description="Unique thread ID for continuing this session (store on client side).")
+    problem_id: str = Field(description="The problem ID being solved in this session.")
+    user_id: str = Field(description="User identifier ('anonymous' if not provided in request).")
+    agent_response: str = Field(description="The agent's initial greeting or first teaching message.")
+    current_state: str = Field(
+        description="Current pedagogical node/state (e.g., 'START', 'ASSESSMENT', 'COACH', 'SCAFFOLD')."
+    )
+    message: str = Field(
+        default="Session started successfully. Agent is ready for student input.",
+        description="Status message about the session creation."
+    )
+    metadata: SessionMetadata = Field(
+        default_factory=SessionMetadata,
+        description="Session metadata with scores, node transitions, etc."
+    )
+
+
+class MathContinueSessionResponse(BaseModel):
+    """Response from continuing a math tutoring session."""
+    success: bool = Field(description="Whether the agent response was generated successfully.")
+    thread_id: str = Field(description="The thread ID of this session (same as request).")
+    agent_response: str = Field(
+        description="The agent's response to the student's message (teaching, questions, feedback, etc.)."
+    )
+    current_state: str = Field(
+        description="Current pedagogical node/state after processing the student's message."
+    )
+    metadata: SessionMetadata = Field(
+        default_factory=SessionMetadata,
+        description="Session metadata with scores, node transitions, etc."
+    )
+    message: str = Field(
+        default="Response generated successfully.",
+        description="Status message about the response generation."
+    )
+
+
+class ProblemInfo(BaseModel):
+    """Information about a single math problem from the catalog."""
+    problem_id: str = Field(description="Unique problem identifier (e.g., 'add_frac_same_den_01').")
+    topic: str = Field(description="Topic or title of the problem (e.g., 'Adding Fractions').")
+    difficulty: Optional[str] = Field(
+        default=None,
+        description="Difficulty level of the problem (e.g., 'easy', 'medium', 'hard')."
+    )
+
+
+class ProblemsListResponse(BaseModel):
+    """Response listing all available math problems."""
+    success: bool = Field(default=True, description="Whether the problems were retrieved successfully.")
+    problems: List[ProblemInfo] = Field(description="List of available math problems with their details.")
+    total: int = Field(description="Total number of available problems.")
+    message: str = Field(
+        default="Available problems retrieved successfully.",
+        description="Status message about the retrieval."
+    )
+
+
+class MathSessionStatusResponse(BaseModel):
+    """Response from GET /math/session/status/{thread_id}."""
+    success: bool = Field(description="Whether the status was retrieved successfully.")
+    thread_id: str = Field(description="The thread ID of the session.")
+    exists: bool = Field(description="Whether the session exists in the checkpoint store.")
+    current_state: Optional[str] = Field(
+        default=None,
+        description="Current pedagogical node if session exists (e.g., 'START', 'ASSESSMENT', 'COACH')."
+    )
+    problem_id: Optional[str] = Field(
+        default=None,
+        description="The problem being solved in this session."
+    )
+    progress: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Progress information: step_index, max_steps, Ta, Tu, mode, nudge_count, etc."
+    )
+    message: str = Field(
+        default="Status retrieved successfully.",
+        description="Status message about the retrieval."
+    )
+
+
+class MathSessionHistoryResponse(BaseModel):
+    """Response from GET /math/session/history/{thread_id}."""
+    success: bool = Field(description="Whether the history was retrieved successfully.")
+    thread_id: str = Field(description="The thread ID of the session.")
+    exists: bool = Field(description="Whether the session exists in the checkpoint store.")
+    messages: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="List of conversation messages with role ('user' or 'assistant'), content, and node."
+    )
+    node_transitions: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="History of pedagogical node transitions during the session."
+    )
+    problem_id: Optional[str] = Field(
+        default=None,
+        description="The problem being solved in this session."
+    )
+    message: str = Field(
+        default="History retrieved successfully.",
+        description="Status message about the retrieval."
+    )

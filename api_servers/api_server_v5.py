@@ -1,10 +1,10 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Form, File, UploadFile
 from fastapi.openapi.docs import get_swagger_ui_html
 from api_servers.auth import get_current_user, get_current_user_rate_limited, get_docs_username
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
-from typing import Dict, Optional, Any
+from typing import Dict, Optional, Any, List
 import sys
 import os
 import traceback
@@ -16,6 +16,9 @@ from datetime import datetime
 
 from educational_agent_optimized_langsmith_v5.graph import graph
 
+# Import math tutoring agent graph
+from educational_agent_math_tutor.graph import graph as math_graph
+
 # Import revision agent graph
 from revision_agent.graph import graph as revision_graph
 from langchain_core.messages import HumanMessage
@@ -25,7 +28,7 @@ from api_servers.schemas import (
     StartSessionRequest, StartSessionResponse,
     ContinueSessionRequest, ContinueSessionResponse,
     SessionStatusRequest, SessionStatusResponse,
-    SessionHistoryResponse, SessionSummaryResponse,
+    SessionHistoryResponse, SessionSummaryResponse, SessionMetadata,
     TestPersonaRequest, HealthResponse, ErrorResponse,
     PersonaInfo, PersonasListResponse,
     TestImageRequest, TestImageResponse,
@@ -38,6 +41,11 @@ from api_servers.schemas import (
     RevContinueSessionRequest, RevContinueSessionResponse,
     RevSessionStatusResponse, RevSessionHistoryResponse,
     RevChaptersListResponse,
+    # Math agent schemas
+    MathStartSessionRequest, MathStartSessionResponse,
+    MathContinueSessionResponse,
+    ProblemInfo, ProblemsListResponse,
+    MathSessionStatusResponse, MathSessionHistoryResponse,
 )
 
 # Import personas from tester_agent
@@ -69,6 +77,7 @@ from utils.shared_utils import (
     translate_to_kannada_google,
     translate_to_english_gemini,
 )
+from utils.ocr_utilities import process_image_from_path
 
 from api_tracker_utils.error import MinuteLimitExhaustedError, DayLimitExhaustedError
 from api_tracker_utils.tracker import track_model_call
@@ -299,7 +308,7 @@ def get_history_from_state(state: Dict[str, Any]) -> list[Dict[str, Any]]:
 # API ENDPOINTS
 # ============================================================================
 
-@app.get("/", response_model=Dict[str, Any])
+@app.get("/", response_model=Dict[str, Any], tags=["Education Agent"])
 def read_root():
     return {
         "message": "Educational Agent API is running!",
@@ -338,7 +347,7 @@ def read_root():
 
 
 
-@app.get("/health", response_model=HealthResponse)
+@app.get("/health", response_model=HealthResponse, tags=["Education Agent"])
 def health_check():
     return HealthResponse(
         status="healthy",
@@ -372,7 +381,7 @@ def health_check():
     )
 
 
-@app.get("/concepts", response_model=ConceptsListResponse)
+@app.get("/concepts", response_model=ConceptsListResponse, tags=["Education Agent"])
 def list_available_concepts(user: dict = Depends(get_current_user)):
     """List all available concepts that can be taught by the educational agent."""
     try:
@@ -395,7 +404,7 @@ def list_available_concepts(user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail=f"Error retrieving concepts: {str(e)}")
 
 
-@app.post("/session/start", response_model=StartSessionResponse)
+@app.post("/session/start", response_model=StartSessionResponse, tags=["Education Agent"])
 def start_session(request: StartSessionRequest, user: dict = Depends(get_current_user_rate_limited)):
     try:
         print(f"API /session/start - concept: {request.concept_title}, student: {request.student_id}, language: {'Kannada' if request.is_kannada else 'English'}")
@@ -404,7 +413,7 @@ def start_session(request: StartSessionRequest, user: dict = Depends(get_current
         thread_id = generate_thread_id(
             concept_title=request.concept_title,
             is_kannada=request.is_kannada,
-            label=request.session_label,
+            label="education",
             user_id=request.student_id
         )
         
@@ -494,7 +503,7 @@ def start_session(request: StartSessionRequest, user: dict = Depends(get_current
         raise HTTPException(status_code=500, detail=f"Error starting session: {str(e)}")
 
 
-@app.post("/session/continue", response_model=ContinueSessionResponse)
+@app.post("/session/continue", response_model=ContinueSessionResponse, tags=["Education Agent"])
 def continue_session(request: ContinueSessionRequest, user: dict = Depends(get_current_user_rate_limited)):
     try:
         print(f"API /session/continue - thread: {request.thread_id}, message: {request.user_message[:50]}...")
@@ -590,7 +599,7 @@ def continue_session(request: ContinueSessionRequest, user: dict = Depends(get_c
         raise HTTPException(status_code=500, detail=f"Error continuing session: {str(e)}")
 
 
-@app.get("/session/status/{thread_id}", response_model=SessionStatusResponse)
+@app.get("/session/status/{thread_id}", response_model=SessionStatusResponse, tags=["Education Agent"])
 def get_session_status(thread_id: str, user: dict = Depends(get_current_user)):
     try:
         print(f"API /session/status - thread: {thread_id}")
@@ -635,7 +644,7 @@ def get_session_status(thread_id: str, user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail=f"Error retrieving status: {str(e)}")
 
 
-@app.get("/session/history/{thread_id}", response_model=SessionHistoryResponse)
+@app.get("/session/history/{thread_id}", response_model=SessionHistoryResponse, tags=["Education Agent"])
 def get_session_history(thread_id: str, user: dict = Depends(get_current_user)):
     try:
         print(f"API /session/history - thread: {thread_id}")
@@ -671,7 +680,7 @@ def get_session_history(thread_id: str, user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail=f"Error retrieving history: {str(e)}")
 
 
-@app.get("/session/summary/{thread_id}", response_model=SessionSummaryResponse)
+@app.get("/session/summary/{thread_id}", response_model=SessionSummaryResponse, tags=["Education Agent"])
 def get_session_summary(thread_id: str, user: dict = Depends(get_current_user)):
     try:
         print(f"API /session/summary - thread: {thread_id}")
@@ -705,7 +714,7 @@ def get_session_summary(thread_id: str, user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail=f"Error retrieving summary: {str(e)}")
 
 
-@app.delete("/session/{thread_id}")
+@app.delete("/session/{thread_id}", tags=["Education Agent"])
 def delete_session(thread_id: str, user: dict = Depends(get_current_user)):
     try:
         print(f"API /session DELETE - thread: {thread_id}")
@@ -778,7 +787,7 @@ def delete_session(thread_id: str, user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail=f"Error deleting session: {str(e)}")
 
 
-@app.get("/test/personas", response_model=PersonasListResponse)
+@app.get("/test/personas", response_model=PersonasListResponse, tags=["Education Agent"])
 def list_available_personas(user: dict = Depends(get_current_user)):
     try:
         print("API /test/personas - listing available personas")
@@ -805,7 +814,7 @@ def list_available_personas(user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail=f"Error retrieving personas: {str(e)}")
 
 
-@app.post("/test/persona")
+@app.post("/test/persona", tags=["Education Agent"])
 def test_with_persona(request: TestPersonaRequest, user: dict = Depends(get_current_user_rate_limited)):
     try:
         print(f"API /test/persona - persona: {request.persona_name}, concept: {request.concept_title}")
@@ -829,7 +838,7 @@ def test_with_persona(request: TestPersonaRequest, user: dict = Depends(get_curr
         raise HTTPException(status_code=500, detail=f"Error creating test session: {str(e)}")
 
 
-@app.post("/test/images", response_model=TestImageResponse)
+@app.post("/test/images", response_model=TestImageResponse, tags=["Education Agent"])
 def get_test_image(request: TestImageRequest, user: dict = Depends(get_current_user)):
     try:
         print(f"API /test/images - concept: {request.concept_title}, language: {request.language}")
@@ -862,7 +871,7 @@ def get_test_image(request: TestImageRequest, user: dict = Depends(get_current_u
         raise HTTPException(status_code=500, detail=f"Error retrieving image: {str(e)}")
 
 
-@app.post("/test/simulation", response_model=TestSimulationResponse)
+@app.post("/test/simulation", response_model=TestSimulationResponse, tags=["Education Agent"])
 def get_test_simulation(request: TestSimulationRequest, user: dict = Depends(get_current_user)):
     try:
         print(f"API /test/simulation - concept: {request.concept_title}, type: {request.simulation_type}")
@@ -890,7 +899,7 @@ def get_test_simulation(request: TestSimulationRequest, user: dict = Depends(get
         raise HTTPException(status_code=500, detail=f"Error retrieving simulation config: {str(e)}")
 
 
-@app.post("/concept-map/generate", response_model=ConceptMapResponse)
+@app.post("/concept-map/generate", response_model=ConceptMapResponse, tags=["Education Agent"])
 def generate_concept_map(request: ConceptMapRequest, user: dict = Depends(get_current_user_rate_limited)):
     """
     Generate concept map timeline from educational description.
@@ -1049,7 +1058,7 @@ def start_simulation_session(request: SimStartSessionRequest, user: dict = Depen
         thread_id = generate_thread_id(
             concept_title=request.simulation_id,
             is_kannada=(language == "kannada"),
-            label="sim",
+            label="simulation",
             user_id=request.student_id,
         )
         print(f"📌 Generated simulation thread_id: {thread_id}")
@@ -1417,12 +1426,12 @@ def start_revision_session(request: RevStartSessionRequest, user: dict = Depends
         thread_id = generate_thread_id(
             concept_title=request.chapter,
             is_kannada=request.is_kannada,
-            label=request.session_label or "revision",
+            label="revision",
             user_id=request.student_id,
         )
 
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-        session_id = f"revision-{request.session_label or 'session'}-{timestamp}"
+        session_id = f"revision-session-{timestamp}"
         student_id = request.student_id or "anonymous"
 
         print(f"📌 Generated revision thread_id: {thread_id}")
@@ -1708,10 +1717,424 @@ def translate_to_english(request: TranslationRequest, user: dict = Depends(get_c
         )
 
 
+# ============================================================================
+# MATH AGENT ENDPOINTS
+# ============================================================================
+
+MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024  # 10MB
+ALLOWED_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
+
+
+def _iter_json_objects(raw_text: str):
+    """Yield JSON objects from text that may contain concatenated JSON blobs."""
+    import json as _json
+    decoder = _json.JSONDecoder()
+    idx = 0
+    length = len(raw_text)
+    while idx < length:
+        while idx < length and raw_text[idx].isspace():
+            idx += 1
+        if idx >= length:
+            break
+        try:
+            obj, next_idx = decoder.raw_decode(raw_text, idx)
+            yield obj
+            idx = next_idx
+        except _json.JSONDecodeError:
+            idx += 1
+
+
+def _load_problem_catalog() -> List[Dict[str, Any]]:
+    """Load problem metadata from problems_json files."""
+    problems_dir = Path(__file__).parent.parent / "problems_json"
+    if not problems_dir.exists():
+        return []
+    catalog: List[Dict[str, Any]] = []
+    for json_file in sorted(problems_dir.glob("*.json")):
+        try:
+            content = json_file.read_text(encoding="utf-8")
+            for obj in _iter_json_objects(content):
+                if not isinstance(obj, dict):
+                    continue
+                pid = obj.get("problem_id")
+                topic = obj.get("topic")
+                if isinstance(pid, str) and pid.strip() and isinstance(topic, str) and topic.strip():
+                    catalog.append({
+                        "problem_id": pid.strip(),
+                        "topic": topic.strip(),
+                        "difficulty": obj.get("difficulty"),
+                    })
+        except Exception as read_error:
+            print(f"[WARN] Failed loading problem catalog from {json_file.name}: {read_error}")
+    return catalog
+
+
+def _resolve_problem(problem_id: Optional[str]) -> Dict[str, Any]:
+    """Resolve incoming session target to a concrete problem from catalog."""
+    catalog = _load_problem_catalog()
+    if not catalog:
+        raise HTTPException(status_code=500, detail="No problems available in problems_json")
+    if problem_id:
+        for item in catalog:
+            if item["problem_id"].lower() == problem_id.strip().lower():
+                return item
+        raise HTTPException(status_code=400, detail=f"Unknown problem_id '{problem_id}'")
+    raise HTTPException(status_code=400, detail="Provide problem_id")
+
+
+def _validate_uploaded_image(image: UploadFile) -> None:
+    """Validate uploaded image extension and size before processing."""
+    file_extension = os.path.splitext(image.filename or "")[1].lower()
+    if file_extension not in ALLOWED_IMAGE_EXTENSIONS:
+        raise HTTPException(
+            status_code=415,
+            detail=f"Unsupported image type '{file_extension}'. Allowed: {sorted(ALLOWED_IMAGE_EXTENSIONS)}"
+        )
+    current_pos = image.file.tell()
+    image.file.seek(0, os.SEEK_END)
+    file_size = image.file.tell()
+    image.file.seek(current_pos)
+    if file_size > MAX_IMAGE_SIZE_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"Image too large ({file_size} bytes). Max allowed: {MAX_IMAGE_SIZE_BYTES} bytes"
+        )
+
+
+def _save_uploaded_image_to_temp(image: UploadFile) -> Path:
+    """Persist uploaded image to temp directory and return the saved path."""
+    import uuid as _uuid
+    upload_dir = Path("./temp/uploads")
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    file_extension = os.path.splitext(image.filename or "")[1] or ".jpg"
+    temp_filename = f"{_uuid.uuid4()}{file_extension}"
+    temp_path = upload_dir / temp_filename
+    file_bytes = image.file.read()
+    with open(temp_path, "wb") as f:
+        f.write(file_bytes)
+    return temp_path
+
+def get_math_state_from_checkpoint(thread_id: str) -> Optional[Dict[str, Any]]:
+    """Get the state snapshot from the math graph checkpoint."""
+    try:
+        state_snapshot = math_graph.get_state(
+            config={"configurable": {"thread_id": thread_id}}
+        )
+        if state_snapshot and state_snapshot.values:
+            return state_snapshot.values
+        return None
+    except Exception as e:
+        print(f"Error retrieving math state for thread {thread_id}: {e}")
+        return None
+
+
+def _extract_math_metadata(state: Dict[str, Any]) -> SessionMetadata:
+    """Extract metadata from math agent state into the shared SessionMetadata model."""
+    from api_servers.schemas import SessionMetadata
+    return SessionMetadata(
+        show_simulation=False,
+        simulation_config={},
+        image_url=None,
+        image_description=None,
+        image_node=None,
+        video_url=None,
+        video_node=None,
+        quiz_score=-1.0,
+        retrieval_score=-1.0,
+        sim_concepts=[],
+        sim_current_idx=-1,
+        sim_total_concepts=0,
+        misconception_detected=False,
+        last_correction="",
+        node_transitions=state.get("node_transitions", []),
+    )
+
+
+@app.get("/math/problems", response_model=ProblemsListResponse, tags=["Maths Agent"])
+def list_math_problems(user_email: str = Depends(get_current_user)):
+    """List all available math problems that can be solved."""
+    try:
+        print(f"API /math/problems - user: {user_email}")
+        catalog = _load_problem_catalog()
+        problems = [
+            ProblemInfo(
+                problem_id=item["problem_id"],
+                topic=item["topic"],
+                difficulty=item.get("difficulty") if isinstance(item.get("difficulty"), str) else None,
+            )
+            for item in catalog
+        ]
+        return ProblemsListResponse(
+            success=True,
+            problems=problems,
+            total=len(problems),
+            message=f"Retrieved {len(problems)} available problems",
+        )
+    except Exception as e:
+        print(f"API error in /math/problems: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving problems: {str(e)}")
+
+
+@app.post("/math/session/start", response_model=MathStartSessionResponse, tags=["Maths Agent"])
+def start_math_session(
+    request: MathStartSessionRequest,
+    user_email: str = Depends(get_current_user_rate_limited),
+):
+    """Start a new math tutoring session. Rate-limited per email."""
+    try:
+        resolved_problem = _resolve_problem(request.problem_id)
+        selected_problem_id = resolved_problem["problem_id"]
+        selected_topic = resolved_problem["topic"]
+
+        print(
+            f"API /math/session/start - problem_id: {selected_problem_id}, "
+            f"topic: {selected_topic}, student: {request.student_id}, "
+            f"language: {'Kannada' if request.is_kannada else 'English'}, user: {user_email}"
+        )
+
+        thread_id = generate_thread_id(
+            concept_title=selected_topic,
+            is_kannada=request.is_kannada,
+            label="maths",
+            user_id=request.student_id,
+        )
+
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        base = "math-session"
+        session_id = f"{base}-{timestamp}"
+        user_id = request.student_id or "anonymous"
+
+        print(f"[INFO] Generated math thread_id: {thread_id}")
+
+        result = math_graph.invoke(
+            {
+                "messages": [HumanMessage(content="__start__")],
+                "is_kannada": request.is_kannada,
+                "concept_title": selected_topic,
+                "problem_id": selected_problem_id,
+                "summary": "",
+                "summary_last_index": -1,
+            },
+            config={"configurable": {"thread_id": thread_id}},
+        )
+
+        agent_response = result.get("agent_output", "")
+        if not agent_response and result.get("messages"):
+            messages = result.get("messages", [])
+            for msg in reversed(messages):
+                if hasattr(msg, "type") and msg.type == "ai":
+                    agent_response = msg.content
+                    break
+
+        metadata = _extract_math_metadata(result)
+
+        return MathStartSessionResponse(
+            success=True,
+            session_id=session_id,
+            thread_id=thread_id,
+            problem_id=selected_problem_id,
+            user_id=user_id,
+            agent_response=agent_response,
+            current_state=result.get("current_state", "START"),
+            message="Session started successfully. Agent is ready for student input.",
+            metadata=metadata,
+        )
+
+    except MinuteLimitExhaustedError as e:
+        print(f"[API] Rate limit (minute): {e}")
+        raise HTTPException(status_code=501, detail=f"Rate limit exceeded: {e}")
+    except DayLimitExhaustedError as e:
+        print(f"[API] Rate limit (day): {e}")
+        raise HTTPException(status_code=502, detail=f"Daily limit exceeded: {e}")
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"API error in /math/session/start: {str(e)}")
+        print(f"Full traceback:\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Error starting math session: {str(e)}")
+
+
+@app.post("/math/session/continue", response_model=MathContinueSessionResponse, tags=["Maths Agent"])
+def continue_math_session(
+    thread_id: str = Form(...),
+    user_message: str = Form(""),
+    image: Optional[UploadFile] = File(None),
+    user_email: str = Depends(get_current_user_rate_limited),
+):
+    """Continue a math tutoring session. Accepts multipart form data (text + optional image). Rate-limited."""
+    temp_image_path: Optional[Path] = None
+    try:
+        resolved_thread_id = thread_id.strip()
+        resolved_user_message = user_message.strip()
+        has_image = bool(image and image.filename)
+
+        if not has_image and not resolved_user_message:
+            raise HTTPException(status_code=400, detail="Provide either image or user_message")
+
+        input_content = resolved_user_message
+        if has_image and image:
+            _validate_uploaded_image(image)
+            temp_image_path = _save_uploaded_image_to_temp(image)
+            ocr_result = process_image_from_path(str(temp_image_path))
+            image_text = (ocr_result.get("text") or "").strip()
+            if not image_text:
+                image_text = "[Image uploaded but no text extracted.]"
+            if resolved_user_message:
+                input_content = f"{image_text}\n\n{resolved_user_message}"
+            else:
+                input_content = image_text
+            print(f"[INFO] Math image uploaded: {image.filename} -> {temp_image_path}")
+
+        print(f"API /math/session/continue - thread: {resolved_thread_id}, user: {user_email}, msg: {input_content[:50]}...")
+
+        existing_state = get_math_state_from_checkpoint(resolved_thread_id)
+        if existing_state is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Math session not found for thread_id: {resolved_thread_id}. Please start a new session.",
+            )
+
+        update_dict = {"messages": [HumanMessage(content=input_content)]}
+        cmd = Command(resume=True, update=update_dict)
+
+        result = math_graph.invoke(
+            cmd,
+            config={"configurable": {"thread_id": resolved_thread_id}},
+        )
+
+        agent_response = result.get("agent_output", "")
+        if not agent_response and result.get("messages"):
+            messages = result.get("messages", [])
+            for msg in reversed(messages):
+                if hasattr(msg, "type") and msg.type == "ai":
+                    agent_response = msg.content
+                    break
+
+        metadata = _extract_math_metadata(result)
+
+        return MathContinueSessionResponse(
+            success=True,
+            thread_id=resolved_thread_id,
+            agent_response=agent_response,
+            current_state=result.get("current_state", "UNKNOWN"),
+            metadata=metadata,
+            message="Response generated successfully",
+        )
+
+    except MinuteLimitExhaustedError as e:
+        print(f"[API] Rate limit (minute): {e}")
+        raise HTTPException(status_code=501, detail=f"Rate limit exceeded: {e}")
+    except DayLimitExhaustedError as e:
+        print(f"[API] Rate limit (day): {e}")
+        raise HTTPException(status_code=502, detail=f"Daily limit exceeded: {e}")
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"API error in /math/session/continue: {str(e)}")
+        print(f"Full traceback:\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Error continuing math session: {str(e)}")
+    finally:
+        if temp_image_path and temp_image_path.exists():
+            try:
+                temp_image_path.unlink()
+            except Exception as cleanup_error:
+                print(f"[WARN] Failed to cleanup temp upload {temp_image_path}: {cleanup_error}")
+
+
+@app.get("/math/session/status/{thread_id}", response_model=MathSessionStatusResponse, tags=["Maths Agent"])
+def get_math_session_status(
+    thread_id: str,
+    user_email: str = Depends(get_current_user),
+):
+    """Get the status of a math tutoring session."""
+    try:
+        print(f"API /math/session/status - thread: {thread_id}, user: {user_email}")
+        state = get_math_state_from_checkpoint(thread_id)
+        if state is None:
+            return MathSessionStatusResponse(
+                success=True,
+                thread_id=thread_id,
+                exists=False,
+                message="Math session not found",
+            )
+
+        return MathSessionStatusResponse(
+            success=True,
+            thread_id=thread_id,
+            exists=True,
+            current_state=state.get("current_state"),
+            problem_id=state.get("problem_id"),
+            progress={
+                "step_index": state.get("step_index", 0),
+                "max_steps": state.get("max_steps", 0),
+                "Ta": state.get("Ta", 0.0),
+                "Tu": state.get("Tu", 0.0),
+                "nudge_count": state.get("nudge_count", 0),
+                "scaffold_retry_count": state.get("scaffold_retry_count", 0),
+                "solved": state.get("solved", False),
+                "concepts_taught": state.get("concepts_taught", []),
+                "missing_concepts": state.get("missing_concepts", []),
+                "is_kannada": state.get("is_kannada", False),
+            },
+            message="Status retrieved successfully.",
+        )
+    except Exception as e:
+        print(f"API error in /math/session/status: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving math session status: {str(e)}")
+
+
+@app.get("/math/session/history/{thread_id}", response_model=MathSessionHistoryResponse, tags=["Maths Agent"])
+def get_math_session_history(
+    thread_id: str,
+    user_email: str = Depends(get_current_user),
+):
+    """Get the conversation history of a math tutoring session."""
+    try:
+        print(f"API /math/session/history - thread: {thread_id}, user: {user_email}")
+        state = get_math_state_from_checkpoint(thread_id)
+        if state is None:
+            return MathSessionHistoryResponse(
+                success=True,
+                thread_id=thread_id,
+                exists=False,
+                message="Math session not found",
+            )
+
+        history = []
+        messages = state.get("messages", [])
+        for msg in messages:
+            if hasattr(msg, "type"):
+                if msg.type == "human" and msg.content != "__start__":
+                    history.append({"role": "user", "content": msg.content})
+                elif msg.type == "ai":
+                    history.append({
+                        "role": "assistant",
+                        "content": msg.content,
+                        "node": state.get("current_state", "unknown"),
+                    })
+
+        return MathSessionHistoryResponse(
+            success=True,
+            thread_id=thread_id,
+            exists=True,
+            messages=history,
+            node_transitions=state.get("node_transitions", []),
+            problem_id=state.get("problem_id"),
+            message="History retrieved successfully.",
+        )
+    except Exception as e:
+        print(f"API error in /math/session/history: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving math session history: {str(e)}")
+
+
+# ============================================================================
+# STARTUP LOG
+# ============================================================================
+
 print("=" * 80)
 print("🎓 Educational Agent API Server Starting...")
 print("=" * 80)
-print(f"Agent Type: educational_agent_optimized_langsmith_v5")
+print(f"Agent Type: educational_agent_optimized_langsmith_v5 + math_tutor")
 print(f"Concept: Dynamic (passed via API request)")
 print(f"Persistence: Supabase-Postgres (LangGraph)")
 print("=" * 80)
@@ -1729,15 +2152,21 @@ print("  GET  /test/personas - List available test personas")
 print("  POST /test/persona - Test with predefined persona")
 print("  POST /test/images - Get image for a concept")
 print("  POST /test/simulation - Get simulation config for a concept")
-print("  POST /concept-map/generate - Generate concept map timeline (character-based timing)")
+print("  POST /concept-map/generate - Generate concept map timeline")
 print("  GET  /revision/chapters - List available revision chapters")
 print("  POST /revision/session/start - Start new revision session")
 print("  POST /revision/session/continue - Continue existing revision session")
 print("  GET  /revision/session/status/{thread_id} - Get revision session status")
 print("  GET  /revision/session/history/{thread_id} - Get revision conversation history")
 print("  DELETE /revision/session/{thread_id} - Delete revision session")
-print("  POST /translate/to-kannada - Translate text to Kannada (Azure)")
-print("  POST /translate/to-english - Translate text to English (Gemini)")
+print("  POST /translate/to-kannada - Translate text to Kannada")
+print("  POST /translate/to-english - Translate text to English")
+print("  --- Math Tutoring Agent ---")
+print("  GET  /math/problems - List all available math problems")
+print("  POST /math/session/start - Start new math session")
+print("  POST /math/session/continue - Continue math session (multipart)")
+print("  GET  /math/session/status/{thread_id} - Get math session status")
+print("  GET  /math/session/history/{thread_id} - Get math conversation history")
 print("=" * 80)
 print(f"Available Test Personas: {len(personas)}")
 for p in personas:

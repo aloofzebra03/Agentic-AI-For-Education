@@ -57,4 +57,10 @@ orjson
 # Firebase
 firebase-admin
 
+# OCR (Cloudflare Workers AI fallback)
+cloudflare
+
+# Multipart form support (for image uploads)
+python-multipart
+
 -e .

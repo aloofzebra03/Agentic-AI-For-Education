@@ -46,6 +46,8 @@ COPY api_tracker_utils/ /app/api_tracker_utils/
 COPY api_servers/ /app/api_servers/
 COPY science_jsons/ /app/science_jsons/
 COPY NCERT/ /app/NCERT/
+COPY educational_agent_math_tutor/ /app/educational_agent_math_tutor/
+COPY problems_json/ /app/problems_json/
 
 # Install project in editable mode (makes all modules importable)
 RUN pip install --no-cache-dir -e .
