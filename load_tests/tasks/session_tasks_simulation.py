@@ -3,6 +3,7 @@ import random
 import time
 from utils.response_generator import ResponseGenerator
 from utils.metrics_collector import global_metrics
+from config import AUTH_HEADERS
 
 
 class SessionTaskSet(TaskSet):
@@ -31,6 +32,7 @@ class SessionTaskSet(TaskSet):
                 "student_id": f"load_test_user_{id(self)}",
                 "language": "english"
             },
+            headers=AUTH_HEADERS,
             catch_response=True,
             name="/simulation/session/start"
         ) as response:
@@ -84,6 +86,7 @@ class SessionTaskSet(TaskSet):
             json={
                 "student_response": user_message
             },
+            headers=AUTH_HEADERS,
             catch_response=True,
             name="/simulation/session/{session_id}/respond"
         ) as response:
@@ -148,6 +151,7 @@ class SessionTaskSet(TaskSet):
         
         with self.client.get(
             f"/simulation/session/{self.session_id}",
+            headers=AUTH_HEADERS,
             catch_response=True,
             name="/simulation/session/{session_id}"
         ) as response:

@@ -7,6 +7,7 @@ import uvicorn
 from typing import Dict, Optional, Any, List
 import sys
 import os
+import json
 import traceback
 from pathlib import Path
 from datetime import datetime
@@ -80,7 +81,7 @@ from utils.shared_utils import (
 from utils.ocr_utilities import process_image_from_path
 
 from api_tracker_utils.error import MinuteLimitExhaustedError, DayLimitExhaustedError
-from api_tracker_utils.tracker import track_model_call
+from api_tracker_utils.tracker import track_model_call, get_tracker_stats
 
 # Import question bank loader for listing available chapters
 from revision_agent.question_bank import load_question_bank
@@ -327,6 +328,7 @@ def read_root():
             "POST /test/persona - Test with predefined persona",
             "POST /test/images - Get image for a concept",
             "POST /test/simulation - Get simulation config for a concept",
+            "GET  /test/api-key-metrics - Export tracker API/model usage metrics",
             "POST /concept-map/generate - Generate concept map timeline from description",
             "GET  /simulation - Simulation health check",
             "POST /simulation/session/start - Start simulation teaching session",
@@ -342,6 +344,11 @@ def read_root():
             "GET  /revision/session/status/{thread_id} - Get revision session status",
             "GET  /revision/session/history/{thread_id} - Get revision conversation history",
             "DELETE /revision/session/{thread_id} - Delete revision session",
+            "GET  /math/problems - List all available math problems",
+            "POST /math/session/start - Start new math session",
+            "POST /math/session/continue - Continue math session (multipart: text/image/is_kannada)",
+            "GET  /math/session/status/{thread_id} - Get math session status",
+            "GET  /math/session/history/{thread_id} - Get math conversation history",
         ]
     }
 
@@ -368,6 +375,7 @@ def health_check():
             "/test/persona",
             "/test/images",
             "/test/simulation",
+            "/test/api-key-metrics",
             "/concept-map/generate",
             "/translate/to-kannada",
             "/translate/to-english",
@@ -377,6 +385,11 @@ def health_check():
             "/revision/session/status/{thread_id}",
             "/revision/session/history/{thread_id}",
             "/revision/session/{thread_id}",
+            "/math/problems",
+            "/math/session/start",
+            "/math/session/continue",
+            "/math/session/status/{thread_id}",
+            "/math/session/history/{thread_id}",
         ]
     )
 
@@ -897,6 +910,40 @@ def get_test_simulation(request: TestSimulationRequest, user: dict = Depends(get
     except Exception as e:
         print(f"API error in /test/simulation: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error retrieving simulation config: {str(e)}")
+
+
+@app.get("/test/api-key-metrics", response_model=Dict[str, Any], tags=["Education Agent"])
+def export_api_key_metrics(user: dict = Depends(get_current_user)):
+    """Export tracker API/model usage metrics for load-test reports."""
+    try:
+        stats = get_tracker_stats()
+        summary = {
+            "api_key_count": len(stats),
+            "model_pair_count": sum(len(models) for models in stats.values()),
+            "total_calls": sum(
+                model_stats.get("total_calls", 0)
+                for models in stats.values()
+                for model_stats in models.values()
+            ),
+            "exported_at": datetime.now().isoformat(),
+        }
+
+        reports_dir = Path(__file__).resolve().parent.parent / "load_tests" / "reports"
+        reports_dir.mkdir(parents=True, exist_ok=True)
+        filepath = reports_dir / f"api_key_metrics_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        with filepath.open("w", encoding="utf-8") as f:
+            json.dump({"summary": summary, "stats": stats}, f, indent=2)
+
+        return {
+            "success": True,
+            "message": "API key metrics exported successfully",
+            "filepath": str(filepath),
+            "summary": summary,
+            "stats": stats,
+        }
+    except Exception as e:
+        print(f"API error in /test/api-key-metrics: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error exporting API key metrics: {str(e)}")
 
 
 @app.post("/concept-map/generate", response_model=ConceptMapResponse, tags=["Education Agent"])
@@ -1745,8 +1792,11 @@ def _iter_json_objects(raw_text: str):
 
 
 def _load_problem_catalog() -> List[Dict[str, Any]]:
-    """Load problem metadata from problems_json files."""
-    problems_dir = Path(__file__).parent.parent / "problems_json"
+    """Load problem metadata from math problem JSON files."""
+    repo_root = Path(__file__).parent.parent
+    problems_dir = repo_root / "math_problems_jsons"
+    if not problems_dir.exists():
+        problems_dir = repo_root / "problems_json"
     if not problems_dir.exists():
         return []
     catalog: List[Dict[str, Any]] = []
@@ -1773,7 +1823,7 @@ def _resolve_problem(problem_id: Optional[str]) -> Dict[str, Any]:
     """Resolve incoming session target to a concrete problem from catalog."""
     catalog = _load_problem_catalog()
     if not catalog:
-        raise HTTPException(status_code=500, detail="No problems available in problems_json")
+        raise HTTPException(status_code=500, detail="No problems available in math_problems_jsons")
     if problem_id:
         for item in catalog:
             if item["problem_id"].lower() == problem_id.strip().lower():
@@ -1958,6 +2008,7 @@ def start_math_session(
 def continue_math_session(
     thread_id: str = Form(...),
     user_message: str = Form(""),
+    is_kannada: Optional[bool] = Form(None),
     image: Optional[UploadFile] = File(None),
     user_email: str = Depends(get_current_user_rate_limited),
 ):
@@ -1995,6 +2046,9 @@ def continue_math_session(
             )
 
         update_dict = {"messages": [HumanMessage(content=input_content)]}
+        if is_kannada is not None:
+            update_dict["is_kannada"] = is_kannada
+            print(f"[INFO] Math language updated to: {'Kannada' if is_kannada else 'English'}")
         cmd = Command(resume=True, update=update_dict)
 
         result = math_graph.invoke(
@@ -2152,6 +2206,7 @@ print("  GET  /test/personas - List available test personas")
 print("  POST /test/persona - Test with predefined persona")
 print("  POST /test/images - Get image for a concept")
 print("  POST /test/simulation - Get simulation config for a concept")
+print("  GET  /test/api-key-metrics - Export tracker API/model usage metrics")
 print("  POST /concept-map/generate - Generate concept map timeline")
 print("  GET  /revision/chapters - List available revision chapters")
 print("  POST /revision/session/start - Start new revision session")
@@ -2164,7 +2219,7 @@ print("  POST /translate/to-english - Translate text to English")
 print("  --- Math Tutoring Agent ---")
 print("  GET  /math/problems - List all available math problems")
 print("  POST /math/session/start - Start new math session")
-print("  POST /math/session/continue - Continue math session (multipart)")
+print("  POST /math/session/continue - Continue math session (multipart: text/image/is_kannada)")
 print("  GET  /math/session/status/{thread_id} - Get math session status")
 print("  GET  /math/session/history/{thread_id} - Get math conversation history")
 print("=" * 80)

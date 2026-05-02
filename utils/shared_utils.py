@@ -35,6 +35,60 @@ print(os.getenv("LANGCHAIN_PROJECT"))
 # Type alias for AgentState - flexible to work with different state structures
 AgentState = Dict[str, Any]
 
+
+def normalize_llm_content(content: Any) -> str:
+    """
+    Return user-visible text from LangChain model content.
+
+    Some Google/Gemma responses arrive as content parts, for example:
+    [{"type": "thinking", ...}, {"type": "text", "text": "..."}].
+    The application nodes expect a plain string, so keep text parts and drop
+    thinking parts before callers use string methods like .strip().
+    """
+    if isinstance(content, str):
+        return content
+    if content is None:
+        return ""
+
+    if isinstance(content, dict):
+        part_type = str(content.get("type", "")).lower()
+        if part_type == "thinking":
+            return ""
+        if content.get("text") is not None:
+            return str(content["text"])
+        if content.get("content") is not None:
+            return normalize_llm_content(content["content"])
+        return ""
+
+    if isinstance(content, list):
+        parts = []
+        for part in content:
+            if isinstance(part, dict) and str(part.get("type", "")).lower() == "thinking":
+                continue
+            text = normalize_llm_content(part)
+            if text:
+                parts.append(text)
+        return "\n".join(parts)
+
+    return str(content)
+
+
+def normalize_llm_response(response):
+    """Ensure LangChain response.content is a string while preserving metadata."""
+    if isinstance(getattr(response, "content", None), str):
+        return response
+
+    normalized_content = normalize_llm_content(getattr(response, "content", ""))
+    try:
+        response.content = normalized_content
+        return response
+    except Exception:
+        if hasattr(response, "model_copy"):
+            return response.model_copy(update={"content": normalized_content})
+        if hasattr(response, "copy"):
+            return response.copy(update={"content": normalized_content})
+        return AIMessage(content=normalized_content)
+
 # ─── Autosuggestion Pool Constants (Single Source of Truth) ──────────────────
 
 # Positive affirmations - student understands/agrees
@@ -234,7 +288,7 @@ def invoke_llm_with_fallback(messages: List, operation_name: str = "LLM call"):
     llm = get_llm(api_key=selected_api_key, model=selected_model)
     
     try:
-        response = llm.invoke(messages)
+        response = normalize_llm_response(llm.invoke(messages))
         print(f"✅ {operation_name} - Success with tracked key and model: {selected_model}")
         return response
     except Exception as e:
@@ -1591,7 +1645,7 @@ def reset_memory_summary(state: AgentState):
 # (Used by educational_agent_math_tutor — problem loading, message building)
 # ============================================================================
 
-def load_problem_from_json(problem_id: str, problems_dir: str = "problems_json") -> Dict[str, Any]:
+def load_problem_from_json(problem_id: str, problems_dir: Optional[str] = None) -> Dict[str, Any]:
     """
     Load a problem definition from JSON files.
 
@@ -1599,7 +1653,8 @@ def load_problem_from_json(problem_id: str, problems_dir: str = "problems_json")
 
     Args:
         problem_id: Unique identifier for the problem (e.g., "add_frac_same_den_01")
-        problems_dir: Directory containing problem JSON files
+        problems_dir: Directory containing problem JSON files. Defaults to the
+            math tutor config value, currently math_problems_jsons.
 
     Returns:
         Dictionary containing problem data
@@ -1609,10 +1664,29 @@ def load_problem_from_json(problem_id: str, problems_dir: str = "problems_json")
         ValueError: If problem_id not found in any JSON file
     """
     current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    problems_path = os.path.join(current_dir, problems_dir)
+    if problems_dir is None:
+        try:
+            from educational_agent_math_tutor.config import PROBLEMS_DIR
+            problems_dir = PROBLEMS_DIR
+        except Exception:
+            problems_dir = "math_problems_jsons"
 
-    if not os.path.exists(problems_path):
-        raise FileNotFoundError(f"Problems directory not found: {problems_path}")
+    candidate_dirs = [problems_dir]
+    if problems_dir != "math_problems_jsons":
+        candidate_dirs.append("math_problems_jsons")
+    if problems_dir != "problems_json":
+        candidate_dirs.append("problems_json")
+
+    problems_path = None
+    for candidate_dir in candidate_dirs:
+        candidate_path = os.path.join(current_dir, candidate_dir)
+        if os.path.exists(candidate_path):
+            problems_path = candidate_path
+            break
+
+    if problems_path is None:
+        searched = ", ".join(os.path.join(current_dir, d) for d in candidate_dirs)
+        raise FileNotFoundError(f"Problems directory not found. Searched: {searched}")
 
     for filename in os.listdir(problems_path):
         if not filename.endswith('.json'):
@@ -1633,13 +1707,13 @@ def load_problem_from_json(problem_id: str, problems_dir: str = "problems_json")
                         brace_count += 1
                     elif char == '}':
                         brace_count -= 1
-                        if brace_count == 0 and current_obj.strip():
+                        if brace_count == 0 and current_obj.strip(' \n\r\t,[]'):
                             try:
-                                obj = json.loads(current_obj.strip())
+                                obj = json.loads(current_obj.strip(' \n\r\t,[]'))
                                 json_objects.append(obj)
-                                current_obj = ""
                             except json.JSONDecodeError:
                                 pass
+                            current_obj = ""
 
                 for problem_data in json_objects:
                     if problem_data.get('problem_id') == problem_id:

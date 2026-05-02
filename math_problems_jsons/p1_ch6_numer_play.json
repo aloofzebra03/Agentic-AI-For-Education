@@ -1,0 +1,337 @@
+[
+  {
+    "problem_id": "num_play_parity_contradiction_01",
+    "topic": "Parity (Odd/Even Reasoning and Contradictions)",
+    "difficulty": "medium",
+    "question": "A student claims they can pick exactly five odd numbers from the set {1, 3, 5, 7, 9, 11, 13, 15} that sum up to exactly 30. Explain using parity (even/odd rules) why this is mathematically impossible.",
+    "final_answer": "It is impossible because the sum of an odd number of odd numbers is always odd, and 30 is even.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Identify the property of the numbers being added: all available choices are odd numbers.",
+          "concept": "data_analysis"
+        },
+        {
+          "step_id": 2,
+          "description": "Recall the parity rules for addition: odd + odd = even, and even + odd = odd.",
+          "concept": "parity_addition_rules"
+        },
+        {
+          "step_id": 3,
+          "description": "Group the five odd numbers to find their total parity: (odd + odd) + (odd + odd) + odd. This simplifies to (even) + (even) + odd.",
+          "concept": "grouping_logic"
+        },
+        {
+          "step_id": 4,
+          "description": "Simplify further: even + even = even. Then, even + odd = odd. Thus, the sum of any five odd numbers must be an odd number.",
+          "concept": "logical_deduction"
+        },
+        {
+          "step_id": 5,
+          "description": "Since 30 is an even number, it is impossible for it to be the sum of five odd numbers.",
+          "concept": "proof_by_contradiction"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Trying to repeatedly guess and check numbers instead of stepping back to look at the mathematical rule.",
+      "Assuming that adding more numbers will eventually 'fix' the parity issue."
+    ],
+    "required_concepts": [
+      "parity_rules",
+      "mathematical_impossibility",
+      "logical_proofs"
+    ]
+  },
+  {
+    "problem_id": "num_play_expression_parity_01",
+    "topic": "Parity of Algebraic Expressions",
+    "difficulty": "medium",
+    "question": "Determine whether the algebraic expression 3n + 5 will always yield an even number, always yield an odd number, or if it depends on whether the integer 'n' is even or odd. Justify your reasoning.",
+    "final_answer": "It depends on 'n'. It is even when 'n' is odd, and odd when 'n' is even.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Break the expression into parts and test Case 1: assume 'n' is an even number.",
+          "concept": "case_based_reasoning"
+        },
+        {
+          "step_id": 2,
+          "description": "If 'n' is even, multiplying it by 3 (an odd number) results in an even number (odd * even = even). Thus, 3n is even.",
+          "concept": "parity_multiplication"
+        },
+        {
+          "step_id": 3,
+          "description": "Adding 5 (an odd number) to the even 3n gives an odd result (even + odd = odd).",
+          "concept": "parity_addition"
+        },
+        {
+          "step_id": 4,
+          "description": "Test Case 2: assume 'n' is an odd number. Multiplying by 3 gives an odd number (odd * odd = odd). Thus, 3n is odd.",
+          "concept": "parity_multiplication"
+        },
+        {
+          "step_id": 5,
+          "description": "Adding 5 to the odd 3n gives an even result (odd + odd = even). Therefore, the parity strictly depends on 'n'.",
+          "concept": "final_conclusion"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Testing with Values",
+        "steps": [
+          "Let n = 2 (even). 3(2) + 5 = 6 + 5 = 11 (odd).",
+          "Let n = 3 (odd). 3(3) + 5 = 9 + 5 = 14 (even).",
+          "Since the result changes parity depending on the input, it depends on 'n'."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Assuming that because 3 and 5 are odd, the result must always be odd.",
+      "Only testing one value for 'n' and assuming the pattern holds for all numbers."
+    ],
+    "required_concepts": [
+      "algebraic_parity",
+      "generalization",
+      "variable_dependencies"
+    ]
+  },
+  {
+    "problem_id": "num_play_grid_impossibility_01",
+    "topic": "Grid Logic and Impossibility",
+    "difficulty": "medium",
+    "question": "Consider a 3x3 grid. You are asked to fill it with the digits 1 through 9 exactly once so that the sum of the numbers in every single row is exactly 14. Explain mathematically why this task is impossible.",
+    "final_answer": "It is impossible because the total sum of digits 1-9 is 45, which is not divisible by 14. Three rows of 14 would only sum to 42.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Calculate the total sum of all the numbers available to put in the grid (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9). The total is 45.",
+          "concept": "calculating_total_sum"
+        },
+        {
+          "step_id": 2,
+          "description": "Analyze the requirement: the grid has 3 distinct rows, and every number 1-9 must be placed exactly once, so the rows must contain all the numbers.",
+          "concept": "grid_structure"
+        },
+        {
+          "step_id": 3,
+          "description": "Calculate the required sum if the rule were followed: 3 rows \u00d7 14 per row = a total sum of 42.",
+          "concept": "calculating_required_sum"
+        },
+        {
+          "step_id": 4,
+          "description": "Compare the totals. The numbers in the grid sum to 45, but the row constraints demand a sum of 42. Since 45 \u2260 42, the grid cannot be constructed.",
+          "concept": "invariant_contradiction"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Trying to draw grids and repeatedly failing without realizing there's a mathematical proof of impossibility.",
+      "Forgetting that all 9 numbers must be used exactly once."
+    ],
+    "required_concepts": [
+      "invariant_logic",
+      "impossibility_proofs",
+      "summation"
+    ]
+  },
+  {
+    "problem_id": "num_play_magic_square_constraints_01",
+    "topic": "Magic Squares (Constraints & Reasoning)",
+    "difficulty": "hard",
+    "question": "In a 3x3 magic square using digits 1-9 (where each row, column, and diagonal sums to 15), the center is 5. Explain step-by-step why placing the number 9 in any corner leads to a grid contradiction.",
+    "final_answer": "Placing 9 in a corner requires two other pairs of numbers to sum to 6 for the row and column. However, only the pair (2, 4) is available, leading to a contradiction.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Place 5 in the center. Assume we try to place 9 in the top-left corner.",
+          "concept": "grid_setup"
+        },
+        {
+          "step_id": 2,
+          "description": "The diagonal containing 9 and 5 must sum to 15. So, the bottom-right corner must be 1 (9 + 5 + 1 = 15).",
+          "concept": "diagonal_constraint"
+        },
+        {
+          "step_id": 3,
+          "description": "Consider the top row. It already has 9, so the other two empty squares in that row must sum to 6 to reach 15. The only available unused digits that sum to 6 are 2 and 4.",
+          "concept": "row_constraint"
+        },
+        {
+          "step_id": 4,
+          "description": "Consider the left column. It also starts with 9, so its two empty squares must also sum to 6.",
+          "concept": "column_constraint"
+        },
+        {
+          "step_id": 5,
+          "description": "Since 2 and 4 are already required for the top row, and we cannot reuse numbers or use 3+3, we have no valid numbers left to complete the left column. This contradiction proves 9 cannot be in a corner.",
+          "concept": "logical_contradiction"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Assuming 9 can go in a corner because 9+5+1 = 15 works for the diagonal, but failing to check the row and column requirements simultaneously."
+    ],
+    "required_concepts": [
+      "magic_square_properties",
+      "combinatorial_constraints",
+      "proof_by_contradiction"
+    ]
+  },
+  {
+    "problem_id": "num_play_cryptarithms_01",
+    "topic": "Cryptarithms (Digit Puzzles)",
+    "difficulty": "medium",
+    "question": "Solve the cryptarithm AA + B = BCC, where each distinct letter represents a distinct single digit (0-9). Find the numerical values of A, B, and C.",
+    "final_answer": "A = 9, B = 1, C = 0. (99 + 1 = 100).",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Analyze the structure: 'AA' is a two-digit number, and adding a single digit 'B' results in a three-digit number 'BCC'.",
+          "concept": "place_value_analysis"
+        },
+        {
+          "step_id": 2,
+          "description": "Determine B: The absolute maximum sum of a two-digit and single-digit number is 99 + 9 = 108. Therefore, the resulting three-digit number must be in the 100s. This forces B to equal 1.",
+          "concept": "upper_bound_logic"
+        },
+        {
+          "step_id": 3,
+          "description": "Substitute B = 1 into the puzzle: AA + 1 = 1CC.",
+          "concept": "substitution"
+        },
+        {
+          "step_id": 4,
+          "description": "Determine A: For a two-digit number to roll over into the 100s by simply adding 1, the original number must be 99. Therefore, A must equal 9.",
+          "concept": "number_transitions"
+        },
+        {
+          "step_id": 5,
+          "description": "Determine C: Calculate 99 + 1 = 100. Comparing this to 1CC reveals that C must equal 0.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Guessing numbers randomly instead of using the 'carry-over' logic to force B to be 1.",
+      "Assuming letters can represent the same digit (e.g., trying to make A and B the same number)."
+    ],
+    "required_concepts": [
+      "cryptarithms",
+      "place_value",
+      "carry_over_logic"
+    ]
+  },
+  {
+    "problem_id": "num_play_product_parity_01",
+    "topic": "Parity (Products)",
+    "difficulty": "easy",
+    "question": "Without performing the actual long multiplication, logically determine whether the final product of 47 \u00d7 83 \u00d7 105 is an even number or an odd number. State the rule used.",
+    "final_answer": "Odd. The product of only odd numbers is always odd.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Examine the units digit of each factor to determine their parity. 47 (ends in 7) is odd, 83 (ends in 3) is odd, and 105 (ends in 5) is odd.",
+          "concept": "identifying_parity"
+        },
+        {
+          "step_id": 2,
+          "description": "Recall the multiplication rule for parity: an odd number multiplied by an odd number always yields an odd number.",
+          "concept": "parity_multiplication_rules"
+        },
+        {
+          "step_id": 3,
+          "description": "Since all the factors are odd, there is no even number (no factor of 2) to trigger an even result.",
+          "concept": "logical_deduction"
+        },
+        {
+          "step_id": 4,
+          "description": "Therefore, the entire product will strictly be an odd number.",
+          "concept": "final_conclusion"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Wasting time doing the full multiplication, risking calculation errors.",
+      "Confusing addition rules with multiplication rules (e.g., thinking odd + odd is even, so odd \u00d7 odd must be even)."
+    ],
+    "required_concepts": [
+      "parity_of_products",
+      "mental_math_shortcuts"
+    ]
+  },
+  {
+    "problem_id": "num_play_virahanka_fibonacci_01",
+    "topic": "Combinatorics (Virah\u0101\u1e45ka\u2013Fibonacci Sequence)",
+    "difficulty": "hard",
+    "question": "Using the logic of the Virah\u0101\u1e45ka\u2013Fibonacci sequence, how many valid ways can you write the number 6 as a sum composed exclusively of 1s and 2s? Explain the sequence logic.",
+    "final_answer": "13 ways.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Recognize that finding combinations of 1s and 2s to reach a total follows the Virah\u0101\u1e45ka-Fibonacci sequence, where the ways to reach step 'N' equals the sum of the ways to reach step 'N-1' and 'N-2'.",
+          "concept": "pattern_recognition"
+        },
+        {
+          "step_id": 2,
+          "description": "Establish base cases. To sum to 1, there is 1 way: (1). To sum to 2, there are 2 ways: (1,1) and (2).",
+          "concept": "base_cases"
+        },
+        {
+          "step_id": 3,
+          "description": "Apply the recursive addition for N=3: 1 + 2 = 3 ways.",
+          "concept": "sequence_step_3"
+        },
+        {
+          "step_id": 4,
+          "description": "Apply for N=4: 2 + 3 = 5 ways.",
+          "concept": "sequence_step_4"
+        },
+        {
+          "step_id": 5,
+          "description": "Apply for N=5: 3 + 5 = 8 ways.",
+          "concept": "sequence_step_5"
+        },
+        {
+          "step_id": 6,
+          "description": "Apply for the target N=6: 5 + 8 = 13 ways.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Manual Listing",
+        "steps": [
+          "List combinations with six 1s (1 way).",
+          "List combinations with four 1s and one 2 (5 ways).",
+          "List combinations with two 1s and two 2s (6 ways).",
+          "List combinations with three 2s (1 way).",
+          "Add them up: 1 + 5 + 6 + 1 = 13 ways."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Losing track while manually listing them all and missing one or two combinations.",
+      "Misidentifying the sequence rule as simple doubling."
+    ],
+    "required_concepts": [
+      "virahanka_fibonacci_sequence",
+      "combinatorial_decomposition",
+      "recursive_addition"
+    ]
+  }
+]

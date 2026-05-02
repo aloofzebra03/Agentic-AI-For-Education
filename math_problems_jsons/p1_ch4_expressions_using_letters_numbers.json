@@ -1,0 +1,437 @@
+[
+  {
+    "problem_id": "arith_algebra_bridge_01",
+    "topic": "Arithmetic Expressions (Foundations & Brackets)",
+    "difficulty": "medium",
+    "question": "Evaluate the arithmetic expression 68 - (18 + 13) in two different ways to show that the value remains the same: first by solving the bracket, and second by opening the brackets properly.",
+    "final_answer": "37",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Method 1 (Solving bracket first): Add the numbers inside the parenthesis. 18 + 13 = 31.",
+          "concept": "order_of_operations"
+        },
+        {
+          "step_id": 2,
+          "description": "Subtract the result from 68. 68 - 31 = 37.",
+          "concept": "subtraction"
+        },
+        {
+          "step_id": 3,
+          "description": "Method 2 (Opening brackets): Distribute the negative sign to both terms inside the bracket. The expression becomes 68 - 18 - 13.",
+          "concept": "removing_brackets"
+        },
+        {
+          "step_id": 4,
+          "description": "Subtract sequentially from left to right. 68 - 18 = 50. Then 50 - 13 = 37. Both methods yield the same result.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Grouping with Addition",
+        "steps": [
+          "Rewrite subtraction as addition of negative numbers: 68 + (-18) + (-13)",
+          "Combine the negative numbers: 68 + (-31)",
+          "Solve: 37"
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Removing the brackets without changing the sign of the second term (calculating 68 - 18 + 13 = 63)."
+    ],
+    "required_concepts": [
+      "bracket_handling",
+      "sign_distribution",
+      "multiple_evaluation_methods"
+    ]
+  },
+  {
+    "problem_id": "alg_error_correction_01",
+    "topic": "Algebraic Expressions (Error Detection & Multiplication Omission)",
+    "difficulty": "easy",
+    "question": "A student was asked to evaluate the expression '3d' when d = 6. They wrote the answer as 36. Identify the mistake, explain what went wrong, and provide the correct value.",
+    "final_answer": "18",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Identify the conceptual error: The student simply placed the digit 6 next to the 3, treating '3d' like a two-digit number instead of an algebraic multiplication.",
+          "concept": "error_identification"
+        },
+        {
+          "step_id": 2,
+          "description": "Explain the correct rule: In algebra, omitting the multiplication sign between a number and a letter-number means they are multiplied together (3d means 3 times d).",
+          "concept": "omission_of_multiplication_symbol"
+        },
+        {
+          "step_id": 3,
+          "description": "Substitute d = 6 into the correct operation: 3 * 6.",
+          "concept": "substitution"
+        },
+        {
+          "step_id": 4,
+          "description": "Calculate the final correct value: 18.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Failing to recognize that '3d' represents multiplication.",
+      "Appending the value of the variable as a digit (e.g., 3 and 6 becomes 36)."
+    ],
+    "required_concepts": [
+      "conceptual_debugging",
+      "algebraic_notation",
+      "evaluating_expressions"
+    ]
+  },
+  {
+    "problem_id": "alg_expr_equality_01",
+    "topic": "Algebraic Expressions (Comparing Expressions)",
+    "difficulty": "medium",
+    "question": "Are the algebraic expressions 10y - 3 and 10(y - 3) equal? Justify your answer by evaluating both expressions when y = 2.",
+    "final_answer": "No, they are not equal. 17 vs -10.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Evaluate the first expression, 10y - 3, by substituting y = 2.",
+          "concept": "substitution"
+        },
+        {
+          "step_id": 2,
+          "description": "Calculate: (10 * 2) - 3 = 20 - 3 = 17.",
+          "concept": "evaluating_expression_1"
+        },
+        {
+          "step_id": 3,
+          "description": "Evaluate the second expression, 10(y - 3), by substituting y = 2.",
+          "concept": "substitution"
+        },
+        {
+          "step_id": 4,
+          "description": "Calculate inside the bracket first: 10 * (2 - 3) = 10 * (-1) = -10.",
+          "concept": "evaluating_expression_2"
+        },
+        {
+          "step_id": 5,
+          "description": "Compare the results: 17 does not equal -10. Therefore, the expressions are not conceptually equal.",
+          "concept": "final_conclusion"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Algebraic Expansion",
+        "steps": [
+          "Expand the second expression using the distributive property: 10(y - 3) = 10y - 30.",
+          "Compare the terms of 10y - 3 and 10y - 30.",
+          "Since subtracting 3 is different from subtracting 30, the expressions are not equal."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Assuming the brackets don't matter and treating 10(y - 3) as 10y - 3.",
+      "Miscalculating negative numbers, e.g., stating 2 - 3 = 1."
+    ],
+    "required_concepts": [
+      "expression_equivalence",
+      "distributive_property",
+      "testing_with_values"
+    ]
+  },
+  {
+    "problem_id": "alg_real_world_modeling_01",
+    "topic": "Algebraic Expressions (Real-World Modeling)",
+    "difficulty": "medium",
+    "question": "Ketaki buys 'c' coconuts at 35 rupees each and 'j' kg of jaggery at 60 rupees per kg. Write an algebraic expression for the total cost, and use it to find the total amount paid for 8 coconuts and 9 kg of jaggery.",
+    "final_answer": "Expression: 35c + 60j. Total amount: 820 rupees.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Identify the relationship for coconuts: the cost is the number of coconuts (c) multiplied by the price (35), giving 35c.",
+          "concept": "translating_variables_1"
+        },
+        {
+          "step_id": 2,
+          "description": "Identify the relationship for jaggery: the cost is the kgs of jaggery (j) multiplied by the price (60), giving 60j.",
+          "concept": "translating_variables_2"
+        },
+        {
+          "step_id": 3,
+          "description": "Form the total cost expression by adding the two amounts: 35c + 60j.",
+          "concept": "forming_expression"
+        },
+        {
+          "step_id": 4,
+          "description": "Substitute the specific values c = 8 and j = 9 into the expression: 35(8) + 60(9).",
+          "concept": "substitution"
+        },
+        {
+          "step_id": 5,
+          "description": "Calculate the final amount: 280 + 540 = 820 rupees.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Creating a single variable expression like 95x instead of recognizing two distinct variables.",
+      "Multiplying the quantities by the wrong prices (e.g., 60c + 35j)."
+    ],
+    "required_concepts": [
+      "multi_variable_expressions",
+      "real_world_translation",
+      "evaluating_expressions"
+    ]
+  },
+  {
+    "problem_id": "alg_expr_interpretation_01",
+    "topic": "Algebraic Expressions (Expression Interpretation)",
+    "difficulty": "hard",
+    "question": "Describe a real-life situation that perfectly corresponds to the algebraic expression 8x + 3y.",
+    "final_answer": "A shopkeeper sells a pen for x rupees and a notebook for y rupees. A customer buys 8 pens and 3 notebooks. The total cost is 8x + 3y.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Analyze the expression '8x + 3y'. It consists of two terms being added together.",
+          "concept": "deconstruct_expression"
+        },
+        {
+          "step_id": 2,
+          "description": "Assign a real-world meaning to the variables. Let 'x' be the price of Item A, and 'y' be the price of Item B.",
+          "concept": "variable_assignment"
+        },
+        {
+          "step_id": 3,
+          "description": "Assign meaning to the coefficients. The '8' represents the quantity of Item A bought, and the '3' represents the quantity of Item B bought.",
+          "concept": "coefficient_interpretation"
+        },
+        {
+          "step_id": 4,
+          "description": "Combine into a cohesive real-world narrative: Finding the total cost of buying 8 pens (at price x) and 3 notebooks (at price y).",
+          "concept": "scenario_construction"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Distance and Time Narrative",
+        "steps": [
+          "Let x be the speed of a car and y be the speed of a bicycle.",
+          "The expression represents the total distance covered by driving for 8 hours and cycling for 3 hours."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Describing a situation that involves multiplication of the terms (e.g., area) instead of addition.",
+      "Assigning the numbers 8 and 3 as the variables instead of the coefficients."
+    ],
+    "required_concepts": [
+      "reverse_modeling",
+      "coefficient_variable_relationship"
+    ]
+  },
+  {
+    "problem_id": "alg_multi_expr_combination_01",
+    "topic": "Algebraic Expressions (Combining Multiple Expressions)",
+    "difficulty": "hard",
+    "question": "Charu's scores in three consecutive rounds of a quiz are represented by the expressions 7p - 3q, 8p - 4q, and 6p - 2q. What is her final total score? Simplify the expression completely.",
+    "final_answer": "21p - 9q",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Set up the addition of all three scores: (7p - 3q) + (8p - 4q) + (6p - 2q).",
+          "concept": "expression_addition"
+        },
+        {
+          "step_id": 2,
+          "description": "Since all operations between brackets are addition, remove the brackets safely: 7p - 3q + 8p - 4q + 6p - 2q.",
+          "concept": "removing_brackets"
+        },
+        {
+          "step_id": 3,
+          "description": "Group the like terms together: (7p + 8p + 6p) + (-3q - 4q - 2q).",
+          "concept": "grouping_terms"
+        },
+        {
+          "step_id": 4,
+          "description": "Combine the coefficients for p: 7 + 8 + 6 = 21p.",
+          "concept": "combining_like_terms_1"
+        },
+        {
+          "step_id": 5,
+          "description": "Combine the coefficients for q: -3 - 4 - 2 = -9q.",
+          "concept": "combining_like_terms_2"
+        },
+        {
+          "step_id": 6,
+          "description": "Write the final simplified expression: 21p - 9q.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Column Addition",
+        "steps": [
+          "Stack the expressions vertically aligning the like terms.",
+          "  7p - 3q",
+          "  8p - 4q",
+          "+ 6p - 2q",
+          "---------",
+          " 21p - 9q"
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Adding the coefficients of 'p' correctly but ignoring the negative signs on the 'q' terms, resulting in 21p + 9q.",
+      "Multiplying terms instead of adding them."
+    ],
+    "required_concepts": [
+      "adding_polynomials",
+      "like_and_unlike_terms",
+      "negative_coefficients"
+    ]
+  },
+  {
+    "problem_id": "alg_advanced_patterns_01",
+    "topic": "Algebraic Expressions (Advanced Generalization)",
+    "difficulty": "hard",
+    "question": "In a calendar, choose any 2x2 grid of dates. Let the top-left date be 'a'. Write expressions for the other three dates. Then, find the sum of the two numbers on each diagonal and simplify them. What is the final simplified expression for a diagonal sum?",
+    "final_answer": "2a + 8",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Define the four dates in the 2x2 grid. If the top-left is 'a', the date to its right is 'a + 1'. The date directly below 'a' is a week later, so it is 'a + 7'. The date below and to the right is 'a + 8'.",
+          "concept": "grid_pattern_modeling"
+        },
+        {
+          "step_id": 2,
+          "description": "Set up the sum for the first diagonal (top-left and bottom-right): a + (a + 8).",
+          "concept": "diagonal_1_sum"
+        },
+        {
+          "step_id": 3,
+          "description": "Simplify the first diagonal: a + a + 8 = 2a + 8.",
+          "concept": "simplification_1"
+        },
+        {
+          "step_id": 4,
+          "description": "Set up the sum for the second diagonal (top-right and bottom-left): (a + 1) + (a + 7).",
+          "concept": "diagonal_2_sum"
+        },
+        {
+          "step_id": 5,
+          "description": "Simplify the second diagonal: a + a + 1 + 7 = 2a + 8.",
+          "concept": "simplification_2"
+        },
+        {
+          "step_id": 6,
+          "description": "Conclude that both diagonal sums simplify to the same expression: 2a + 8.",
+          "concept": "pattern_proof"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Assuming the date below 'a' is 'a + 1' instead of understanding calendar rows advance by 7 days.",
+      "Failing to combine the 'a' terms, leaving the expression as a + a + 8."
+    ],
+    "required_concepts": [
+      "pattern_generalization",
+      "algebraic_proof",
+      "like_terms"
+    ]
+  },
+  {
+    "problem_id": "alg_error_correction_02",
+    "topic": "Algebraic Expressions (Error Detection in Simplification)",
+    "difficulty": "medium",
+    "question": "A student simplified the expression (4x + 3y) - (3x + 4y) and got x + 7y as their final answer. Explain the mistake the student made and provide the correct simplified form.",
+    "final_answer": "x - y",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Identify the mistake: The student subtracted the x terms correctly (4x - 3x = x) but added the y terms (3y + 4y = 7y) because they failed to distribute the negative sign to the second term in the bracket.",
+          "concept": "error_identification"
+        },
+        {
+          "step_id": 2,
+          "description": "Apply the correct rule for opening brackets preceded by a minus sign: the signs inside change. The expression becomes 4x + 3y - 3x - 4y.",
+          "concept": "bracket_removal_rule"
+        },
+        {
+          "step_id": 3,
+          "description": "Group the like terms together: (4x - 3x) + (3y - 4y).",
+          "concept": "grouping_terms"
+        },
+        {
+          "step_id": 4,
+          "description": "Simplify to get the final correct answer: x - y.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Only applying the negative sign to the very first term inside the bracket.",
+      "Making an integer math error resulting in x + y instead of x - y."
+    ],
+    "required_concepts": [
+      "conceptual_debugging",
+      "distributing_negatives",
+      "simplification"
+    ]
+  },
+  {
+    "problem_id": "alg_number_machine_01",
+    "topic": "Algebraic Expressions (Rule Finding & Number Machines)",
+    "difficulty": "medium",
+    "question": "A number machine takes two inputs: a left input 'a' and a right input 'b'. The machine multiplies the two numbers together and then adds 1 to produce the final output. Write the algebraic formula for this machine and find the output if a = 10 and b = 3.",
+    "final_answer": "Formula: ab + 1. Output: 31.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Translate the first operation 'multiplies the two numbers together' into math: a * b, which is written as ab.",
+          "concept": "translating_operations_1"
+        },
+        {
+          "step_id": 2,
+          "description": "Translate the second operation 'adds 1' to the result: ab + 1.",
+          "concept": "translating_operations_2"
+        },
+        {
+          "step_id": 3,
+          "description": "Substitute the specific values a = 10 and b = 3 into the formula.",
+          "concept": "substitution"
+        },
+        {
+          "step_id": 4,
+          "description": "Evaluate: (10 * 3) + 1 = 30 + 1 = 31.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Adding the variables first before multiplying by 1: (a + b) * 1.",
+      "Writing the formula as a * b + 1 but evaluating it as 10 * (3 + 1) = 40 due to bad order of operations."
+    ],
+    "required_concepts": [
+      "rule_finding",
+      "forming_general_formulas",
+      "evaluating_expressions"
+    ]
+  }
+]

@@ -16,7 +16,17 @@ logger = logging.getLogger(__name__)
 
 # Auth Configuration
 CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
-API_KEYS = set(k.strip().strip("'").strip('"') for k in filter(None, os.getenv("API_KEYS", "").split(",")))
+def _load_api_keys_from_env() -> set[str]:
+    """Load endpoint access keys accepted through the X-API-Key header."""
+    raw_keys = os.getenv("X_API_KEYS", "")
+    return {
+        key.strip().strip("'").strip('"')
+        for key in raw_keys.split(",")
+        if key.strip().strip("'").strip('"')
+    }
+
+
+X_API_KEYS = _load_api_keys_from_env()
 DOCS_USERNAME = os.getenv("DOCS_USERNAME", "admin")
 DOCS_PASSWORD = os.getenv("DOCS_PASSWORD", "password")
 
@@ -36,7 +46,7 @@ def _verify_user_base(
     # ── 1. API Key Authentication (highest priority) ────────
     if api_key:
         api_key_clean = api_key.strip().strip("'").strip('"')
-        if api_key_clean in API_KEYS:
+        if api_key_clean in X_API_KEYS:
             return {"user": "admin_api_user", "auth_method": "api_key"}
         # Invalid key — fall through so JWT path can run (or 401 below)
         logger.warning("Invalid API key provided; attempting JWT fallback.")

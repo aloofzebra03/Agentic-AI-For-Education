@@ -47,6 +47,11 @@ class EducationalAgentAPIClient:
     def __init__(self, base_url: str = API_BASE_URL):
         self.base_url = base_url
         self.session = requests.Session()
+        api_key = os.getenv("TEST_API_KEY") or os.getenv("LOAD_TEST_API_KEY")
+        if not api_key:
+            api_key = os.getenv("X_API_KEYS", "").split(",")[0].strip().strip("'").strip('"')
+        if api_key:
+            self.session.headers.update({"X-API-Key": api_key})
     
     def start_session(self, concept_title: str, persona_name: str, session_label: Optional[str] = None, is_kannada: bool = False) -> Dict[str, Any]:
         url = f"{self.base_url}/session/start"

@@ -1,0 +1,365 @@
+[
+  {
+    "problem_id": "integer_puzzle_sum_diff_01",
+    "topic": "Operations with Integers (Number Puzzles)",
+    "difficulty": "easy",
+    "question": "Think of two numbers whose sum is 25 and whose difference is 11. What are the two numbers? If you swap the order of the two numbers, what happens to their sum and their difference?",
+    "final_answer": "The numbers are 18 and 7. If swapped (7 and 18), the sum remains 25, but the difference becomes -11.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Set up the conditions: First Number + Second Number = 25, and First Number - Second Number = 11.",
+          "concept": "condition_setup"
+        },
+        {
+          "step_id": 2,
+          "description": "Test pairs of numbers that add up to 25. For example, 15 and 10 (difference 5). 20 and 5 (difference 15). 18 and 7 (difference 11).",
+          "concept": "guess_and_check"
+        },
+        {
+          "step_id": 3,
+          "description": "Identify the correct pair: The first number is 18 and the second number is 7 because 18 + 7 = 25 and 18 - 7 = 11.",
+          "concept": "identifying_solution"
+        },
+        {
+          "step_id": 4,
+          "description": "Analyze what happens when the numbers are swapped: The new pair is 7 and 18.",
+          "concept": "swapping_order"
+        },
+        {
+          "step_id": 5,
+          "description": "Calculate the new sum (7 + 18 = 25) and new difference (7 - 18 = -11). The sum stays the same (commutative property), but the difference changes sign.",
+          "concept": "analyzing_swapped_results"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Algebraic Equations",
+        "steps": [
+          "Let x and y be the numbers: x + y = 25 and x - y = 11.",
+          "Add the equations together: 2x = 36, so x = 18.",
+          "Substitute x back in: 18 + y = 25, so y = 7.",
+          "Swapping makes x=7, y=18. Sum is 7+18=25, Diff is 7-18=-11."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Assuming the difference is always positive regardless of the order of the numbers.",
+      "Finding pairs that have a difference of 11 (like 20 and 9) but forgetting to check if their sum is 25."
+    ],
+    "required_concepts": [
+      "integer_addition",
+      "integer_subtraction",
+      "commutative_property",
+      "logical_deduction"
+    ]
+  },
+  {
+    "problem_id": "integer_token_subtraction_01",
+    "topic": "Operations with Integers (Token Subtraction using Zero Pairs)",
+    "difficulty": "medium",
+    "question": "Evaluate the expression 7 - 18 using the 'tokens in a bag' model. Explain step-by-step how to subtract 18 positive tokens when you only start with 7.",
+    "final_answer": "-11",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Interpret the problem: You start with a bag containing exactly 7 positive tokens. You are asked to subtract (remove) 18 positive tokens.",
+          "concept": "model_translation"
+        },
+        {
+          "step_id": 2,
+          "description": "Identify the physical limitation: You cannot take out 18 positive tokens because there are only 7 in the bag.",
+          "concept": "identifying_limitations"
+        },
+        {
+          "step_id": 3,
+          "description": "Introduce zero pairs to solve the problem. A zero pair is one positive token and one negative token, which together have a net value of 0. Adding zero pairs does not change the value of the bag.",
+          "concept": "introducing_zero_pairs"
+        },
+        {
+          "step_id": 4,
+          "description": "Add 11 zero pairs to the bag. The bag now contains 18 positive tokens (7 original + 11 new) and 11 negative tokens.",
+          "concept": "adding_zero_pairs"
+        },
+        {
+          "step_id": 5,
+          "description": "Perform the subtraction: Remove 18 positive tokens from the bag. The only tokens left in the bag are the 11 negative tokens.",
+          "concept": "physical_subtraction"
+        },
+        {
+          "step_id": 6,
+          "description": "Conclude the final value: Since 11 negative tokens remain, the result of 7 - 18 is -11.",
+          "concept": "final_conclusion"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Just subtracting 18 - 7 and writing positive 11.",
+      "Adding 18 negative tokens directly without understanding the underlying mechanism of 'taking away' via zero pairs."
+    ],
+    "required_concepts": [
+      "token_model",
+      "zero_pairs",
+      "subtracting_integers"
+    ]
+  },
+  {
+    "problem_id": "integer_number_line_movement_01",
+    "topic": "Operations with Integers (Number Line Model)",
+    "difficulty": "easy",
+    "question": "A counter is placed at the mark +3 on a number line. It is moved 8 units to the left, and then 4 units to the right. Write a mathematical expression using addition of signed integers to represent these movements, and find the final position of the counter.",
+    "final_answer": "Expression: 3 + (-8) + 4. Final position: -1",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Identify the starting position on the number line: +3.",
+          "concept": "initial_position"
+        },
+        {
+          "step_id": 2,
+          "description": "Translate the first movement into a signed integer. Moving 8 units to the left represents adding a negative integer: + (-8).",
+          "concept": "left_movement_as_negative"
+        },
+        {
+          "step_id": 3,
+          "description": "Translate the second movement into a signed integer. Moving 4 units to the right represents adding a positive integer: + 4.",
+          "concept": "right_movement_as_positive"
+        },
+        {
+          "step_id": 4,
+          "description": "Write the full mathematical expression: 3 + (-8) + 4.",
+          "concept": "forming_expression"
+        },
+        {
+          "step_id": 5,
+          "description": "Evaluate the expression sequentially. First, 3 + (-8) = -5 (landing at -5 on the number line).",
+          "concept": "evaluation_step_1"
+        },
+        {
+          "step_id": 6,
+          "description": "Add the final movement: -5 + 4 = -1. The counter ends at the -1 mark.",
+          "concept": "evaluation_step_2"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Net Movement Calculation",
+        "steps": [
+          "Calculate the net movement first: 8 left (-8) and 4 right (+4) = -8 + 4 = -4.",
+          "The net movement is 4 units left.",
+          "Apply the net movement to the starting position: 3 + (-4) = -1."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Subtracting the 4 units right instead of adding them.",
+      "Misinterpreting '8 units to the left' as landing directly on the number -8."
+    ],
+    "required_concepts": [
+      "number_line",
+      "integer_addition",
+      "directionality_of_signs"
+    ]
+  },
+  {
+    "problem_id": "integer_distributive_property_01",
+    "topic": "Operations with Integers (Distributive Property)",
+    "difficulty": "medium",
+    "question": "Use the distributive property of multiplication over addition to evaluate (-25) × 103 in a way that makes mental calculation easier.",
+    "final_answer": "-2575",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Break down one of the numbers into a sum of two simpler numbers. 103 can be written as (100 + 3).",
+          "concept": "number_decomposition"
+        },
+        {
+          "step_id": 2,
+          "description": "Rewrite the expression using the decomposition: (-25) × (100 + 3).",
+          "concept": "expression_rewriting"
+        },
+        {
+          "step_id": 3,
+          "description": "Apply the distributive property [a × (b + c) = a × b + a × c]: (-25) × 100 + (-25) × 3.",
+          "concept": "distributive_property"
+        },
+        {
+          "step_id": 4,
+          "description": "Calculate the first product: (-25) × 100 = -2500.",
+          "concept": "multiplication_part_1"
+        },
+        {
+          "step_id": 5,
+          "description": "Calculate the second product: (-25) × 3 = -75.",
+          "concept": "multiplication_part_2"
+        },
+        {
+          "step_id": 6,
+          "description": "Add the two products together: (-2500) + (-75) = -2575.",
+          "concept": "final_addition"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Distributing incorrectly, such as (-25) × 100 + 3, ignoring the multiplication on the second term.",
+      "Making a sign error when adding the two negative products, resulting in -2425."
+    ],
+    "required_concepts": [
+      "distributive_property",
+      "integer_multiplication",
+      "mental_math_strategies"
+    ]
+  },
+  {
+    "problem_id": "integer_associative_commutative_01",
+    "topic": "Operations with Integers (Commutative & Associative Properties)",
+    "difficulty": "medium",
+    "question": "Evaluate the expression (-50) × (-37) × (-2) efficiently by using the commutative and associative properties to group compatible numbers together.",
+    "final_answer": "-3700",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Identify numbers that are easy to multiply together to form powers of 10. In this case, -50 and -2 multiply to make 100.",
+          "concept": "identifying_compatible_numbers"
+        },
+        {
+          "step_id": 2,
+          "description": "Use the commutative property of multiplication (a × b = b × a) to rearrange the terms: (-50) × (-2) × (-37).",
+          "concept": "commutative_property"
+        },
+        {
+          "step_id": 3,
+          "description": "Use the associative property of multiplication to group the first two terms together: [(-50) × (-2)] × (-37).",
+          "concept": "associative_property"
+        },
+        {
+          "step_id": 4,
+          "description": "Calculate the grouped terms: a negative times a negative is positive, so (-50) × (-2) = 100.",
+          "concept": "grouped_calculation"
+        },
+        {
+          "step_id": 5,
+          "description": "Multiply the result by the remaining integer: 100 × (-37) = -3700.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Multiplying straight across left to right: (-50) × (-37) = 1850, then 1850 × (-2) = -3700. This gets the right answer but ignores the instruction to use properties for efficiency.",
+      "Losing track of the negative signs and outputting a positive 3700."
+    ],
+    "required_concepts": [
+      "commutative_property",
+      "associative_property",
+      "integer_multiplication"
+    ]
+  },
+  {
+    "problem_id": "integer_elevator_motion_01",
+    "topic": "Operations with Integers (Vertical Motion Word Problem)",
+    "difficulty": "medium",
+    "question": "An elevator descends into a deep mine shaft at the rate of 6 meters per minute. If the descent starts from a platform 15 meters above ground level, what will be its exact vertical position relative to ground level after 45 minutes?",
+    "final_answer": "-255 meters",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Identify the initial position. Ground level is 0, so 15 meters above ground is represented by the integer +15.",
+          "concept": "initial_position"
+        },
+        {
+          "step_id": 2,
+          "description": "Identify the rate of descent. Descending means moving down, which is represented by a negative integer: -6 meters per minute.",
+          "concept": "rate_as_integer"
+        },
+        {
+          "step_id": 3,
+          "description": "Calculate the total change in position by multiplying the rate by the time elapsed: 45 minutes × (-6) meters/minute.",
+          "concept": "calculating_total_change"
+        },
+        {
+          "step_id": 4,
+          "description": "Evaluate the change: 45 × (-6) = -270 meters.",
+          "concept": "integer_multiplication"
+        },
+        {
+          "step_id": 5,
+          "description": "Calculate the final position by adding the total change to the initial position: 15 + (-270).",
+          "concept": "adding_integers"
+        },
+        {
+          "step_id": 6,
+          "description": "Evaluate the final sum: 15 - 270 = -255. The elevator is 255 meters below ground level.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Forgetting to account for the initial +15 meters and answering -270 meters.",
+      "Adding 15 and 270 instead of subtracting them, resulting in an incorrect descent depth."
+    ],
+    "required_concepts": [
+      "vertical_motion_model",
+      "integer_multiplication",
+      "integer_addition",
+      "real_world_application"
+    ]
+  },
+  {
+    "problem_id": "integer_additive_inverse_01",
+    "topic": "Operations with Integers (Additive Inverse)",
+    "difficulty": "easy",
+    "question": "Explain how the concept of the additive inverse transforms the subtraction problem (-15) - (-8) into an addition problem, and solve it.",
+    "final_answer": "Subtracting an integer is the same as adding its additive inverse. The additive inverse of -8 is 8, so the problem becomes -15 + 8 = -7.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Recall the fundamental rule of integer subtraction: subtracting a number 'b' from 'a' is equivalent to adding the additive inverse of 'b' to 'a'. (a - b = a + (-b)).",
+          "concept": "subtraction_rule"
+        },
+        {
+          "step_id": 2,
+          "description": "Identify the number being subtracted in the expression (-15) - (-8). The number being subtracted is -8.",
+          "concept": "identifying_subtrahend"
+        },
+        {
+          "step_id": 3,
+          "description": "Find the additive inverse of -8. The additive inverse is the number that adds to -8 to make 0, which is +8.",
+          "concept": "finding_additive_inverse"
+        },
+        {
+          "step_id": 4,
+          "description": "Rewrite the original subtraction expression as an addition expression: (-15) + 8.",
+          "concept": "rewriting_expression"
+        },
+        {
+          "step_id": 5,
+          "description": "Calculate the final sum: -15 + 8 = -7.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Changing the sign of the first number as well, writing 15 + 8 = 23.",
+      "Multiplying the numbers instead of adding them, mistaking the adjacent minus signs for a multiplication problem."
+    ],
+    "required_concepts": [
+      "additive_inverse",
+      "integer_subtraction",
+      "converting_subtraction_to_addition"
+    ]
+  }
+]

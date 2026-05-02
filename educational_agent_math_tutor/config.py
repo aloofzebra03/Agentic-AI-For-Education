@@ -53,4 +53,4 @@ LLM_TEMPERATURE = 0.5
 # ============================================================================
 
 # Directory containing problem JSON files (relative to project root)
-PROBLEMS_DIR = "problems_json"
+PROBLEMS_DIR = "math_problems_jsons"

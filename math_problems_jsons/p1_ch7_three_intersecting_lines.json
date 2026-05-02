@@ -1,0 +1,547 @@
+[
+  {
+    "problem_id": "tri_angle_sum_proof_01",
+    "topic": "Angle Sum Property (Proof via Parallel Lines)",
+    "difficulty": "hard",
+    "question": "To prove that the sum of the three interior angles of ∆ABC is 180°, a line XY is drawn parallel to the base BC, passing through the opposite vertex A. Explain step-by-step how alternate interior angles are used to prove the Angle Sum Property.",
+    "final_answer": "By drawing XY parallel to BC, ∠XAB = ∠B and ∠YAC = ∠C (alternate interior angles). Since XAY is a straight line, ∠XAB + ∠BAC + ∠YAC = 180°. Substituting gives ∠B + ∠BAC + ∠C = 180°.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Construct line XY passing through vertex A such that XY is perfectly parallel to the base BC.",
+          "concept": "geometric_construction"
+        },
+        {
+          "step_id": 2,
+          "description": "Treat side AB as a transversal intersecting the parallel lines XY and BC. Therefore, the alternate interior angle to ∠B is ∠XAB. So, ∠XAB = ∠B.",
+          "concept": "alternate_interior_angles"
+        },
+        {
+          "step_id": 3,
+          "description": "Treat side AC as a second transversal. The alternate interior angle to ∠C is ∠YAC. So, ∠YAC = ∠C.",
+          "concept": "alternate_interior_angles"
+        },
+        {
+          "step_id": 4,
+          "description": "Observe the angles forming a straight line along XY at vertex A. The sum of angles on a straight line is 180°. Therefore, ∠XAB + ∠BAC + ∠YAC = 180°.",
+          "concept": "angles_on_straight_line"
+        },
+        {
+          "step_id": 5,
+          "description": "Substitute the alternate interior angles back into the straight line equation: ∠B + ∠BAC + ∠C = 180°. This proves the sum of the angles of the triangle is 180°.",
+          "concept": "substitution_proof"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Assuming the line XY must be the same length as BC instead of an infinite parallel line.",
+      "Confusing alternate interior angles with corresponding angles during the substitution step."
+    ],
+    "required_concepts": [
+      "angle_sum_property_proof",
+      "parallel_lines",
+      "alternate_interior_angles"
+    ]
+  },
+  {
+    "problem_id": "tri_two_angle_condition_01",
+    "topic": "Conditions for Triangle Formation (Angles)",
+    "difficulty": "medium",
+    "question": "What is the specific mathematical rule describing the sum of any two angles, A and B, in a valid triangle? Explain conceptually why A + B must strictly be less than 180°.",
+    "final_answer": "The rule is 0° < A + B < 180°. If A + B equals or exceeds 180°, the third angle would have to be 0° or negative, meaning the sides would never intersect to close the shape.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Recall the fundamental Angle Sum Property: the sum of all three interior angles (A + B + C) must equal exactly 180°.",
+          "concept": "angle_sum_property"
+        },
+        {
+          "step_id": 2,
+          "description": "Isolate the third angle (C) algebraically: C = 180° - (A + B).",
+          "concept": "algebraic_isolation"
+        },
+        {
+          "step_id": 3,
+          "description": "Recognize the physical constraint of a triangle: every angle must exist and have a positive measure strictly greater than 0°. Therefore, C > 0°.",
+          "concept": "positive_angle_constraint"
+        },
+        {
+          "step_id": 4,
+          "description": "Substitute the expression for C into the inequality: 180° - (A + B) > 0°.",
+          "concept": "inequality_substitution"
+        },
+        {
+          "step_id": 5,
+          "description": "Solve the inequality: 180° > A + B, which is written as A + B < 180°. Since angles must be positive, the full rule is 0° < A + B < 180°.",
+          "concept": "final_conclusion"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Visual/Geometric Argument",
+        "steps": [
+          "Imagine drawing a base line segment.",
+          "Draw two angles at the endpoints that add up to exactly 180° (e.g., 90° and 90°).",
+          "The two resulting lines will be perfectly parallel.",
+          "Parallel lines never intersect, so a third vertex cannot be formed. Thus, the sum must be less than 180° so the lines lean inward and meet."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Stating the rule as A + B ≤ 180°, failing to realize that exactly 180° flattens the triangle.",
+      "Confusing the angle rule with the side inequality rule."
+    ],
+    "required_concepts": [
+      "triangle_formation_constraints",
+      "angle_sum_property",
+      "logical_proofs"
+    ]
+  },
+  {
+    "problem_id": "tri_side_inequality_impossibility_01",
+    "topic": "Triangle Inequality Theorem (Sides)",
+    "difficulty": "medium",
+    "question": "A student claims they used a ruler to construct a triangle with side lengths 4 cm, 5 cm, and 10 cm. Explain mathematically, using the Triangle Inequality Theorem, why this construction is impossible.",
+    "final_answer": "It is impossible because the sum of the two shorter sides (4 + 5 = 9) is not strictly greater than the longest side (10). The sides would fall flat and fail to meet at a vertex.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Identify the Triangle Inequality Theorem: The sum of the lengths of any two sides of a triangle must be strictly greater than the length of the third side.",
+          "concept": "theorem_identification"
+        },
+        {
+          "step_id": 2,
+          "description": "Identify the three side lengths given: 4 cm, 5 cm, and 10 cm.",
+          "concept": "data_analysis"
+        },
+        {
+          "step_id": 3,
+          "description": "Test the condition using the two shortest sides, as this is the most restrictive case. Add 4 cm and 5 cm.",
+          "concept": "testing_shortest_sides"
+        },
+        {
+          "step_id": 4,
+          "description": "Calculate the sum: 4 + 5 = 9 cm.",
+          "concept": "calculation"
+        },
+        {
+          "step_id": 5,
+          "description": "Compare the sum to the third side: 9 cm is not greater than 10 cm (9 < 10). Because it fails the theorem, the triangle cannot be constructed.",
+          "concept": "final_conclusion"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Thinking that as long as 10 - 5 = 5 (which is > 4), it works, misapplying the difference rule.",
+      "Believing that any three numbers can form a triangle if drawn carefully enough."
+    ],
+    "required_concepts": [
+      "triangle_inequality_theorem",
+      "geometric_impossibility"
+    ]
+  },
+  {
+    "problem_id": "tri_exterior_angle_property_01",
+    "topic": "Exterior Angle Property",
+    "difficulty": "medium",
+    "question": "One side of a triangle is extended to form an exterior angle measuring 110°. If the two interior opposite angles are in the ratio of 2:3, calculate the measure of all three interior angles of the triangle.",
+    "final_answer": "The interior angles are 44°, 66°, and 70°.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Recall the Exterior Angle Property: An exterior angle of a triangle is equal to the sum of its two interior opposite angles.",
+          "concept": "exterior_angle_theorem"
+        },
+        {
+          "step_id": 2,
+          "description": "Let the two interior opposite angles be 2x and 3x based on the given ratio.",
+          "concept": "algebraic_representation"
+        },
+        {
+          "step_id": 3,
+          "description": "Set up the equation using the theorem: 2x + 3x = 110°.",
+          "concept": "equation_setup"
+        },
+        {
+          "step_id": 4,
+          "description": "Solve for x: 5x = 110°  => x = 22°.",
+          "concept": "algebraic_solution"
+        },
+        {
+          "step_id": 5,
+          "description": "Calculate the two interior opposite angles: 2(22) = 44° and 3(22) = 66°.",
+          "concept": "angle_calculation_1"
+        },
+        {
+          "step_id": 6,
+          "description": "Find the third interior angle using the linear pair with the exterior angle, or the angle sum property: 180° - 110° = 70°.",
+          "concept": "angle_calculation_2"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Using Angle Sum Property after finding adjacent angle",
+        "steps": [
+          "The interior angle adjacent to the 110° exterior angle forms a linear pair: 180° - 110° = 70°.",
+          "The sum of all interior angles is 180°. So, 2x + 3x + 70° = 180°.",
+          "5x = 110° => x = 22°.",
+          "Angles are 44° and 66°."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Assuming the exterior angle and the interior opposite angles sum to 180°.",
+      "Solving for x = 22 but forgetting to multiply by 2 and 3 to find the actual angles."
+    ],
+    "required_concepts": [
+      "exterior_angle_property",
+      "ratios_in_geometry",
+      "linear_pairs"
+    ]
+  },
+  {
+    "problem_id": "tri_isosceles_equilateral_logic_01",
+    "topic": "Special Triangles (Isosceles and Equilateral Deduction)",
+    "difficulty": "medium",
+    "question": "In an isosceles triangle, the vertex angle (the angle between the two equal sides) is 50°. Calculate the base angles. If the vertex angle was changed to exactly 60°, what specific type of triangle would it become, and why?",
+    "final_answer": "Base angles are 65°. If changed to 60°, it becomes an equilateral triangle because all three angles become 60°.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Recall the property of isosceles triangles: the angles opposite the equal sides (base angles) are also equal. Let them be 'x'.",
+          "concept": "isosceles_triangle_property"
+        },
+        {
+          "step_id": 2,
+          "description": "Set up the equation using the Angle Sum Property: x + x + 50° = 180°.",
+          "concept": "equation_setup"
+        },
+        {
+          "step_id": 3,
+          "description": "Solve for the base angles: 2x = 130° => x = 65°.",
+          "concept": "base_angle_calculation"
+        },
+        {
+          "step_id": 4,
+          "description": "Analyze the second scenario: The vertex angle is changed to 60°. Set up the new equation: y + y + 60° = 180°.",
+          "concept": "scenario_analysis"
+        },
+        {
+          "step_id": 5,
+          "description": "Solve for the new base angles: 2y = 120° => y = 60°.",
+          "concept": "new_angle_calculation"
+        },
+        {
+          "step_id": 6,
+          "description": "Conclude: Since all three angles are exactly 60°, the triangle is no longer just isosceles; it is an equilateral triangle.",
+          "concept": "equilateral_deduction"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Assuming the 50° angle is one of the base angles and calculating the vertex angle as 180 - (50+50) = 80°.",
+      "Stating the triangle stays isosceles when the vertex is 60°, failing to recognize the stronger equilateral classification."
+    ],
+    "required_concepts": [
+      "isosceles_triangles",
+      "angle_sum_property",
+      "equilateral_triangles"
+    ]
+  },
+  {
+    "problem_id": "tri_error_correction_01",
+    "topic": "Conceptual Debugging (Contradictory Properties)",
+    "difficulty": "easy",
+    "question": "A student claims they drew a 'right-angled equilateral triangle' in their geometry notebook. Explain mathematically why this specific shape cannot possibly exist.",
+    "final_answer": "It cannot exist because an equilateral triangle must have three 60° angles, but a right-angled triangle requires one 90° angle. A triangle cannot be both simultaneously.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Define the requirement for a right-angled triangle: it must contain exactly one angle that measures 90°.",
+          "concept": "definition_right_triangle"
+        },
+        {
+          "step_id": 2,
+          "description": "Define the requirement for an equilateral triangle: all three sides are equal, which forces all three interior angles to be equal.",
+          "concept": "definition_equilateral_triangle"
+        },
+        {
+          "step_id": 3,
+          "description": "Calculate the mandatory angles for an equilateral triangle: 180° / 3 = 60°.",
+          "concept": "equilateral_angle_calculation"
+        },
+        {
+          "step_id": 4,
+          "description": "Identify the contradiction: An equilateral triangle strictly requires all angles to be 60°, leaving no room for a 90° angle. Therefore, a right-angled equilateral triangle is mathematically impossible.",
+          "concept": "proof_by_contradiction"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Sum Contradiction",
+        "steps": [
+          "Assume the triangle is both right-angled and equilateral.",
+          "Since it is equilateral, all angles must be equal.",
+          "Since it is right-angled, one angle is 90°. Therefore, all three angles must be 90°.",
+          "Sum the angles: 90° + 90° + 90° = 270°.",
+          "This violates the Angle Sum Property (180°), proving it cannot exist."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Confusing equilateral with isosceles (a right-angled isosceles triangle IS possible).",
+      "Trying to draw it and relying on a messy sketch rather than the definitive mathematical rules."
+    ],
+    "required_concepts": [
+      "properties_of_triangles",
+      "angle_sum_property",
+      "logical_contradiction"
+    ]
+  },
+  {
+    "problem_id": "tri_sss_construction_circles_01",
+    "topic": "Triangle Construction (SSS & Intersecting Arcs)",
+    "difficulty": "medium",
+    "question": "To construct a triangle with sides 5 cm, 3 cm, and 4 cm, you first draw a base line segment of 5 cm. Then, you use a compass to draw two arcs from the endpoints with radii 3 cm and 4 cm. Explain how the intersection of these arcs determines the third vertex, and describe what visually happens to the arcs if the radii were 2 cm and 3 cm instead.",
+    "final_answer": "The arcs intersect at a specific point that is exactly 3 cm from one end and 4 cm from the other, forming the third vertex. If the radii were 2 cm and 3 cm, their sum (5 cm) equals the base, so the arcs would just touch at a single point on the base line, failing to form a triangle.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Understand the SSS construction method: the base provides the first side, and drawing arcs represents all possible points at a specific distance from the endpoints.",
+          "concept": "compass_construction_logic"
+        },
+        {
+          "step_id": 2,
+          "description": "Identify the intersection: Where the 3 cm arc and 4 cm arc cross, that point simultaneously satisfies the length requirements for both remaining sides. This intersection is the third vertex.",
+          "concept": "intersection_as_vertex"
+        },
+        {
+          "step_id": 3,
+          "description": "Analyze the second scenario: Base is 5 cm, radii are 2 cm and 3 cm.",
+          "concept": "scenario_analysis"
+        },
+        {
+          "step_id": 4,
+          "description": "Apply the triangle side length rule intuitively via circles: The maximum reach of the two arcs towards each other is 2 cm + 3 cm = 5 cm.",
+          "concept": "radius_summation"
+        },
+        {
+          "step_id": 5,
+          "description": "Conclude the visual result: Because the sum of the radii equals the distance between the circle centers (the 5 cm base), the arcs will exactly touch at one point on the base itself, rather than intersecting above it. Thus, no triangle is formed.",
+          "concept": "circle_intersection_logic"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Stating the arcs won't meet at all for 2 cm and 3 cm (they do meet, but they just touch on the line).",
+      "Failing to connect the physical drawing of arcs to the geometric rule of side inequalities."
+    ],
+    "required_concepts": [
+      "sss_construction",
+      "arc_intersection",
+      "geometric_intuition_of_inequality"
+    ]
+  },
+  {
+    "problem_id": "tri_sas_construction_01",
+    "topic": "Triangle Construction (SAS)",
+    "difficulty": "medium",
+    "question": "Describe the step-by-step geometric construction of a triangle PQR where PQ = 6 cm, ∠P = 60°, and PR = 5 cm using a ruler, protractor, and compass. Why is this specific combination of information enough to uniquely draw the triangle?",
+    "final_answer": "Draw base PQ = 6 cm. Use a protractor to draw a 60° angle at P. Use a compass to mark an arc 5 cm away from P on that angle's line to find R. Join R to Q. It is unique because the two sides and their included angle lock the position of all three vertices.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Step 1 (Base): Use a ruler to draw a line segment PQ of length 6 cm.",
+          "concept": "drawing_base"
+        },
+        {
+          "step_id": 2,
+          "description": "Step 2 (Angle): Place a protractor at point P and mark a 60° angle. Draw a ray from P through the mark.",
+          "concept": "constructing_angle"
+        },
+        {
+          "step_id": 3,
+          "description": "Step 3 (Second Side): Open a compass to 5 cm. Place the compass point on P and draw an arc that cuts the ray. The intersection point is vertex R.",
+          "concept": "cutting_arc"
+        },
+        {
+          "step_id": 4,
+          "description": "Step 4 (Closing): Use a ruler to join point R to point Q, completing the triangle.",
+          "concept": "completing_triangle"
+        },
+        {
+          "step_id": 5,
+          "description": "Reasoning: This is the Side-Angle-Side (SAS) criterion. The included angle dictates exactly how far apart the endpoints of the two known sides will swing, firmly locking the length and position of the third side (RQ).",
+          "concept": "sas_uniqueness_logic"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Trying to draw PR first without establishing the angle.",
+      "Attempting to draw arcs from both P and Q (confusing SAS with SSS construction)."
+    ],
+    "required_concepts": [
+      "sas_construction",
+      "use_of_compass_and_protractor",
+      "triangle_uniqueness"
+    ]
+  },
+  {
+    "problem_id": "tri_asa_construction_missing_01",
+    "topic": "Triangle Construction (ASA) & Missing Angle",
+    "difficulty": "medium",
+    "question": "You are asked to construct ∆XYZ where the base side YZ = 7 cm, ∠Y = 40°, and ∠X = 60°. Since the angle at the other end of the base (∠Z) is not given directly, how must you proceed to construct this triangle using the ASA (Angle-Side-Angle) method?",
+    "final_answer": "First, calculate ∠Z using the Angle Sum Property: 180° - (40° + 60°) = 80°. Then draw base YZ = 7 cm, construct a 40° angle at Y and an 80° angle at Z. Extend the two rays until they intersect to form vertex X.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Identify the problem: To use the ASA construction method on base YZ, you need the angles at both ends of the base (∠Y and ∠Z). You are given ∠Y and ∠X instead.",
+          "concept": "identifying_missing_information"
+        },
+        {
+          "step_id": 2,
+          "description": "Use the Angle Sum Property (the sum of all interior angles is 180°) to find the missing angle: ∠Z = 180° - (∠X + ∠Y).",
+          "concept": "angle_sum_property"
+        },
+        {
+          "step_id": 3,
+          "description": "Calculate ∠Z: 180° - (60° + 40°) = 180° - 100° = 80°.",
+          "concept": "calculation"
+        },
+        {
+          "step_id": 4,
+          "description": "Begin construction: Draw the base line segment YZ = 7 cm.",
+          "concept": "drawing_base"
+        },
+        {
+          "step_id": 5,
+          "description": "Construct angles: Use a protractor to draw a 40° angle at vertex Y and an 80° angle at vertex Z.",
+          "concept": "constructing_base_angles"
+        },
+        {
+          "step_id": 6,
+          "description": "Complete triangle: Extend the rays from Y and Z until they cross. The intersection point naturally forms vertex X, which will mathematically be 60°.",
+          "concept": "ray_intersection"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Trying to draw a 60° angle at Z, misplacing the given angle.",
+      "Thinking the triangle cannot be constructed because 'not enough information is given on the base'."
+    ],
+    "required_concepts": [
+      "asa_construction",
+      "angle_sum_property",
+      "indirect_information"
+    ]
+  },
+  {
+    "problem_id": "tri_basic_angle_sum_01",
+    "topic": "Angle Sum Property (Basic Application)",
+    "difficulty": "easy",
+    "question": "In ∆ABC, the measure of ∠A is 55° and the measure of ∠B is 75°. Calculate the exact measure of the third angle, ∠C.",
+    "final_answer": "50°",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "State the governing rule: The sum of the three interior angles in any triangle is always 180°.",
+          "concept": "angle_sum_property"
+        },
+        {
+          "step_id": 2,
+          "description": "Add the two known angles together: 55° + 75°.",
+          "concept": "addition"
+        },
+        {
+          "step_id": 3,
+          "description": "Calculate the sum: 130°.",
+          "concept": "calculation_1"
+        },
+        {
+          "step_id": 4,
+          "description": "Subtract this sum from the total 180° to find the missing angle: ∠C = 180° - 130°.",
+          "concept": "subtraction"
+        },
+        {
+          "step_id": 5,
+          "description": "Final calculation: ∠C = 50°.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Arithmetic errors when adding 55 and 75.",
+      "Subtracting the sum from 360° instead of 180°."
+    ],
+    "required_concepts": [
+      "angle_sum_property",
+      "basic_arithmetic"
+    ]
+  },
+  {
+    "problem_id": "tri_angle_validity_classification_01",
+    "topic": "Angle Validity and Triangle Classification",
+    "difficulty": "easy",
+    "question": "Examine the following pairs of angles meant to belong to a triangle: Pair 1 (90°, 90°), Pair 2 (60°, 60°), Pair 3 (120°, 70°). Which of these pairs can possibly form a valid triangle? For the valid pair, calculate the third angle and classify the triangle based on its side/angle properties.",
+    "final_answer": "Pair 2 (60°, 60°) is valid. The third angle is 60°, classifying it as an equilateral (and acute) triangle.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Test Pair 1 (90°, 90°): 90° + 90° = 180°. Since two angles already sum to 180°, the third angle would be 0°. This is invalid.",
+          "concept": "validity_test_1"
+        },
+        {
+          "step_id": 2,
+          "description": "Test Pair 3 (120°, 70°): 120° + 70° = 190°. The sum of two angles exceeds 180°. This is invalid.",
+          "concept": "validity_test_2"
+        },
+        {
+          "step_id": 3,
+          "description": "Test Pair 2 (60°, 60°): 60° + 60° = 120°. The sum is less than 180°, leaving room for a valid third angle. This is the valid pair.",
+          "concept": "validity_test_3"
+        },
+        {
+          "step_id": 4,
+          "description": "Calculate the third angle for Pair 2: 180° - 120° = 60°.",
+          "concept": "angle_calculation"
+        },
+        {
+          "step_id": 5,
+          "description": "Classify the triangle: Since all three angles are 60° (and all sides will therefore be equal), it is classified as an equilateral triangle.",
+          "concept": "triangle_classification"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Assuming 90° and 90° can make a right triangle (failing to see a triangle can only have ONE right angle).",
+      "Identifying the valid pair but forgetting to explicitly classify it as equilateral."
+    ],
+    "required_concepts": [
+      "conditions_for_triangle_formation",
+      "angle_sum_property",
+      "equilateral_triangles"
+    ]
+  }
+]

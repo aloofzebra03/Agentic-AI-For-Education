@@ -1,0 +1,372 @@
+[
+  {
+    "problem_id": "frac_div_conceptual_derivation_01",
+    "topic": "Working with Fractions (Conceptual Division Derivation)",
+    "difficulty": "medium",
+    "question": "Instead of immediately using the reciprocal rule, how can the division problem 3 ÷ (2/3) be rewritten as a missing-value multiplication problem? Explain step-by-step how solving this multiplication leads to the final quotient.",
+    "final_answer": "9/2",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Rewrite the division problem as a multiplication problem by asking: 'What number multiplied by the divisor (2/3) gives the dividend (3)?' This is written as: (2/3) × ? = 3.",
+          "concept": "division_as_multiplication"
+        },
+        {
+          "step_id": 2,
+          "description": "To find the missing number, first determine what to multiply by (2/3) to get exactly 1. Multiplying a fraction by its reciprocal yields 1, so (2/3) × (3/2) = 1.",
+          "concept": "using_reciprocals_for_identity"
+        },
+        {
+          "step_id": 3,
+          "description": "Since the target product is 3 (not 1), multiply the reciprocal (3/2) by 3.",
+          "concept": "scaling_to_target"
+        },
+        {
+          "step_id": 4,
+          "description": "Calculate the final missing value: (3/2) × 3 = 9/2. Therefore, 3 ÷ (2/3) = 9/2.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Jumping straight to the formula without understanding the 'missing multiplier' concept.",
+      "Writing the equation backwards as 3 × ? = 2/3."
+    ],
+    "required_concepts": [
+      "division_as_inverse_multiplication",
+      "multiplicative_identity"
+    ]
+  },
+  {
+    "problem_id": "frac_mixed_mult_01",
+    "topic": "Working with Fractions (Mixed Fraction Multiplication & Multi-step)",
+    "difficulty": "easy",
+    "question": "A car runs 16 km using exactly 1 litre of petrol. How far will it go using 2 ¼ (two and one-fourth) litres of petrol? Show the steps for converting and multiplying.",
+    "final_answer": "36 km",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Identify that the total distance is the product of the distance per litre and the number of litres: 16 × 2 ¼.",
+          "concept": "formulating_multiplication"
+        },
+        {
+          "step_id": 2,
+          "description": "Convert the mixed fraction 2 ¼ into an improper fraction. 2 ¼ = (2 × 4 + 1) / 4 = 9/4.",
+          "concept": "converting_mixed_fractions"
+        },
+        {
+          "step_id": 3,
+          "description": "Set up the multiplication: 16 × (9/4). Rewrite 16 as a fraction: (16/1) × (9/4).",
+          "concept": "setting_up_calculation"
+        },
+        {
+          "step_id": 4,
+          "description": "Simplify before multiplying by dividing 16 and 4 by their common factor of 4. This leaves 4 × 9.",
+          "concept": "simplifying_before_multiplying"
+        },
+        {
+          "step_id": 5,
+          "description": "Calculate the final product: 4 × 9 = 36 km.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Distributive Property",
+        "steps": [
+          "Split the mixed number into a whole number and a fraction: 16 × (2 + 1/4).",
+          "Distribute the 16: (16 × 2) + (16 × 1/4).",
+          "Calculate each part: 32 + 4 = 36 km."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Multiplying the whole numbers and adding the fraction at the end (16 × 2 = 32, then writing 32 ¼).",
+      "Failing to convert the mixed fraction to an improper fraction correctly."
+    ],
+    "required_concepts": [
+      "mixed_fractions",
+      "fraction_multiplication",
+      "real_world_application"
+    ]
+  },
+  {
+    "problem_id": "frac_magnitude_three_cases_01",
+    "topic": "Working with Fractions (Magnitude of Products - 3 Cases)",
+    "difficulty": "medium",
+    "question": "Consider three multiplication scenarios: (A) 4/3 × 4, (B) 3/4 × 2/5, and (C) 3/4 × 5. Without calculating the exact products, describe how the product compares to the original numbers in each of the three scenarios.",
+    "final_answer": "(A) Greater than both numbers. (B) Less than both numbers. (C) Less than the number greater than 1 (5), but greater than the number between 0 and 1 (3/4).",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Analyze Scenario A (4/3 × 4). Since 4/3 > 1 and 4 > 1, both numbers are greater than 1. The rule states the product will be greater than both numbers.",
+          "concept": "magnitude_case_1"
+        },
+        {
+          "step_id": 2,
+          "description": "Analyze Scenario B (3/4 × 2/5). Since 3/4 < 1 and 2/5 < 1, both numbers are between 0 and 1. The rule states the product will be less than both numbers.",
+          "concept": "magnitude_case_2"
+        },
+        {
+          "step_id": 3,
+          "description": "Analyze Scenario C (3/4 × 5). One number is between 0 and 1 (3/4) and the other is greater than 1 (5). The rule states the product is less than the larger number, but greater than the smaller number.",
+          "concept": "magnitude_case_3"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Assuming multiplication always makes numbers larger (violating case B and C).",
+      "Calculating the exact fractions but failing to draw the conceptual inequalities."
+    ],
+    "required_concepts": [
+      "magnitude_of_products",
+      "inequalities",
+      "conceptual_estimation"
+    ]
+  },
+  {
+    "problem_id": "frac_order_property_01",
+    "topic": "Working with Fractions (Order of Multiplication)",
+    "difficulty": "easy",
+    "question": "A rectangle is drawn with a length of 1/2 unit and a breadth of 1/4 unit. A second rectangle is drawn with a length of 1/4 unit and a breadth of 1/2 unit. Calculate the area of both rectangles. What geometric and mathematical property does this demonstrate regarding the order of multiplication?",
+    "final_answer": "Both areas are 1/8 square units. This demonstrates that the order of multiplication does not matter (commutative property).",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Calculate the area of the first rectangle: Length × Breadth = (1/2) × (1/4).",
+          "concept": "area_calculation"
+        },
+        {
+          "step_id": 2,
+          "description": "Product is (1 × 1) / (2 × 4) = 1/8 square units.",
+          "concept": "fraction_multiplication"
+        },
+        {
+          "step_id": 3,
+          "description": "Calculate the area of the second rectangle: Length × Breadth = (1/4) × (1/2).",
+          "concept": "area_calculation"
+        },
+        {
+          "step_id": 4,
+          "description": "Product is (1 × 1) / (4 × 2) = 1/8 square units.",
+          "concept": "fraction_multiplication"
+        },
+        {
+          "step_id": 5,
+          "description": "Compare the results. Since changing the order of the sides (just rotating the rectangle) yields the exact same area, it proves that a/b × c/d = c/d × a/b.",
+          "concept": "commutative_property_of_multiplication"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Believing the order affects the numerator or denominator arrangements differently."
+    ],
+    "required_concepts": [
+      "order_of_operations",
+      "area_of_rectangles",
+      "commutative_property"
+    ]
+  },
+  {
+    "problem_id": "frac_visual_area_reasoning_01",
+    "topic": "Working with Fractions (Fractional Area Reasoning)",
+    "difficulty": "hard",
+    "question": "A large square has an area of 1 square unit. The top-right quadrant (1/4 of the square) is further divided into 4 smaller, equal squares. If a triangle occupying exactly half of one of these smaller squares is shaded, what fraction of the entire large square is shaded?",
+    "final_answer": "1/32",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Determine the area of the top-right quadrant. It is exactly 1/4 of the whole square.",
+          "concept": "identifying_primary_fraction"
+        },
+        {
+          "step_id": 2,
+          "description": "The quadrant is divided into 4 smaller squares. Find the area of one smaller square by multiplying: (1/4) × (1/4) = 1/16 of the whole.",
+          "concept": "subdivision_multiplication"
+        },
+        {
+          "step_id": 3,
+          "description": "A triangle occupies half of this smaller square. Multiply the area of the smaller square by 1/2: (1/16) × (1/2).",
+          "concept": "final_subdivision"
+        },
+        {
+          "step_id": 4,
+          "description": "Calculate the final shaded area: (1 × 1) / (16 × 2) = 1/32.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Visual Grid Expansion",
+        "steps": [
+          "Imagine applying the smallest grid size (the small square) to the entire large square.",
+          "If 1 quadrant holds 4 small squares, the whole large square holds 4 × 4 = 16 small squares.",
+          "If each small square is cut in half by a triangle, there are 16 × 2 = 32 such triangles in the whole square.",
+          "Since only 1 triangle is shaded, it represents 1 out of 32 parts, or 1/32."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Adding the fractions (1/4 + 1/4 + 1/2) instead of finding a 'fraction of a fraction' through multiplication.",
+      "Forgetting the initial 1/4 and assuming the small square is 1/4 of the whole."
+    ],
+    "required_concepts": [
+      "fraction_of_a_fraction",
+      "area_decomposition",
+      "visual_fraction_logic"
+    ]
+  },
+  {
+    "problem_id": "frac_multistep_word_problem_01",
+    "topic": "Working with Fractions (Multi-step Word Problems)",
+    "difficulty": "hard",
+    "question": "The government takes 1/6 of Somu's land. She gives half (1/2) of the REMAINING land to her daughter Krishna, and 1/3 of the SAME remaining land to her son Bora. What fraction of the original land does Bora receive?",
+    "final_answer": "5/18",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Calculate the fraction of land remaining after the government takes its share: 1 - 1/6.",
+          "concept": "subtraction_from_whole"
+        },
+        {
+          "step_id": 2,
+          "description": "The remaining land is 5/6.",
+          "concept": "intermediate_calculation"
+        },
+        {
+          "step_id": 3,
+          "description": "Determine Bora's share. Bora receives 1/3 of the remaining land. This translates mathematically to 1/3 × (Remaining Land).",
+          "concept": "fraction_of_a_quantity"
+        },
+        {
+          "step_id": 4,
+          "description": "Set up the multiplication: 1/3 × 5/6.",
+          "concept": "setting_up_calculation"
+        },
+        {
+          "step_id": 5,
+          "description": "Calculate the final product: (1 × 5) / (3 × 6) = 5/18 of the original land.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Calculating 1/3 of the original whole land (answering 1/3) instead of 1/3 of the remaining land.",
+      "Subtracting Krishna's share first before calculating Bora's, misunderstanding that both took a fraction of the *same* remaining pool."
+    ],
+    "required_concepts": [
+      "multi_step_word_problems",
+      "fraction_of_a_fraction",
+      "careful_reading_of_constraints"
+    ]
+  },
+  {
+    "problem_id": "frac_mixed_division_01",
+    "topic": "Working with Fractions (Division of Mixed Fractions)",
+    "difficulty": "medium",
+    "question": "Evaluate the division of the mixed fractions: 3 2/3 ÷ 1 3/8. Express your final answer as a mixed fraction.",
+    "final_answer": "2 2/3",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Convert the first mixed fraction (dividend) to an improper fraction: 3 2/3 = (3 × 3 + 2) / 3 = 11/3.",
+          "concept": "converting_mixed_fractions"
+        },
+        {
+          "step_id": 2,
+          "description": "Convert the second mixed fraction (divisor) to an improper fraction: 1 3/8 = (1 × 8 + 3) / 8 = 11/8.",
+          "concept": "converting_mixed_fractions"
+        },
+        {
+          "step_id": 3,
+          "description": "Rewrite the division problem using the improper fractions: 11/3 ÷ 11/8.",
+          "concept": "setting_up_division"
+        },
+        {
+          "step_id": 4,
+          "description": "Convert the division to multiplication by using the reciprocal of the divisor: 11/3 × 8/11.",
+          "concept": "multiplying_by_reciprocal"
+        },
+        {
+          "step_id": 5,
+          "description": "Simplify by cancelling the common factor of 11 in the numerator and denominator, leaving 8/3.",
+          "concept": "simplifying_before_multiplying"
+        },
+        {
+          "step_id": 6,
+          "description": "Convert the improper fraction 8/3 back into a mixed fraction: 8 ÷ 3 = 2 with a remainder of 2, so 2 2/3.",
+          "concept": "converting_to_mixed_fraction"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Dividing the whole numbers (3 ÷ 1) and the fractions (2/3 ÷ 3/8) separately.",
+      "Forgetting to take the reciprocal of the second fraction before multiplying."
+    ],
+    "required_concepts": [
+      "mixed_fractions",
+      "fraction_division",
+      "reciprocals"
+    ]
+  },
+  {
+    "problem_id": "frac_word_problem_area_contextual_01",
+    "topic": "Working with Fractions (Real-world Constraints in Division)",
+    "difficulty": "hard",
+    "question": "You need to completely cover an area of 15/2 square units using small square bricks. Each brick has an area of 1/25 square units. Using division of fractions, calculate the mathematical number of bricks required, and then state the actual whole number of bricks you would need to buy to ensure the area is covered completely.",
+    "final_answer": "188 bricks (since 375/2 = 187.5, we need a whole number)",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Set up the algebraic relationship: Number of bricks = Total Area ÷ Area of one brick. So, (15/2) ÷ (1/25).",
+          "concept": "formulating_division"
+        },
+        {
+          "step_id": 2,
+          "description": "Convert to multiplication using the reciprocal of the divisor: (15/2) × 25/1.",
+          "concept": "multiplying_by_reciprocal"
+        },
+        {
+          "step_id": 3,
+          "description": "Compute the mathematical result: (15 × 25) / 2 = 375/2.",
+          "concept": "fraction_multiplication"
+        },
+        {
+          "step_id": 4,
+          "description": "Convert to a decimal to understand the physical requirement: 375 ÷ 2 = 187.5.",
+          "concept": "decimal_conversion"
+        },
+        {
+          "step_id": 5,
+          "description": "Apply real-world logic: You cannot buy exactly half a brick. To completely cover the area, you must round up to the next whole number. Therefore, 188 bricks are needed.",
+          "concept": "real_world_contextualization"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Leaving the answer as 375/2 without considering the physical reality of discrete objects like bricks.",
+      "Rounding down to 187, which would leave a portion of the area uncovered."
+    ],
+    "required_concepts": [
+      "division_of_fractions",
+      "area_applications",
+      "contextual_rounding"
+    ]
+  }
+]

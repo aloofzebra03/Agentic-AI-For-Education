@@ -1,0 +1,220 @@
+[
+  {
+    "problem_id": "geo_parallel_def_notation_01",
+    "topic": "Parallel Lines (Definition and Notation)",
+    "difficulty": "easy",
+    "question": "Two distinct straight lines, p and q, are drawn on a flat sheet of paper. No matter how far they are extended in either direction, the perpendicular distance between them remains constant and they never intersect. What geometric term describes this relationship, and what is the mathematical symbol used to write this?",
+    "final_answer": "Parallel lines; p \u2225 q",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Identify the defining characteristics from the problem: the lines are on the same plane (a flat sheet), the distance between them is constant, and they never meet.",
+          "concept": "definition_of_parallel_lines"
+        },
+        {
+          "step_id": 2,
+          "description": "Recall the geometric term for lines that have these exact properties. They are called parallel lines.",
+          "concept": "terminology"
+        },
+        {
+          "step_id": 3,
+          "description": "Identify the standard mathematical shorthand (notation) used to denote parallel lines, which is two vertical bars (\u2225).",
+          "concept": "mathematical_notation"
+        },
+        {
+          "step_id": 4,
+          "description": "Combine the line names with the symbol to write the final notation: p \u2225 q.",
+          "concept": "final_conclusion"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Using the equal sign (=) instead of the parallel symbol (\u2225).",
+      "Stating that the lines are just 'straight' without identifying the specific parallel relationship."
+    ],
+    "required_concepts": [
+      "properties_of_parallel_lines",
+      "parallel_notation"
+    ]
+  },
+  {
+    "problem_id": "geo_perpendicular_notation_01",
+    "topic": "Intersecting Lines (Perpendicularity)",
+    "difficulty": "easy",
+    "question": "Line segment AB intersects line segment CD at point O such that all four angles formed around point O are equal. What specific type of intersecting lines are these, what is the measure of each angle, and how is this relationship written using mathematical notation?",
+    "final_answer": "Perpendicular lines, 90\u00b0, AB \u22a5 CD",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Recognize that the total angle measure around a central point is 360\u00b0.",
+          "concept": "angles_around_a_point"
+        },
+        {
+          "step_id": 2,
+          "description": "Since all four angles are equal, divide the total degrees by 4: 360\u00b0 / 4 = 90\u00b0.",
+          "concept": "angle_calculation"
+        },
+        {
+          "step_id": 3,
+          "description": "Identify the geometric term for lines that intersect at exactly 90\u00b0 (right angles). These are called perpendicular lines.",
+          "concept": "definition_of_perpendicular_lines"
+        },
+        {
+          "step_id": 4,
+          "description": "Recall the mathematical symbol for perpendicularity, which is an upside-down T (\u22a5), and write the relationship: AB \u22a5 CD.",
+          "concept": "mathematical_notation"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Using Linear Pairs",
+        "steps": [
+          "Recognize that two adjacent angles on a straight line form a linear pair (180\u00b0).",
+          "Since they are equal, each must be 180\u00b0 / 2 = 90\u00b0.",
+          "Identify lines meeting at 90\u00b0 as perpendicular and use the \u22a5 notation."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Forgetting the specific notation (\u22a5) or using the parallel symbol by mistake.",
+      "Stating the angles are 180\u00b0 or 360\u00b0 instead of 90\u00b0."
+    ],
+    "required_concepts": [
+      "perpendicular_lines",
+      "right_angles",
+      "perpendicular_notation"
+    ]
+  },
+  {
+    "problem_id": "geo_interior_same_side_01",
+    "topic": "Transversals (Interior Angles on the Same Side)",
+    "difficulty": "medium",
+    "question": "A transversal intersects two parallel lines. If one of the interior angles on the same side of the transversal is 72\u00b0, what is the measure of the other interior angle on that same side? State the specific geometric property used to find this answer.",
+    "final_answer": "108\u00b0; Interior angles on the same side of a transversal are supplementary.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Identify the relevant theorem: When two parallel lines are cut by a transversal, the interior angles on the same side of the transversal are supplementary.",
+          "concept": "interior_angles_same_side_theorem"
+        },
+        {
+          "step_id": 2,
+          "description": "Recall that supplementary angles add up to exactly 180\u00b0.",
+          "concept": "definition_of_supplementary"
+        },
+        {
+          "step_id": 3,
+          "description": "Set up the equation to find the missing angle: 72\u00b0 + x = 180\u00b0.",
+          "concept": "equation_setup"
+        },
+        {
+          "step_id": 4,
+          "description": "Solve for x: x = 180\u00b0 - 72\u00b0 = 108\u00b0.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Assuming the angles are equal (alternate interior) and answering 72\u00b0.",
+      "Subtracting from 90\u00b0 instead of 180\u00b0."
+    ],
+    "required_concepts": [
+      "transversals",
+      "interior_angles_on_same_side",
+      "supplementary_angles"
+    ]
+  },
+  {
+    "problem_id": "geo_construction_set_square_01",
+    "topic": "Construction Activities (Drawing Parallel Lines)",
+    "difficulty": "medium",
+    "question": "In a geometry activity, you are given a line l and a point A outside it. You place one edge of a set square on line l and place a ruler against its other edge. Then, you slide the set square along the ruler until its first edge reaches point A, and draw a new line m. What geometric angle principle ensures that line l is parallel to line m?",
+    "final_answer": "The sliding motion ensures that the corresponding angles created by the transversal (the ruler) are equal.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Visualize the setup: The ruler acts as a transversal line cutting across the space where the two lines (l and m) will be.",
+          "concept": "identifying_transversal"
+        },
+        {
+          "step_id": 2,
+          "description": "Recognize the role of the set square: The corner of the set square forms a specific, fixed angle against the ruler.",
+          "concept": "fixed_angle_property"
+        },
+        {
+          "step_id": 3,
+          "description": "Understand the sliding motion: As you slide the set square along the straight ruler, you are effectively copying that exact same angle to a new position along the transversal.",
+          "concept": "copying_angles"
+        },
+        {
+          "step_id": 4,
+          "description": "Relate to angle properties: These copied angles sit in the same relative position at each intersection, making them corresponding angles.",
+          "concept": "corresponding_angles"
+        },
+        {
+          "step_id": 5,
+          "description": "Conclude: Because the corresponding angles are forced to be equal by the rigid set square, lines l and m must be parallel.",
+          "concept": "parallel_line_proof"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Saying the ruler makes them parallel without mentioning angles.",
+      "Confusing corresponding angles with alternate interior angles in this physical context."
+    ],
+    "required_concepts": [
+      "geometric_construction",
+      "corresponding_angles_axiom",
+      "use_of_set_squares"
+    ]
+  },
+  {
+    "problem_id": "geo_paper_folding_01",
+    "topic": "Construction Activities (Paper Folding)",
+    "difficulty": "easy",
+    "question": "Fold a rectangular piece of paper in half by bringing its top edge to meet its bottom edge, and unfold it to get a crease line p. Now fold it in half by bringing its left edge to meet its right edge, and unfold it to get a crease line q. What is the specific geometric relationship between crease p and crease q, and what is the measure of the angles formed at their intersection?",
+    "final_answer": "They are perpendicular to each other; 90\u00b0.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Analyze the first fold: Folding top to bottom creates a horizontal crease line perfectly parallel to the top and bottom edges.",
+          "concept": "horizontal_lines"
+        },
+        {
+          "step_id": 2,
+          "description": "Analyze the second fold: Folding left to right creates a vertical crease line perfectly parallel to the side edges.",
+          "concept": "vertical_lines"
+        },
+        {
+          "step_id": 3,
+          "description": "Determine the relationship: Since a standard rectangle has 90\u00b0 corners, horizontal and vertical lines crossing each other will also intersect at exactly 90\u00b0.",
+          "concept": "intersecting_lines"
+        },
+        {
+          "step_id": 4,
+          "description": "Apply the correct terminology: Lines that intersect at 90\u00b0 right angles are called perpendicular lines.",
+          "concept": "perpendicularity"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Saying they are parallel lines.",
+      "Stating they just 'intersect' without specifying they are perpendicular at 90\u00b0."
+    ],
+    "required_concepts": [
+      "physical_modeling_of_geometry",
+      "perpendicular_lines",
+      "right_angles"
+    ]
+  }
+]

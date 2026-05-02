@@ -60,7 +60,7 @@ class MathAgentState(TypedDict, total=False):
     # Mode & state
     mode: Mode
     solved: bool
-    is_kannada: Optional[bool]
+    is_kannada: Annotated[bool, lambda x, y: y if y is not None else x]
     
     # Step tracking
     steps: List[Dict[str, Any]]  # Full step objects with step_id, description, concept

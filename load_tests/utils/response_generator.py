@@ -81,6 +81,34 @@ class ResponseGenerator:
         "Alright",
         "Yes",
     ]
+
+    MATH_START_RESPONSES = [
+        "I think I need to understand what operation the problem is asking for.",
+        "I can try solving it step by step.",
+        "Let me first identify the important numbers in the question.",
+        "I am not fully sure yet, but I can make an attempt.",
+    ]
+
+    MATH_COACH_RESPONSES = [
+        "I think my approach is correct because I used the same operation on the related quantities.",
+        "Let me check whether the result matches what the question asks.",
+        "I may have made a small mistake, can you help me verify the next step?",
+        "The answer should come from simplifying the expression after setting it up.",
+    ]
+
+    MATH_GUIDED_RESPONSES = [
+        "So I should focus on the missing part before calculating?",
+        "I understand the hint, but I need help connecting it to the numbers.",
+        "Maybe I should rewrite the problem in a simpler form first.",
+        "Can you show me what to do with the terms in this step?",
+    ]
+
+    MATH_SCAFFOLD_RESPONSES = [
+        "I think the next step is to use the given values carefully.",
+        "The result for this step should be the simplified value.",
+        "I am not sure, but I will try that step.",
+        "Can you explain this step one more time?",
+    ]
     
     @classmethod
     def generate_response(cls, current_state: str, confused_probability: float = 0.1) -> str:
@@ -153,6 +181,24 @@ class ResponseGenerator:
         else:
             # Default behavior
             return cls.generate_response(current_state)
+
+    @classmethod
+    def generate_math_response(cls, current_state: str, confused_probability: float = 0.15) -> str:
+        if random.random() < confused_probability:
+            return random.choice(cls.CONFUSED_RESPONSES)
+
+        state = (current_state or "").upper()
+        if state in {"START", "ASSESSMENT"}:
+            return random.choice(cls.MATH_START_RESPONSES)
+        if state == "COACH":
+            return random.choice(cls.MATH_COACH_RESPONSES)
+        if state in {"GUIDED", "CONCEPT"}:
+            return random.choice(cls.MATH_GUIDED_RESPONSES)
+        if state == "SCAFFOLD":
+            return random.choice(cls.MATH_SCAFFOLD_RESPONSES)
+        if state == "END":
+            return "Thank you, I understand the solution now."
+        return random.choice(cls.ACKNOWLEDGMENT)
 
 
 # Quick test

@@ -1,0 +1,113 @@
+{
+  "test_info": {
+    "timestamp": "2026-05-02T10:08:03.597631",
+    "users": 10,
+    "duration_seconds": 299.3069713115692
+  },
+  "request_stats": {
+    "total_requests": 85,
+    "total_failures": 4,
+    "failure_rate": 0.047058823529411764,
+    "avg_response_time_ms": 13249.50782706112,
+    "min_response_time_ms": 228.29990001628175,
+    "max_response_time_ms": 108176.5075000003,
+    "median_response_time_ms": 5300.0,
+    "requests_per_second": 0.28398937594914103,
+    "percentiles": {
+      "p50": 5300.0,
+      "p75": 13000.0,
+      "p90": 39000.0,
+      "p95": 53000.0,
+      "p99": 108000.0
+    }
+  },
+  "endpoint_stats": {
+    "('/math/problems', 'GET')": {
+      "num_requests": 10,
+      "num_failures": 0,
+      "avg_response_time_ms": 2203.393420006614,
+      "min_response_time_ms": 2047.9929999564774,
+      "max_response_time_ms": 2697.6856000255793,
+      "requests_per_second": 0.033410514817546005
+    },
+    "('/math/session/start', 'POST')": {
+      "num_requests": 10,
+      "num_failures": 0,
+      "avg_response_time_ms": 532.7107499935664,
+      "min_response_time_ms": 228.29990001628175,
+      "max_response_time_ms": 1473.1083000078797,
+      "requests_per_second": 0.033410514817546005
+    },
+    "('/math/session/continue', 'POST')": {
+      "num_requests": 60,
+      "num_failures": 4,
+      "avg_response_time_ms": 18138.88338333539,
+      "min_response_time_ms": 2266.035200038459,
+      "max_response_time_ms": 108176.5075000003,
+      "requests_per_second": 0.20046308890527603
+    },
+    "('/math/session/status/{thread_id}', 'GET')": {
+      "num_requests": 5,
+      "num_failures": 0,
+      "avg_response_time_ms": 2102.8241200139746,
+      "min_response_time_ms": 2073.970500030555,
+      "max_response_time_ms": 2183.8190000271425,
+      "requests_per_second": 0.016705257408773003
+    }
+  },
+  "custom_metrics": {
+    "node_latencies": {
+      "START": {
+        "count": 10,
+        "total": 5326.161861419678,
+        "min": 228.06143760681152,
+        "max": 1473.1488227844238,
+        "avg": 532.6161861419678
+      },
+      "CHECK_ANSWER": {
+        "count": 10,
+        "total": 236024.9423980713,
+        "min": 2266.669988632202,
+        "max": 108175.92191696167,
+        "avg": 23602.49423980713
+      },
+      "ASSESSMENT": {
+        "count": 10,
+        "total": 268582.7724933624,
+        "min": 7044.35920715332,
+        "max": 91660.19678115845,
+        "avg": 26858.277249336243
+      },
+      "CONCEPT": {
+        "count": 9,
+        "total": 239240.43917655945,
+        "min": 5216.445446014404,
+        "max": 54060.86874008179,
+        "avg": 26582.271019617718
+      },
+      "ADAPTIVE_SOLVER": {
+        "count": 1,
+        "total": 69269.0076828003,
+        "min": 69269.0076828003,
+        "max": 69269.0076828003,
+        "avg": 69269.0076828003
+      }
+    },
+    "checkpoint_stats": {
+      "total_operations": 66,
+      "save_count": 66,
+      "load_count": 0,
+      "save_avg_ms": 1703.3686236901717,
+      "save_max_ms": 10817.592191696167
+    },
+    "total_transitions": 40,
+    "total_checkpoint_ops": 66,
+    "total_llm_calls": 0,
+    "total_simulations": 0,
+    "total_images": 0,
+    "total_videos": 0,
+    "total_misconceptions": 0,
+    "avg_quiz_score": 0,
+    "completed_sessions": 0
+  }
+}

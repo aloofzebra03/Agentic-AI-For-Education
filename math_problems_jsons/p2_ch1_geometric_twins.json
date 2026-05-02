@@ -1,0 +1,313 @@
+[
+  {
+    "problem_id": "geom_basic_superimposition_01",
+    "topic": "Basic Congruence and Superimposition",
+    "difficulty": "easy",
+    "question": "Two identical-looking L-shaped brackets are drawn on a page, but one is upside down and facing left. Can they still be considered congruent? Describe the physical action you could take with a tracing of the first shape to prove it.",
+    "final_answer": "Yes, they can be congruent. You can trace the first shape, and then rotate or flip the tracing paper to see if it superimposes exactly over the second shape.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Recall the definition of congruence: two figures are congruent if they have the exact same shape and size.",
+          "concept": "congruence_definition"
+        },
+        {
+          "step_id": 2,
+          "description": "Recognize that changing the orientation (how the shape is turned or flipped) does not change its actual shape or size.",
+          "concept": "orientation_independence"
+        },
+        {
+          "step_id": 3,
+          "description": "State the method of verification: Make a trace of the first bracket.",
+          "concept": "tracing_method"
+        },
+        {
+          "step_id": 4,
+          "description": "Explain the physical manipulation: Rotate and/or flip the tracing paper until the drawn shape aligns with the second bracket.",
+          "concept": "rotation_and_flipping"
+        },
+        {
+          "step_id": 5,
+          "description": "Conclude: If the traced shape exactly covers (superimposes on) the second shape, they are congruent.",
+          "concept": "superimposition"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Assuming shapes must face the exact same direction to be congruent.",
+      "Thinking that flipping a shape changes its geometric properties."
+    ],
+    "required_concepts": [
+      "basic_congruence",
+      "superimposition",
+      "geometric_transformations"
+    ]
+  },
+  {
+    "problem_id": "geom_measurement_sufficiency_01",
+    "topic": "Measurement-Based Congruence",
+    "difficulty": "medium",
+    "question": "Two V-shaped symbols on a signboard both have arm lengths of 4 cm and 8 cm. Is this side-length information alone sufficient to guarantee that the two symbols are exactly congruent? Explain your reasoning.",
+    "final_answer": "No. The angle between the two arms could be different, resulting in a different overall shape (e.g., a wide V versus a narrow V). The included angle must also be exactly the same.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Identify the given measurements: two side lengths (4 cm and 8 cm) for both shapes.",
+          "concept": "identifying_given_data"
+        },
+        {
+          "step_id": 2,
+          "description": "Analyze if the shape is fully locked in place. Imagine two sticks of 4 cm and 8 cm joined at a hinge.",
+          "concept": "geometric_visualization"
+        },
+        {
+          "step_id": 3,
+          "description": "Realize that the hinge can open wide or close tightly without changing the arm lengths.",
+          "concept": "angle_variability"
+        },
+        {
+          "step_id": 4,
+          "description": "Deduce that changing this opening changes the distance between the unjoined ends, thus creating non-congruent shapes.",
+          "concept": "logical_deduction"
+        },
+        {
+          "step_id": 5,
+          "description": "Conclude that to guarantee exact shape and size, the measure of the included angle is also required.",
+          "concept": "final_conclusion"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Assuming that having any matching numbers automatically makes shapes congruent.",
+      "Confusing 2D open shapes (like a V) with closed rigid shapes (like a triangle built with SSS)."
+    ],
+    "required_concepts": [
+      "measurement_sufficiency",
+      "shape_vs_size",
+      "angles_defining_shape"
+    ]
+  },
+  {
+    "problem_id": "geom_circle_rect_congruence_01",
+    "topic": "Congruence of Non-Triangle Shapes",
+    "difficulty": "easy",
+    "question": "To verify if two circles are congruent, what is the single measurement you need to check? Similarly, what two measurements are required to verify that two rectangles are congruent?",
+    "final_answer": "For circles, you must check if their radii are equal. For rectangles, you must check if their lengths are equal and their breadths are equal.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Define congruence for a circle: two circles will perfectly superimpose if they are the exact same size.",
+          "concept": "circle_congruence"
+        },
+        {
+          "step_id": 2,
+          "description": "Identify the defining measurement of a circle's size, which is its radius. Therefore, equal radii guarantee congruent circles.",
+          "concept": "radius_property"
+        },
+        {
+          "step_id": 3,
+          "description": "Define congruence for a rectangle: two rectangles will perfectly superimpose if their dimensions match exactly.",
+          "concept": "rectangle_congruence"
+        },
+        {
+          "step_id": 4,
+          "description": "Identify the defining measurements of a rectangle, which are its length and breadth. Both pairs of measurements must match for congruence.",
+          "concept": "length_and_breadth"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Using Diameter / Perimeter",
+        "steps": [
+          "For circles, checking if the diameters are equal also proves congruence (since diameter = 2 * radius).",
+          "For rectangles, length and width are still required (perimeter alone is not enough)."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Thinking that having the same perimeter makes rectangles congruent (e.g., 4x4 and 5x3 have the same perimeter but are not congruent).",
+      "Saying circles just need to be 'round' to be congruent."
+    ],
+    "required_concepts": [
+      "circle_properties",
+      "rectangle_properties",
+      "superimposition_of_standard_shapes"
+    ]
+  },
+  {
+    "problem_id": "geom_multiple_naming_01",
+    "topic": "Congruence Notation and Correspondence",
+    "difficulty": "medium",
+    "question": "It is given that ∆PQR ≅ ∆LMN. Write two other mathematically correct ways to state this exact same congruence relationship by rearranging the letters of the triangles.",
+    "final_answer": "∆QRP ≅ ∆MNL and ∆RQP ≅ ∆NLM. (Other valid pairs are also possible as long as the relative mapping remains P→L, Q→M, R→N).",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Analyze the original statement: ∆PQR ≅ ∆LMN. This defines a strict vertex correspondence: P corresponds to L, Q corresponds to M, and R corresponds to N.",
+          "concept": "vertex_correspondence"
+        },
+        {
+          "step_id": 2,
+          "description": "Create a new name for the first triangle by shifting the letters. For example, shift the first letter to the end: ∆QRP.",
+          "concept": "rearranging_vertices"
+        },
+        {
+          "step_id": 3,
+          "description": "Apply the exact same shifting pattern to the corresponding vertices of the second triangle. LMN becomes MNL.",
+          "concept": "matching_the_pattern"
+        },
+        {
+          "step_id": 4,
+          "description": "Write the first new valid statement: ∆QRP ≅ ∆MNL.",
+          "concept": "first_new_statement"
+        },
+        {
+          "step_id": 5,
+          "description": "Create another new name by reversing the original order: ∆RQP.",
+          "concept": "rearranging_vertices"
+        },
+        {
+          "step_id": 6,
+          "description": "Reverse the original order of the second triangle to match: ∆NLM.",
+          "concept": "matching_the_pattern"
+        },
+        {
+          "step_id": 7,
+          "description": "Write the second new valid statement: ∆RQP ≅ ∆NLM.",
+          "concept": "second_new_statement"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Rearranging the letters of the first triangle but leaving the second one as LMN (e.g., writing ∆QRP ≅ ∆LMN).",
+      "Mixing up the mappings, such as writing ∆PRQ ≅ ∆LMN."
+    ],
+    "required_concepts": [
+      "congruence_notation",
+      "strict_correspondence",
+      "naming_conventions"
+    ]
+  },
+  {
+    "problem_id": "geom_parallel_proof_01",
+    "topic": "Applications of Congruence (Proving Parallel Lines)",
+    "difficulty": "hard",
+    "question": "In a geometric figure, line segments AD and BC cross at point O such that AO = OD and BO = OC. You have already successfully proven that ∆AOB ≅ ∆DOC. Explain step-by-step how to use this congruence result to prove that line segment AB is parallel to line segment CD.",
+    "final_answer": "Because ∆AOB ≅ ∆DOC, their corresponding parts are equal, meaning ∠OAB = ∠ODC. Since line AD acts as a transversal cutting lines AB and CD, and these alternate interior angles are equal, lines AB and CD must be parallel.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Recall the established fact: ∆AOB ≅ ∆DOC.",
+          "concept": "given_information"
+        },
+        {
+          "step_id": 2,
+          "description": "Use the rule of Corresponding Parts of Congruent Triangles. The angle at vertex A in the first triangle corresponds to the angle at vertex D in the second triangle.",
+          "concept": "corresponding_angles"
+        },
+        {
+          "step_id": 3,
+          "description": "State the equality: Therefore, ∠OAB = ∠ODC (or simply ∠A = ∠D in the context of these triangles).",
+          "concept": "angle_equality"
+        },
+        {
+          "step_id": 4,
+          "description": "Observe the larger geometric structure: Line AD is a straight line acting as a transversal that intersects the two lines AB and CD.",
+          "concept": "identifying_transversals"
+        },
+        {
+          "step_id": 5,
+          "description": "Identify the relationship between ∠OAB and ∠ODC in this larger structure: they are 'alternate interior angles'.",
+          "concept": "alternate_interior_angles"
+        },
+        {
+          "step_id": 6,
+          "description": "Apply the parallel line theorem: If a transversal cuts two lines such that the alternate interior angles are equal, then the two lines must be parallel. Thus, AB ∥ CD.",
+          "concept": "proving_lines_parallel"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Using Transversal BC",
+        "steps": [
+          "From the congruence ∆AOB ≅ ∆DOC, identify that corresponding angles ∠OBA and ∠OCD are equal.",
+          "Observe that line BC acts as a transversal cutting lines AB and CD.",
+          "Angles ∠OBA and ∠OCD are alternate interior angles.",
+          "Because these alternate interior angles are equal, AB ∥ CD."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Stating they are parallel just because the triangles look identical.",
+      "Confusing alternate interior angles with vertically opposite angles (∠AOB and ∠DOC), which do not prove lines parallel."
+    ],
+    "required_concepts": [
+      "corresponding_parts_of_congruent_triangles",
+      "transversals",
+      "alternate_interior_angles",
+      "parallel_line_proofs"
+    ]
+  },
+  {
+    "problem_id": "geom_equilateral_60_proof_01",
+    "topic": "Properties Derived from Congruence (Equilateral Triangle Angles)",
+    "difficulty": "medium",
+    "question": "Using the geometric rule that 'angles opposite to equal sides of a triangle are equal', explain step-by-step why every single angle in an equilateral triangle must be exactly 60°.",
+    "final_answer": "In an equilateral triangle, all three sides are equal. Because sides AB=AC, ∠B=∠C. Because sides BC=BA, ∠A=∠C. Therefore, ∠A=∠B=∠C. Since the three angles must add up to 180°, each angle is exactly 180° ÷ 3 = 60°.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Define the starting shape: Let the equilateral triangle be ∆ABC. By definition, all its sides are equal in length, so AB = BC = AC.",
+          "concept": "equilateral_definition"
+        },
+        {
+          "step_id": 2,
+          "description": "Apply the rule to the first pair of sides: Consider sides AB and AC. Since AB = AC, the angles opposite them must be equal. Therefore, ∠C = ∠B.",
+          "concept": "isosceles_property_application_1"
+        },
+        {
+          "step_id": 3,
+          "description": "Apply the rule to a second pair of sides: Consider sides BC and BA. Since BC = BA, the angles opposite them must be equal. Therefore, ∠A = ∠C.",
+          "concept": "isosceles_property_application_2"
+        },
+        {
+          "step_id": 4,
+          "description": "Combine the findings: If ∠B = ∠C and ∠A = ∠C, it logically follows that all three angles are perfectly equal to each other: ∠A = ∠B = ∠C.",
+          "concept": "transitive_equality"
+        },
+        {
+          "step_id": 5,
+          "description": "Apply the Angle Sum Property: The sum of all interior angles in any triangle is 180°. So, ∠A + ∠B + ∠C = 180°.",
+          "concept": "angle_sum_property"
+        },
+        {
+          "step_id": 6,
+          "description": "Since all three angles are identical, let their measure be 'x'. Then x + x + x = 180°, or 3x = 180°. Solving this gives x = 60°.",
+          "concept": "final_calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [],
+    "common_mistakes": [
+      "Simply stating 'a triangle is 180 and 180 divided by 3 is 60' without proving *why* the three angles must be equal first.",
+      "Using symmetry as a vague reason instead of applying the specific mathematical rule about angles opposite equal sides."
+    ],
+    "required_concepts": [
+      "equilateral_triangle_properties",
+      "angles_opposite_equal_sides",
+      "angle_sum_property",
+      "algebraic_substitution"
+    ]
+  }
+]

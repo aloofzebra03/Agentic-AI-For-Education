@@ -692,7 +692,7 @@ class MathStartSessionRequest(BaseModel):
     """Request to start a new math tutoring session."""
     problem_id: str = Field(
         ...,
-        description="Unique problem identifier from problems_json (e.g., 'add_frac_same_den_01')."
+        description="Unique problem identifier from math_problems_jsons (e.g., 'add_frac_same_den_01')."
     )
     student_id: Optional[str] = Field(
         default=None,

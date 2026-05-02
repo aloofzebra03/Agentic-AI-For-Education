@@ -1,0 +1,346 @@
+[
+  {
+    "problem_id": "dec_tenths_01",
+    "topic": "Understanding Tenths",
+    "difficulty": "easy",
+    "question": "What is the meaning of the measurement $2\\frac{7}{10}$ cm as seen on a ruler, and how is it read?",
+    "final_answer": "Two and seven-tenth centimeters (or two point seven cm).",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "On a standard ruler, the unit length between two consecutive numbers is divided into 10 equal parts[cite: 1706].",
+          "concept": "unit_division"
+        },
+        {
+          "step_id": 2,
+          "description": "To get the length $2\\frac{7}{10}$ cm, move from 0 to 2 on the scale and then take seven smaller parts, each representing $\\frac{1}{10}$ of a unit[cite: 1707, 1709].",
+          "concept": "locating_fractions"
+        },
+        {
+          "step_id": 3,
+          "description": "This measurement is read as 'two and seven-tenth centimeters'[cite: 1712].",
+          "concept": "reading_decimals"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Decimal Notation",
+        "steps": [
+          "Convert the fraction to a decimal: $\\frac{7}{10} = 0.7$[cite: 2207].",
+          "Combine with the whole number: $2 + 0.7 = 2.7$ cm[cite: 2205].",
+          "Read as 'two point seven centimeters'[cite: 2210]."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Counting 7 marks from the start of the ruler instead of starting from the number 2",
+      "Reading it as 'twenty-seven centimeters' instead of 'two point seven'"
+    ],
+    "required_concepts": [
+      "fractional_measurement",
+      "number_line_division"
+    ]
+  },
+  {
+    "problem_id": "dec_addition_01",
+    "topic": "Addition of Decimals (Body Parts)",
+    "difficulty": "medium",
+    "question": "Calculate the total length of a honeybee if its head is $2\\frac{3}{10}$ units, thorax is $5\\frac{4}{10}$ units, and abdomen is $7\\frac{5}{10}$ units.",
+    "final_answer": "15.2 units",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Group the whole units and the tenth parts separately: $(2 + 5 + 7) + (\\frac{3}{10} + \\frac{4}{10} + \\frac{5}{10})$[cite: 1796, 1800].",
+          "concept": "grouping_terms"
+        },
+        {
+          "step_id": 2,
+          "description": "Add the whole units: $2 + 5 + 7 = 14$ units[cite: 1796].",
+          "concept": "integer_addition"
+        },
+        {
+          "step_id": 3,
+          "description": "Add the tenths: $\\frac{3}{10} + \\frac{4}{10} + \\frac{5}{10} = \\frac{12}{10}$ units[cite: 1801].",
+          "concept": "fraction_addition"
+        },
+        {
+          "step_id": 4,
+          "description": "Convert $\\frac{12}{10}$ to units and tenths: $\\frac{12}{10} = 1$ unit and $2$ one-tenths[cite: 1797, 1803].",
+          "concept": "mixed_number_conversion"
+        },
+        {
+          "step_id": 5,
+          "description": "Add the converted unit to the total whole units: $14 + 1 = 15$ units and $2$ one-tenths, written as $15.2$[cite: 1804, 1834].",
+          "concept": "final_sum"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Total Tenths Method",
+        "steps": [
+          "Convert all lengths to tenths: 23 tenths + 54 tenths + 75 tenths[cite: 1812].",
+          "Add: $23 + 54 + 75 = 152$ tenths[cite: 1813].",
+          "Convert back: $\\frac{152}{10} = 15.2$ units[cite: 1814, 1817]."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Forgetting to carry over the '1' unit when the tenths sum exceeds 10",
+      "Adding the whole numbers correctly but leaving the tenths as 12, resulting in 14.12"
+    ],
+    "required_concepts": [
+      "decimal_addition",
+      "place_value_carrying"
+    ]
+  },
+  {
+    "problem_id": "dec_hundredths_01",
+    "topic": "Introduction to Hundredths",
+    "difficulty": "medium",
+    "question": "A sheet of paper of length $8\\frac{9}{10}$ units is folded in half. The folded length is between $4\\frac{4}{10}$ and $4\\frac{5}{10}$ units. How can we find the exact measurement?",
+    "final_answer": "By splitting each one-tenth into 10 smaller parts to create one-hundredths.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "When a length falls between two tenth markings, the tenths must be subdivided for more accuracy[cite: 1882, 1883].",
+          "concept": "precision_need"
+        },
+        {
+          "step_id": 2,
+          "description": "Split each one-tenth into 10 equal parts. Since there are 10 one-tenths in a unit, there will be $10 \\times 10 = 100$ such parts in a full unit[cite: 1884, 1899].",
+          "concept": "hundredth_derivation"
+        },
+        {
+          "step_id": 3,
+          "description": "Each small part represents $\\frac{1}{100}$ of a unit[cite: 1902].",
+          "concept": "identifying_hundredths"
+        },
+        {
+          "step_id": 4,
+          "description": "The folded paper ends at 4 units, 4 one-tenths, and 5 one-hundredths, written as $4\\frac{4}{10}\\frac{5}{100}$ or $4.45$[cite: 1908, 1911].",
+          "concept": "decimal_notation"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Direct Fraction Division",
+        "steps": [
+          "The total length is $8.9$ units.",
+          "Folded in half means $8.9 \\div 2$.",
+          "Half of 8 is 4, and half of 0.9 (90 hundredths) is 0.45[cite: 1911].",
+          "Result: 4.45 units."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Thinking that $\\frac{1}{100}$ is larger than $\\frac{1}{10}$",
+      "Assuming the measurement is exactly $4.4$ or $4.5$ because there are no markings"
+    ],
+    "required_concepts": [
+      "fractional_subdivision",
+      "precision_measurement"
+    ]
+  },
+  {
+    "problem_id": "dec_compare_01",
+    "topic": "Comparing Decimals",
+    "difficulty": "easy",
+    "question": "Which decimal number is greater: 6.456 or 6.465? Explain using place value.",
+    "final_answer": "6.465",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Compare the digits at the highest place value (Units). Both have 6 units[cite: 2486, 2509].",
+          "concept": "place_value_comparison"
+        },
+        {
+          "step_id": 2,
+          "description": "Compare the next smaller place value (Tenths). Both have 4 tenths[cite: 2506, 2510].",
+          "concept": "sequential_comparison"
+        },
+        {
+          "step_id": 3,
+          "description": "Compare the Hundredths place. The first number has 5 hundredths, while the second has 6 hundredths[cite: 2507].",
+          "concept": "identifying_difference"
+        },
+        {
+          "step_id": 4,
+          "description": "Since 6 is greater than 5 at the hundredths position, 6.465 is the larger number[cite: 2512].",
+          "concept": "final_determination"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Number Line Method",
+        "steps": [
+          "Locate 6.45 and 6.46 on a magnified number line[cite: 2470].",
+          "6.456 is slightly past 6.45.",
+          "6.465 is slightly past 6.46.",
+          "Since 6.465 is further to the right, it is greater[cite: 2522]."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Assuming the number with more digits is always larger[cite: 2732, 3235]",
+      "Comparing digits from right to left instead of left to right"
+    ],
+    "required_concepts": [
+      "place_value",
+      "decimal_comparison"
+    ]
+  },
+  {
+    "problem_id": "dec_zero_dilemma",
+    "topic": "Trailing Zeros",
+    "difficulty": "easy",
+    "question": "Are the numbers 0.2, 0.20, and 0.200 equal? Why or why not?",
+    "final_answer": "Yes, they are equal because they all represent 2 tenths.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Examine 0.2: It represents 2 tenths and nothing else[cite: 2431].",
+          "concept": "reading_place_value"
+        },
+        {
+          "step_id": 2,
+          "description": "Examine 0.20: It represents 2 tenths and 0 hundredths[cite: 2431].",
+          "concept": "reading_place_value"
+        },
+        {
+          "step_id": 3,
+          "description": "Examine 0.200: It represents 2 tenths, 0 hundredths, and 0 thousandths[cite: 2431].",
+          "concept": "reading_place_value"
+        },
+        {
+          "step_id": 4,
+          "description": "Since adding zeros to the right of the last digit in a decimal part does not change the quantity of tenths, the values remain the same[cite: 2432].",
+          "concept": "zero_property_decimals"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Fractional Equivalence",
+        "steps": [
+          "0.2 = $\\frac{2}{10}$",
+          "0.20 = $\\frac{20}{100} = \\frac{2}{10}$",
+          "0.200 = $\\frac{200}{1000} = \\frac{2}{10}$",
+          "All simplify to the same fraction."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Thinking 0.20 is larger than 0.2 because 20 is larger than 2",
+      "Confusing 0.20 with 0.02 (which represents 2 hundredths and is much smaller)[cite: 2433]"
+    ],
+    "required_concepts": [
+      "equivalent_decimals",
+      "trailing_zeros"
+    ]
+  },
+  {
+    "problem_id": "dec_conversion_01",
+    "topic": "Unit Conversion (Length & Weight)",
+    "difficulty": "medium",
+    "question": "Convert (a) 5 mm to cm and (b) 254 g to kg.",
+    "final_answer": "(a) 0.5 cm, (b) 0.254 kg",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "For length: 1 cm = 10 mm, so 1 mm = $\\frac{1}{10}$ cm = 0.1 cm[cite: 2248, 2250].",
+          "concept": "conversion_factor_length"
+        },
+        {
+          "step_id": 2,
+          "description": "Multiply the value by the factor: 5 mm = $5 \\times 0.1$ cm = 0.5 cm[cite: 2252].",
+          "concept": "calculation"
+        },
+        {
+          "step_id": 3,
+          "description": "For weight: 1 kg = 1000 g, so 1 g = $\\frac{1}{1000}$ kg = 0.001 kg[cite: 2302, 2321].",
+          "concept": "conversion_factor_weight"
+        },
+        {
+          "step_id": 4,
+          "description": "Convert 254 g: $\\frac{254}{1000}$ kg = 0.254 kg[cite: 2308, 2309].",
+          "concept": "calculation"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Place Value Shifting",
+        "steps": [
+          "To convert mm to cm, divide by 10 (move decimal one place left): $5.0 \\rightarrow 0.5$.",
+          "To convert g to kg, divide by 1000 (move decimal three places left): $254.0 \\rightarrow 0.254$."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Multiplying instead of dividing (e.g., 5 mm = 50 cm)",
+      "Moving the decimal point the wrong number of places (e.g., 254 g = 2.54 kg)"
+    ],
+    "required_concepts": [
+      "metric_units",
+      "decimal_shifting"
+    ]
+  },
+  {
+    "problem_id": "dec_context_errors",
+    "topic": "Importance of Units & Decimal Points",
+    "difficulty": "medium",
+    "question": "How can reading 0.05 mg as 0.5 mg lead to a medication error?",
+    "final_answer": "It results in using 10 times more medicine than prescribed.",
+    "canonical_solution": {
+      "steps": [
+        {
+          "step_id": 1,
+          "description": "Identify the place values: 0.05 mg is 5 hundredths of a milligram[cite: 2197].",
+          "concept": "place_value_analysis"
+        },
+        {
+          "step_id": 2,
+          "description": "Identify the other value: 0.5 mg is 5 tenths of a milligram[cite: 2193].",
+          "concept": "place_value_analysis"
+        },
+        {
+          "step_id": 3,
+          "description": "Compare them: 0.5 mg is the same as 0.50 mg (50 hundredths)[cite: 2432].",
+          "concept": "normalization"
+        },
+        {
+          "step_id": 4,
+          "description": "Calculate the difference factor: 50 hundredths is 10 times larger than 5 hundredths ($5 \\times 10 = 50$)[cite: 2664].",
+          "concept": "scaling_factor"
+        }
+      ]
+    },
+    "alternative_solutions": [
+      {
+        "method": "Visual Decimal Shift",
+        "steps": [
+          "Moving the decimal point one place to the right in '0.05' creates '0.5'.",
+          "Each one-place shift to the right in the decimal system represents a 10-fold increase[cite: 2056]."
+        ]
+      }
+    ],
+    "common_mistakes": [
+      "Thinking the difference is 'only one zero' and therefore small",
+      "Assuming 0.05 is larger because it has more digits"
+    ],
+    "required_concepts": [
+      "decimal_place_value",
+      "safety_in_math"
+    ]
+  }
+]

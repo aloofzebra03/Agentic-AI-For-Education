@@ -1,6 +1,12 @@
 from locust import HttpUser, between, events
-from utils.metrics_collector import global_metrics
-from config import MIN_WAIT_TIME, MAX_WAIT_TIME, REQUEST_TIMEOUT, LOAD_TEST_TASK_MODE
+from config import (
+    MIN_WAIT_TIME,
+    MAX_WAIT_TIME,
+    REQUEST_TIMEOUT,
+    AUTH_HEADERS,
+    configure_runtime_options,
+)
+import importlib.util
 import sys
 import os
 import json
@@ -8,17 +14,38 @@ from datetime import datetime
 from pathlib import Path
 
 
-if LOAD_TEST_TASK_MODE == "regular":
-    from tasks.session_tasks import SessionTaskSet
-elif LOAD_TEST_TASK_MODE == "simulation":
-    from tasks.session_tasks_simulation import SessionTaskSet
-elif LOAD_TEST_TASK_MODE == "mixed":
-    from tasks.session_tasks_mixed import SessionTaskSet
-else:
-    raise ValueError(
-        f"Invalid LOAD_TEST_TASK_MODE='{LOAD_TEST_TASK_MODE}'. "
-        "Use one of: regular, simulation, mixed."
-    )
+LOAD_TESTS_DIR = Path(__file__).resolve().parent
+if str(LOAD_TESTS_DIR) not in sys.path:
+    sys.path.insert(0, str(LOAD_TESTS_DIR))
+
+from utils.metrics_collector import global_metrics
+
+VALID_TASK_MODES = ("regular", "simulation", "mixed", "math", "all")
+
+
+def get_task_set(task_mode: str):
+    task_files = {
+        "regular": "session_tasks.py",
+        "simulation": "session_tasks_simulation.py",
+        "mixed": "session_tasks_mixed.py",
+        "math": "session_tasks_math.py",
+        "all": "session_tasks_all.py",
+    }
+    task_file = task_files.get(task_mode)
+    if task_file is None:
+        raise ValueError(
+            f"Invalid task mode '{task_mode}'. Use one of: {', '.join(VALID_TASK_MODES)}."
+        )
+
+    task_path = LOAD_TESTS_DIR / "tasks" / task_file
+    module_name = f"load_test_{task_mode}_tasks"
+    spec = importlib.util.spec_from_file_location(module_name, task_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Could not load task module from {task_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return module.SessionTaskSet
 
 # # Add parent directory to path to ensure imports work
 # sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -27,7 +54,7 @@ else:
 class EducationalAgentUser(HttpUser):
 
     # Task set defining user behavior
-    tasks = [SessionTaskSet]
+    tasks = []
     
     # Wait time between tasks (simulates student thinking)
     wait_time = between(MIN_WAIT_TIME, MAX_WAIT_TIME)
@@ -41,6 +68,36 @@ class EducationalAgentUser(HttpUser):
 # EVENT HANDLERS (for test lifecycle)
 # ============================================================================
 
+@events.init_command_line_parser.add_listener
+def init_parser(parser):
+    parser.add_argument(
+        "--task-mode",
+        choices=VALID_TASK_MODES,
+        default=os.getenv("LOAD_TEST_TASK_MODE", "simulation").strip().lower(),
+        help="Load-test workload to run: regular, simulation, mixed, math, or all.",
+    )
+    parser.add_argument(
+        "--api-key",
+        default="",
+        help="Optional X-API-Key. If omitted, the first key from X_API_KEYS in .env is used.",
+    )
+    parser.add_argument(
+        "--math-problem-id",
+        default=os.getenv("LOAD_TEST_MATH_PROBLEM_ID", "").strip(),
+        help="Optional math problem_id for --task-mode math/all. Defaults to first /math/problems item.",
+    )
+
+
+@events.init.add_listener
+def on_locust_init(environment, **kwargs):
+    options = environment.parsed_options
+    configure_runtime_options(
+        task_mode=options.task_mode,
+        api_key=options.api_key,
+        math_problem_id=options.math_problem_id,
+    )
+    EducationalAgentUser.tasks = [get_task_set(options.task_mode)]
+
 @events.test_start.add_listener
 def on_test_start(environment, **kwargs):
     print("\n" + "=" * 80)
@@ -49,6 +106,8 @@ def on_test_start(environment, **kwargs):
     print(f"Target Host: {environment.host}")
     print(f"User Class: {EducationalAgentUser.__name__}")
     print(f"Tasks: {EducationalAgentUser.tasks}")
+    print(f"Task Mode: {environment.parsed_options.task_mode}")
+    print(f"Auth Header: {'X-API-Key configured' if AUTH_HEADERS else 'not configured'}")
     print(f"Wait Time: {MIN_WAIT_TIME}-{MAX_WAIT_TIME} seconds")
     print("=" * 80 + "\n")
 
@@ -91,7 +150,11 @@ def on_test_stop(environment, **kwargs):
     print("=" * 80)
     try:
         import requests
-        response = requests.get(f"{environment.host}/test/api-key-metrics", timeout=30)
+        response = requests.get(
+            f"{environment.host}/test/api-key-metrics",
+            headers=AUTH_HEADERS,
+            timeout=30,
+        )
         
         if response.status_code == 200:
             data = response.json()
@@ -126,8 +189,8 @@ def export_reports(environment):
     stats = environment.stats
     
     # Create reports directory if it doesn't exist
-    reports_dir = Path("load_tests/reports")
-    reports_dir.mkdir(exist_ok=True)
+    reports_dir = LOAD_TESTS_DIR / "reports"
+    reports_dir.mkdir(parents=True, exist_ok=True)
     
     # Generate timestamp for unique filenames
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

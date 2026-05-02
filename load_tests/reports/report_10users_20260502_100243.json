@@ -1,0 +1,47 @@
+{
+  "test_info": {
+    "timestamp": "2026-05-02T10:02:43.899391",
+    "users": 10,
+    "duration_seconds": 13.092101573944092
+  },
+  "request_stats": {
+    "total_requests": 10,
+    "total_failures": 10,
+    "failure_rate": 1.0,
+    "avg_response_time_ms": 4055.4711000004318,
+    "min_response_time_ms": 4026.0991000104696,
+    "max_response_time_ms": 4161.780500027817,
+    "median_response_time_ms": 4026.0991000104696,
+    "requests_per_second": 0.7638193107134156,
+    "percentiles": {
+      "p50": 4000.0,
+      "p75": 4100.0,
+      "p90": 4200.0,
+      "p95": 4200.0,
+      "p99": 4200.0
+    }
+  },
+  "endpoint_stats": {
+    "('/math/problems', 'GET')": {
+      "num_requests": 10,
+      "num_failures": 10,
+      "avg_response_time_ms": 4055.4711000004318,
+      "min_response_time_ms": 4026.0991000104696,
+      "max_response_time_ms": 4161.780500027817,
+      "requests_per_second": 0.7638193107134156
+    }
+  },
+  "custom_metrics": {
+    "node_latencies": {},
+    "checkpoint_stats": {},
+    "total_transitions": 0,
+    "total_checkpoint_ops": 0,
+    "total_llm_calls": 0,
+    "total_simulations": 0,
+    "total_images": 0,
+    "total_videos": 0,
+    "total_misconceptions": 0,
+    "avg_quiz_score": 0,
+    "completed_sessions": 0
+  }
+}
