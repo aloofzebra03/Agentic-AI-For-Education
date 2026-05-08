@@ -227,14 +227,14 @@ def extract_json_block(text) -> str:
 
 def get_llm(
     api_key: Optional[str] = None,
-    model: str = "gemma-3-27b-it",
+    model: str = "gemma-4-31b-it",
     temperature: float = 0.5,
 ) -> ChatGoogleGenerativeAI:
     """Get configured LLM instance with specified API key and model.
     
     Args:
         api_key: Google API key. If None, will use environment variable.
-        model: Model name to use. Defaults to gemma-3-27b-it.
+        model: Model name to use. Defaults to gemma-4-31b-it.
         temperature: Sampling temperature. Defaults to 0.5.
     
     Returns:
@@ -1279,7 +1279,7 @@ def create_simulation_config(variables: List, concept: str, action_config: Optio
         raise ValueError(f"Unrecognized independent variable '{independent_var}' for concept: {concept}")
 
 
-def select_most_relevant_image_for_concept_introduction(concept: str, definition_context: str, language: str = "English", model: str = "gemma-3-27b-it") -> Optional[Dict]:
+def select_most_relevant_image_for_concept_introduction(concept: str, definition_context: str, language: str = "English", model: str = "gemma-4-31b-it") -> Optional[Dict]:
     """
     Select the most pedagogically relevant image for introducing a concept.
     Uses the concept-to-file mapping to find the correct JSON file.
@@ -1289,7 +1289,7 @@ def select_most_relevant_image_for_concept_introduction(concept: str, definition
         concept: The concept name (can be in any case)
         definition_context: The context/definition being provided to the student
         language: Language for image selection ("English" or "Kannada"). Defaults to "English".
-        model: Model to use for image selection. Defaults to gemma-3-27b-it.
+        model: Model to use for image selection. Defaults to gemma-4-31b-it.
     
     Returns:
         Dict with url, description, and relevance_reason, or None if no images found
@@ -1444,13 +1444,13 @@ def identify_node_segments_from_transitions(messages: list, transitions: list) -
     
     return segments
 
-def create_educational_summary(messages: list, model: str = "gemma-3-27b-it") -> str:
+def create_educational_summary(messages: list, model: str = "gemma-4-31b-it") -> str:
     """
     Use LLM to create a proper educational summary of the conversation.
     
     Args:
         messages: List of conversation messages
-        model: Model to use for summarization. Defaults to gemma-3-27b-it.
+        model: Model to use for summarization. Defaults to gemma-4-31b-it.
     """
     if not messages:
         return ""
@@ -1498,13 +1498,13 @@ Summary:"""
         raise e
         return f"Educational discussion with {len(messages)} exchanges about the concept"
 
-def create_educational_summary_from_text(conversation_text: str, model: str = "gemma-3-27b-it") -> str:
+def create_educational_summary_from_text(conversation_text: str, model: str = "gemma-4-31b-it") -> str:
     """
     Create an LLM-generated summary from conversation text.
     
     Args:
         conversation_text: Text of the conversation to summarize
-        model: Model to use for summarization. Defaults to gemma-3-27b-it.
+        model: Model to use for summarization. Defaults to gemma-4-31b-it.
     """
     try:
         if not conversation_text.strip():
@@ -1543,7 +1543,7 @@ def build_node_aware_conversation_history(state: AgentState, current_node: str) 
     """
     messages = state.get("messages", [])
     transitions = state.get("node_transitions", [])
-    model = state.get("model", "gemma-3-27b-it")
+    model = state.get("model", "gemma-4-31b-it")
     
     # For short conversations, use full history
     if len(messages) <= 6:

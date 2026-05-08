@@ -6,7 +6,7 @@ These define the structure of data exchanged between Android app and API.
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -84,7 +84,7 @@ class SimulationState(BaseModel):
 
 class ConceptInfo(BaseModel):
     """Information about a concept"""
-    id: int
+    id: Union[int, str]
     title: str
     description: str
     key_insight: str

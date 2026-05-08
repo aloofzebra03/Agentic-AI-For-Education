@@ -80,7 +80,7 @@ class AgentState(TypedDict, total=False):
     summary_last_index: int
     enhanced_message_metadata: Dict[str, Any]
     # NEW: Language preference
-    is_kannada: bool
+    is_kannada: Annotated[bool, lambda old, new: new if new is not None else old]
     # NEW: Concept title
     concept_title: str
     # Model selection

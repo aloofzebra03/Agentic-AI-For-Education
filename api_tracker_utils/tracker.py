@@ -409,8 +409,9 @@ class ModelUsageTracker:
             print(f"[TRACKER] Found {len(valid_pairs)} valid API-model pairs within limits")
     
         
-        # Sort by usage (ascending)
-        candidates.sort(key=lambda x: x[2])  # Sort by total_usage
+        # Prefer the configured default model; use other models only when the
+        # default has no valid API keys left under the configured limits.
+        candidates.sort(key=lambda x: (x[1] != DEFAULT_MODEL, x[2]))
         
         # Pick randomly from top 3 to better distribute concurrent requests
         top_n = min(3, len(candidates))

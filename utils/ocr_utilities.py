@@ -24,7 +24,7 @@ except ImportError:
     print("[OCR] API tracker unavailable; using environment key fallback.")
 
 
-OCR_MODEL = "gemma-3-27b-it"
+OCR_MODEL = "gemma-4-31b-it"
 OCR_TEMPERATURE = 0.0
 OCR_PROMPT = (
     "Transcribe the math/text in this image into LaTeX format. "

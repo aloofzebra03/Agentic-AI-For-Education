@@ -217,16 +217,65 @@ def validate_student_level(level: str) -> str:
 
 def get_state_from_checkpoint(thread_id: str) -> Optional[Dict[str, Any]]:
     try:
-        # Get the state snapshot from the graph using the thread_id
-        state_snapshot = graph.get_state(config={"configurable": {"thread_id": thread_id}})
-        
-        # Check if state exists and has values
-        if state_snapshot and state_snapshot.values:
-            return state_snapshot.values
-        return None
+        return _get_graph_state_values(graph, thread_id)
     except Exception as e:
         print(f"Error retrieving state for thread {thread_id}: {e}")
         return None
+
+
+def _get_graph_state_values(graph_obj: Any, thread_id: Optional[str]) -> Optional[Dict[str, Any]]:
+    if not thread_id:
+        return None
+
+    state_snapshot = graph_obj.get_state(config={"configurable": {"thread_id": thread_id}})
+    if state_snapshot and state_snapshot.values:
+        return state_snapshot.values
+    return None
+
+
+def _simulation_checkpoint_exists(thread_id: Optional[str]) -> bool:
+    if not thread_id:
+        return False
+
+    try:
+        from simulation_to_concept.graph import get_session_state
+
+        return bool(get_session_state(thread_id))
+    except Exception as e:
+        print(f"Error retrieving simulation state for thread {thread_id}: {e}")
+        return False
+
+
+def _build_start_failure_detail(
+    error: Exception,
+    message: str,
+    thread_id: Optional[str] = None,
+    graph_obj: Any = None,
+    checkpoint_exists: Optional[bool] = None,
+) -> Dict[str, Any]:
+    if checkpoint_exists is None and graph_obj is not None:
+        try:
+            checkpoint_exists = _get_graph_state_values(graph_obj, thread_id) is not None
+        except Exception as checkpoint_error:
+            print(f"Error checking checkpoint for failed start {thread_id}: {checkpoint_error}")
+            checkpoint_exists = False
+    elif checkpoint_exists is None:
+        checkpoint_exists = False
+
+    if thread_id:
+        print(
+            f"[API] Start failed for generated thread_id={thread_id}; "
+            f"checkpoint_exists={checkpoint_exists}; not returning thread_id to client."
+        )
+
+    return {
+        "error": "Start Failed",
+        "message": message,
+        "detail": str(error),
+        "thread_id_issued": False,
+        "can_continue": False,
+        "retry": "start_new_session",
+    }
 
 
 def extract_metadata_from_state(state: Dict[str, Any]):
@@ -419,6 +468,7 @@ def list_available_concepts(user: dict = Depends(get_current_user)):
 
 @app.post("/session/start", response_model=StartSessionResponse, tags=["Education Agent"])
 def start_session(request: StartSessionRequest, user: dict = Depends(get_current_user_rate_limited)):
+    thread_id = None
     try:
         print(f"API /session/start - concept: {request.concept_title}, student: {request.student_id}, language: {'Kannada' if request.is_kannada else 'English'}")
         
@@ -499,7 +549,12 @@ def start_session(request: StartSessionRequest, user: dict = Depends(get_current
         print(f"Full traceback:\n{traceback.format_exc()}")
         raise HTTPException(
             status_code = 501,
-            detail=f"Error processing query: {e}"
+            detail=_build_start_failure_detail(
+                e,
+                "Rate limit hit while starting education session",
+                thread_id,
+                graph_obj=graph,
+            )
         ) 
     
     except DayLimitExhaustedError as e:
@@ -507,13 +562,26 @@ def start_session(request: StartSessionRequest, user: dict = Depends(get_current
         print(f"Full traceback:\n{traceback.format_exc()}")
         raise HTTPException(
             status_code = 502,
-            detail=f"Error processing query: {e}"
+            detail=_build_start_failure_detail(
+                e,
+                "Daily limit hit while starting education session",
+                thread_id,
+                graph_obj=graph,
+            )
         )
     
     except Exception as e:
         print(f"API error in /session/start: {str(e)}")
         print(f"Full traceback:\n{traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=f"Error starting session: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=_build_start_failure_detail(
+                e,
+                "Failed to start education session",
+                thread_id,
+                graph_obj=graph,
+            ),
+        )
 
 
 @app.post("/session/continue", response_model=ContinueSessionResponse, tags=["Education Agent"])
@@ -1087,6 +1155,7 @@ def start_simulation_session(request: SimStartSessionRequest, user: dict = Depen
     }
     ```
     """
+    thread_id = None
     try:
         # Validate simulation ID
         if not validate_simulation_id(request.simulation_id):
@@ -1124,18 +1193,36 @@ def start_simulation_session(request: SimStartSessionRequest, user: dict = Depen
         raise  # Pass through 400/404 errors without wrapping them in a 500
     except MinuteLimitExhaustedError as e:
         print(f"[API] Simulation start - minute limit: {e}")
-        raise HTTPException(status_code=501, detail=f"Per Minute Rate limit error: {e}")
+        raise HTTPException(
+            status_code=501,
+            detail=_build_start_failure_detail(
+                e,
+                "Rate limit hit while starting simulation session",
+                thread_id,
+                checkpoint_exists=_simulation_checkpoint_exists(thread_id),
+            ),
+        )
     except DayLimitExhaustedError as e:
         print(f"[API] Simulation start - day limit: {e}")
-        raise HTTPException(status_code=502, detail=f"Daily limit error: {e}")
+        raise HTTPException(
+            status_code=502,
+            detail=_build_start_failure_detail(
+                e,
+                "Daily limit hit while starting simulation session",
+                thread_id,
+                checkpoint_exists=_simulation_checkpoint_exists(thread_id),
+            ),
+        )
     except ValueError as e:
         # Invalid simulation or configuration error
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail={
-                "error": "Invalid Request",
-                "message": str(e)
-            }
+            detail=_build_start_failure_detail(
+                e,
+                "Invalid simulation start request",
+                thread_id,
+                checkpoint_exists=_simulation_checkpoint_exists(thread_id),
+            )
         )
     except Exception as e:
         # Unexpected error
@@ -1143,11 +1230,12 @@ def start_simulation_session(request: SimStartSessionRequest, user: dict = Depen
         traceback.print_exc()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": "Internal Server Error",
-                "message": "Failed to create teaching session",
-                "detail": str(e)
-            }
+            detail=_build_start_failure_detail(
+                e,
+                "Failed to create teaching session",
+                thread_id,
+                checkpoint_exists=_simulation_checkpoint_exists(thread_id),
+            )
         )
 
 
@@ -1466,6 +1554,7 @@ def start_revision_session(request: RevStartSessionRequest, user: dict = Depends
 
     Use POST /revision/session/continue with the returned thread_id for subsequent turns.
     """
+    thread_id = None
     try:
         print(f"API /revision/session/start - chapter: {request.chapter}, student: {request.student_id}, kannada: {request.is_kannada}")
 
@@ -1516,20 +1605,52 @@ def start_revision_session(request: RevStartSessionRequest, user: dict = Depends
 
     except MinuteLimitExhaustedError as e:
         print(f"[API] Revision start - minute limit: {e}")
-        raise HTTPException(status_code=501, detail=f"Rate limit error: {e}")
+        raise HTTPException(
+            status_code=501,
+            detail=_build_start_failure_detail(
+                e,
+                "Rate limit hit while starting revision session",
+                thread_id,
+                graph_obj=revision_graph,
+            ),
+        )
 
     except DayLimitExhaustedError as e:
         print(f"[API] Revision start - day limit: {e}")
-        raise HTTPException(status_code=502, detail=f"Daily limit error: {e}")
+        raise HTTPException(
+            status_code=502,
+            detail=_build_start_failure_detail(
+                e,
+                "Daily limit hit while starting revision session",
+                thread_id,
+                graph_obj=revision_graph,
+            ),
+        )
 
     except FileNotFoundError as e:
         print(f"API error in /revision/session/start (chapter not found): {e}")
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(
+            status_code=404,
+            detail=_build_start_failure_detail(
+                e,
+                "Revision chapter not found",
+                thread_id,
+                graph_obj=revision_graph,
+            ),
+        )
 
     except Exception as e:
         print(f"API error in /revision/session/start: {str(e)}")
         print(f"Full traceback:\n{traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=f"Error starting revision session: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=_build_start_failure_detail(
+                e,
+                "Failed to start revision session",
+                thread_id,
+                graph_obj=revision_graph,
+            ),
+        )
 
 
 @app.post("/revision/session/continue", response_model=RevContinueSessionResponse, tags=["Revision"], summary="Continue an existing revision session")
@@ -1931,6 +2052,7 @@ def start_math_session(
     user_email: str = Depends(get_current_user_rate_limited),
 ):
     """Start a new math tutoring session. Rate-limited per email."""
+    thread_id = None
     try:
         resolved_problem = _resolve_problem(request.problem_id)
         selected_problem_id = resolved_problem["problem_id"]
@@ -1992,16 +2114,40 @@ def start_math_session(
 
     except MinuteLimitExhaustedError as e:
         print(f"[API] Rate limit (minute): {e}")
-        raise HTTPException(status_code=501, detail=f"Rate limit exceeded: {e}")
+        raise HTTPException(
+            status_code=501,
+            detail=_build_start_failure_detail(
+                e,
+                "Rate limit hit while starting math session",
+                thread_id,
+                graph_obj=math_graph,
+            ),
+        )
     except DayLimitExhaustedError as e:
         print(f"[API] Rate limit (day): {e}")
-        raise HTTPException(status_code=502, detail=f"Daily limit exceeded: {e}")
+        raise HTTPException(
+            status_code=502,
+            detail=_build_start_failure_detail(
+                e,
+                "Daily limit hit while starting math session",
+                thread_id,
+                graph_obj=math_graph,
+            ),
+        )
     except HTTPException:
         raise
     except Exception as e:
         print(f"API error in /math/session/start: {str(e)}")
         print(f"Full traceback:\n{traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=f"Error starting math session: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=_build_start_failure_detail(
+                e,
+                "Failed to start math session",
+                thread_id,
+                graph_obj=math_graph,
+            ),
+        )
 
 
 @app.post("/math/session/continue", response_model=MathContinueSessionResponse, tags=["Maths Agent"])
