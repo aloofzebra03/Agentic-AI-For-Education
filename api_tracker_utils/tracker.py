@@ -27,6 +27,11 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 
+def _is_gemini_model(model_name: str) -> bool:
+    """Return True for Gemini models configured in AVAILABLE_MODELS."""
+    return model_name.lower().startswith("gemini")
+
+
 # ============================================================================
 # API KEY MANAGEMENT
 # ============================================================================
@@ -343,9 +348,10 @@ class ModelUsageTracker:
         
         Selection algorithm:
         1. Filter to only pairs within both per-minute and per-day limits
-        2. Sort by total usage (ascending)
-        3. Randomly pick from top 3 least-used pairs to spread load across concurrent requests
-        4. If no pairs are available (all hit limits), use least-used anyway
+        2. If any valid Gemini pairs exist, select only from Gemini pairs
+        3. Sort by default-model preference and total usage (ascending)
+        4. Randomly pick from top 3 least-used pairs to spread load across concurrent requests
+        5. If no pairs are available (all hit limits), raise the matching limit error
         
         Returns:
             Tuple of (api_key, model_name)
@@ -409,8 +415,16 @@ class ModelUsageTracker:
             print(f"[TRACKER] Found {len(valid_pairs)} valid API-model pairs within limits")
     
         
-        # Prefer the configured default model; use other models only when the
-        # default has no valid API keys left under the configured limits.
+        # When Gemini models are configured and available, always return a
+        # Gemini key/model pair. Non-Gemini models are only considered after
+        # every Gemini pair has hit its configured limits.
+        gemini_candidates = [pair for pair in candidates if _is_gemini_model(pair[1])]
+        if gemini_candidates:
+            candidates = gemini_candidates
+            print(f"[TRACKER] Preferring {len(gemini_candidates)} valid Gemini API-model pairs")
+        
+        # Within the preferred model group, keep the existing default-model
+        # preference and least-used balancing behavior.
         candidates.sort(key=lambda x: (x[1] != DEFAULT_MODEL, x[2]))
         
         # Pick randomly from top 3 to better distribute concurrent requests
