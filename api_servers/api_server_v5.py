@@ -1925,16 +1925,19 @@ def _load_problem_catalog() -> List[Dict[str, Any]]:
         try:
             content = json_file.read_text(encoding="utf-8")
             for obj in _iter_json_objects(content):
-                if not isinstance(obj, dict):
-                    continue
-                pid = obj.get("problem_id")
-                topic = obj.get("topic")
-                if isinstance(pid, str) and pid.strip() and isinstance(topic, str) and topic.strip():
-                    catalog.append({
-                        "problem_id": pid.strip(),
-                        "topic": topic.strip(),
-                        "difficulty": obj.get("difficulty"),
-                    })
+                # Unwrap array files (e.g. p1_ch3+) — old files are bare objects
+                items = obj if isinstance(obj, list) else [obj]
+                for item in items:
+                    if not isinstance(item, dict):
+                        continue
+                    pid = item.get("problem_id")
+                    topic = item.get("topic")
+                    if isinstance(pid, str) and pid.strip() and isinstance(topic, str) and topic.strip():
+                        catalog.append({
+                            "problem_id": pid.strip(),
+                            "topic": topic.strip(),
+                            "difficulty": item.get("difficulty"),
+                        })
         except Exception as read_error:
             print(f"[WARN] Failed loading problem catalog from {json_file.name}: {read_error}")
     return catalog
