@@ -31,7 +31,7 @@
         "daily_limit": 20,
         "within_limits": true
       },
-      "gemma-3-27b-it": {
+      "gemma-4-31b-it": {
         "total_calls": 2,
         "minute_usage": 1,
         "minute_limit": 30,
@@ -49,7 +49,7 @@
         "daily_limit": 1500,
         "within_limits": true
       },
-      "gemma-3-27b-it": {
+      "gemma-4-31b-it": {
         "total_calls": 2,
         "minute_usage": 1,
         "minute_limit": 30,
@@ -91,7 +91,7 @@
         "daily_limit": 1500,
         "within_limits": true
       },
-      "gemma-3-27b-it": {
+      "gemma-4-31b-it": {
         "total_calls": 1,
         "minute_usage": 0,
         "minute_limit": 30,
@@ -125,7 +125,7 @@
         "daily_limit": 1500,
         "within_limits": true
       },
-      "gemma-3-27b-it": {
+      "gemma-4-31b-it": {
         "total_calls": 1,
         "minute_usage": 0,
         "minute_limit": 30,
@@ -159,7 +159,7 @@
         "daily_limit": 1500,
         "within_limits": true
       },
-      "gemma-3-27b-it": {
+      "gemma-4-31b-it": {
         "total_calls": 2,
         "minute_usage": 0,
         "minute_limit": 30,
@@ -193,7 +193,7 @@
         "daily_limit": 1500,
         "within_limits": true
       },
-      "gemma-3-27b-it": {
+      "gemma-4-31b-it": {
         "total_calls": 1,
         "minute_usage": 0,
         "minute_limit": 30,
@@ -235,7 +235,7 @@
         "daily_limit": 1500,
         "within_limits": true
       },
-      "gemma-3-27b-it": {
+      "gemma-4-31b-it": {
         "total_calls": 2,
         "minute_usage": 1,
         "minute_limit": 30,
@@ -245,7 +245,7 @@
       }
     },
     "jnU5o8": {
-      "gemma-3-27b-it": {
+      "gemma-4-31b-it": {
         "total_calls": 1,
         "minute_usage": 0,
         "minute_limit": 30,
@@ -279,7 +279,7 @@
       }
     },
     "stFW1A": {
-      "gemma-3-27b-it": {
+      "gemma-4-31b-it": {
         "total_calls": 1,
         "minute_usage": 0,
         "minute_limit": 30,
@@ -321,7 +321,7 @@
         "daily_limit": 20,
         "within_limits": true
       },
-      "gemma-3-27b-it": {
+      "gemma-4-31b-it": {
         "total_calls": 2,
         "minute_usage": 0,
         "minute_limit": 30,
@@ -347,7 +347,7 @@
       }
     },
     "ruc9b4": {
-      "gemma-3-27b-it": {
+      "gemma-4-31b-it": {
         "total_calls": 1,
         "minute_usage": 0,
         "minute_limit": 30,
@@ -381,7 +381,7 @@
       }
     },
     "hYEMqg": {
-      "gemma-3-27b-it": {
+      "gemma-4-31b-it": {
         "total_calls": 2,
         "minute_usage": 1,
         "minute_limit": 30,
@@ -431,7 +431,7 @@
         "daily_limit": 1500,
         "within_limits": true
       },
-      "gemma-3-27b-it": {
+      "gemma-4-31b-it": {
         "total_calls": 2,
         "minute_usage": 1,
         "minute_limit": 30,

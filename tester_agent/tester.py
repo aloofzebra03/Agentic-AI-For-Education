@@ -10,7 +10,7 @@ class TesterAgent:
         self.persona = persona
         self.is_kannada = is_kannada
         self.llm = ChatGoogleGenerativeAI(
-            model="gemma-3-27b-it",
+            model="gemma-4-31b-it",
             api_key=os.getenv("GOOGLE_API_KEY_2"),
             temperature=0.7,
         )

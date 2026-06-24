@@ -64,7 +64,7 @@ class MetricsComputer:
     
     def __init__(self):
         self.llm = ChatGoogleGenerativeAI(
-            model="gemma-3-27b-it",
+            model="gemma-4-31b-it",
             api_key=os.getenv("GOOGLE_API_KEY_5"),
             temperature=0.2,
         )

@@ -480,7 +480,7 @@ No threads blocked - event loop switches between requests
 **Current code (synchronous):**
 
 ```python
-def invoke_llm_with_fallback(messages, operation_name="LLM call", model="gemma-3-27b-it"):
+def invoke_llm_with_fallback(messages, operation_name="LLM call", model="gemma-4-31b-it"):
     available_keys = get_available_api_keys()
   
     for api_key in available_keys:
@@ -497,7 +497,7 @@ def invoke_llm_with_fallback(messages, operation_name="LLM call", model="gemma-3
 **Async version:**
 
 ```python
-async def invoke_llm_with_fallback(messages, operation_name="LLM call", model="gemma-3-27b-it"):
+async def invoke_llm_with_fallback(messages, operation_name="LLM call", model="gemma-4-31b-it"):
     available_keys = get_available_api_keys()
   
     for api_key in available_keys:
@@ -1001,7 +1001,7 @@ class ApiKeyPerformanceTracker:
 # Global singleton - accessed from all threads
 _api_key_tracker = ApiKeyPerformanceTracker()
 
-def invoke_llm_with_fallback(messages, operation_name="LLM call", model="gemma-3-27b-it"):
+def invoke_llm_with_fallback(messages, operation_name="LLM call", model="gemma-4-31b-it"):
     """Multiple threads call this simultaneously."""
     available_keys = get_available_api_keys()
   
@@ -1107,7 +1107,7 @@ def select_best_api_key(model: str) -> str:
   
     return best_key or available_keys[0]
 
-def invoke_llm_with_rate_limiting(messages, model="gemma-3-27b-it"):
+def invoke_llm_with_rate_limiting(messages, model="gemma-4-31b-it"):
     """Invoke LLM with intelligent API key selection."""
     # Select least-used API key
     api_key = select_best_api_key(model)

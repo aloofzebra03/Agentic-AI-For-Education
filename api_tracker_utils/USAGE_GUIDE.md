@@ -55,7 +55,7 @@ Edit `api_tracker_utils/config.py` to match your actual Google AI Studio / Gemin
 AVAILABLE_MODELS = [
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
-    "gemma-3-27b-it",
+    "gemma-4-31b-it",
 ]
 
 RATE_LIMITS = {
@@ -67,7 +67,7 @@ RATE_LIMITS = {
         "per_minute": 10,
         "per_day": 20
     },
-    "gemma-3-27b-it": {
+    "gemma-4-31b-it": {
         "per_minute": 30,
         "per_day": 14400
     }

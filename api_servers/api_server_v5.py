@@ -489,7 +489,7 @@ def start_session(request: StartSessionRequest, user: dict = Depends(get_current
         print(f"📌 Generated thread_id: {thread_id}")
         
         # # Validate model if provided
-        # model = request.model or "gemma-3-27b-it"
+        # model = request.model or "gemma-4-31b-it"
         # if model not in AVAILABLE_GEMINI_MODELS:
         #     raise HTTPException(
         #         status_code=400,

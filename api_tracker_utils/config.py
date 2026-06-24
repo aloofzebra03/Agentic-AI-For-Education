@@ -24,7 +24,7 @@ DEFAULT_MODEL = "gemma-4-31b-it"
 #         "per_minute": 10,
 #         "per_day": 20
 #     },  
-#     "gemma-3-27b-it": {
+#     "gemma-4-31b-it": {
 #         "per_minute": 30,
 #         "per_day": 14400
 #     }

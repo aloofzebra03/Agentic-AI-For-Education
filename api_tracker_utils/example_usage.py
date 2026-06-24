@@ -44,9 +44,9 @@ def example_usage():
     except Exception as e:
         print(f"❌ Error: {e}\n")
     
-    # Example 3: Get best API key for gemma-3-27b-it
+    # Example 3: Get best API key for gemma-4-31b-it
     try:
-        model = "gemma-3-27b-it"
+        model = "gemma-4-31b-it"
         print(f"Getting best API key for '{model}'...")
         api_key = get_best_api_key_for_model(model)
         print(f"✅ Best API key for {model}: ...{api_key[-6:]}\n")

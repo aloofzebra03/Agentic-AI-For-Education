@@ -30,7 +30,7 @@ class SessionTaskSet(TaskSet):
             json={
                 "concept_title": "Pendulum and its Time Period",
                 "student_id": f"load_test_user_{id(self)}",
-                "session_label": f"gemma-3-27b-it_{int(time.time())}"
+                "session_label": f"gemma-4-31b-it_{int(time.time())}"
             },
             headers=AUTH_HEADERS,
             catch_response=True,
