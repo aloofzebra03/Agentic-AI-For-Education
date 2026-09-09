@@ -56,6 +56,14 @@ def setup_tables_with_retry(max_retries=5, retry_delay=3):
     INSERT INTO checkpoint_migrations (v) 
     VALUES (1) 
     ON CONFLICT (v) DO NOTHING;
+
+    CREATE TABLE IF NOT EXISTS api_rate_limits (
+        email TEXT NOT NULL,
+        rate_date DATE NOT NULL,
+        count INTEGER NOT NULL DEFAULT 0,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        PRIMARY KEY (email, rate_date)
+    );
     """
     
     for attempt in range(1, max_retries + 1):
@@ -84,7 +92,7 @@ def setup_tables_with_retry(max_retries=5, retry_delay=3):
                 cur.execute("""
                     SELECT table_name 
                     FROM information_schema.tables 
-                    WHERE table_name IN ('checkpoints', 'checkpoint_writes', 'checkpoint_migrations')
+                    WHERE table_name IN ('checkpoints', 'checkpoint_writes', 'checkpoint_migrations', 'api_rate_limits')
                     ORDER BY table_name;
                 """)
                 tables = cur.fetchall()
