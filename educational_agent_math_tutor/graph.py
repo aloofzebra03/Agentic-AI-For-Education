@@ -10,8 +10,7 @@ from datetime import datetime
 from typing import Literal
 from langgraph.graph import StateGraph, END
 # from langgraph.checkpoint.memory import InMemorySaver  # Replaced with PostgresSaver
-from langgraph.checkpoint.postgres import PostgresSaver
-from psycopg_pool import ConnectionPool
+from utils.postgres_checkpointer import get_shared_checkpointer
 from langchain_core.messages import HumanMessage
 
 dotenv.load_dotenv(dotenv_path=".env", override=True)
@@ -356,40 +355,7 @@ def create_graph():
     workflow.add_edge("HANDLE_SUMMARY_REQUEST", "END")
     workflow.add_edge("END", END)
     
-    # ── PostgreSQL Checkpointer (same config as v5 and revision agents) ──
-    connection_kwargs = {
-        "autocommit": True,  # Required for Transaction Mode
-        "prepare_threshold": None,  # Never use prepared statements (Transaction Mode port 6543)
-        "gssencmode": "disable",  # Required for Windows
-    }
-
-    postgres_url = os.getenv('POSTGRES_DATABASE_URL')
-    if not postgres_url:
-        raise ValueError("POSTGRES_DATABASE_URL environment variable is not set")
-
-    print(f"🔍 Math agent: Initializing Postgres checkpointer...")
-    skip_setup = os.getenv('SKIP_POSTGRES_SETUP', 'true').lower() == 'true'
-
-    pool = ConnectionPool(
-        conninfo=postgres_url,
-        max_size=40,
-        min_size=5,
-        timeout=30,
-        max_idle=300,
-        max_lifetime=1800,
-        reconnect_timeout=30,
-        kwargs=connection_kwargs,
-    )
-    checkpointer = PostgresSaver(pool)
-
-    if not skip_setup:
-        print("🔧 Running checkpointer.setup() to create tables...")
-        checkpointer.setup()
-        print("✅ Tables created/verified")
-    else:
-        print("⏭️  Skipping table setup (assuming tables exist)")
-
-    print("✅ Math agent Postgres checkpointer initialized successfully")
+    checkpointer = get_shared_checkpointer()
 
     graph = workflow.compile(
         checkpointer=checkpointer,

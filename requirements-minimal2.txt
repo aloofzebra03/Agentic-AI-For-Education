@@ -37,7 +37,7 @@ langsmith
 
 # PostgreSQL (for production checkpointing)
 psycopg[binary]>=3.0.0
-psycopg-pool>=3.0.0
+psycopg-pool>=3.2.0
 
 # ============================================
 # UTILITIES

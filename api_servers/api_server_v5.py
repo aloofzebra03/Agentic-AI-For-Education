@@ -91,11 +91,20 @@ from concept_map_poc.timeline_mapper import create_timeline
 from concept_map_poc.streamlit_app_standalone import save_timeline_json_to_disk
 
 # Import for wrapper function
-from contextlib import contextmanager
+from contextlib import asynccontextmanager, contextmanager
+from utils.postgres_checkpointer import close_shared_postgres_pool
 
 # ============================================================================
 # FASTAPI APP INITIALIZATION
 # ============================================================================
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    try:
+        yield
+    finally:
+        close_shared_postgres_pool()
+
 
 app = FastAPI(
     title="Educational Agent API",
@@ -103,7 +112,8 @@ app = FastAPI(
     description="Stateful API for personalized education with LangGraph-based agent",
     docs_url=None,
     redoc_url=None,
-    openapi_url=None
+    openapi_url=None,
+    lifespan=lifespan,
 )
 
 @app.get("/docs", include_in_schema=False)
