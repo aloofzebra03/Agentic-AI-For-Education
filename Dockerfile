@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7
 # Simple, production-ready Dockerfile for Educational API on EC2
 # Pass environment variables at runtime (not baked into image)
 
@@ -48,6 +49,8 @@ COPY science_jsons/ /app/science_jsons/
 COPY NCERT/ /app/NCERT/
 COPY educational_agent_math_tutor/ /app/educational_agent_math_tutor/
 COPY math_problems_jsons/ /app/math_problems_jsons/
+# Single source of truth: supplied with --build-context whiteboard_poc=...
+COPY --from=whiteboard_poc whiteboard_tutor/ /app/whiteboard_tutor/
 
 # Install project in editable mode (makes all modules importable)
 RUN pip install --no-cache-dir -e .

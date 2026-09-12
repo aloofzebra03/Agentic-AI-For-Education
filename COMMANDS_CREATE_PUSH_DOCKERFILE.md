@@ -1,8 +1,14 @@
 # Building the Image
 
 ```powershell
-docker build -t aloofzebra03/educational-api:latest .                                           
+docker build `
+  --build-context whiteboard_poc=../Whiteboard_Tutor_Education_POC `
+  -t aloofzebra03/educational-api:latest .
 ```
+
+The sibling POC checkout is required because it is the single source for the
+`whiteboard_tutor` package. See `WHITEBOARD_TUTOR_DOCKER_INTEGRATION.md` for API
+examples.
 
 # Running the Container
 

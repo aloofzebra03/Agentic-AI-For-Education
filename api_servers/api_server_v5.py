@@ -93,6 +93,7 @@ from concept_map_poc.streamlit_app_standalone import save_timeline_json_to_disk
 # Import for wrapper function
 from contextlib import asynccontextmanager, contextmanager
 from utils.postgres_checkpointer import close_shared_postgres_pool
+from api_servers.whiteboard_tutor_integration import whiteboard_tutor_router
 
 # ============================================================================
 # FASTAPI APP INITIALIZATION
@@ -132,6 +133,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(whiteboard_tutor_router)
 
 # ============================================================================
 # HELPER FUNCTIONS
@@ -408,6 +411,7 @@ def read_root():
             "POST /math/session/continue - Continue math session (multipart: text/image/is_kannada)",
             "GET  /math/session/status/{thread_id} - Get math session status",
             "GET  /math/session/history/{thread_id} - Get math conversation history",
+            "GET/POST /whiteboard-tutor/* - CI/GE tutor and semantic whiteboard API",
         ]
     }
 
@@ -2381,6 +2385,11 @@ print("  POST /math/session/start - Start new math session")
 print("  POST /math/session/continue - Continue math session (multipart: text/image/is_kannada)")
 print("  GET  /math/session/status/{thread_id} - Get math session status")
 print("  GET  /math/session/history/{thread_id} - Get math conversation history")
+print("  --- Whiteboard Tutor (CI + GE) ---")
+print("  GET  /whiteboard-tutor/concepts - List whiteboard tutor concepts")
+print("  POST /whiteboard-tutor/session/start - Start a whiteboard lesson")
+print("  POST /whiteboard-tutor/session/continue - Continue a whiteboard lesson")
+print("  GET  /whiteboard-tutor/scenes/manifest - List trusted SVG scenes")
 print("=" * 80)
 print(f"Available Test Personas: {len(personas)}")
 for p in personas:
