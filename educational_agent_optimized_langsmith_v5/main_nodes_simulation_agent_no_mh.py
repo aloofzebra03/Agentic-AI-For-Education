@@ -20,6 +20,7 @@ from utils.shared_utils import (
     build_prompt_from_template_optimized,
     get_ground_truth_from_json,
     select_most_relevant_image_for_concept_introduction,
+    translate_to_kannada_google,
     translate_if_kannada,
 )
 
@@ -109,49 +110,23 @@ rlc_parser = PydanticOutputParser(pydantic_object=RlcResponse)
 # ─── Node definitions ───────────────────────────────────────────────────────────
 
 def start_node(state: AgentState) -> AgentState:
-    # Base system prompt
-    system_prompt = f"""
-        You are an educational agent helping a learner understand '{state["concept_title"]}'. The learner is a student of class 7. Remember that you are interacting directly with the learner.\n"
-        "Greet the learner and ask if they are ready to begin."
-        "DONT use emojis as a TTS to speech model will break because of that."
-    """
-    
-    # Conditionally add Kannada instruction if is_kannada is True
+    concept_title = state["concept_title"]
     if state.get("is_kannada", False):
-        system_prompt += "\nAlso Remember that the student is of Kannada origin and understands only kannada. So speak to the student in kannada. The script has to be kannada and not english.Show text in kannada only."
-    
-    # Build final prompt using optimized template
-    final_prompt = build_prompt_from_template_optimized(
-        system_prompt=system_prompt,
-        state=state,
-        include_last_message=False,
-        include_instructions=False,
-        current_node="START"
-    )
-    
-    print("IN START NODE")
-    resp = llm_with_history(state, final_prompt)  # Using regular llm_with_history since prompt is pre-built
-    # Apply JSON extraction in case LLM wraps response in markdown
-    content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-    
-    # 🔍 START NODE - CONTENT PROCESSING 🔍
-    print("=" * 80)
-    print("🎯 START NODE - CONTENT OUTPUT 🎯")
-    print("=" * 80)
-    print(f"📄 CONTENT: {content}")
-    print(f"📏 CONTENT_LENGTH: {len(content)} characters")
-    print(f"📊 CONTENT_TYPE: {type(content).__name__}")
-    print(f"🔧 USED_JSON_EXTRACTION: {resp.content.strip().startswith('```')}")
-    print("=" * 80)
-    
-    # Translate and set agent output
-    translated_content = translate_if_kannada(state, content)
-    state["agent_output"] = translated_content
+        translated_concept = translate_to_kannada_google(concept_title)
+        content = (
+            f"ನಮಸ್ಕಾರ! ಇಂದು ನಾವು {translated_concept} ಬಗ್ಗೆ ಕಲಿಯೋಣ. "
+            "ಪ್ರಾರಂಭಿಸಲು ಸಿದ್ಧರಿದ್ದೀರಾ?"
+        )
+    else:
+        content = f"Hello! Today we'll learn about {concept_title}. Are you ready to begin?"
+
+    print("IN START NODE - using deterministic greeting")
+    state["agent_output"] = content
     state["current_state"] = "APK"
     
     # Initialize message list and summary tracking
     state["messages"] = []
-    add_system_message_to_conversation(state, translated_content)
+    add_system_message_to_conversation(state, content)
     state["summary"] = ""
     state["summary_last_index"] = -1
     

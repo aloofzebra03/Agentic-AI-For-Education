@@ -19,6 +19,7 @@ from utils.shared_utils import (
     llm_with_history,
     build_prompt_from_template_optimized,
     add_ai_message_to_conversation,
+    translate_to_kannada_google,
     translate_if_kannada,
 )
 
@@ -91,44 +92,25 @@ def revision_start_node(state: Dict[str, Any]) -> Dict[str, Any]:
     print(f"🎯 Initialized revision for: {state['chapter']}")
     print(f"📚 Total questions: {state['questions_total']}")
     
-    # Create welcome message
-    system_prompt = f"""You are a helpful revision tutor.
-    
-The student wants to revise the chapter '{chapter}'.
-You have {state['questions_total']} questions ready for them.
-
-Greet the student warmly and explain that:
-1. You'll ask them questions about {chapter}
-2. If they answer correctly, you'll move to the next question
-3. If they struggle, you'll explain the concept and ask a followup question
-4. Remember that don;t start asking the questions now.We are ONLY greeting the students.Questions will come later
-
-Keep it brief (2-3 sentences) and encouraging.
-"""
-    
-    # Add Kannada instruction if needed
+    resolved_chapter = state["chapter"]
+    question_count = state["questions_total"]
     if state.get("is_kannada", False):
-        system_prompt += "\nRemember the student understands only Kannada. Speak to the student in Kannada script only."
-    
-    # Build prompt
-    final_prompt = build_prompt_from_template_optimized(
-        system_prompt=system_prompt,
-        state=state,
-        include_last_message=False,
-        include_instructions=False,
-        current_node="REVISION_START",
-        include_autosuggestions=False  # No autosuggestions for revision agent
-    )
-    
-    resp = llm_with_history(state, final_prompt)
-    content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-    
-    # Translate and update state
-    translated_content = translate_if_kannada(state, content)
-    state["agent_output"] = translated_content
+        translated_chapter = translate_to_kannada_google(resolved_chapter)
+        content = (
+            f"ನಮಸ್ಕಾರ! ನಾವು {translated_chapter} ಅಧ್ಯಾಯವನ್ನು {question_count} ಪ್ರಶ್ನೆಗಳ ಮೂಲಕ "
+            "ಪುನರವಲೋಕನ ಮಾಡೋಣ. ನಿಮಗೆ ಸಹಾಯ ಬೇಕಾದರೆ, ಮುಂದುವರಿಯುವ ಮೊದಲು ನಾನು ಪರಿಕಲ್ಪನೆಯನ್ನು "
+            "ವಿವರಿಸುತ್ತೇನೆ. ನೀವು ಸಿದ್ಧರಿದ್ದೀರಾ?"
+        )
+    else:
+        content = (
+            f"Hello! We'll revise {resolved_chapter} using {question_count} questions. "
+            "If you need help, I'll explain the concept before we continue. Are you ready?"
+        )
+
+    state["agent_output"] = content
     state["current_state"] = "QUESTION_PRESENTER"
     state["messages"] = []  # Initialize empty message list
-    add_ai_message_to_conversation(state, translated_content)
+    add_ai_message_to_conversation(state, content)
     
     # Initialize optimization fields
     state["summary"] = ""
@@ -173,36 +155,15 @@ def question_presenter_node(state: Dict[str, Any]) -> Dict[str, Any]:
     total = state["questions_total"]
     question_text = next_q["question"]
     
-    system_prompt = f"""You are a revision tutor presenting a question to the student.
-
-Progress: Question {current_idx + 1} of {total}
-
-Present this exact question to the student:
-"{question_text}"
-
-Keep it simple and clear. Just present the question naturally (you can add a brief encouraging phrase).
-"""
-    
-    # Add Kannada instruction if needed
     if state.get("is_kannada", False):
-        system_prompt += "\nRemember the student understands only Kannada. Present the question in Kannada script only."
-    
-    final_prompt = build_prompt_from_template_optimized(
-        system_prompt=system_prompt,
-        state=state,
-        include_last_message=True,  # Include previous context
-        include_instructions=False,
-        current_node="QUESTION_PRESENTER",
-        include_autosuggestions=False
-    )
-    
-    resp = llm_with_history(state, final_prompt)
-    content = extract_json_block(resp.content) if resp.content.strip().startswith("```") else resp.content
-    
-    translated_content = translate_if_kannada(state, content)
-    state["agent_output"] = translated_content
+        translated_question = translate_to_kannada_google(question_text)
+        content = f"ಪ್ರಶ್ನೆ {current_idx + 1}/{total}: {translated_question}"
+    else:
+        content = f"Question {current_idx + 1} of {total}: {question_text}"
+
+    state["agent_output"] = content
     state["current_state"] = "EVALUATOR"
-    add_ai_message_to_conversation(state, translated_content)
+    add_ai_message_to_conversation(state, content)
     
     print(f"📝 Presented question {current_idx + 1}/{total}: {question_text[:50]}...")
     print("=" * 80)
