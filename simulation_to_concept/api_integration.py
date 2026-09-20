@@ -21,6 +21,7 @@ from simulation_to_concept.translation import (
     SUPPORTED_LANGUAGES,
     DEFAULT_LANGUAGE
 )
+from api_servers.request_timing import measure
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -237,22 +238,25 @@ def create_teaching_session(simulation_id: str, student_id: str = None, language
     print(f"{'='*60}")
     
     # Validate config
-    validate_config()
+    with measure("simulation_config_validation"):
+        validate_config()
     
     # Use provided thread_id or generate a UUID-based fallback
     if not thread_id:
         thread_id = f"api_session_{uuid.uuid4().hex[:8]}"
     
     # Create initial state with simulation_id for downstream nodes
-    initial_state = create_initial_state(
-        topic_description=topic_description,
-        initial_params=initial_params.copy(),
-        simulation_id=simulation_id,  # Pass simulation_id for content_loader
-        language=language              # Pass language for translation layer
-    )
+    with measure("simulation_state_init"):
+        initial_state = create_initial_state(
+            topic_description=topic_description,
+            initial_params=initial_params.copy(),
+            simulation_id=simulation_id,  # Pass simulation_id for content_loader
+            language=language              # Pass language for translation layer
+        )
     
     # Start the session - runs until first interrupt
-    state = start_session(initial_state, thread_id)
+    with measure("simulation_graph_start"):
+        state = start_session(initial_state, thread_id)
     
     print(f"✅ Session created: {thread_id}")
     print(f"📝 Initial message: {state.get('last_teacher_message', '')[:80]}...")
@@ -262,10 +266,12 @@ def create_teaching_session(simulation_id: str, student_id: str = None, language
     _session_simulations[thread_id] = simulation_id
     
     # Format for API
-    response = format_api_response(thread_id, state, simulation_id)
+    with measure("simulation_response_format"):
+        response = format_api_response(thread_id, state, simulation_id)
     
     # Translate response if needed
-    response = translate_api_response(response, language)
+    with measure("simulation_response_translation"):
+        response = translate_api_response(response, language)
     
     return thread_id, response
 

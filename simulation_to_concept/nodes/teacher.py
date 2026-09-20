@@ -33,6 +33,7 @@ from simulation_to_concept.config import (
 from api_tracker_utils.error import MinuteLimitExhaustedError, DayLimitExhaustedError
 from simulation_to_concept.state import add_message_to_history
 from simulation_to_concept.simulations_config import get_simulation
+from api_servers.request_timing import measure, timed
 
 
 def get_llm_with_key():
@@ -226,6 +227,7 @@ def format_conversation_history(history: list, last_n: int = 6) -> str:
     return "\n".join(formatted)
 
 
+@timed("simulation_teacher_node")
 def teacher_node(state: Dict[str, Any], config: RunnableConfig) -> Dict[str, Any]:
     """
     Generate a natural, adaptive teacher response.
@@ -311,6 +313,58 @@ def teacher_node(state: Dict[str, Any], config: RunnableConfig) -> Dict[str, Any
     # which would otherwise cause the LLM to infer and respond in Kannada even for English sessions.
     session_language = state.get("language", "english")
     language_instruction = "English" if session_language.lower() == "english" else session_language.capitalize()
+
+    # The first simulation message does not need adaptive reasoning. Avoid an
+    # LLM call while preserving the same history, counters, simulation display,
+    # and interrupt-before-evaluator behavior used by later turns.
+    is_first_session_message = (
+        current_idx == 0
+        and exchange_count == 0
+        and not conversation
+        and not student_response
+    )
+    if is_first_session_message:
+        with measure("simulation_initial_template"):
+            teacher_message = (
+                f"Hello! Let's explore {TOPIC_TITLE} with this interactive simulation. "
+                f"We'll begin with {current_concept['title']}. Observe the simulation: "
+                "what do you notice?"
+            )
+            first_param = next(
+                iter(current_concept.get("related_params", [])),
+                next(iter(PARAMETER_INFO), None),
+            )
+            new_message = add_message_to_history(state, "teacher", teacher_message)
+            updates = {
+                "last_teacher_message": teacher_message,
+                "waiting_for_input": True,
+                "exchange_count": 1,
+                "needs_deeper": False,
+                "conversation_history": state.get("conversation_history", []) + [new_message],
+                "current_params": current_params.copy(),
+                "last_displayed_params": current_params.copy(),
+                "show_simulation": True,
+                "student_changed_params_this_turn": False,
+                "student_changed_params": {},
+            }
+
+            if first_param is not None:
+                current_value = current_params.get(first_param)
+                updates["parameter_history"] = state.get("parameter_history", []) + [{
+                    "parameter": first_param,
+                    "old_value": current_value,
+                    "new_value": current_value,
+                    "reason": "Display initial simulation state",
+                    "prediction_asked": "What do you notice?",
+                    "student_reaction": "",
+                    "understanding_before": understanding,
+                    "understanding_after": "",
+                    "was_effective": False,
+                    "initiated_by": "agent",
+                }]
+
+            print("[TEACHER] Using deterministic initial simulation message")
+            return updates
 
     print(f"   Concept: {current_concept['title']}")
     print(f"   Strategy: {strategy}")

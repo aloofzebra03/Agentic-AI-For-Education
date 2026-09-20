@@ -6,8 +6,10 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, HTTPBasic
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 import logging
+from time import perf_counter
 
 from api_servers.firebase_client import is_email_allowed, check_and_increment_rate_limit, DAILY_REQUEST_LIMIT
+from api_servers.request_timing import measure, new_timing_store, record_duration
 
 # Load environment variables
 load_dotenv()
@@ -43,11 +45,22 @@ def _verify_user_base(
     Base dependency that ONLY authenticates the user (via API Key or Google JWT).
     It checks if the email is allowed, but it DOES NOT process rate limits.
     """
+    request_started_at = perf_counter()
+    timings = new_timing_store()
+
     # ── 1. API Key Authentication (highest priority) ────────
     if api_key:
-        api_key_clean = api_key.strip().strip("'").strip('"')
-        if api_key_clean in X_API_KEYS:
-            return {"user": "admin_api_user", "auth_method": "api_key"}
+        with measure("auth_api_key", timings):
+            api_key_clean = api_key.strip().strip("'").strip('"')
+            api_key_is_valid = api_key_clean in X_API_KEYS
+        if api_key_is_valid:
+            record_duration("auth_total", (perf_counter() - request_started_at) * 1000, timings)
+            return {
+                "user": "admin_api_user",
+                "auth_method": "api_key",
+                "_server_timings": timings,
+                "_request_started_at": request_started_at,
+            }
         # Invalid key — fall through so JWT path can run (or 401 below)
         logger.warning("Invalid API key provided; attempting JWT fallback.")
 
@@ -56,7 +69,8 @@ def _verify_user_base(
         token = auth_header.credentials
         try:
             # Verify the token with Google's OAuth2 infrastructure
-            idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), CLIENT_ID)
+            with measure("auth_jwt_verify", timings):
+                idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), CLIENT_ID)
             email = idinfo.get("email")
 
             if not email:
@@ -66,17 +80,22 @@ def _verify_user_base(
                 )
 
             # Authorization: email must exist in 'users' collection
-            if not is_email_allowed(email):
+            with measure("auth_allowlist", timings):
+                email_is_allowed = is_email_allowed(email)
+            if not email_is_allowed:
                 logger.warning(f"Unauthorized email attempted access: {email}")
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="Email not authorized: Must be a registered user.",
                 )
 
+            record_duration("auth_total", (perf_counter() - request_started_at) * 1000, timings)
             return {
                 "user": "app_user",
                 "email": email,
                 "auth_method": "jwt",
+                "_server_timings": timings,
+                "_request_started_at": request_started_at,
             }
 
         except HTTPException:
@@ -115,7 +134,8 @@ def get_current_user_rate_limited(
         email = user["email"]
         
         # Per-email daily rate limit
-        new_count, remaining, limit_exceeded = check_and_increment_rate_limit(email)
+        with measure("rate_limit_postgres", user.get("_server_timings")):
+            new_count, remaining, limit_exceeded = check_and_increment_rate_limit(email)
 
         # Always attach rate-limit headers so clients can display usage
         response.headers["X-RateLimit-Limit"]     = str(DAILY_REQUEST_LIMIT)

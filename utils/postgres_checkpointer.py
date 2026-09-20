@@ -7,6 +7,8 @@ from typing import Optional
 from langgraph.checkpoint.postgres import PostgresSaver
 from psycopg_pool import ConnectionPool
 
+from api_servers.request_timing import measure
+
 
 _POOL_MIN_SIZE = 5
 _POOL_MAX_SIZE = 40
@@ -14,6 +16,22 @@ _POOL_MAX_SIZE = 40
 _lock = threading.Lock()
 _pool: Optional[ConnectionPool] = None
 _checkpointer: Optional[PostgresSaver] = None
+
+
+class TimedPostgresSaver(PostgresSaver):
+    """Measure the actual database work performed by LangGraph checkpoints."""
+
+    def get_tuple(self, *args, **kwargs):
+        with measure("checkpoint_load"):
+            return super().get_tuple(*args, **kwargs)
+
+    def put(self, *args, **kwargs):
+        with measure("checkpoint_save"):
+            return super().put(*args, **kwargs)
+
+    def put_writes(self, *args, **kwargs):
+        with measure("checkpoint_writes"):
+            return super().put_writes(*args, **kwargs)
 
 
 def _create_pool(postgres_url: str) -> ConnectionPool:
@@ -63,7 +81,7 @@ def get_shared_checkpointer() -> PostgresSaver:
 
         pool = _create_pool(postgres_url)
         try:
-            checkpointer = PostgresSaver(pool)
+            checkpointer = TimedPostgresSaver(pool)
 
             if os.getenv("SKIP_POSTGRES_SETUP", "true").lower() != "true":
                 checkpointer.setup()

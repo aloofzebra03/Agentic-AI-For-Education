@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status, Form, File, UploadFile
+from fastapi import FastAPI, Depends, HTTPException, status, Form, File, UploadFile, Response
 from fastapi.openapi.docs import get_swagger_ui_html
 from api_servers.auth import get_current_user, get_current_user_rate_limited, get_docs_username
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,6 +11,7 @@ import json
 import traceback
 from pathlib import Path
 from datetime import datetime
+from time import perf_counter
 
 # Add parent directory to path to import educational agent
 # sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -93,6 +94,12 @@ from concept_map_poc.streamlit_app_standalone import save_timeline_json_to_disk
 # Import for wrapper function
 from contextlib import asynccontextmanager, contextmanager
 from utils.postgres_checkpointer import close_shared_postgres_pool
+from api_servers.request_timing import (
+    bind_timing_store,
+    build_server_timing_header,
+    measure,
+    record_duration,
+)
 from api_servers.whiteboard_tutor_integration import whiteboard_tutor_router
 
 # ============================================================================
@@ -481,7 +488,11 @@ def list_available_concepts(user: dict = Depends(get_current_user)):
 
 
 @app.post("/session/start", response_model=StartSessionResponse, tags=["Education Agent"])
-def start_session(request: StartSessionRequest, user: dict = Depends(get_current_user_rate_limited)):
+def start_session(
+    request: StartSessionRequest,
+    response: Response,
+    user: dict = Depends(get_current_user_rate_limited),
+):
     thread_id = None
     try:
         print(f"API /session/start - concept: {request.concept_title}, student: {request.student_id}, language: {'Kannada' if request.is_kannada else 'English'}")
@@ -517,17 +528,20 @@ def start_session(request: StartSessionRequest, user: dict = Depends(get_current
         # Start the conversation by invoking the graph with __start__ message
         # Tracker will automatically select the best API key and model based on rate limits
         print("Invoking graph to start session (tracker will select optimal model)")
-        result = graph.invoke(
-            {
-                "messages": [HumanMessage(content="__start__")],
-                "is_kannada": request.is_kannada,
-                "concept_title": request.concept_title,
-                "student_level": student_level,
-                "summary": "",  # Initialize summary field
-                "summary_last_index": -1,  # Initialize summary tracking
-            },
-            config={"configurable": {"thread_id": thread_id}},
-        )
+        timings = user.get("_server_timings", {})
+        with bind_timing_store(timings):
+            with measure("graph_invoke"):
+                result = graph.invoke(
+                    {
+                        "messages": [HumanMessage(content="__start__")],
+                        "is_kannada": request.is_kannada,
+                        "concept_title": request.concept_title,
+                        "student_level": student_level,
+                        "summary": "",  # Initialize summary field
+                        "summary_last_index": -1,  # Initialize summary tracking
+                    },
+                    config={"configurable": {"thread_id": thread_id}},
+                )
         
         # Extract agent response
         agent_response = result.get("agent_output", "")
@@ -545,7 +559,7 @@ def start_session(request: StartSessionRequest, user: dict = Depends(get_current
         # Extract autosuggestions
         autosuggestions = result.get("autosuggestions", [])
         
-        return StartSessionResponse(
+        response_body = StartSessionResponse(
             success=True,
             session_id=session_id,
             thread_id=thread_id,
@@ -557,6 +571,15 @@ def start_session(request: StartSessionRequest, user: dict = Depends(get_current
             metadata=metadata,
             autosuggestions=autosuggestions
         )
+        request_started_at = user.get("_request_started_at")
+        if request_started_at is not None:
+            record_duration(
+                "server_total",
+                (perf_counter() - request_started_at) * 1000,
+                timings,
+            )
+        response.headers["Server-Timing"] = build_server_timing_header(timings)
+        return response_body
 
     except MinuteLimitExhaustedError as e:
         print(f"[API] Error processing query: {e}")
@@ -1142,7 +1165,11 @@ def simulation_root():
     tags=["Simulation"],
     summary="Start New Simulation Teaching Session"
 )
-def start_simulation_session(request: SimStartSessionRequest, user: dict = Depends(get_current_user_rate_limited)):
+def start_simulation_session(
+    request: SimStartSessionRequest,
+    response: Response,
+    user: dict = Depends(get_current_user_rate_limited),
+):
     """
     Start a new teaching session for a specific simulation.
     
@@ -1170,9 +1197,12 @@ def start_simulation_session(request: SimStartSessionRequest, user: dict = Depen
     ```
     """
     thread_id = None
+    timings = user.get("_server_timings", {})
     try:
         # Validate simulation ID
-        if not validate_simulation_id(request.simulation_id):
+        with measure("simulation_id_validation", timings):
+            simulation_is_valid = validate_simulation_id(request.simulation_id)
+        if not simulation_is_valid:
             available = get_available_simulations()
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -1194,14 +1224,24 @@ def start_simulation_session(request: SimStartSessionRequest, user: dict = Depen
         print(f"📌 Generated simulation thread_id: {thread_id}")
 
         # Create session
-        session_id, response = create_teaching_session(
-            simulation_id=request.simulation_id,
-            student_id=request.student_id,
-            language=language,
-            thread_id=thread_id,
-        )
-        
-        return response
+        with bind_timing_store(timings):
+            with measure("simulation_session_create"):
+                session_id, response_body = create_teaching_session(
+                    simulation_id=request.simulation_id,
+                    student_id=request.student_id,
+                    language=language,
+                    thread_id=thread_id,
+                )
+
+        request_started_at = user.get("_request_started_at")
+        if request_started_at is not None:
+            record_duration(
+                "server_total",
+                (perf_counter() - request_started_at) * 1000,
+                timings,
+            )
+        response.headers["Server-Timing"] = build_server_timing_header(timings)
+        return response_body
         
     except HTTPException:
         raise  # Pass through 400/404 errors without wrapping them in a 500

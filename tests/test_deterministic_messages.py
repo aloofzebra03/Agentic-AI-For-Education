@@ -7,6 +7,7 @@ from educational_agent_optimized_langsmith_v5 import (
     main_nodes_simulation_agent_no_mh as education_nodes,
 )
 from revision_agent import nodes as revision_nodes
+from simulation_to_concept.nodes import teacher as simulation_teacher
 
 
 class EducationStartNodeTests(unittest.TestCase):
@@ -175,6 +176,58 @@ class RevisionNodeTests(unittest.TestCase):
             "ಪ್ರಶ್ನೆ 2/2: ಸಸ್ಯಗಳಿಗೆ ಸೂರ್ಯನ ಬೆಳಕು ಏಕೆ ಬೇಕು?",
         )
         self.assertEqual(result["current_state"], "EVALUATOR")
+
+
+class SimulationStartMessageTests(unittest.TestCase):
+    def test_first_teacher_message_does_not_call_llm(self):
+        simulation_config = {
+            "title": "Simple Pendulum",
+            "description": "Explore pendulum motion.",
+            "cannot_demonstrate": [],
+            "parameter_info": {
+                "length": {"label": "Length", "range": "1-10", "effect": "speed"}
+            },
+        }
+        state = {
+            "simulation_id": "simple_pendulum",
+            "concepts": [{
+                "id": 1,
+                "title": "Pendulum Motion",
+                "description": "Observe how it swings.",
+                "key_insight": "Length changes the period.",
+                "related_params": ["length"],
+            }],
+            "current_concept_index": 0,
+            "conversation_history": [],
+            "student_response": "",
+            "understanding_level": "none",
+            "exchange_count": 0,
+            "current_params": {"length": 5},
+            "parameter_history": [],
+            "language": "english",
+        }
+
+        with (
+            patch.object(simulation_teacher, "get_simulation", return_value=simulation_config),
+            patch.object(simulation_teacher, "get_llm_with_key") as get_llm,
+            patch.object(simulation_teacher, "invoke_llm_with_prompts") as invoke_llm,
+        ):
+            result = simulation_teacher.teacher_node(state, {})
+
+        get_llm.assert_not_called()
+        invoke_llm.assert_not_called()
+        self.assertEqual(
+            result["last_teacher_message"],
+            "Hello! Let's explore Simple Pendulum with this interactive simulation. "
+            "We'll begin with Pendulum Motion. Observe the simulation: what do you notice?",
+        )
+        self.assertEqual(result["exchange_count"], 1)
+        self.assertTrue(result["waiting_for_input"])
+        self.assertTrue(result["show_simulation"])
+        self.assertEqual(result["last_displayed_params"], {"length": 5})
+        self.assertEqual(len(result["conversation_history"]), 1)
+        self.assertEqual(result["conversation_history"][0]["role"], "teacher")
+        self.assertEqual(result["parameter_history"][0]["parameter"], "length")
 
 
 if __name__ == "__main__":

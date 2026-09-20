@@ -26,6 +26,7 @@ from utils.shared_utils import (
 
 # Import autosuggestion utilities
 from autosuggestion import generate_static_autosuggestions
+from api_servers.request_timing import measure
 
 PEDAGOGICAL_MOVES: Dict[str, Dict[str, str]] = {
     "APK": {
@@ -110,27 +111,29 @@ rlc_parser = PydanticOutputParser(pydantic_object=RlcResponse)
 # ─── Node definitions ───────────────────────────────────────────────────────────
 
 def start_node(state: AgentState) -> AgentState:
-    concept_title = state["concept_title"]
-    if state.get("is_kannada", False):
-        translated_concept = translate_to_kannada_google(concept_title)
-        content = (
-            f"ನಮಸ್ಕಾರ! ಇಂದು ನಾವು {translated_concept} ಬಗ್ಗೆ ಕಲಿಯೋಣ. "
-            "ಪ್ರಾರಂಭಿಸಲು ಸಿದ್ಧರಿದ್ದೀರಾ?"
-        )
-    else:
-        content = f"Hello! Today we'll learn about {concept_title}. Are you ready to begin?"
+    with measure("start_node"):
+        concept_title = state["concept_title"]
+        if state.get("is_kannada", False):
+            with measure("start_translation"):
+                translated_concept = translate_to_kannada_google(concept_title)
+            content = (
+                f"ನಮಸ್ಕಾರ! ಇಂದು ನಾವು {translated_concept} ಬಗ್ಗೆ ಕಲಿಯೋಣ. "
+                "ಪ್ರಾರಂಭಿಸಲು ಸಿದ್ಧರಿದ್ದೀರಾ?"
+            )
+        else:
+            content = f"Hello! Today we'll learn about {concept_title}. Are you ready to begin?"
 
-    print("IN START NODE - using deterministic greeting")
-    state["agent_output"] = content
-    state["current_state"] = "APK"
-    
-    # Initialize message list and summary tracking
-    state["messages"] = []
-    add_system_message_to_conversation(state, content)
-    state["summary"] = ""
-    state["summary_last_index"] = -1
-    
-    return state
+        print("IN START NODE - using deterministic greeting")
+        state["agent_output"] = content
+        state["current_state"] = "APK"
+
+        # Initialize message list and summary tracking
+        state["messages"] = []
+        add_system_message_to_conversation(state, content)
+        state["summary"] = ""
+        state["summary_last_index"] = -1
+
+        return state
 
 def apk_node(state: AgentState) -> AgentState:
     if not state.get("asked_apk", False):
