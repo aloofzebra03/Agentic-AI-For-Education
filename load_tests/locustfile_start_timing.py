@@ -88,6 +88,15 @@ class StartTimingUser(HttpUser):
                 "student_id": student_id,
                 "language": "kannada" if is_kannada else "english",
             }
+        elif start_kind == "whiteboard":
+            endpoint = "/whiteboard-tutor/session/start"
+            payload = {
+                "concept_id": os.getenv(
+                    "LOAD_TEST_WHITEBOARD_CONCEPT_ID",
+                    "math-p1-ch7-triangle-angles",
+                ),
+                "student_id": student_id,
+            }
         elif start_kind == "education":
             endpoint = "/session/start"
             payload = {
@@ -98,7 +107,9 @@ class StartTimingUser(HttpUser):
                 "student_level": "medium",
             }
         else:
-            raise RuntimeError("LOAD_TEST_START_KIND must be 'education' or 'simulation'.")
+            raise RuntimeError(
+                "LOAD_TEST_START_KIND must be 'education', 'simulation', or 'whiteboard'."
+            )
 
         started_at = perf_counter()
         with self.client.post(
