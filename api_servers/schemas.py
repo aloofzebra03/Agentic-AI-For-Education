@@ -1,10 +1,24 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, Dict, Any, List
 
 
 # ============================================================================
 # REQUEST MODELS
 # ============================================================================
+
+class DoubtRequest(BaseModel):
+    """A general question with optional background for doubt clarification."""
+    question: str = Field(min_length=1, max_length=4000)
+    context: str = Field(default="", max_length=8000)
+
+    @field_validator("question")
+    @classmethod
+    def clean_question(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("question must contain visible text")
+        return value
+
 
 class StartSessionRequest(BaseModel):
     """Request to start a new learning session with the educational agent."""
@@ -462,6 +476,12 @@ class ConceptsListResponse(BaseModel):
         default="Available concepts retrieved successfully",
         description="Status message about the retrieval"
     )
+
+class DoubtResponse(BaseModel):
+    """The explanation returned by the general doubt endpoint."""
+    success: bool = True
+    answer: str
+
 
 class TranslationResponse(BaseModel):
     original: str

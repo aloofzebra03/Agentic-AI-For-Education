@@ -252,7 +252,9 @@ def get_llm(
     )
 
 
-def invoke_llm_with_fallback(messages: List, operation_name: str = "LLM call"):
+def invoke_llm_with_fallback(
+    messages: List, operation_name: str = "LLM call", *, temperature: float = 0.5,
+):
     """
     Invoke LLM using tracker-selected API key and model pair.
     
@@ -268,6 +270,7 @@ def invoke_llm_with_fallback(messages: List, operation_name: str = "LLM call"):
     Args:
         messages: List of messages to send to the LLM
         operation_name: Name of the operation for logging purposes
+        temperature: Sampling temperature; defaults to the existing value of 0.5
     
     Returns:
         LLM response object
@@ -285,7 +288,7 @@ def invoke_llm_with_fallback(messages: List, operation_name: str = "LLM call"):
     track_model_call(selected_api_key, selected_model)
     
     # Create LLM instance and invoke
-    llm = get_llm(api_key=selected_api_key, model=selected_model)
+    llm = get_llm(api_key=selected_api_key, model=selected_model, temperature=temperature)
     
     try:
         response = normalize_llm_response(llm.invoke(messages))
