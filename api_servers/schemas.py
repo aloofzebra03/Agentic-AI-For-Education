@@ -1,5 +1,33 @@
 from pydantic import BaseModel, Field, field_validator
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Literal
+
+
+class SearchAction(BaseModel):
+    type: Literal["tutor", "whiteboard", "doubt"]
+    concept_title: Optional[str] = None
+    concept_id: Optional[str] = None
+    problem_id: Optional[str] = None
+
+
+class SearchResult(BaseModel):
+    id: str
+    subject: Literal["science", "math"]
+    title: str
+    description: str
+    content_type: Literal["topic", "problem", "whiteboard_lesson"]
+    chapter: Optional[int] = None
+    book_part: Optional[int] = None
+    actions: List[SearchAction]
+
+
+class SearchResponse(BaseModel):
+    success: bool = True
+    query: str
+    subject: Literal["all", "science", "math"]
+    mode: Literal["all", "tutor", "whiteboard", "doubt"]
+    selection: Literal["random", "ranked"]
+    total_matches: int
+    results: List[SearchResult]
 
 
 # ============================================================================

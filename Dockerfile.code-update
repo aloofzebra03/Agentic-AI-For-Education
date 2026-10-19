@@ -1,0 +1,9 @@
+# syntax=docker/dockerfile:1.7
+# Update application code while preserving the installed release environment.
+ARG BASE_IMAGE=aloofzebra03/educational-api:v9.9.4
+FROM ${BASE_IMAGE}
+
+WORKDIR /app
+COPY api_servers/ /app/api_servers/
+COPY utils/ /app/utils/
+COPY --from=whiteboard_poc whiteboard_tutor/ /app/whiteboard_tutor/

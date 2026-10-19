@@ -4,6 +4,7 @@
 
 # UI Framework
 streamlit
+requests>=2.31,<3
 
 # LangChain & LLM
 langchain-google-genai
